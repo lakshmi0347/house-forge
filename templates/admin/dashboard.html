@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - House-Forge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .welcome-banner {
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .welcome-banner h1 {
+            margin-bottom: 10px;
+            font-size: 36px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+            border-left: 4px solid #434343;
+        }
+        
+        .stat-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #434343;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #434343;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #000000;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        
+        .verification-card {
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background: #fff9e6;
+        }
+        
+        .verification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .verification-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .verification-details {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-warning {
+            background: #ffc107;
+            color: #856404;
+        }
+        
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .action-card {
+            padding: 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s;
+        }
+        
+        .action-card:hover {
+            border-color: #434343;
+            background: #f8f9fa;
+        }
+        
+        .action-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-brand">⚙️ House-Forge Admin</div>
+        <div class="navbar-menu">
+            <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin.manage_users') }}">Users</a>
+            <a href="{{ url_for('admin.manage_contractors') }}">Contractors</a>
+            <a href="{{ url_for('admin.manage_suppliers') }}">Suppliers</a>
+            <a href="{{ url_for('admin.all_projects') }}">Projects</a>
+            <a href="{{ url_for('admin.analytics') }}">Analytics</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <h1>👨‍💼 Admin Control Panel</h1>
+            <p>Manage and monitor the entire House-Forge platform</p>
+        </div>
+        
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number">{{ stats.total_users }}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">🔨</div>
+                <div class="stat-number">{{ stats.total_contractors }}</div>
+                <div class="stat-label">Contractors</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-number">{{ stats.total_suppliers }}</div>
+                <div class="stat-label">Suppliers</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-number">{{ stats.pending_verifications }}</div>
+                <div class="stat-label">Pending Verifications</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📁</div>
+                <div class="stat-number">{{ stats.total_projects }}</div>
+                <div class="stat-label">Total Projects</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">🚀</div>
+                <div class="stat-number">{{ stats.active_projects }}</div>
+                <div class="stat-label">Active Projects</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-number">₹{{ "{:,.0f}".format(stats.total_revenue) }}</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">🌐</div>
+                <div class="stat-number">{{ stats.total_platform_users }}</div>
+                <div class="stat-label">Platform Users</div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Quick Actions</h2>
+            </div>
+            <div class="quick-actions">
+                <a href="{{ url_for('admin.manage_users') }}" class="action-card">
+                    <div class="action-icon">👥</div>
+                    <div>Manage Users</div>
+                </a>
+                
+                <a href="{{ url_for('admin.manage_contractors') }}" class="action-card">
+                    <div class="action-icon">✅</div>
+                    <div>Verify Contractors</div>
+                </a>
+                
+                <a href="{{ url_for('admin.manage_suppliers') }}" class="action-card">
+                    <div class="action-icon">✅</div>
+                    <div>Verify Suppliers</div>
+                </a>
+                
+                <a href="{{ url_for('admin.all_projects') }}" class="action-card">
+                    <div class="action-icon">📊</div>
+                    <div>View All Projects</div>
+                </a>
+                
+                <a href="{{ url_for('admin.analytics') }}" class="action-card">
+                    <div class="action-icon">📈</div>
+                    <div>Analytics</div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Pending Verifications -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">⏳ Pending Verifications</h2>
+                <a href="{{ url_for('admin.manage_contractors') }}" class="btn btn-primary">View All</a>
+            </div>
+            
+            {% if pending_contractors or pending_suppliers %}
+                <!-- Pending Contractors -->
+                {% for contractor in pending_contractors %}
+                <div class="verification-card">
+                    <div class="verification-header">
+                        <div>
+                            <div class="verification-name">🔨 {{ contractor.to_dict().get('company_name') or contractor.to_dict().get('name') }}</div>
+                            <div class="verification-details">
+                                Contractor • {{ contractor.to_dict().get('experience', 0) }} years experience
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.verify_contractor', contractor_id=contractor.id) }}" style="display: inline;">
+                            <button type="submit" class="btn btn-success">Verify</button>
+                        </form>
+                    </div>
+                    <span class="badge badge-warning">Pending Verification</span>
+                </div>
+                {% endfor %}
+                
+                <!-- Pending Suppliers -->
+                {% for supplier in pending_suppliers %}
+                <div class="verification-card">
+                    <div class="verification-header">
+                        <div>
+                            <div class="verification-name">📦 {{ supplier.to_dict().get('company_name') or supplier.to_dict().get('name') }}</div>
+                            <div class="verification-details">
+                                Supplier • {{ supplier.to_dict().get('business_type', 'N/A') }}
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.verify_supplier', supplier_id=supplier.id) }}" style="display: inline;">
+                            <button type="submit" class="btn btn-success">Verify</button>
+                        </form>
+                    </div>
+                    <span class="badge badge-warning">Pending Verification</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>✅ No pending verifications</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

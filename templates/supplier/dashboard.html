@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Dashboard - House-Forge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .welcome-banner {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .welcome-banner h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-banner p {
+            color: #666;
+        }
+        
+        .verification-badge {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .verified {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .stat-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #4facfe;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .revenue {
+            color: #28a745;
+        }
+        
+        .rating {
+            color: #ffa500;
+            font-size: 32px;
+        }
+        
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+        }
+        
+        .order-card, .material-card {
+            border: 2px solid #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        
+        .order-card:hover, .material-card:hover {
+            border-color: #4facfe;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .order-title, .material-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .order-details {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-processing {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .action-card {
+            padding: 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s;
+        }
+        
+        .action-card:hover {
+            border-color: #4facfe;
+            background: #f0faff;
+        }
+        
+        .action-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .action-label {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-brand">📦 House-Forge Supplier</div>
+        <div class="navbar-menu">
+            <a href="{{ url_for('supplier.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('supplier.inventory') }}">Inventory</a>
+            <a href="{{ url_for('supplier.orders') }}">Orders</a>
+            <a href="{{ url_for('supplier.profile') }}">Profile</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <div>
+                <h1>👋 Welcome, {{ current_user.company_name or current_user.name }}!</h1>
+                <p>Manage your inventory and fulfill orders</p>
+            </div>
+            <div>
+                {% if stats.verified %}
+                    <span class="verification-badge verified">✓ Verified Supplier</span>
+                {% else %}
+                    <span class="verification-badge pending">⏳ Pending Verification</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-number">{{ stats.total_materials }}</div>
+                <div class="stat-label">Materials Listed</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📋</div>
+                <div class="stat-number">{{ stats.total_orders }}</div>
+                <div class="stat-label">Total Orders</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-number">{{ stats.pending_orders }}</div>
+                <div class="stat-label">Pending Orders</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon revenue">💰</div>
+                <div class="stat-number">₹{{ "{:,.0f}".format(stats.total_revenue) }}</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon rating">⭐</div>
+                <div class="stat-number">{{ "%.1f"|format(stats.rating) }}</div>
+                <div class="stat-label">Your Rating</div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Quick Actions</h2>
+            </div>
+            <div class="quick-actions">
+                <a href="{{ url_for('supplier.add_material') }}" class="action-card">
+                    <div class="action-icon">➕</div>
+                    <div class="action-label">Add Material</div>
+                </a>
+                
+                <a href="{{ url_for('supplier.inventory') }}" class="action-card">
+                    <div class="action-icon">📦</div>
+                    <div class="action-label">Manage Inventory</div>
+                </a>
+                
+                <a href="{{ url_for('supplier.orders') }}" class="action-card">
+                    <div class="action-icon">📋</div>
+                    <div class="action-label">View Orders</div>
+                </a>
+                
+                <a href="{{ url_for('supplier.profile') }}" class="action-card">
+                    <div class="action-icon">👤</div>
+                    <div class="action-label">Update Profile</div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Pending Orders -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Pending Orders</h2>
+                <a href="{{ url_for('supplier.orders') }}" class="btn btn-primary">View All</a>
+            </div>
+            
+            {% if orders %}
+                {% for order in orders %}
+                <div class="order-card">
+                    <div class="order-title">Order #{{ order.id[:8] }}</div>
+                    <div class="order-details">
+                        <span>💰 ₹{{ "{:,.2f}".format(order.total or 0) }}</span>
+                        <span>📅 {{ order.created_at.strftime('%d %b %Y') if order.created_at else 'N/A' }}</span>
+                    </div>
+                    <span class="status-badge status-{{ order.status }}">
+                        {{ order.status.upper() }}
+                    </span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">📂</div>
+                    <p>No pending orders at the moment.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

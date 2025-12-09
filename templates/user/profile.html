@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - House-Forge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .page-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .page-header p {
+            color: #666;
+        }
+        
+        .profile-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+        
+        .profile-sidebar {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+        
+        .profile-picture-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .profile-picture-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+        }
+        
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+        }
+        
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .upload-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #667eea;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid white;
+        }
+        
+        .upload-overlay:hover {
+            background: #5568d3;
+            transform: scale(1.1);
+        }
+        
+        .upload-overlay input {
+            display: none;
+        }
+        
+        .profile-name {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .profile-email {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .profile-stats {
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .profile-main {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: #666;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .tab:hover {
+            color: #667eea;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        input:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .password-requirements {
+            margin-top: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        
+        .requirement {
+            color: #666;
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .requirement.valid {
+            color: #28a745;
+        }
+        
+        .requirement.invalid {
+            color: #dc3545;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-brand">🏗️ House-Forge</div>
+        <div class="navbar-menu">
+            <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('user.projects') }}">My Projects</a>
+            <a href="{{ url_for('user.profile') }}">Profile</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>👤 My Profile</h1>
+            <p>Manage your account settings and preferences</p>
+        </div>
+        
+        <div class="profile-container">
+            <!-- Sidebar -->
+            <div class="profile-sidebar">
+                <div class="profile-picture-section">
+                    <div class="profile-picture-wrapper">
+                        <div class="profile-picture" id="profilePicture">
+                            {% if user_data.get('profile_picture') %}
+                            <img id="profileImg" src="{{ url_for('static', filename='uploads/profiles/' + user_data.profile_picture) }}" alt="{{ user_data.name }}" style="display: block;">
+                            <span id="profileInitials" style="display: none;">{{ user_data.name[:2].upper() if user_data.name else 'U' }}</span>
+                            {% else %}
+                            <img id="profileImg" src="" alt="" style="display: none;">
+                            <span id="profileInitials">{{ user_data.name[:2].upper() if user_data.name else 'U' }}</span>
+                            {% endif %}
+                        </div>
+                        <label class="upload-overlay" for="profileUpload" title="Change profile picture">
+                            📷
+                            <input type="file" id="profileUpload" accept="image/*">
+                        </label>
+                    </div>
+                    <div class="profile-name" id="sidebarName">{{ user_data.name }}</div>
+                    <div class="profile-email" id="sidebarEmail">{{ user_data.email }}</div>
+                </div>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Projects</span>
+                        <span class="stat-value">{{ project_count if project_count else 0 }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Member Since</span>
+                        <span class="stat-value">{{ user_data.get('created_at', 'N/A') }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Role</span>
+                        <span class="stat-value">{{ user_data.get('role', 'User').title() }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="profile-main">
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('personal')">Personal Information</button>
+                    <button class="tab" onclick="switchTab('security')">Security</button>
+                </div>
+                
+                <!-- Personal Information Tab -->
+                <div id="personal" class="tab-content active">
+                    <div id="personalAlert" class="alert alert-success">
+                        Profile updated successfully!
+                    </div>
+                    
+                    <form id="personalInfoForm">
+                        <div class="form-section">
+                            <h3 class="section-title">Basic Information</h3>
+                            
+                            <div class="form-group">
+                                <label for="fullName">Full Name *</label>
+                                <input type="text" id="fullName" name="name" value="{{ user_data.get('name', '') }}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address *</label>
+                                <input type="email" id="email" name="email" value="{{ user_data.get('email', '') }}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" value="{{ user_data.get('phone', '') }}" placeholder="+91 00000 00000">
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3 class="section-title">Additional Information</h3>
+                            
+                            <div class="form-group">
+                                <label for="location">Location</label>
+                                <input type="text" id="location" name="location" value="{{ user_data.get('location', '') }}" placeholder="City, State">
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="resetPersonalForm()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Security Tab -->
+                <div id="security" class="tab-content">
+                    <div id="securityAlert" class="alert alert-success">
+                        Password changed successfully!
+                    </div>
+                    
+                    <form id="securityForm">
+                        <div class="form-section">
+                            <h3 class="section-title">Change Password</h3>
+                            
+                            <div class="form-group">
+                                <label for="currentPassword">Current Password *</label>
+                                <input type="password" id="currentPassword" name="currentPassword" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newPassword">New Password *</label>
+                                <input type="password" id="newPassword" name="newPassword" required>
+                                <div class="password-requirements">
+                                    <div class="requirement" id="req-length">
+                                        <span>●</span> At least 8 characters
+                                    </div>
+                                    <div class="requirement" id="req-uppercase">
+                                        <span>●</span> One uppercase letter
+                                    </div>
+                                    <div class="requirement" id="req-lowercase">
+                                        <span>●</span> One lowercase letter
+                                    </div>
+                                    <div class="requirement" id="req-number">
+                                        <span>●</span> One number
+                                    </div>
+                                    <div class="requirement" id="req-special">
+                                        <span>●</span> One special character
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm New Password *</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="resetSecurityForm()">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Change Password</button>
+                        </div>
+                    </form>
+                    
+                    <div class="form-section" style="margin-top: 40px;">
+                        <h3 class="section-title">Account Security</h3>
+                        <div class="form-group">
+                            <label>Two-Factor Authentication</label>
+                            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                                Add an extra layer of security to your account
+                            </p>
+                            <button class="btn btn-secondary">Enable 2FA</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+        
+        // Profile picture upload
+        document.getElementById('profileUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const formData = new FormData();
+                formData.append('profile_picture', file);
+                
+                // Preview image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('profileImg');
+                    const initials = document.getElementById('profileInitials');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    initials.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+                
+                // Upload to server
+                fetch('{{ url_for("user.upload_profile_picture") }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Profile picture uploaded successfully');
+                    } else {
+                        alert('Error uploading profile picture: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        });
+        
+        // Personal info form submission
+        document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('{{ url_for("user.update_profile") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update sidebar with new info
+                    const name = document.getElementById('fullName').value;
+                    const email = document.getElementById('email').value;
+                    
+                    document.getElementById('sidebarName').textContent = name;
+                    document.getElementById('sidebarEmail').textContent = email;
+                    
+                    // Get initials
+                    const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2);
+                    document.getElementById('profileInitials').textContent = initials.toUpperCase();
+                    
+                    // Show success message
+                    const alert = document.getElementById('personalAlert');
+                    alert.classList.add('show');
+                    setTimeout(() => {
+                        alert.classList.remove('show');
+                    }, 3000);
+                } else {
+                    alert('Error updating profile: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating your profile');
+            });
+        });
+        
+        // Password validation
+        const newPasswordInput = document.getElementById('newPassword');
+        newPasswordInput.addEventListener('input', function() {
+            const password = this.value;
+            
+            // Check length
+            updateRequirement('req-length', password.length >= 8);
+            
+            // Check uppercase
+            updateRequirement('req-uppercase', /[A-Z]/.test(password));
+            
+            // Check lowercase
+            updateRequirement('req-lowercase', /[a-z]/.test(password));
+            
+            // Check number
+            updateRequirement('req-number', /[0-9]/.test(password));
+            
+            // Check special character
+            updateRequirement('req-special', /[!@#$%^&*(),.?":{}|<>]/.test(password));
+        });
+        
+        function updateRequirement(id, isValid) {
+            const element = document.getElementById(id);
+            if (isValid) {
+                element.classList.remove('invalid');
+                element.classList.add('valid');
+            } else {
+                element.classList.remove('valid');
+                element.classList.add('invalid');
+            }
+        }
+        
+        // Security form submission
+        document.getElementById('securityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            // Validate password strength
+            if (newPassword.length < 8) {
+                alert('Password must be at least 8 characters long');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            
+            fetch('{{ url_for("user.change_password") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const alert = document.getElementById('securityAlert');
+                    alert.classList.add('show');
+                    setTimeout(() => {
+                        alert.classList.remove('show');
+                    }, 3000);
+                    
+                    // Reset form
+                    this.reset();
+                    
+                    // Reset password requirements
+                    document.querySelectorAll('.requirement').forEach(req => {
+                        req.classList.remove('valid', 'invalid');
+                    });
+                } else {
+                    alert('Error changing password: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while changing your password');
+            });
+        });
+        
+        function resetPersonalForm() {
+            document.getElementById('personalInfoForm').reset();
+        }
+        
+        function resetSecurityForm() {
+            document.getElementById('securityForm').reset();
+            // Reset password requirements
+            document.querySelectorAll('.requirement').forEach(req => {
+                req.classList.remove('valid', 'invalid');
+            });
+        }
+    </script>
+</body>
+</html>

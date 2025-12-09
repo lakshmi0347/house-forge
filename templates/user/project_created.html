@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Created - House-Forge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .success-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        
+        .success-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 1s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .success-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .project-info {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .project-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+        }
+        
+        .cost-summary {
+            margin-bottom: 30px;
+        }
+        
+        .summary-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .cost-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .cost-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .cost-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .cost-card.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .budget-label {
+            font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .cost-amount {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .cost-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .cost-details {
+            margin-top: 10px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .stages-section {
+            margin-bottom: 30px;
+        }
+        
+        .stages-title {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .stages-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .stage-card {
+            background: white;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .stage-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .stage-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .stage-cost {
+            font-size: 16px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stage-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        
+        .materials-count {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .timeline-section {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .timeline-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .timeline-total {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff6b35;
+            margin-bottom: 10px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .cost-cards, .stages-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <!-- Success Header -->
+        <div class="success-header">
+            <div class="success-icon">✅</div>
+            <h1>Project Created Successfully!</h1>
+            <p>Complete construction estimation with {{ estimation.total_materials_count }}+ materials calculated</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Project Info -->
+            <div class="project-info">
+                <div class="project-title">🏗️ {{ project.title }}</div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span>📏</span>
+                        <span>{{ project.square_feet }} sq ft</span>
+                    </div>
+                    <div class="info-item">
+                        <span>📍</span>
+                        <span>{{ project.location }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span>🚪</span>
+                        <span>{{ project.rooms }} Rooms</span>
+                    </div>
+                    <div class="info-item">
+                        <span>🏢</span>
+                        <span>{{ project.floors }} Floors</span>
+                    </div>
+                    <div class="info-item">
+                        <span>🚿</span>
+                        <span>{{ project.bathrooms }} Bathrooms</span>
+                    </div>
+                    <div class="info-item">
+                        <span>🏘️</span>
+                        <span>{{ project.property_type.title() }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cost Summary -->
+            <div class="cost-summary">
+                <h3 class="summary-title">💰 Total Cost Estimation</h3>
+                <div class="cost-cards">
+                    <div class="cost-card {% if project.budget_range == 'low' %}selected{% endif %}">
+                        <div class="cost-icon">💵</div>
+                        <div class="budget-label">Budget</div>
+                        <div class="cost-amount">₹{{ "{:,.0f}".format(estimation.costs.low.total_cost) }}</div>
+                        <div class="cost-details">
+                            Materials: ₹{{ "{:,.0f}".format(estimation.costs.low.material_cost) }}<br>
+                            Labor: ₹{{ "{:,.0f}".format(estimation.costs.low.labor_cost) }}
+                        </div>
+                    </div>
+                    
+                    <div class="cost-card {% if project.budget_range == 'medium' %}selected{% endif %}">
+                        <div class="cost-icon">💰</div>
+                        <div class="budget-label">Standard</div>
+                        <div class="cost-amount">₹{{ "{:,.0f}".format(estimation.costs.medium.total_cost) }}</div>
+                        <div class="cost-details">
+                            Materials: ₹{{ "{:,.0f}".format(estimation.costs.medium.material_cost) }}<br>
+                            Labor: ₹{{ "{:,.0f}".format(estimation.costs.medium.labor_cost) }}
+                        </div>
+                    </div>
+                    
+                    <div class="cost-card {% if project.budget_range == 'high' %}selected{% endif %}">
+                        <div class="cost-icon">💎</div>
+                        <div class="budget-label">Premium</div>
+                        <div class="cost-amount">₹{{ "{:,.0f}".format(estimation.costs.high.total_cost) }}</div>
+                        <div class="cost-details">
+                            Materials: ₹{{ "{:,.0f}".format(estimation.costs.high.material_cost) }}<br>
+                            Labor: ₹{{ "{:,.0f}".format(estimation.costs.high.labor_cost) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Timeline -->
+            <div class="timeline-section">
+                <div class="timeline-title">⏱️ Estimated Timeline</div>
+                <div class="timeline-total">{{ estimation.timeline.total_days }} Days</div>
+                <p style="color: #666;">Approximately {{ (estimation.timeline.total_days / 30) | round(1) }} months to complete</p>
+            </div>
+            
+            <!-- Construction Stages -->
+            <div class="stages-section">
+                <h3 class="stages-title">🏗️ Construction Stages Breakdown</h3>
+                <div class="stages-grid">
+                    <div class="stage-card">
+                        <div class="stage-header">
+                            <div class="stage-name"><span class="stage-icon">🏗️</span>Foundation</div>
+                            <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown.foundation) }}</div>
+                        </div>
+                        <div class="materials-count">{{ estimation.materials.foundation | length }} materials</div>
+                    </div>
+                    
+                    <div class="stage-card">
+                        <div class="stage-header">
+                            <div class="stage-name"><span class="stage-icon">🧱</span>Walls</div>
+                            <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown.walls) }}</div>
+                        </div>
+                        <div class="materials-count">{{ estimation.materials.walls | length }} materials</div>
+                    </div>
+                    
+                    <div class="stage-card">
+                        <div class="stage-header">
+                            <div class="stage-name"><span class="stage-icon">🪟</span>Flooring</div>
+                            <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown.flooring) }}</div>
+                        </div>
+                        <div class="materials-count">{{ estimation.materials.flooring | length }} materials</div>
+                    </div>
+                    
+                    <div class="stage-card">
+                        <div class="stage-header">
+                            <div class="stage-name"><span class="stage-icon">🏠</span>Roofing</div>
+                            <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown.roofing) }}</div>
+                        </div>
+                        <div class="materials-count">{{ estimation.materials.roofing | length }} materials</div>
+                    </div>
+                    
+                    <div class="stage-card">
+                        <div class="stage-header">
+                            <div class="stage-name"><span class="stage-icon">🚰</span>Plumbing</div>
+                            <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown.plumbing) }}</div>
+                        </div>
+                        <div class="materials-count">{{ estimation.materials.plumbing | length }} materials</div>
+                    </div>
+                    
+                    <div class="stage-card">
+                        <div class="stage-header">
+                            <div class="stage-name"><span class="stage-icon">⚡</span>Electrical</div>
+                            <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown.electrical) }}</div>
+                        </div>
+                        <div class="materials-count">{{ estimation.materials.electrical | length }} materials</div>
+                    </div>
+                    
+                    <div class="stage-card">
+                        <div class="stage-header">
+                            <div class="stage-name"><span class="stage-icon">🎨</span>Finishing</div>
+                            <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown.finishing) }}</div>
+                        </div>
+                        <div class="materials-count">{{ estimation.materials.finishing | length }} materials</div>
+                    </div>
+                    
+                    <div class="stage-card">
+                        <div class="stage-header">
+                            <div class="stage-name"><span class="stage-icon">🪑</span>Carpentry</div>
+                            <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown.carpentry) }}</div>
+                        </div>
+                        <div class="materials-count">{{ estimation.materials.carpentry | length }} materials</div>
+                    </div>
+                    
+                    <div class="stage-card">
+                        <div class="stage-header">
+                            <div class="stage-name"><span class="stage-icon">🌳</span>Exterior</div>
+                            <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown.exterior) }}</div>
+                        </div>
+                        <div class="materials-count">{{ estimation.materials.exterior | length }} materials</div>
+                    </div>
+                    
+                    <div class="stage-card">
+                        <div class="stage-header">
+                            <div class="stage-name"><span class="stage-icon">🔧</span>Miscellaneous</div>
+                            <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown.miscellaneous) }}</div>
+                        </div>
+                        <div class="materials-count">{{ estimation.materials.miscellaneous | length }} materials</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="actions">
+                <a href="{{ url_for('user.projects') }}" class="btn btn-primary">
+                    View My Projects
+                </a>
+                <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary">
+                    Go to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House-Forge - Construction Planning System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('/static/images/house.jpg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Dark overlay with gradient for better contrast */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.85) 100%);
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 96px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        h1 {
+            color: white;
+            font-size: 56px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .tagline {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 24px;
+            margin-bottom: 50px;
+            line-height: 1.6;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 600px;
+            margin: 50px auto;
+        }
+        
+        .feature-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .feature-box h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .feature-box p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .cta-buttons {
+            margin-top: 60px;
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 18px 50px;
+            font-size: 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+        
+        .btn-primary:hover {
+            background: #f0f0f0;
+            transform: scale(1.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 3px solid white;
+        }
+        
+        .btn-secondary:hover {
+            background: white;
+            color: #667eea;
+            transform: scale(1.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🏗️</div>
+        <h1>House-Forge</h1>
+        <p class="tagline">Plan, Build, and Manage Your Dream Home<br>All in One Platform</p>
+        
+        <div class="features-grid">
+            <div class="feature-box">
+                <h3>📊 Cost Estimation</h3>
+                <p>Get accurate material & labor cost estimates instantly</p>
+            </div>
+            <div class="feature-box">
+                <h3>🔨 Find Contractors</h3>
+                <p>Connect with verified professionals</p>
+            </div>
+            <div class="feature-box">
+                <h3>📦 Order Materials</h3>
+                <p>Source quality materials from trusted suppliers</p>
+            </div>
+            <div class="feature-box">
+                <h3>📈 Track Progress</h3>
+                <p>Monitor your project from start to finish</p>
+            </div>
+        </div>
+        
+        <div class="cta-buttons">
+            <a href="/login" class="btn btn-primary">Login</a>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-secondary">Get Started</a>
+        </div>
+    </div>
+</body>
+</html>

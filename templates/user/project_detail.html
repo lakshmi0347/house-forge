@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project.title }} - House-Forge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .back-link {
+            color: #667eea;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .project-title {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .project-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            color: #666;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-planning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .cost-summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .total-label {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .total-amount {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .cost-breakdown {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .breakdown-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        
+        .breakdown-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .breakdown-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .stage-accordion {
+            margin-bottom: 15px;
+        }
+        
+        .stage-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .stage-header:hover {
+            background: #e9ecef;
+        }
+        
+        .stage-header.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .stage-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .stage-icon {
+            font-size: 32px;
+        }
+        
+        .stage-details h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .stage-meta {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+        
+        .stage-cost {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .stage-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .stage-content.active {
+            max-height: 2000px;
+        }
+        
+        .materials-table {
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .materials-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .materials-table th,
+        .materials-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .materials-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .materials-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .info-value {
+            color: #333;
+        }
+        
+        .timeline-card {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .timeline-value {
+            font-size: 42px;
+            font-weight: bold;
+            color: #ff6b35;
+            margin: 10px 0;
+        }
+        
+        .timeline-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .action-buttons {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 14px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        @media (max-width: 1024px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-brand">🏗️ House-Forge</div>
+        <div class="navbar-menu">
+            <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('user.projects') }}">My Projects</a>
+            <a href="{{ url_for('user.profile') }}">Profile</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <a href="{{ url_for('user.projects') }}" class="back-link">← Back to Projects</a>
+            <h1 class="project-title">{{ project.title }}</h1>
+            <div class="project-meta">
+                <div class="meta-item">
+                    <span>📍</span>
+                    <span>{{ project.location }}</span>
+                </div>
+                <div class="meta-item">
+                    <span>📅</span>
+                    <span>Created: {{ project.created_at.strftime('%d %b %Y') if project.created_at else 'N/A' }}</span>
+                </div>
+                <span class="status-badge status-{{ project.status }}">{{ project.status.upper() }}</span>
+            </div>
+        </div>
+        
+        <div class="two-column">
+            <!-- Main Content -->
+            <div>
+                <!-- Cost Summary -->
+                <div class="cost-summary-card">
+                    <div class="total-label">Total Estimated Cost ({{ project.budget_range.title() }} Budget)</div>
+                    <div class="total-amount">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].total_cost) }}</div>
+                    
+                    <div class="cost-breakdown">
+                        <div class="breakdown-item">
+                            <div class="breakdown-label">Materials</div>
+                            <div class="breakdown-value">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].material_cost) }}</div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-label">Labor</div>
+                            <div class="breakdown-value">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].labor_cost) }}</div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-label">Other</div>
+                            <div class="breakdown-value">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].other_costs) }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stage-by-Stage Breakdown -->
+                <div class="section">
+                    <h2 class="section-title">🏗️ Construction Stages & Materials</h2>
+                    
+                    {% set stages = [
+                        ('foundation', '🏗️', 'Foundation'),
+                        ('walls', '🧱', 'Walls'),
+                        ('flooring', '🪟', 'Flooring & Slab'),
+                        ('roofing', '🏠', 'Roofing'),
+                        ('plumbing', '🚰', 'Plumbing'),
+                        ('electrical', '⚡', 'Electrical'),
+                        ('finishing', '🎨', 'Finishing'),
+                        ('carpentry', '🪑', 'Carpentry'),
+                        ('exterior', '🌳', 'Exterior'),
+                        ('miscellaneous', '🔧', 'Miscellaneous')
+                    ] %}
+                    
+                    {% for stage_key, icon, stage_name in stages %}
+                    <div class="stage-accordion">
+                        <div class="stage-header" onclick="toggleStage('{{ stage_key }}')">
+                            <div class="stage-info">
+                                <span class="stage-icon">{{ icon }}</span>
+                                <div class="stage-details">
+                                    <h3>{{ stage_name }}</h3>
+                                    <div class="stage-meta">{{ estimation.materials[stage_key] | length }} materials</div>
+                                </div>
+                            </div>
+                            <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown[stage_key]) }}</div>
+                        </div>
+                        
+                        <div class="stage-content" id="stage-{{ stage_key }}">
+                            <div class="materials-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Material</th>
+                                            <th>Quantity</th>
+                                            <th>Unit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for material, quantity in estimation.materials[stage_key].items() %}
+                                        {% if quantity > 0 %}
+                                        <tr>
+                                            <td>{{ material.replace('_', ' ').title() }}</td>
+                                            <td>{{ "{:,.0f}".format(quantity) }}</td>
+                                            <td>
+                                                {% if 'bags' in material %}bags
+                                                {% elif 'kg' in material %}kg
+                                                {% elif 'cuft' in material %}cu ft
+                                                {% elif 'sqft' in material %}sq ft
+                                                {% elif 'meters' in material %}meters
+                                                {% elif 'liters' in material %}liters
+                                                {% elif 'sheets' in material %}sheets
+                                                {% else %}units
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div>
+                <!-- Project Info -->
+                <div class="section">
+                    <h3 class="section-title">📋 Project Details</h3>
+                    <div class="info-card">
+                        <div class="info-row">
+                            <span class="info-label">Area</span>
+                            <span class="info-value">{{ project.square_feet }} sq ft</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Rooms</span>
+                            <span class="info-value">{{ project.rooms }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Floors</span>
+                            <span class="info-value">{{ project.floors }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Bathrooms</span>
+                            <span class="info-value">{{ project.bathrooms }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Property Type</span>
+                            <span class="info-value">{{ project.property_type.title() }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Budget Range</span>
+                            <span class="info-value">{{ project.budget_range.title() }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timeline -->
+                <div class="section">
+                    <h3 class="section-title">⏱️ Timeline</h3>
+                    <div class="timeline-card">
+                        <div class="timeline-label">Estimated Duration</div>
+                        <div class="timeline-value">{{ estimation.timeline.total_days }}</div>
+                        <div class="timeline-label">Days (≈ {{ (estimation.timeline.total_days / 30) | round(1) }} months)</div>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="section">
+                    <h3 class="section-title">⚡ Actions</h3>
+                    <div class="action-buttons">
+                        <a href="{{ url_for('user.download_pdf', project_id=project.id) }}" class="btn btn-primary">📄 Download PDF</a>
+                        <a href="{{ url_for('user.find_contractors') }}" class="btn btn-outline">🔨 Find Contractors</a>
+                        <a href="#" class="btn btn-outline">📦 Order Materials</a>
+                        <a href="#" class="btn btn-outline">✏️ Edit Project</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function toggleStage(stageKey) {
+            const content = document.getElementById('stage-' + stageKey);
+            const header = content.previousElementSibling;
+            
+            // Close all other stages
+            document.querySelectorAll('.stage-content').forEach(el => {
+                if (el.id !== 'stage-' + stageKey) {
+                    el.classList.remove('active');
+                    el.previousElementSibling.classList.remove('active');
+                }
+            });
+            
+            // Toggle current stage
+            content.classList.toggle('active');
+            header.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

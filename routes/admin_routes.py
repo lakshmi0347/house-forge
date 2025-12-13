@@ -1,11 +1,14 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from firebase_admin import firestore
 from datetime import datetime
 from functools import wraps
 
 admin_bp = Blueprint('admin', __name__)
-db = firestore.client()
+
+# Import db from app.py after it's initialized
+def get_db():
+    from app import db
+    return db
 
 # Admin-only decorator
 def admin_required(f):
@@ -22,6 +25,8 @@ def admin_required(f):
 @admin_required
 def dashboard():
     """Admin Dashboard - Overview of entire platform"""
+    
+    db = get_db()  # Get db instance
     
     # Get all users count
     users = list(db.collection('users').stream())
@@ -66,6 +71,7 @@ def dashboard():
 @admin_required
 def manage_users():
     """View and manage all users"""
+    db = get_db()
     users = []
     for doc in db.collection('users').stream():
         user_data = doc.to_dict()
@@ -80,6 +86,7 @@ def manage_users():
 @admin_required
 def manage_contractors():
     """View and manage all contractors"""
+    db = get_db()
     contractors = []
     for doc in db.collection('contractors').stream():
         contractor_data = doc.to_dict()
@@ -93,6 +100,7 @@ def manage_contractors():
 @admin_required
 def manage_suppliers():
     """View and manage all suppliers"""
+    db = get_db()
     suppliers = []
     for doc in db.collection('suppliers').stream():
         supplier_data = doc.to_dict()
@@ -106,6 +114,7 @@ def manage_suppliers():
 @admin_required
 def verify_contractor(contractor_id):
     """Verify a contractor"""
+    db = get_db()
     try:
         db.collection('contractors').document(contractor_id).update({
             'verified': True,
@@ -123,6 +132,7 @@ def verify_contractor(contractor_id):
 @admin_required
 def verify_supplier(supplier_id):
     """Verify a supplier"""
+    db = get_db()
     try:
         db.collection('suppliers').document(supplier_id).update({
             'verified': True,
@@ -140,6 +150,7 @@ def verify_supplier(supplier_id):
 @admin_required
 def deactivate_user(user_type, user_id):
     """Deactivate/Block a user"""
+    db = get_db()
     try:
         collection = user_type + 's' if user_type != 'user' else 'users'
         db.collection(collection).document(user_id).update({
@@ -158,6 +169,7 @@ def deactivate_user(user_type, user_id):
 @admin_required
 def activate_user(user_type, user_id):
     """Activate/Unblock a user"""
+    db = get_db()
     try:
         collection = user_type + 's' if user_type != 'user' else 'users'
         db.collection(collection).document(user_id).update({
@@ -175,6 +187,7 @@ def activate_user(user_type, user_id):
 @admin_required
 def all_projects():
     """View all projects"""
+    db = get_db()
     projects = []
     for doc in db.collection('projects').stream():
         project_data = doc.to_dict()
@@ -188,6 +201,7 @@ def all_projects():
 @admin_required
 def analytics():
     """Platform analytics and reports"""
+    db = get_db()
     # Collect analytics data
     users = list(db.collection('users').stream())
     contractors = list(db.collection('contractors').stream())

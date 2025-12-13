@@ -10,7 +10,96 @@ import json
 supplier_bp = Blueprint('supplier', __name__)
 db = firestore.client()
 
-# ... (keep your existing dashboard, inventory, orders, add_material routes)
+@supplier_bp.route('/dashboard')
+@login_required
+def dashboard():
+    """Supplier Dashboard - Main page after login"""
+    
+    # Get supplier's materials
+    materials_ref = db.collection('materials').where('supplier_id', '==', current_user.id).stream()
+    materials = []
+    for doc in materials_ref:
+        material_data = doc.to_dict()
+        material_data['id'] = doc.id
+        materials.append(material_data)
+    
+    # Get orders
+    orders_ref = db.collection('orders').where('supplier_id', '==', current_user.id).stream()
+    orders = []
+    total_revenue = 0
+    pending_orders = 0
+    
+    for doc in orders_ref:
+        order_data = doc.to_dict()
+        order_data['id'] = doc.id
+        orders.append(order_data)
+        
+        if order_data.get('status') == 'completed':
+            total_revenue += order_data.get('total', 0)
+        if order_data.get('status') == 'pending':
+            pending_orders += 1
+    
+    stats = {
+        'total_materials': len(materials),
+        'total_orders': len(orders),
+        'pending_orders': pending_orders,
+        'total_revenue': total_revenue,
+        'rating': current_user.rating if hasattr(current_user, 'rating') else 0.0,
+        'verified': current_user.verified if hasattr(current_user, 'verified') else False
+    }
+    
+    return render_template('supplier/dashboard.html',
+                         stats=stats,
+                         orders=orders[:5])  # Show only 5 recent orders
+
+@supplier_bp.route('/inventory')
+@login_required
+def inventory():
+    """View and manage inventory"""
+    materials_ref = db.collection('materials').where('supplier_id', '==', current_user.id).stream()
+    materials = []
+    for doc in materials_ref:
+        material_data = doc.to_dict()
+        material_data['id'] = doc.id
+        materials.append(material_data)
+    
+    return render_template('supplier/inventory.html', materials=materials)
+
+@supplier_bp.route('/orders')
+@login_required
+def orders():
+    """View all orders"""
+    orders_ref = db.collection('orders').where('supplier_id', '==', current_user.id).stream()
+    orders = []
+    for doc in orders_ref:
+        order_data = doc.to_dict()
+        order_data['id'] = doc.id
+        orders.append(order_data)
+    
+    return render_template('supplier/orders.html', orders=orders)
+
+@supplier_bp.route('/add-material', methods=['GET', 'POST'])
+@login_required
+def add_material():
+    """Add new material to inventory"""
+    if request.method == 'POST':
+        material_data = {
+            'supplier_id': current_user.id,
+            'supplier_name': current_user.company_name or current_user.name,
+            'name': request.form.get('name'),
+            'category': request.form.get('category'),
+            'price': float(request.form.get('price')),
+            'unit': request.form.get('unit'),
+            'quantity': int(request.form.get('quantity')),
+            'description': request.form.get('description'),
+            'created_at': datetime.now()
+        }
+        
+        db.collection('materials').add(material_data)
+        flash('Material added successfully!', 'success')
+        return redirect(url_for('supplier.inventory'))
+    
+    return render_template('supplier/add_material.html')
 
 @supplier_bp.route('/profile')
 @login_required

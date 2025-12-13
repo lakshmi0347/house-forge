@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Projects - House-Forge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .page-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 25px;
+        }
+        
+        .project-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        
+        .project-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .project-location {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-new {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-bid {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .project-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .project-budget {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .budget-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .budget-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .project-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            display: block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #f5576c;
+            border: 2px solid #f5576c;
+        }
+        
+        .btn-outline:hover {
+            background: #f5576c;
+            color: white;
+        }
+        
+        .btn-disabled {
+            background: #e0e0e0;
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 15px;
+        }
+        
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .project-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-brand">🔨 House-Forge Contractor</div>
+        <div class="navbar-menu">
+            <a href="{{ url_for('contractor.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('contractor.browse_projects') }}">Browse Projects</a>
+            <a href="{{ url_for('contractor.my_bids') }}">My Bids</a>
+            <a href="{{ url_for('contractor.my_projects') }}">My Projects</a>
+            <a href="{{ url_for('contractor.profile') }}">Profile</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">🔍 Browse Available Projects</h1>
+            <p style="color: #666;">Find projects that match your expertise and submit competitive bids</p>
+        </div>
+        
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Projects Grid -->
+        {% if projects %}
+            <div class="projects-grid">
+                {% for project in projects %}
+                <div class="project-card">
+                    <div class="project-header">
+                        <div>
+                            <div class="project-title">{{ project.title }}</div>
+                            <div class="project-location">📍 {{ project.location or 'Location not specified' }}</div>
+                        </div>
+                        {% if project.has_bid %}
+                            <span class="badge badge-bid">✓ Bid Submitted</span>
+                        {% else %}
+                            <span class="badge badge-new">🆕 New</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="project-details">
+                        <div class="detail-item">
+                            <span>📏</span>
+                            <span>{{ project.square_feet }} sq ft</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>🚪</span>
+                            <span>{{ project.rooms }} Rooms</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>🏢</span>
+                            <span>{{ project.floors }} Floors</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>🚿</span>
+                            <span>{{ project.bathrooms or 2 }} Bathrooms</span>
+                        </div>
+                    </div>
+                    
+                    <div class="project-budget">
+                        <div class="budget-label">Budget Range</div>
+                        <div class="budget-value">{{ project.budget_range.title() or 'Medium' }}</div>
+                    </div>
+                    
+                    {% if project.description %}
+                    <div style="color: #666; font-size: 14px; margin: 15px 0; line-height: 1.6;">
+                        {{ project.description[:120] }}{% if project.description|length > 120 %}...{% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="project-actions">
+                        <a href="{{ url_for('contractor.view_project', project_id=project.id) }}" class="btn btn-outline">
+                            View Details
+                        </a>
+                        {% if project.has_bid %}
+                            <button class="btn btn-disabled" disabled>Bid Already Submitted</button>
+                        {% else %}
+                            <a href="{{ url_for('contractor.submit_bid', project_id=project.id) }}" class="btn btn-primary">
+                                Submit Bid
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📂</div>
+                <h2>No Projects Available</h2>
+                <p>There are no active projects at the moment. Check back later!</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

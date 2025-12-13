@@ -1,13 +1,16 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from firebase_admin import firestore
 from models.user import User
 from datetime import datetime
 import re
 
 auth_bp = Blueprint('auth', __name__)
-db = firestore.client()
+
+# Import db from app.py after it's initialized
+def get_db():
+    from app import db
+    return db
 
 def validate_email(email):
     """Validate email format"""
@@ -21,6 +24,8 @@ def validate_phone(phone):
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    db = get_db()
+    
     """Login page for all users"""
     if current_user.is_authenticated:
         # Redirect based on role
@@ -37,6 +42,12 @@ def login():
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         
+        print("=" * 50)
+        print("LOGIN ATTEMPT")
+        print(f"Email: {email}")
+        print(f"Password length: {len(password)}")
+        print("=" * 50)
+        
         # Validate inputs
         if not email or not password:
             flash('Please fill in all fields', 'error')
@@ -51,14 +62,19 @@ def login():
             collections = ['users', 'admins', 'contractors', 'suppliers']
             user_doc = None
             user_data = None
+            collection_name = None
             
             for collection in collections:
+                print(f"Searching in {collection}...")
                 users_ref = db.collection(collection)
                 query = users_ref.where('email', '==', email).limit(1).stream()
                 
                 for doc in query:
                     user_doc = doc
                     user_data = doc.to_dict()
+                    collection_name = collection
+                    print(f"✅ Found user in {collection}")
+                    print(f"User data: {user_data.get('name')}, Role: {user_data.get('role')}")
                     break
                 
                 if user_doc:
@@ -66,11 +82,20 @@ def login():
             
             # Check if user exists
             if not user_doc or not user_data:
+                print("❌ User not found in any collection")
                 flash('Invalid email or password', 'error')
                 return render_template('login.html')
             
+            # Get stored password hash
+            stored_password_hash = user_data.get('password', '')
+            print(f"Stored password hash: {stored_password_hash[:50]}...")
+            
             # Verify password
-            if not check_password_hash(user_data.get('password', ''), password):
+            password_match = check_password_hash(stored_password_hash, password)
+            print(f"Password match: {password_match}")
+            
+            if not password_match:
+                print("❌ Password verification failed")
                 flash('Invalid email or password', 'error')
                 return render_template('login.html')
             
@@ -84,10 +109,11 @@ def login():
             login_user(user, remember=True)
             
             # Update last login
-            db.collection(collection).document(user_doc.id).update({
+            db.collection(collection_name).document(user_doc.id).update({
                 'last_login': datetime.now()
             })
             
+            print(f"✅ Login successful for {user.name}, Role: {user.role}")
             flash(f'Welcome back, {user.name}!', 'success')
             
             # Redirect based on role
@@ -101,6 +127,9 @@ def login():
                 return redirect(url_for('user.dashboard'))
                 
         except Exception as e:
+            print(f"❌ Login error: {str(e)}")
+            import traceback
+            traceback.print_exc()
             flash(f'Login error: {str(e)}', 'error')
             return render_template('login.html')
     
@@ -119,13 +148,27 @@ def register():
         password = request.form.get('password', '')
         confirm_password = request.form.get('confirm_password', '')
         role = request.form.get('role', 'user')
+        
+        print("=" * 50)
+        print("REGISTRATION ATTEMPT")
+        print(f"Name: {name}")
+        print(f"Email: {email}")
+        print(f"Role: {role}")
+        print(f"Password: {password}")
+        print(f"Confirm Password: {confirm_password}")
+        print(f"Passwords match: {password == confirm_password}")
+        print("=" * 50)
+        
+        # Role-specific fields
         company_name = request.form.get('company_name', '').strip() or name
         experience = request.form.get('experience', 0)
         license_number = request.form.get('license_number', '').strip()
         gst_number = request.form.get('gst_number', '').strip()
         business_type = request.form.get('business_type', '').strip()
+        
         errors = []
         
+        # Validation
         if not name or len(name) < 3:
             errors.append('Name must be at least 3 characters')
         
@@ -134,11 +177,14 @@ def register():
         
         if not validate_phone(phone):
             errors.append('Invalid phone number (10 digits starting with 6-9)')
+        
         if len(password) < 6:
             errors.append('Password must be at least 6 characters')
         
+        # FIXED: Direct string comparison instead of relying on form validation
         if password != confirm_password:
             errors.append('Passwords do not match')
+            print(f"❌ Password mismatch - Password: '{password}', Confirm: '{confirm_password}'")
         
         if role not in ['user', 'contractor', 'supplier']:
             errors.append('Invalid role selected')
@@ -154,7 +200,7 @@ def register():
             return render_template('register.html')
         
         try:
-            # Check if email already exists
+            # Check if email already exists in any collection
             collections = ['users', 'admins', 'contractors', 'suppliers']
             for collection in collections:
                 existing = db.collection(collection).where('email', '==', email).limit(1).stream()
@@ -170,12 +216,16 @@ def register():
             elif role == 'supplier':
                 collection = 'suppliers'
             
+            # Hash password
+            hashed_password = generate_password_hash(password)
+            print(f"Generated password hash: {hashed_password[:50]}...")
+            
             # Create user data
             user_data = {
                 'name': name,
                 'email': email,
                 'phone': phone,
-                'password': generate_password_hash(password),
+                'password': hashed_password,
                 'role': role,
                 'created_at': datetime.now(),
                 'active': True,
@@ -186,7 +236,7 @@ def register():
             if role == 'contractor':
                 user_data.update({
                     'company_name': company_name,
-                    'experience': int(experience),
+                    'experience': int(experience) if experience else 0,
                     'license_number': license_number,
                     'rating': 0.0,
                     'completed_projects': 0
@@ -200,7 +250,8 @@ def register():
                 })
             
             # Add to database
-            db.collection(collection).add(user_data)
+            doc_ref = db.collection(collection).add(user_data)
+            print(f"✅ User created successfully in {collection} with ID: {doc_ref[1].id}")
             
             if role in ['contractor', 'supplier']:
                 flash('Registration successful! Your account will be verified by admin soon.', 'success')
@@ -210,6 +261,9 @@ def register():
             return redirect(url_for('auth.login'))
             
         except Exception as e:
+            print(f"❌ Registration error: {str(e)}")
+            import traceback
+            traceback.print_exc()
             flash(f'Registration error: {str(e)}', 'error')
             return render_template('register.html')
     

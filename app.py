@@ -5,6 +5,7 @@ from flask_wtf.csrf import CSRFProtect
 import firebase_admin
 from firebase_admin import credentials, firestore
 import os
+import json
 from config import config
 
 # Initialize Flask app
@@ -21,14 +22,29 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message = 'Please log in to access this page.'
 
-# Initialize Firebase
+# Initialize Firebase - Check if already initialized
+db = None
 try:
-    cred = credentials.Certificate(app.config['FIREBASE_CONFIG'])
-    firebase_admin.initialize_app(cred)
+    # Check if Firebase is already initialized
+    if not firebase_admin._apps:
+        # Read the config file with utf-8-sig to remove BOM
+        with open(app.config['FIREBASE_CONFIG'], 'r', encoding='utf-8-sig') as f:
+            firebase_config = json.load(f)
+        
+        cred = credentials.Certificate(firebase_config)
+        firebase_admin.initialize_app(cred)
+        print("✅ Firebase initialized successfully!")
+    else:
+        print("✅ Firebase already initialized!")
+    
+    # Get Firestore client
     db = firestore.client()
-    print("✅ Firebase initialized successfully!")
+    print("✅ Firestore client ready!")
+    
 except Exception as e:
     print(f"❌ Firebase initialization error: {e}")
+    import traceback
+    traceback.print_exc()
     db = None
 
 # User loader for Flask-Login
@@ -36,6 +52,7 @@ except Exception as e:
 def load_user(user_id):
     """Load user from database"""
     if db is None:
+        print("⚠️  Cannot load user - database not connected")
         return None
     
     try:
@@ -68,17 +85,6 @@ app.register_blueprint(contractor_bp, url_prefix='/contractor')
 app.register_blueprint(supplier_bp, url_prefix='/supplier')
 app.register_blueprint(admin_bp, url_prefix='/admin')
 
-# (We'll add other modules later)
-# from routes.user_routes import user_bp
-# from routes.admin_routes import admin_bp
-# from routes.contractor_routes import contractor_bp
-# from routes.supplier_routes import supplier_bp
-
-# app.register_blueprint(user_bp, url_prefix='/user')
-# app.register_blueprint(admin_bp, url_prefix='/admin')
-# app.register_blueprint(contractor_bp, url_prefix='/contractor')
-# app.register_blueprint(supplier_bp, url_prefix='/supplier')
-
 # Home route
 @app.route('/')
 def index():
@@ -89,14 +95,28 @@ def index():
 @app.route('/test')
 def test():
     """Test route to verify setup"""
-    return '''
+    db_status = 'Connected' if db else 'Not Connected'
+    
+    # Try to count documents if connected
+    doc_count = "N/A"
+    if db:
+        try:
+            users = len(list(db.collection('users').limit(10).stream()))
+            contractors = len(list(db.collection('contractors').limit(10).stream()))
+            suppliers = len(list(db.collection('suppliers').limit(10).stream()))
+            doc_count = f"Users: {users}, Contractors: {contractors}, Suppliers: {suppliers}"
+        except:
+            doc_count = "Error reading collections"
+    
+    return f'''
     <h1>🎉 House-Forge is Running!</h1>
     <p>✅ Flask is working</p>
     <p>✅ Configuration loaded</p>
-    <p>✅ Firebase status: {}</p>
+    <p>✅ Firebase status: {db_status}</p>
+    <p>📊 Database contents: {doc_count}</p>
     <br>
-    <a href="/">Go to Home</a>
-    '''.format('Connected' if db else 'Not Connected')
+    <a href="/">Go to Home</a> | <a href="/login">Login</a> | <a href="/register">Register</a>
+    '''
 
 # Error handlers
 @app.errorhandler(404)
@@ -131,6 +151,17 @@ if __name__ == '__main__':
     print(f"🌍 Running on: http://127.0.0.1:5000")
     print(f"📝 Environment: {env}")
     print(f"🔥 Firebase: {'✅ Connected' if db else '❌ Not Connected'}")
+    
+    if db:
+        try:
+            # Count documents
+            users_count = len(list(db.collection('users').limit(10).stream()))
+            contractors_count = len(list(db.collection('contractors').limit(10).stream()))
+            suppliers_count = len(list(db.collection('suppliers').limit(10).stream()))
+            print(f"📊 Database: {users_count} users, {contractors_count} contractors, {suppliers_count} suppliers")
+        except Exception as e:
+            print(f"⚠️  Could not count documents: {e}")
+    
     print("=" * 50)
     
     app.run(debug=True, port=5000)

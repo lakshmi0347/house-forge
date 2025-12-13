@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Projects - House-Forge Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
+        .navbar { background: linear-gradient(135deg, #434343 0%, #000000 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; }
+        .navbar-brand { font-size: 24px; font-weight: bold; }
+        .navbar-menu { display: flex; gap: 20px; }
+        .navbar-menu a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 5px; }
+        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
+        .page-header { background: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; }
+        table { width: 100%; background: white; border-radius: 15px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; }
+        th { background: #434343; color: white; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">⚙️ House-Forge Admin</div>
+        <div class="navbar-menu">
+            <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin.all_projects') }}">Projects</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>📁 All Projects</h1>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Location</th>
+                    <th>Area</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in projects %}
+                <tr>
+                    <td>{{ project.title }}</td>
+                    <td>{{ project.location }}</td>
+                    <td>{{ project.square_feet }} sq ft</td>
+                    <td>{{ project.status }}</td>
+                    <td>{{ project.created_at.strftime('%Y-%m-%d') if project.created_at else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

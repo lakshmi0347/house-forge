@@ -226,11 +226,15 @@
             text-decoration: none;
             color: #333;
             transition: all 0.3s;
+            display: block;
+            cursor: pointer;
         }
         
         .action-card:hover {
             border-color: #f5576c;
             background: #fff5f7;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .action-icon {
@@ -250,6 +254,7 @@
         <div class="navbar-menu">
             <a href="{{ url_for('contractor.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('contractor.browse_projects') }}">Browse Projects</a>
+            <a href="{{ url_for('contractor.my_bids') }}">My Bids</a>
             <a href="{{ url_for('contractor.my_projects') }}">My Projects</a>
             <a href="{{ url_for('contractor.profile') }}">Profile</a>
             <a href="{{ url_for('auth.logout') }}">Logout</a>
@@ -261,7 +266,7 @@
         <div class="welcome-banner">
             <div>
                 <h1>👋 Welcome, {{ current_user.company_name or current_user.name }}!</h1>
-                <p>Manage your projects and find new opportunities</p>
+                <p>Manage your bids and find new opportunities</p>
             </div>
             <div>
                 {% if stats.verified %}
@@ -277,7 +282,7 @@
             <div class="stat-card">
                 <div class="stat-icon">📋</div>
                 <div class="stat-number">{{ stats.total_estimates }}</div>
-                <div class="stat-label">Estimates Submitted</div>
+                <div class="stat-label">Bids Submitted</div>
             </div>
             
             <div class="stat-card">
@@ -302,12 +307,17 @@
         <!-- Quick Actions -->
         <div class="section">
             <div class="section-header">
-                <h2 class="section-title">Quick Actions</h2>
+                <h2 class="section-title">⚡ Quick Actions</h2>
             </div>
             <div class="quick-actions">
                 <a href="{{ url_for('contractor.browse_projects') }}" class="action-card">
                     <div class="action-icon">🔍</div>
                     <div class="action-label">Browse Projects</div>
+                </a>
+                
+                <a href="{{ url_for('contractor.my_bids') }}" class="action-card">
+                    <div class="action-icon">📋</div>
+                    <div class="action-label">My Bids</div>
                 </a>
                 
                 <a href="{{ url_for('contractor.my_projects') }}" class="action-card">
@@ -319,18 +329,13 @@
                     <div class="action-icon">👤</div>
                     <div class="action-label">Update Profile</div>
                 </a>
-                
-                <a href="#" class="action-card">
-                    <div class="action-icon">💰</div>
-                    <div class="action-label">Earnings</div>
-                </a>
             </div>
         </div>
         
         <!-- Available Projects -->
         <div class="section">
             <div class="section-header">
-                <h2 class="section-title">Available Projects</h2>
+                <h2 class="section-title">🆕 Available Projects</h2>
                 <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-primary">View All</a>
             </div>
             
@@ -344,13 +349,44 @@
                         <span>🏢 {{ project.floors }} floors</span>
                         <span>📍 {{ project.location or 'Not specified' }}</span>
                     </div>
-                    <a href="#" class="btn btn-primary">Submit Estimate</a>
+                    <a href="{{ url_for('contractor.submit_bid', project_id=project.id) }}" class="btn btn-primary">Submit Bid</a>
                 </div>
                 {% endfor %}
             {% else %}
                 <div class="empty-state">
                     <div class="empty-state-icon">📂</div>
                     <p>No available projects at the moment. Check back later!</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Recent Bids -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">📋 Recent Bids</h2>
+                <a href="{{ url_for('contractor.my_bids') }}" class="btn btn-primary">View All</a>
+            </div>
+            
+            {% if estimates %}
+                {% for bid in estimates %}
+                <div class="project-card">
+                    <div class="project-title">{{ bid.project_title or 'Project' }}</div>
+                    <div class="project-details">
+                        <span>💰 ₹{{ "{:,.0f}".format(bid.total_cost or 0) }}</span>
+                        <span>⏱️ {{ bid.duration_days or 0 }} days</span>
+                        <span>📅 {{ bid.created_at.strftime('%d %b %Y') if bid.created_at else 'N/A' }}</span>
+                        <span class="verification-badge {% if bid.status == 'pending' %}pending{% elif bid.status == 'accepted' %}verified{% else %}pending{% endif %}">
+                            {{ bid.status.title() if bid.status else 'Pending' }}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <p>No bids submitted yet. Browse projects to get started!</p>
+                    <br>
+                    <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-primary">Browse Projects</a>
                 </div>
             {% endif %}
         </div>

@@ -77,6 +77,14 @@
             font-size: 48px;
             color: white;
             flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .profile-info {
@@ -205,6 +213,18 @@
             padding: 15px 20px;
             border-radius: 8px;
             margin-bottom: 20px;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .alert-success {
@@ -217,6 +237,262 @@
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s;
+        }
+        
+        .modal-close:hover {
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: none;
+        }
+        
+        .file-upload-container {
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload-container:hover {
+            border-color: #4facfe;
+            background: #f0faff;
+        }
+        
+        .file-upload-container.dragover {
+            border-color: #4facfe;
+            background: #f0faff;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .file-list {
+            margin-top: 20px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .file-icon {
+            font-size: 24px;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .file-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+        
+        .file-remove:hover {
+            background: #c82333;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .profile-stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -235,6 +511,7 @@
     
     <div class="container">
         <!-- Flash Messages -->
+        <div id="alertContainer"></div>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -247,7 +524,13 @@
         
         <!-- Profile Header -->
         <div class="profile-header">
-            <div class="profile-avatar">📦</div>
+            <div class="profile-avatar">
+                {% if supplier_data.profile_picture %}
+                    <img src="{{ url_for('static', filename='uploads/profiles/' + supplier_data.profile_picture) }}" alt="Profile">
+                {% else %}
+                    📦
+                {% endif %}
+            </div>
             <div class="profile-info">
                 <h1 class="profile-name">{{ supplier_data.name or 'Supplier' }}</h1>
                 <div class="profile-company">{{ supplier_data.company_name or 'Company Name' }}</div>
@@ -291,7 +574,7 @@
                 </div>
                 <div class="info-item">
                     <span class="info-label">Business Type</span>
-                    <span class="info-value">{{ supplier_data.business_type or 'Not specified' }}</span>
+                    <span class="info-value">{{ supplier_data.business_type or 'wholesaler' }}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">GST Number</span>
@@ -343,11 +626,418 @@
         <div class="section">
             <h2 class="section-title">⚡ Quick Actions</h2>
             <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                <button class="btn btn-primary" onclick="alert('Edit profile feature coming soon!')">✏️ Edit Profile</button>
-                <button class="btn btn-primary" onclick="alert('Upload documents feature coming soon!')">📄 Upload Documents</button>
-                <button class="btn btn-primary" onclick="alert('Change password feature coming soon!')">🔒 Change Password</button>
+                <button class="btn btn-primary" onclick="openEditProfileModal()">✏️ Edit Profile</button>
+                <button class="btn btn-primary" onclick="openUploadDocumentsModal()">📄 Upload Documents</button>
+                <button class="btn btn-primary" onclick="openChangePasswordModal()">🔒 Change Password</button>
             </div>
         </div>
     </div>
+    
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">✏️ Edit Profile</h2>
+                <button class="modal-close" onclick="closeModal('editProfileModal')">&times;</button>
+            </div>
+            
+            <form id="editProfileForm" onsubmit="submitEditProfile(event)">
+                <h3 style="color: #333; margin-bottom: 15px; font-size: 18px;">Business Information</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Company Name *</label>
+                    <input type="text" class="form-input" name="company_name" value="{{ supplier_data.company_name or '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Business Type</label>
+                    <select class="form-select" name="business_type">
+                        <option value="wholesaler" {% if supplier_data.business_type == 'wholesaler' %}selected{% endif %}>Wholesaler</option>
+                        <option value="manufacturer" {% if supplier_data.business_type == 'manufacturer' %}selected{% endif %}>Manufacturer</option>
+                        <option value="distributor" {% if supplier_data.business_type == 'distributor' %}selected{% endif %}>Distributor</option>
+                        <option value="retailer" {% if supplier_data.business_type == 'retailer' %}selected{% endif %}>Retailer</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Business License</label>
+                    <input type="text" class="form-input" name="business_license" value="{{ supplier_data.business_license or '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">GST Number</label>
+                    <input type="text" class="form-input" name="gst_number" value="{{ supplier_data.gst_number or '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Years in Business</label>
+                    <input type="number" class="form-input" name="years_in_business" value="{{ supplier_data.years_in_business or 0 }}" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone *</label>
+                    <input type="tel" class="form-input" name="phone" value="{{ supplier_data.phone or '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Location *</label>
+                    <input type="text" class="form-input" name="location" value="{{ supplier_data.location or '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Bio / Description</label>
+                    <textarea class="form-textarea" name="bio">{{ supplier_data.bio or '' }}</textarea>
+                    <div class="form-hint">Tell customers about your business</div>
+                </div>
+                
+                <h3 style="color: #333; margin: 25px 0 15px; font-size: 18px;">Personal Information</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" class="form-input" name="name" value="{{ supplier_data.name or '' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-input" name="email" value="{{ supplier_data.email or '' }}" required>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editProfileModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+            
+            <div id="editProfileLoading" class="loading">
+                <div class="spinner"></div>
+                <p>Updating profile...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upload Documents Modal -->
+    <div id="uploadDocumentsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📄 Upload Documents</h2>
+                <button class="modal-close" onclick="closeModal('uploadDocumentsModal')">&times;</button>
+            </div>
+            
+            <form id="uploadDocumentsForm" onsubmit="submitUploadDocuments(event)">
+                <div class="form-group">
+                    <label class="form-label">Profile Picture</label>
+                    <div class="file-upload-container" onclick="document.getElementById('profilePictureInput').click()">
+                        <div class="upload-icon">📸</div>
+                        <div class="upload-text">Click to upload profile picture</div>
+                        <div class="upload-hint">JPG, PNG or GIF (Max 5MB)</div>
+                    </div>
+                    <input type="file" id="profilePictureInput" accept="image/*" style="display: none;" onchange="handleProfilePictureSelect(event)">
+                    <div id="profilePicturePreview" class="file-list"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Business Documents</label>
+                    <div class="file-upload-container" onclick="document.getElementById('documentsInput').click()">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">Click to upload business documents</div>
+                        <div class="upload-hint">PDF, DOC, DOCX (Max 10MB each)</div>
+                    </div>
+                    <input type="file" id="documentsInput" accept=".pdf,.doc,.docx" multiple style="display: none;" onchange="handleDocumentsSelect(event)">
+                    <div id="documentsPreview" class="file-list"></div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('uploadDocumentsModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Upload Files</button>
+                </div>
+            </form>
+            
+            <div id="uploadLoading" class="loading">
+                <div class="spinner"></div>
+                <p>Uploading files...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🔒 Change Password</h2>
+                <button class="modal-close" onclick="closeModal('changePasswordModal')">&times;</button>
+            </div>
+            
+            <form id="changePasswordForm" onsubmit="submitChangePassword(event)">
+                <div class="form-group">
+                    <label class="form-label">Current Password *</label>
+                    <input type="password" class="form-input" name="currentPassword" required minlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">New Password *</label>
+                    <input type="password" class="form-input" name="newPassword" id="newPassword" required minlength="6">
+                    <div class="form-hint">Must be at least 6 characters</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Confirm New Password *</label>
+                    <input type="password" class="form-input" name="confirmPassword" required minlength="6">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('changePasswordModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </div>
+            </form>
+            
+            <div id="passwordLoading" class="loading">
+                <div class="spinner"></div>
+                <p>Changing password...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Modal Functions
+        function openEditProfileModal() {
+            document.getElementById('editProfileModal').classList.add('active');
+        }
+        
+        function openUploadDocumentsModal() {
+            document.getElementById('uploadDocumentsModal').classList.add('active');
+        }
+        
+        function openChangePasswordModal() {
+            document.getElementById('changePasswordModal').classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        // Close modal on background click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal(modal.id);
+                }
+            });
+        });
+        
+        // Alert Functions
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+        
+        // Edit Profile Form Submission
+        async function submitEditProfile(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const loading = document.getElementById('editProfileLoading');
+            
+            form.style.display = 'none';
+            loading.classList.add('active');
+            
+            try {
+                const response = await fetch('{{ url_for("supplier.update_business_info") }}', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    closeModal('editProfileModal');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('An error occurred. Please try again.', 'error');
+            } finally {
+                form.style.display = 'block';
+                loading.classList.remove('active');
+            }
+        }
+        
+        // Profile Picture Upload
+        let selectedProfilePicture = null;
+        
+        function handleProfilePictureSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('File size must be less than 5MB', 'error');
+                return;
+            }
+            
+            selectedProfilePicture = file;
+            
+            const preview = document.getElementById('profilePicturePreview');
+            preview.innerHTML = `
+                <div class="file-item">
+                    <div class="file-info">
+                        <span class="file-icon">🖼️</span>
+                        <span class="file-name">${file.name}</span>
+                    </div>
+                    <button type="button" class="file-remove" onclick="removeProfilePicture()">Remove</button>
+                </div>
+            `;
+        }
+        
+        function removeProfilePicture() {
+            selectedProfilePicture = null;
+            document.getElementById('profilePicturePreview').innerHTML = '';
+            document.getElementById('profilePictureInput').value = '';
+        }
+        
+        // Documents Upload
+        let selectedDocuments = [];
+        
+        function handleDocumentsSelect(event) {
+            const files = Array.from(event.target.files);
+            
+            files.forEach(file => {
+                if (file.size > 10 * 1024 * 1024) {
+                    showAlert(`${file.name} is too large (max 10MB)`, 'error');
+                    return;
+                }
+                selectedDocuments.push(file);
+            });
+            
+            updateDocumentsPreview();
+        }
+        
+        function updateDocumentsPreview() {
+            const preview = document.getElementById('documentsPreview');
+            preview.innerHTML = selectedDocuments.map((file, index) => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">${file.name}</span>
+                    </div>
+                    <button type="button" class="file-remove" onclick="removeDocument(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+        
+        function removeDocument(index) {
+            selectedDocuments.splice(index, 1);
+            updateDocumentsPreview();
+        }
+        
+        // Upload Documents Form Submission
+        async function submitUploadDocuments(event) {
+            event.preventDefault();
+            
+            if (!selectedProfilePicture && selectedDocuments.length === 0) {
+                showAlert('Please select at least one file to upload', 'error');
+                return;
+            }
+            
+            const form = event.target;
+            const loading = document.getElementById('uploadLoading');
+            
+            form.style.display = 'none';
+            loading.classList.add('active');
+            
+            try {
+                // Upload profile picture if selected
+                if (selectedProfilePicture) {
+                    const formData = new FormData();
+                    formData.append('profile_picture', selectedProfilePicture);
+                    
+                    const response = await fetch('{{ url_for("supplier.upload_profile_picture") }}', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!data.success) {
+                        throw new Error(data.message);
+                    }
+                }
+                
+                // Upload documents if selected
+                if (selectedDocuments.length > 0) {
+                    const formData = new FormData();
+                    selectedDocuments.forEach((file, index) => {
+                        formData.append(`document_${index}`, file);
+                    });
+                    
+                    // Note: You'll need to create this endpoint
+                    // const response = await fetch('{{ url_for("supplier.upload_documents") }}', {
+                    //     method: 'POST',
+                    //     body: formData
+                    // });
+                }
+                
+                showAlert('Files uploaded successfully!', 'success');
+                closeModal('uploadDocumentsModal');
+                setTimeout(() => location.reload(), 1000);
+                
+            } catch (error) {
+                showAlert(error.message || 'An error occurred during upload', 'error');
+            } finally {
+                form.style.display = 'block';
+                loading.classList.remove('active');
+            }
+        }
+        
+        // Change Password Form Submission
+        async function submitChangePassword(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const newPassword = formData.get('newPassword');
+            const confirmPassword = formData.get('confirmPassword');
+            
+            if (newPassword !== confirmPassword) {
+                showAlert('Passwords do not match', 'error');
+                return;
+            }
+            
+            const loading = document.getElementById('passwordLoading');
+            
+            form.style.display = 'none';
+            loading.classList.add('active');
+            
+            try {
+                const response = await fetch('{{ url_for("supplier.change_password") }}', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    closeModal('changePasswordModal');
+                    form.reset();
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('An error occurred. Please try again.', 'error');
+            } finally {
+                form.style.display = 'block';
+                loading.classList.remove('active');
+            }
+        }
+    </script>
 </body>
 </html>

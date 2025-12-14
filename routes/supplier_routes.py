@@ -127,6 +127,8 @@ def profile():
                 'location': getattr(current_user, 'location', ''),
                 'bio': getattr(current_user, 'bio', ''),
                 'business_license': getattr(current_user, 'business_license', ''),
+                'business_type': getattr(current_user, 'business_type', 'wholesaler'),
+                'gst_number': getattr(current_user, 'gst_number', ''),
                 'years_in_business': getattr(current_user, 'years_in_business', 0),
                 'categories': getattr(current_user, 'categories', []),
                 'verified': getattr(current_user, 'verified', False),
@@ -167,10 +169,12 @@ def profile():
             'name': '',
             'email': '',
             'company_name': '',
+            'business_type': 'wholesaler',
             'phone': '',
             'location': '',
             'bio': '',
             'business_license': '',
+            'gst_number': '',
             'years_in_business': 0,
             'categories': [],
             'verified': False,
@@ -197,32 +201,45 @@ def profile():
 @supplier_bp.route('/update_business_info', methods=['POST'])
 @login_required
 def update_business_info():
-    """Update supplier business information"""
+    """Update supplier business and personal information"""
     try:
+        # Business Information
         company_name = request.form.get('company_name')
+        business_type = request.form.get('business_type', 'wholesaler')
         business_license = request.form.get('business_license', '')
+        gst_number = request.form.get('gst_number', '')
         years_in_business = int(request.form.get('years_in_business', 0))
         phone = request.form.get('phone')
         location = request.form.get('location')
         bio = request.form.get('bio', '')
-        categories = json.loads(request.form.get('categories', '[]'))
+        
+        # Personal Information
+        name = request.form.get('name')
+        email = request.form.get('email')
         
         supplier_ref = db.collection('suppliers').document(current_user.id)
         supplier_ref.update({
+            # Business Info
             'company_name': company_name,
+            'business_type': business_type,
             'business_license': business_license,
+            'gst_number': gst_number,
             'years_in_business': years_in_business,
             'phone': phone,
             'location': location,
             'bio': bio,
-            'categories': categories,
+            # Personal Info
+            'name': name,
+            'email': email,
             'updated_at': datetime.now()
         })
         
-        return jsonify({'success': True, 'message': 'Business information updated successfully'})
+        return jsonify({'success': True, 'message': 'Profile updated successfully'})
     
     except Exception as e:
-        print(f"Error updating business info: {str(e)}")
+        print(f"Error updating profile: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @supplier_bp.route('/update_personal_info', methods=['POST'])
@@ -283,6 +300,70 @@ def upload_profile_picture():
     
     except Exception as e:
         print(f"Error uploading profile picture: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@supplier_bp.route('/upload_documents', methods=['POST'])
+@login_required
+def upload_documents():
+    """Upload supplier business documents"""
+    try:
+        uploaded_files = []
+        
+        # Process all uploaded files
+        for key in request.files:
+            file = request.files[key]
+            
+            if file.filename == '':
+                continue
+            
+            allowed_extensions = {'pdf', 'doc', 'docx'}
+            file_ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+            
+            if file_ext not in allowed_extensions:
+                return jsonify({'success': False, 'message': f'Invalid file type: {file.filename}'}), 400
+            
+            filename = secure_filename(f"supplier_{current_user.id}_doc_{int(datetime.now().timestamp())}_{file.filename}")
+            
+            upload_folder = os.path.join('static', 'uploads', 'documents')
+            os.makedirs(upload_folder, exist_ok=True)
+            
+            filepath = os.path.join(upload_folder, filename)
+            file.save(filepath)
+            
+            uploaded_files.append({
+                'original_name': file.filename,
+                'stored_name': filename,
+                'uploaded_at': datetime.now()
+            })
+        
+        if not uploaded_files:
+            return jsonify({'success': False, 'message': 'No files uploaded'}), 400
+        
+        # Store document references in supplier profile
+        supplier_ref = db.collection('suppliers').document(current_user.id)
+        supplier_doc = supplier_ref.get()
+        supplier_data = supplier_doc.to_dict() if supplier_doc.exists else {}
+        
+        existing_docs = supplier_data.get('documents', [])
+        existing_docs.extend(uploaded_files)
+        
+        supplier_ref.update({
+            'documents': existing_docs,
+            'updated_at': datetime.now()
+        })
+        
+        return jsonify({
+            'success': True, 
+            'message': f'{len(uploaded_files)} document(s) uploaded successfully',
+            'files': uploaded_files
+        })
+    
+    except Exception as e:
+        print(f"Error uploading documents: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @supplier_bp.route('/change_password', methods=['POST'])
@@ -314,4 +395,6 @@ def change_password():
     
     except Exception as e:
         print(f"Error changing password: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500

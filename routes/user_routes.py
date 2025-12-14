@@ -389,3 +389,169 @@ def view_contractor(contractor_id):
     except Exception as e:
         flash(f'Error loading contractor: {str(e)}', 'error')
         return redirect(url_for('user.find_contractors'))
+
+@user_bp.route('/project/<project_id>/bids')
+@login_required
+def project_bids(project_id):
+    """View all bids for a specific project"""
+    db = get_db()  # ← ADD THIS LINE
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.projects'))
+    
+    try:
+        # Get project
+        project_doc = db.collection('projects').document(project_id).get()
+        
+        if not project_doc.exists:
+            flash('Project not found', 'error')
+            return redirect(url_for('user.projects'))
+        
+        project_data = project_doc.to_dict()
+        
+        # Check ownership
+        if project_data.get('user_id') != current_user.id:
+            flash('Access denied', 'error')
+            return redirect(url_for('user.projects'))
+        
+        project_data['id'] = project_id
+        
+        # Get all bids for this project
+        bids_ref = db.collection('bids').where('project_id', '==', project_id).stream()
+        bids = []
+        
+        for doc in bids_ref:
+            bid_data = doc.to_dict()
+            bid_data['id'] = doc.id
+            bids.append(bid_data)
+        
+        # Sort by created_at
+        bids.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
+        
+        # Count by status
+        pending = len([b for b in bids if b.get('status') == 'pending'])
+        accepted = len([b for b in bids if b.get('status') == 'accepted'])
+        rejected = len([b for b in bids if b.get('status') == 'rejected'])
+        
+        stats = {
+            'total': len(bids),
+            'pending': pending,
+            'accepted': accepted,
+            'rejected': rejected
+        }
+        
+        return render_template('user/project_bids.html', 
+                             project=project_data, 
+                             bids=bids, 
+                             stats=stats)
+        
+    except Exception as e:
+        flash(f'Error loading bids: {str(e)}', 'error')
+        return redirect(url_for('user.projects'))
+
+@user_bp.route('/bid/<bid_id>/accept', methods=['POST'])
+@login_required
+def accept_bid(bid_id):
+    """Accept a bid and assign contractor to project"""
+    db = get_db()  # ← ADD THIS LINE
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.projects'))
+    
+    try:
+        bid_doc = db.collection('bids').document(bid_id).get()
+        
+        if not bid_doc.exists:
+            flash('Bid not found', 'error')
+            return redirect(url_for('user.projects'))
+        
+        bid_data = bid_doc.to_dict()
+        
+        # Get project to verify ownership
+        project_doc = db.collection('projects').document(bid_data.get('project_id')).get()
+        project_data = project_doc.to_dict()
+        
+        if project_data.get('user_id') != current_user.id:
+            flash('Access denied', 'error')
+            return redirect(url_for('user.projects'))
+        
+        # Update bid status to accepted
+        db.collection('bids').document(bid_id).update({
+            'status': 'accepted',
+            'accepted_at': datetime.now(),
+            'updated_at': datetime.now()
+        })
+        
+        # Reject all other bids for this project
+        other_bids = db.collection('bids').where('project_id', '==', bid_data.get('project_id')).stream()
+        for other_bid in other_bids:
+            if other_bid.id != bid_id and other_bid.to_dict().get('status') == 'pending':
+                db.collection('bids').document(other_bid.id).update({
+                    'status': 'rejected',
+                    'rejected_at': datetime.now(),
+                    'updated_at': datetime.now()
+                })
+        
+        # Update project with contractor info and change status to active
+        db.collection('projects').document(bid_data.get('project_id')).update({
+            'contractor_id': bid_data.get('contractor_id'),
+            'contractor_name': bid_data.get('contractor_name'),
+            'contractor_company': bid_data.get('contractor_company'),
+            'agreed_cost': bid_data.get('total_cost'),
+            'agreed_duration': bid_data.get('duration_days'),
+            'status': 'active',
+            'started_at': datetime.now(),
+            'updated_at': datetime.now()
+        })
+        
+        flash('Bid accepted! Contractor has been assigned to your project.', 'success')
+        return redirect(url_for('user.project_bids', project_id=bid_data.get('project_id')))
+        
+    except Exception as e:
+        flash(f'Error accepting bid: {str(e)}', 'error')
+        return redirect(url_for('user.projects'))
+
+@user_bp.route('/bid/<bid_id>/reject', methods=['POST'])
+@login_required
+def reject_bid(bid_id):
+    """Reject a bid"""
+    db = get_db()  # ← ADD THIS LINE
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.projects'))
+    
+    try:
+        bid_doc = db.collection('bids').document(bid_id).get()
+        
+        if not bid_doc.exists:
+            flash('Bid not found', 'error')
+            return redirect(url_for('user.projects'))
+        
+        bid_data = bid_doc.to_dict()
+        
+        # Get project to verify ownership
+        project_doc = db.collection('projects').document(bid_data.get('project_id')).get()
+        project_data = project_doc.to_dict()
+        
+        if project_data.get('user_id') != current_user.id:
+            flash('Access denied', 'error')
+            return redirect(url_for('user.projects'))
+        
+        # Check if bid is still pending
+        if bid_data.get('status') != 'pending':
+            flash('Only pending bids can be rejected', 'error')
+            return redirect(url_for('user.project_bids', project_id=bid_data.get('project_id')))
+        
+        # Update bid status to rejected
+        db.collection('bids').document(bid_id).update({
+            'status': 'rejected',
+            'rejected_at': datetime.now(),
+            'updated_at': datetime.now()
+        })
+        
+        flash('Bid rejected successfully', 'success')
+        return redirect(url_for('user.project_bids', project_id=bid_data.get('project_id')))
+        
+    except Exception as e:
+        flash(f'Error rejecting bid: {str(e)}', 'error')
+        return redirect(url_for('user.projects'))

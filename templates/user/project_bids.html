@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Bids - House-Forge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .back-link {
+            color: #667eea;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .project-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .project-info {
+            display: flex;
+            gap: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .bid-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .bid-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .bid-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+        }
+        
+        .contractor-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .contractor-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+        }
+        
+        .contractor-details h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .contractor-details p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .rating {
+            color: #ffa500;
+            font-size: 14px;
+        }
+        
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-accepted {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .bid-details {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .detail-item {
+            text-align: center;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .bid-proposal {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 15px 0;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .bid-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 15px;
+        }
+        
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .bid-details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-brand">🏗️ House-Forge</div>
+        <div class="navbar-menu">
+            <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('user.projects') }}">My Projects</a>
+            <a href="{{ url_for('user.profile') }}">Profile</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <a href="{{ url_for('user.view_project', project_id=project.id) }}" class="back-link">
+            ← Back to Project
+        </a>
+        
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="project-title">📋 Bids for: {{ project.title }}</h1>
+            <div class="project-info">
+                <span>📏 {{ project.square_feet }} sq ft</span>
+                <span>📍 {{ project.location }}</span>
+                <span>💰 {{ project.budget_range.title() }} Budget</span>
+            </div>
+        </div>
+        
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total }}</div>
+                <div class="stat-label">Total Bids</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.pending }}</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.accepted }}</div>
+                <div class="stat-label">Accepted</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.rejected }}</div>
+                <div class="stat-label">Rejected</div>
+            </div>
+        </div>
+        
+        <!-- Bids List -->
+        {% if bids %}
+            {% for bid in bids %}
+            <div class="bid-card">
+                <div class="bid-header">
+                    <div class="contractor-info">
+                        <div class="contractor-avatar">🔨</div>
+                        <div class="contractor-details">
+                            <h3>{{ bid.contractor_company or bid.contractor_name }}</h3>
+                            <p>{{ bid.contractor_name if bid.contractor_company else 'Professional Contractor' }}</p>
+                            <span class="rating">
+                                ⭐ {{ "%.1f"|format(bid.contractor_rating or 0) }} 
+                                • {{ bid.contractor_experience or 0 }} years exp
+                            </span>
+                        </div>
+                    </div>
+                    <span class="status-badge status-{{ bid.status }}">
+                        {% if bid.status == 'pending' %}⏳ Pending
+                        {% elif bid.status == 'accepted' %}✅ Accepted
+                        {% elif bid.status == 'rejected' %}❌ Rejected
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="bid-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Total Cost</div>
+                        <div class="detail-value">₹{{ "{:,.0f}".format(bid.total_cost) }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Duration</div>
+                        <div class="detail-value">{{ bid.duration_days }} days</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Material Cost</div>
+                        <div class="detail-value" style="font-size: 14px;">₹{{ "{:,.0f}".format(bid.material_cost or 0) }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Labor Cost</div>
+                        <div class="detail-value" style="font-size: 14px;">₹{{ "{:,.0f}".format(bid.labor_cost or 0) }}</div>
+                    </div>
+                </div>
+                
+                <div class="bid-proposal">
+                    <strong>Proposal:</strong><br>
+                    {{ bid.proposal }}
+                </div>
+                
+                <div style="font-size: 12px; color: #999; margin-top: 10px;">
+                    Submitted: {{ bid.created_at.strftime('%d %b %Y, %I:%M %p') if bid.created_at else 'N/A' }}
+                </div>
+                
+                {% if bid.status == 'pending' %}
+                <div class="bid-actions">
+                    <form method="POST" action="{{ url_for('user.accept_bid', bid_id=bid.id) }}" onsubmit="return confirm('Accept this bid and assign contractor to your project?');" style="flex: 1;">
+                        <button type="submit" class="btn btn-success" style="width: 100%;">✅ Accept Bid</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('user.reject_bid', bid_id=bid.id) }}" onsubmit="return confirm('Reject this bid?');" style="flex: 1;">
+                        <button type="submit" class="btn btn-danger" style="width: 100%;">❌ Reject Bid</button>
+                    </form>
+                    <a href="{{ url_for('user.view_contractor', contractor_id=bid.contractor_id) }}" class="btn btn-outline">View Profile</a>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <h2>No Bids Yet</h2>
+                <p>No contractors have submitted bids for this project yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

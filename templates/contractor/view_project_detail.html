@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Details - House-Forge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .back-link {
+            color: #f5576c;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .project-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .project-meta {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            color: #666;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            font-weight: 600;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .budget-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .budget-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .budget-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .btn {
+            padding: 14px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-disabled {
+            background: #e0e0e0;
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        @media (max-width: 1024px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-brand">🔨 House-Forge Contractor</div>
+        <div class="navbar-menu">
+            <a href="{{ url_for('contractor.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('contractor.browse_projects') }}">Browse Projects</a>
+            <a href="{{ url_for('contractor.my_bids') }}">My Bids</a>
+            <a href="{{ url_for('contractor.profile') }}">Profile</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <a href="{{ url_for('contractor.browse_projects') }}" class="back-link">
+            ← Back to Projects
+        </a>
+        
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="project-title">{{ project.title }}</h1>
+            <div class="project-meta">
+                <span>📍 {{ project.location or 'Location not specified' }}</span>
+                <span>📏 {{ project.square_feet }} sq ft</span>
+                <span>🚪 {{ project.rooms }} Rooms</span>
+                <span>🏢 {{ project.floors }} Floors</span>
+            </div>
+        </div>
+        
+        <!-- Status Messages -->
+        {% if project.has_bid %}
+        <div class="alert alert-info">
+            ✓ You have already submitted a bid for this project.
+        </div>
+        {% endif %}
+        
+        <div class="two-column">
+            <!-- Main Content -->
+            <div>
+                <!-- Project Details -->
+                <div class="section">
+                    <h3 class="section-title">📋 Project Details</h3>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Total Area</span>
+                            <span class="info-value">{{ project.square_feet }} sq ft</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Location</span>
+                            <span class="info-value">{{ project.location or 'Not specified' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Number of Rooms</span>
+                            <span class="info-value">{{ project.rooms }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Number of Floors</span>
+                            <span class="info-value">{{ project.floors }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Bathrooms</span>
+                            <span class="info-value">{{ project.bathrooms or 2 }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Property Type</span>
+                            <span class="info-value">{{ project.property_type.title() if project.property_type else 'Residential' }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                {% if project.description %}
+                <div class="section">
+                    <h3 class="section-title">📝 Project Description</h3>
+                    <p style="color: #666; line-height: 1.8;">{{ project.description }}</p>
+                </div>
+                {% endif %}
+                
+                <!-- Owner Info -->
+                <div class="section">
+                    <h3 class="section-title">👤 Project Owner</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Name</span>
+                            <span class="info-value">{{ project.user_name or 'N/A' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Contact</span>
+                            <span class="info-value">Contact after bid acceptance</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Existing Bid Info -->
+                {% if project.has_bid and project.existing_bid %}
+                <div class="section">
+                    <h3 class="section-title">📋 Your Submitted Bid</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Total Cost</span>
+                            <span class="info-value">₹{{ "{:,.0f}".format(project.existing_bid.total_cost) }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Duration</span>
+                            <span class="info-value">{{ project.existing_bid.duration_days }} days</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status</span>
+                            <span class="info-value">{{ project.existing_bid.status.title() }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Submitted</span>
+                            <span class="info-value">{{ project.existing_bid.created_at.strftime('%d %b %Y') if project.existing_bid.created_at else 'N/A' }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Sidebar -->
+            <div>
+                <!-- Budget Card -->
+                <div class="budget-card">
+                    <div class="budget-label">Budget Range</div>
+                    <div class="budget-value">{{ project.budget_range.title() if project.budget_range else 'Medium' }}</div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="section">
+                    <h3 class="section-title">⚡ Actions</h3>
+                    
+                    {% if project.has_bid %}
+                        {% if project.existing_bid.status == 'pending' %}
+                            <a href="{{ url_for('contractor.edit_bid', bid_id=project.existing_bid.id) }}" class="btn btn-primary">
+                                ✏️ Edit Your Bid
+                            </a>
+                            <a href="{{ url_for('contractor.my_bids') }}" class="btn btn-success">
+                                View My Bids
+                            </a>
+                        {% elif project.existing_bid.status == 'accepted' %}
+                            <button class="btn btn-success">✅ Bid Accepted!</button>
+                            <a href="{{ url_for('contractor.my_projects') }}" class="btn btn-primary">
+                                Go to My Projects
+                            </a>
+                        {% else %}
+                            <button class="btn btn-disabled" disabled>❌ Bid Rejected</button>
+                            <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-primary">
+                                Browse Other Projects
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('contractor.submit_bid', project_id=project.id) }}" class="btn btn-primary">
+                            📝 Submit Your Bid
+                        </a>
+                        <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-success">
+                            Back to Projects
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Project Stats -->
+                <div class="section">
+                    <h3 class="section-title">📊 Quick Stats</h3>
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="font-size: 40px; color: #f5576c; font-weight: bold; margin-bottom: 10px;">
+                            {{ project.square_feet }}
+                        </div>
+                        <div style="color: #666; font-size: 14px;">Total Square Feet</div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px;">
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #333;">{{ project.rooms }}</div>
+                            <div style="font-size: 12px; color: #666;">Rooms</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #333;">{{ project.floors }}</div>
+                            <div style="font-size: 12px; color: #666;">Floors</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #333;">{{ project.bathrooms or 2 }}</div>
+                            <div style="font-size: 12px; color: #666;">Baths</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

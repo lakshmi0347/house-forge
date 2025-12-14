@@ -397,7 +397,7 @@
                     </div>
                     
                     <div class="bid-actions">
-                        <a href="{{ url_for('contractor.view_project', project_id=bid.project_id) }}" class="btn btn-primary">
+                        <a href="/contractor/project/{{ bid.project_id }}/view" class="btn btn-primary">
                             View Project
                         </a>
                         
@@ -411,9 +411,9 @@
                         {% endif %}
                         
                         {% if bid.status == 'accepted' %}
-                        <button class="btn btn-outline" onclick="alert('Contract management feature coming soon!')">
+                        <a href="/contractor/project/{{ bid.project_id }}/view" class="btn btn-outline">
                             View Contract
-                        </button>
+                        </a>
                         {% endif %}
                     </div>
                 </div>

@@ -287,7 +287,7 @@
             </div>
         </div>
         
-        <!-- Quick Actions -->
+      <!-- Quick Actions -->
         <div class="section">
             <div class="section-header">
                 <h2 class="section-title">Quick Actions</h2>
@@ -298,19 +298,14 @@
                     <div class="action-label">New Project</div>
                 </a>
                 
-                <a href="#" class="action-card">
+                <a href="{{ url_for('user.find_contractors') }}" class="action-card">
                     <div class="action-icon">🔨</div>
                     <div class="action-label">Find Contractors</div>
                 </a>
                 
-                <a href="#" class="action-card">
+                <a href="{{ url_for('user.find_suppliers') }}" class="action-card">
                     <div class="action-icon">📦</div>
-                    <div class="action-label">Order Materials</div>
-                </a>
-                
-                <a href="#" class="action-card">
-                    <div class="action-icon">💰</div>
-                    <div class="action-label">Get Estimate</div>
+                    <div class="action-label">Find Suppliers</div>
                 </a>
             </div>
         </div>

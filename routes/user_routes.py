@@ -555,3 +555,294 @@ def reject_bid(bid_id):
     except Exception as e:
         flash(f'Error rejecting bid: {str(e)}', 'error')
         return redirect(url_for('user.projects'))
+
+# Add these routes to your existing user_routes.py file
+
+@user_bp.route('/find-suppliers')
+@login_required
+def find_suppliers():
+    """Browse and find verified suppliers"""
+    db = get_db()
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.dashboard'))
+    
+    try:
+        suppliers_ref = db.collection('suppliers').where('verified', '==', True).where('active', '==', True).stream()
+        suppliers = []
+        
+        for doc in suppliers_ref:
+            supplier_data = doc.to_dict()
+            supplier_data['id'] = doc.id
+            
+            # Count materials offered by this supplier
+            materials_ref = db.collection('materials').where('supplier_id', '==', doc.id).stream()
+            supplier_data['materials_count'] = len(list(materials_ref))
+            
+            suppliers.append(supplier_data)
+        
+        # Sort by rating descending
+        suppliers.sort(key=lambda x: x.get('rating', 0), reverse=True)
+        
+        return render_template('user/find_suppliers.html', suppliers=suppliers)
+        
+    except Exception as e:
+        flash(f'Error loading suppliers: {str(e)}', 'error')
+        return redirect(url_for('user.dashboard'))
+
+
+@user_bp.route('/supplier/<supplier_id>')
+@login_required
+def view_supplier(supplier_id):
+    """View supplier profile and their materials"""
+    db = get_db()
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.find_suppliers'))
+    
+    try:
+        supplier_doc = db.collection('suppliers').document(supplier_id).get()
+        
+        if not supplier_doc.exists:
+            flash('Supplier not found', 'error')
+            return redirect(url_for('user.find_suppliers'))
+        
+        supplier_data = supplier_doc.to_dict()
+        supplier_data['id'] = supplier_id
+        
+        # Get materials offered by this supplier
+        materials_ref = db.collection('materials').where('supplier_id', '==', supplier_id).stream()
+        materials = []
+        
+        for doc in materials_ref:
+            material_data = doc.to_dict()
+            material_data['id'] = doc.id
+            materials.append(material_data)
+        
+        return render_template('user/supplier_profile.html', supplier=supplier_data, materials=materials)
+        
+    except Exception as e:
+        flash(f'Error loading supplier: {str(e)}', 'error')
+        return redirect(url_for('user.find_suppliers'))
+
+
+@user_bp.route('/project/<project_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_project(project_id):
+    """Edit an existing project"""
+    db = get_db()
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.projects'))
+    
+    try:
+        project_doc = db.collection('projects').document(project_id).get()
+        
+        if not project_doc.exists:
+            flash('Project not found', 'error')
+            return redirect(url_for('user.projects'))
+        
+        project_data = project_doc.to_dict()
+        
+        # Check ownership
+        if project_data.get('user_id') != current_user.id:
+            flash('Access denied', 'error')
+            return redirect(url_for('user.projects'))
+        
+        if request.method == 'POST':
+            from services.calculation_service import calculate_materials_and_cost
+            
+            square_feet = float(request.form.get('square_feet'))
+            rooms = int(request.form.get('rooms'))
+            floors = int(request.form.get('floors'))
+            bathrooms = int(request.form.get('bathrooms', 2))
+            budget_range = request.form.get('budget_range')
+            
+            # Recalculate estimation
+            estimation = calculate_materials_and_cost(
+                square_feet, rooms, floors, bathrooms, budget_range
+            )
+            
+            # Update project data
+            updated_data = {
+                'title': request.form.get('title'),
+                'square_feet': square_feet,
+                'rooms': rooms,
+                'floors': floors,
+                'bathrooms': bathrooms,
+                'location': request.form.get('location'),
+                'property_type': request.form.get('property_type', 'residential'),
+                'budget_range': budget_range,
+                'description': request.form.get('description'),
+                'estimation': estimation,
+                'updated_at': datetime.now()
+            }
+            
+            db.collection('projects').document(project_id).update(updated_data)
+            flash('Project updated successfully!', 'success')
+            return redirect(url_for('user.view_project', project_id=project_id))
+        
+        # GET request - show edit form
+        project_data['id'] = project_id
+        return render_template('user/edit_project.html', project=project_data)
+        
+    except Exception as e:
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('user.projects'))
+
+
+@user_bp.route('/materials/browse')
+@login_required
+def browse_materials():
+    """Browse available materials from suppliers"""
+    db = get_db()
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.dashboard'))
+    
+    try:
+        # Get all materials from all suppliers
+        materials_ref = db.collection('materials').stream()
+        materials = []
+        
+        for doc in materials_ref:
+            material_data = doc.to_dict()
+            material_data['id'] = doc.id
+            
+            # Get supplier info
+            supplier_id = material_data.get('supplier_id')
+            if supplier_id:
+                supplier_doc = db.collection('suppliers').document(supplier_id).get()
+                if supplier_doc.exists:
+                    supplier_data = supplier_doc.to_dict()
+                    material_data['supplier_name'] = supplier_data.get('company_name') or supplier_data.get('name')
+                    material_data['supplier_rating'] = supplier_data.get('rating', 0.0)
+            
+            materials.append(material_data)
+        
+        return render_template('user/browse_materials.html', materials=materials)
+        
+    except Exception as e:
+        flash(f'Error loading materials: {str(e)}', 'error')
+        return redirect(url_for('user.dashboard'))
+
+
+@user_bp.route('/project/<project_id>/order-materials')
+@login_required
+def order_materials(project_id):
+    """Order materials for a specific project"""
+    db = get_db()
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.projects'))
+    
+    try:
+        # Get project
+        project_doc = db.collection('projects').document(project_id).get()
+        
+        if not project_doc.exists:
+            flash('Project not found', 'error')
+            return redirect(url_for('user.projects'))
+        
+        project_data = project_doc.to_dict()
+        
+        # Check ownership
+        if project_data.get('user_id') != current_user.id:
+            flash('Access denied', 'error')
+            return redirect(url_for('user.projects'))
+        
+        project_data['id'] = project_id
+        
+        # Get all materials
+        materials_ref = db.collection('materials').stream()
+        materials = []
+        
+        for doc in materials_ref:
+            material_data = doc.to_dict()
+            material_data['id'] = doc.id
+            
+            # Get supplier info
+            supplier_id = material_data.get('supplier_id')
+            if supplier_id:
+                supplier_doc = db.collection('suppliers').document(supplier_id).get()
+                if supplier_doc.exists:
+                    supplier_data = supplier_doc.to_dict()
+                    material_data['supplier_name'] = supplier_data.get('company_name') or supplier_data.get('name')
+            
+            materials.append(material_data)
+        
+        # Get project's estimated materials
+        estimation = project_data.get('estimation', {})
+        estimated_materials = estimation.get('materials', {})
+        
+        return render_template('user/order_materials.html', 
+                             project=project_data, 
+                             materials=materials,
+                             estimated_materials=estimated_materials)
+        
+    except Exception as e:
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('user.projects'))
+
+
+@user_bp.route('/order/create', methods=['POST'])
+@login_required
+def create_order():
+    """Create a material order"""
+    db = get_db()
+    if not db:
+        return jsonify({'success': False, 'message': 'Database connection error'}), 500
+    
+    try:
+        project_id = request.form.get('project_id')
+        material_ids = request.form.getlist('material_ids[]')
+        quantities = request.form.getlist('quantities[]')
+        
+        if not material_ids or not quantities:
+            return jsonify({'success': False, 'message': 'No materials selected'}), 400
+        
+        # Calculate total
+        total_cost = 0
+        order_items = []
+        
+        for i, material_id in enumerate(material_ids):
+            material_doc = db.collection('materials').document(material_id).get()
+            if material_doc.exists:
+                material_data = material_doc.to_dict()
+                quantity = int(quantities[i])
+                item_cost = material_data.get('price', 0) * quantity
+                
+                order_items.append({
+                    'material_id': material_id,
+                    'material_name': material_data.get('name'),
+                    'quantity': quantity,
+                    'unit': material_data.get('unit'),
+                    'price_per_unit': material_data.get('price'),
+                    'total': item_cost,
+                    'supplier_id': material_data.get('supplier_id')
+                })
+                
+                total_cost += item_cost
+        
+        # Create order
+        order_data = {
+            'user_id': current_user.id,
+            'project_id': project_id,
+            'items': order_items,
+            'total': total_cost,
+            'status': 'pending',
+            'created_at': datetime.now(),
+            'updated_at': datetime.now()
+        }
+        
+        order_ref = db.collection('orders').add(order_data)
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Order placed successfully!',
+            'order_id': order_ref[1].id
+        })
+        
+    except Exception as e:
+        print(f"Error creating order: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500

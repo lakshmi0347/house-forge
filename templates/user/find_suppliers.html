@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Suppliers - House-Forge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .page-title {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .search-filter {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .filter-group input,
+        .filter-group select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        
+        .suppliers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .supplier-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .supplier-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .supplier-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        
+        .supplier-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            margin-right: 15px;
+        }
+        
+        .supplier-info {
+            flex: 1;
+        }
+        
+        .supplier-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .supplier-type {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .verified-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .stars {
+            color: #ffa500;
+            font-size: 18px;
+        }
+        
+        .rating-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .supplier-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #4facfe;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .supplier-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #4facfe;
+            border: 2px solid #4facfe;
+        }
+        
+        .btn-outline:hover {
+            background: #4facfe;
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 15px;
+        }
+        
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .suppliers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">🏗️ House-Forge</div>
+        <div class="navbar-menu">
+            <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('user.projects') }}">My Projects</a>
+            <a href="{{ url_for('user.find_contractors') }}">Contractors</a>
+            <a href="{{ url_for('user.find_suppliers') }}">Suppliers</a>
+            <a href="{{ url_for('user.profile') }}">Profile</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">📦 Find Verified Suppliers</h1>
+            <p>Connect with trusted material suppliers for your construction project</p>
+        </div>
+        
+        <!-- Search & Filter -->
+        <div class="search-filter">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label>Search by name</label>
+                    <input type="text" id="searchInput" placeholder="Search suppliers...">
+                </div>
+                <div class="filter-group">
+                    <label>Business Type</label>
+                    <select id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="retailer">Retailer</option>
+                        <option value="wholesaler">Wholesaler</option>
+                        <option value="manufacturer">Manufacturer</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Rating</label>
+                    <select id="ratingFilter">
+                        <option value="">All Ratings</option>
+                        <option value="4">4+ stars</option>
+                        <option value="3">3+ stars</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Suppliers Grid -->
+        {% if suppliers %}
+            <div class="suppliers-grid" id="suppliersGrid">
+                {% for supplier in suppliers %}
+                <div class="supplier-card" 
+                     data-name="{{ supplier.company_name or supplier.name }}" 
+                     data-type="{{ supplier.business_type or '' }}"
+                     data-rating="{{ supplier.rating or 0 }}">
+                    <div class="supplier-header">
+                        <div style="display: flex; align-items: start;">
+                            <div class="supplier-avatar">📦</div>
+                            <div class="supplier-info">
+                                <div class="supplier-name">{{ supplier.company_name or supplier.name }}</div>
+                                <div class="supplier-type">{{ supplier.business_type.title() if supplier.business_type else 'Supplier' }}</div>
+                                {% if supplier.verified %}
+                                <span class="verified-badge">✓ Verified</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rating">
+                        <span class="stars">
+                            {% set rating = supplier.rating or 0 %}
+                            {% for i in range(5) %}
+                                {% if i < rating %}★{% else %}☆{% endif %}
+                            {% endfor %}
+                        </span>
+                        <span class="rating-value">{{ "%.1f"|format(supplier.rating or 0) }}</span>
+                    </div>
+                    
+                    <div class="supplier-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">{{ supplier.materials_count or 0 }}</div>
+                            <div class="stat-label">Materials</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ supplier.total_orders or 0 }}</div>
+                            <div class="stat-label">Orders</div>
+                        </div>
+                    </div>
+                    
+                    {% if supplier.location %}
+                    <div style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                        📍 {{ supplier.location }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="supplier-actions">
+                        <a href="{{ url_for('user.view_supplier', supplier_id=supplier.id) }}" class="btn btn-primary">View Profile</a>
+                        <a href="#" class="btn btn-outline" onclick="alert('Contact feature coming soon!'); return false;">Contact</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <h2>No Suppliers Available</h2>
+                <p>No verified suppliers found at the moment. Check back later!</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const typeFilter = document.getElementById('typeFilter');
+        const ratingFilter = document.getElementById('ratingFilter');
+        const supplierCards = document.querySelectorAll('.supplier-card');
+        
+        function filterSuppliers() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const typeValue = typeFilter.value.toLowerCase();
+            const ratingValue = parseFloat(ratingFilter.value) || 0;
+            
+            supplierCards.forEach(card => {
+                const name = card.dataset.name.toLowerCase();
+                const type = card.dataset.type.toLowerCase();
+                const rating = parseFloat(card.dataset.rating);
+                
+                let show = true;
+                
+                if (searchTerm && !name.includes(searchTerm)) {
+                    show = false;
+                }
+                
+                if (typeValue && type !== typeValue) {
+                    show = false;
+                }
+                
+                if (ratingValue > 0 && rating < ratingValue) {
+                    show = false;
+                }
+                
+                card.style.display = show ? 'block' : 'none';
+            });
+        }
+        
+        searchInput.addEventListener('input', filterSuppliers);
+        typeFilter.addEventListener('change', filterSuppliers);
+        ratingFilter.addEventListener('change', filterSuppliers);
+    </script>
+</body>
+</html>

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Materials - House-Forge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .back-link {
+            color: #667eea;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .project-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .project-info {
+            display: flex;
+            gap: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            font-weight: 600;
+        }
+        
+        .materials-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .material-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        
+        .material-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .material-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .material-info {
+            flex: 1;
+        }
+        
+        .material-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .material-category {
+            font-size: 13px;
+            color: #999;
+            text-transform: uppercase;
+        }
+        
+        .material-supplier {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .material-price-section {
+            text-align: right;
+        }
+        
+        .material-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .material-unit {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .quantity-input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .cart-summary {
+            position: sticky;
+            top: 20px;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .summary-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-top: 12px;
+            border-top: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .summary-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .summary-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .total-amount {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: block;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,255,255,0.3);
+        }
+        
+        .btn-primary:disabled {
+            background: #ccc;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .estimated-materials {
+            background: #fff9e6;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .estimated-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .estimated-list {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .estimated-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 1024px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">🏗️ House-Forge</div>
+        <div class="navbar-menu">
+            <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('user.projects') }}">My Projects</a>
+            <a href="{{ url_for('user.profile') }}">Profile</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <a href="{{ url_for('user.view_project', project_id=project.id) }}" class="back-link">
+            ← Back to Project
+        </a>
+        
+        <div class="page-header">
+            <h1 class="project-title">📦 Order Materials for: {{ project.title }}</h1>
+            <div class="project-info">
+                <span>📏 {{ project.square_feet }} sq ft</span>
+                <span>📍 {{ project.location }}</span>
+                <span>💰 {{ project.budget_range.title() }} Budget</span>
+            </div>
+        </div>
+        
+        <div id="alertContainer"></div>
+        
+        <div class="two-column">
+            <!-- Materials List -->
+            <div class="section">
+                <h2 class="section-title">Available Materials</h2>
+                
+                {% if materials %}
+                    <div class="materials-list" id="materialsList">
+                        {% for material in materials %}
+                        <div class="material-item">
+                            <input type="checkbox" class="material-checkbox" 
+                                   data-id="{{ material.id }}"
+                                   data-name="{{ material.name }}"
+                                   data-price="{{ material.price }}"
+                                   data-unit="{{ material.unit }}"
+                                   onchange="updateCart()">
+                            
+                            <div class="material-info">
+                                <div class="material-name">{{ material.name }}</div>
+                                <div class="material-category">{{ material.category }}</div>
+                                <div class="material-supplier">🏪 {{ material.supplier_name or 'Supplier' }}</div>
+                            </div>
+                            
+                            <div class="material-price-section">
+                                <div class="material-price">₹{{ "{:,.0f}".format(material.price) }}</div>
+                                <div class="material-unit">per {{ material.unit }}</div>
+                            </div>
+                            
+                            <input type="number" class="quantity-input" 
+                                   id="qty-{{ material.id }}"
+                                   min="1" value="1" 
+                                   onchange="updateCart()"
+                                   disabled>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <h3>No Materials Available</h3>
+                        <p>There are no materials listed by suppliers yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Cart Summary -->
+            <div>
+                <div class="cart-summary">
+                    <!-- Estimated Materials -->
+                    {% if estimated_materials %}
+                    <div class="estimated-materials">
+                        <div class="estimated-title">💡 Estimated Materials Needed</div>
+                        <div class="estimated-list">
+                            {% for stage, materials_dict in estimated_materials.items() %}
+                                {% for material, quantity in materials_dict.items() %}
+                                    {% if quantity > 0 %}
+                                    <div class="estimated-item">
+                                        <span>{{ material.replace('_', ' ').title() }}</span>
+                                        <span>{{ "{:,.0f}".format(quantity) }}</span>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Order Summary -->
+                    <div class="summary-card">
+                        <div class="summary-title">Order Summary</div>
+                        
+                        <div class="summary-row">
+                            <span class="summary-label">Items Selected</span>
+                            <span class="summary-value" id="itemCount">0</span>
+                        </div>
+                        
+                        <div class="summary-row">
+                            <span class="summary-label">Total Amount</span>
+                            <span class="summary-value total-amount" id="totalAmount">₹0</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="placeOrderBtn" onclick="placeOrder()" disabled>
+                        Place Order
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedMaterials = [];
+        
+        function updateCart() {
+            selectedMaterials = [];
+            let totalAmount = 0;
+            
+            // Get all checked checkboxes
+            const checkboxes = document.querySelectorAll('.material-checkbox:checked');
+            
+            checkboxes.forEach(checkbox => {
+                const materialId = checkbox.dataset.id;
+                const materialName = checkbox.dataset.name;
+                const price = parseFloat(checkbox.dataset.price);
+                const unit = checkbox.dataset.unit;
+                const qtyInput = document.getElementById('qty-' + materialId);
+                const quantity = parseInt(qtyInput.value) || 1;
+                
+                selectedMaterials.push({
+                    id: materialId,
+                    name: materialName,
+                    price: price,
+                    quantity: quantity,
+                    unit: unit,
+                    total: price * quantity
+                });
+                
+                totalAmount += price * quantity;
+            });
+            
+            // Update summary
+            document.getElementById('itemCount').textContent = selectedMaterials.length;
+            document.getElementById('totalAmount').textContent = '₹' + totalAmount.toLocaleString('en-IN', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+            
+            // Enable/disable order button
+            document.getElementById('placeOrderBtn').disabled = selectedMaterials.length === 0;
+        }
+        
+        // Enable/disable quantity input when checkbox changes
+        document.querySelectorAll('.material-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const materialId = this.dataset.id;
+                const qtyInput = document.getElementById('qty-' + materialId);
+                qtyInput.disabled = !this.checked;
+            });
+        });
+        
+        function placeOrder() {
+            if (selectedMaterials.length === 0) {
+                showAlert('Please select at least one material', 'error');
+                return;
+            }
+            
+            if (!confirm('Place order for ' + selectedMaterials.length + ' materials?')) {
+                return;
+            }
+            
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('project_id', '{{ project.id }}');
+            
+            selectedMaterials.forEach(material => {
+                formData.append('material_ids[]', material.id);
+                formData.append('quantities[]', material.quantity);
+            });
+            
+            // Submit order
+            fetch('{{ url_for("user.create_order") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Order placed successfully!', 'success');
+                    
+                    // Reset after 2 seconds and redirect
+                    setTimeout(() => {
+                        window.location.href = '{{ url_for("user.view_project", project_id=project.id) }}';
+                    }, 2000);
+                } else {
+                    showAlert('Error: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('An error occurred while placing the order', 'error');
+            });
+        }
+        
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-' + type;
+            alertDiv.textContent = message;
+            
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = '';
+            container.appendChild(alertDiv);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

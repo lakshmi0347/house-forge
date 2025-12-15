@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - House-Forge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+            position: relative;
+        }
+        
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .badge-notification {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff3b30;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .page-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .messages-container {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .message-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            border-left: 4px solid #f5576c;
+        }
+        
+        .message-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .message-card.unread {
+            background: #fff9e6;
+            border-left-color: #ffa500;
+        }
+        
+        .message-card.quote-request {
+            border-left-color: #667eea;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .message-sender {
+            flex: 1;
+        }
+        
+        .sender-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .sender-email {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .message-meta {
+            text-align: right;
+        }
+        
+        .message-date {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+        
+        .message-type-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .type-message {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .type-quote {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .message-subject {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .message-content {
+            color: #666;
+            line-height: 1.8;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .quote-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .quote-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .quote-detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .quote-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .quote-value {
+            font-size: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .contact-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .contact-item strong {
+            color: #333;
+        }
+        
+        .message-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #f5576c;
+            border: 2px solid #f5576c;
+        }
+        
+        .btn-outline:hover {
+            background: #f5576c;
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 15px;
+        }
+        
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover {
+            border-color: #f5576c;
+        }
+        
+        .filter-btn.active {
+            background: #f5576c;
+            color: white;
+            border-color: #f5576c;
+        }
+        
+        @media (max-width: 768px) {
+            .message-header {
+                flex-direction: column;
+            }
+            
+            .message-meta {
+                text-align: left;
+                margin-top: 10px;
+            }
+            
+            .quote-details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-brand">🔨 House-Forge Contractor</div>
+        <div class="navbar-menu">
+            <a href="/contractor/dashboard">Dashboard</a>
+            <a href="/contractor/browse-projects">Browse Projects</a>
+            <a href="/contractor/my-bids">My Bids</a>
+            <a href="/contractor/messages" style="position: relative;">
+                Messages
+                <span class="badge-notification" id="messagesBadge" style="display: none;">0</span>
+            </a>
+            <a href="/contractor/profile">Profile</a>
+            <a href="/auth/logout">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">📨 Messages & Inquiries</h1>
+            <p style="color: #666;">Messages and quote requests from potential clients</p>
+        </div>
+        
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterMessages('all')">All Messages</button>
+                <button class="filter-btn" onclick="filterMessages('message')">General Messages</button>
+                <button class="filter-btn" onclick="filterMessages('quote_request')">Quote Requests</button>
+            </div>
+        </div>
+        
+        <!-- Messages List -->
+        <div class="messages-container" id="messagesContainer">
+            <!-- Sample Message Card -->
+            <div class="message-card unread" data-type="message">
+                <div class="message-header">
+                    <div class="message-sender">
+                        <div class="sender-name">John Doe</div>
+                        <div class="sender-email">john@example.com</div>
+                    </div>
+                    <div class="message-meta">
+                        <div class="message-date">2 hours ago</div>
+                        <span class="message-type-badge type-message">💬 Message</span>
+                    </div>
+                </div>
+                
+                <div class="message-subject">Interested in Your Services</div>
+                
+                <div class="message-content">
+                    Hi, I'm planning a home renovation project and would like to discuss the possibility of working with you. I've seen your portfolio and I'm impressed with your work.
+                </div>
+                
+                <div class="contact-info">
+                    <div class="contact-item">
+                        📧 <strong>Email:</strong> john@example.com
+                    </div>
+                    <div class="contact-item">
+                        📞 <strong>Phone:</strong> +91 98765 43210
+                    </div>
+                </div>
+                
+                <div class="message-actions">
+                    <a href="mailto:john@example.com" class="btn btn-primary">Reply via Email</a>
+                    <a href="tel:+919876543210" class="btn btn-outline">Call</a>
+                </div>
+            </div>
+            
+            <!-- Sample Quote Request Card -->
+            <div class="message-card quote-request" data-type="quote_request">
+                <div class="message-header">
+                    <div class="message-sender">
+                        <div class="sender-name">Jane Smith</div>
+                        <div class="sender-email">jane@example.com</div>
+                    </div>
+                    <div class="message-meta">
+                        <div class="message-date">1 day ago</div>
+                        <span class="message-type-badge type-quote">💰 Quote Request</span>
+                    </div>
+                </div>
+                
+                <div class="message-subject">Quote Request: New Construction</div>
+                
+                <div class="quote-details">
+                    <div class="quote-details-grid">
+                        <div class="quote-detail-item">
+                            <span class="quote-label">Project Type</span>
+                            <span class="quote-value">New Construction</span>
+                        </div>
+                        <div class="quote-detail-item">
+                            <span class="quote-label">Area</span>
+                            <span class="quote-value">2,500 sq ft</span>
+                        </div>
+                        <div class="quote-detail-item">
+                            <span class="quote-label">Location</span>
+                            <span class="quote-value">Kochi, Kerala</span>
+                        </div>
+                        <div class="quote-detail-item">
+                            <span class="quote-label">Budget Range</span>
+                            <span class="quote-value">Standard</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-content">
+                    <strong>Project Details:</strong><br>
+                    We're looking to build a 3-bedroom house with modern amenities. We need a detailed quote including material and labor costs. The project should be completed within 6 months.
+                </div>
+                
+                <div class="contact-info">
+                    <div class="contact-item">
+                        📧 <strong>Email:</strong> jane@example.com
+                    </div>
+                    <div class="contact-item">
+                        📞 <strong>Phone:</strong> +91 98765 12345
+                    </div>
+                </div>
+                
+                <div class="message-actions">
+                    <a href="mailto:jane@example.com" class="btn btn-primary">Send Quote</a>
+                    <a href="tel:+919876512345" class="btn btn-outline">Call</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Empty State (hidden by default) -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-icon">📭</div>
+            <h2>No Messages Yet</h2>
+            <p>You haven't received any messages or quote requests yet.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Filter messages
+        function filterMessages(type) {
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter message cards
+            const cards = document.querySelectorAll('.message-card');
+            let visibleCount = 0;
+            
+            cards.forEach(card => {
+                if (type === 'all' || card.dataset.type === type) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Show/hide empty state
+            document.getElementById('emptyState').style.display = visibleCount === 0 ? 'block' : 'none';
+            document.getElementById('messagesContainer').style.display = visibleCount === 0 ? 'none' : 'grid';
+        }
+        
+        // Format relative time
+        function formatRelativeTime(date) {
+            const now = new Date();
+            const diff = now - date;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+            if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            return 'Just now';
+        }
+        
+        // Update message badge
+        function updateMessageBadge() {
+            fetch('/contractor/messages/unread-count')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('messagesBadge');
+                    if (data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                })
+                .catch(error => console.error('Error fetching unread count:', error));
+        }
+        
+        // Update badge every 30 seconds
+        setInterval(updateMessageBadge, 30000);
+        updateMessageBadge();
+    </script>
+</body>
+</html>

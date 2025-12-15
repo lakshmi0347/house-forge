@@ -933,3 +933,92 @@ def my_orders():
     except Exception as e:
         flash(f'Error loading orders: {str(e)}', 'error')
         return redirect(url_for('user.dashboard'))
+@user_bp.route('/contractor/<contractor_id>/send-message', methods=['POST'])
+@login_required
+def send_message_to_contractor(contractor_id):
+    """Send a message to a contractor"""
+    db = get_db()
+    
+    try:
+        # Get form data
+        name = request.form.get('name')
+        email = request.form.get('email')
+        phone = request.form.get('phone', '')
+        subject = request.form.get('subject')
+        message_content = request.form.get('message')
+        
+        # Get contractor info
+        contractor_doc = db.collection('contractors').document(contractor_id).get()
+        if not contractor_doc.exists:
+            return jsonify({'success': False, 'message': 'Contractor not found'}), 404
+        
+        contractor_data = contractor_doc.to_dict()
+        
+        # Create message data
+        message_data = {
+            'contractor_id': contractor_id,
+            'contractor_name': contractor_data.get('company_name') or contractor_data.get('name'),
+            'user_id': current_user.id,
+            'sender_name': name,
+            'sender_email': email,
+            'sender_phone': phone,
+            'subject': subject,
+            'message': message_content,
+            'read': False,
+            'created_at': datetime.now(),
+            'type': 'message'
+        }
+        
+        # Save to database
+        db.collection('messages').add(message_data)
+        
+        return jsonify({'success': True, 'message': 'Message sent successfully!'})
+        
+    except Exception as e:
+        print(f"Error sending message: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@user_bp.route('/contractor/<contractor_id>/request-quote', methods=['POST'])
+@login_required
+def request_quote_from_contractor(contractor_id):
+    """Send a quote request to a contractor"""
+    db = get_db()
+    
+    try:
+        # Get form data
+        data = request.form
+        
+        # Get contractor info
+        contractor_doc = db.collection('contractors').document(contractor_id).get()
+        if not contractor_doc.exists:
+            return jsonify({'success': False, 'message': 'Contractor not found'}), 404
+        
+        contractor_data = contractor_doc.to_dict()
+        
+        # Create quote request data
+        quote_data = {
+            'contractor_id': contractor_id,
+            'contractor_name': contractor_data.get('company_name') or contractor_data.get('name'),
+            'user_id': current_user.id,
+            'sender_name': data.get('name'),
+            'sender_email': data.get('email'),
+            'sender_phone': data.get('phone'),
+            'project_type': data.get('project_type'),
+            'project_area': data.get('project_area'),
+            'project_location': data.get('project_location'),
+            'project_budget': data.get('project_budget'),
+            'project_details': data.get('project_details'),
+            'subject': f"Quote Request: {data.get('project_type')}",
+            'read': False,
+            'created_at': datetime.now(),
+            'type': 'quote_request'
+        }
+        
+        # Save to database
+        db.collection('messages').add(quote_data)
+        
+        return jsonify({'success': True, 'message': 'Quote request sent successfully!'})
+        
+    except Exception as e:
+        print(f"Error sending quote request: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ contractor.company_name or contractor.name }} - House-Forge</title>
+    <title>Contractor Profile - House-Forge</title>
     <style>
         * {
             margin: 0;
@@ -31,24 +31,6 @@
             font-weight: bold;
         }
         
-        .navbar-menu {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        
-        .navbar-menu a {
-            color: white;
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        
-        .navbar-menu a:hover {
-            background: rgba(255,255,255,0.2);
-        }
-        
         .container {
             max-width: 1200px;
             margin: 30px auto;
@@ -63,12 +45,6 @@
             text-decoration: none;
             font-weight: 600;
             margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-        
-        .back-link:hover {
-            color: #5568d3;
-            transform: translateX(-5px);
         }
         
         .profile-header {
@@ -116,34 +92,18 @@
             margin-bottom: 15px;
         }
         
-        .badges {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .badge {
+        .verified-badge {
+            display: inline-block;
             padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .badge-verified {
             background: #d4edda;
             color: #155724;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 20px;
         }
         
-        .badge-experience {
-            background: #cfe2ff;
-            color: #084298;
-        }
-        
-        .rating-section {
+        .rating {
             display: flex;
             align-items: center;
             gap: 15px;
@@ -151,19 +111,14 @@
         }
         
         .stars {
-            font-size: 24px;
             color: #ffa500;
+            font-size: 24px;
         }
         
         .rating-value {
             font-size: 32px;
             font-weight: bold;
             color: #333;
-        }
-        
-        .rating-text {
-            color: #666;
-            font-size: 14px;
         }
         
         .stats-row {
@@ -256,33 +211,6 @@
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 2px solid #f0f0f0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .info-grid {
-            display: grid;
-            gap: 15px;
-        }
-        
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-        
-        .info-label {
-            color: #666;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .info-value {
-            color: #333;
-            font-weight: 500;
         }
         
         .contact-card {
@@ -327,101 +255,225 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
-        .specialization-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+        .info-grid {
+            display: grid;
+            gap: 15px;
         }
         
-        .tag {
-            padding: 8px 16px;
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
             background: #f8f9fa;
-            border: 2px solid #e0e0e0;
-            border-radius: 20px;
-            font-size: 13px;
+            border-radius: 10px;
+        }
+        
+        .info-label {
+            color: #666;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .info-value {
             color: #333;
             font-weight: 500;
         }
         
-        .portfolio-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
         }
         
-        .portfolio-item {
-            aspect-ratio: 16/9;
-            background: #f0f0f0;
-            border-radius: 12px;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal.active {
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #999;
-            font-size: 48px;
         }
         
-        .review-card {
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            margin-bottom: 15px;
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s;
         }
         
-        .review-header {
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            align-items: center;
+            margin-bottom: 25px;
         }
         
-        .reviewer-name {
+        .modal-title {
+            font-size: 24px;
             font-weight: 600;
             color: #333;
         }
         
-        .review-rating {
-            color: #ffa500;
-        }
-        
-        .review-text {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px;
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
             color: #999;
+            transition: color 0.3s;
         }
         
-        .empty-icon {
-            font-size: 64px;
+        .close-modal:hover {
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .contact-info-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
             margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
         }
         
-        @media (max-width: 1024px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
+        .contact-item:last-child {
+            margin-bottom: 0;
         }
         
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .stats-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .portfolio-grid {
-                grid-template-columns: 1fr;
-            }
+        .contact-item-icon {
+            font-size: 24px;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .contact-item-info {
+            flex: 1;
+        }
+        
+        .contact-item-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+        
+        .contact-item-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .contact-item-action {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .contact-item-action:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
         }
     </style>
 </head>
@@ -429,17 +481,10 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="navbar-brand">🏗️ House-Forge</div>
-        <div class="navbar-menu">
-            <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('user.projects') }}">My Projects</a>
-            <a href="{{ url_for('user.find_contractors') }}">Find Contractors</a>
-            <a href="{{ url_for('user.profile') }}">Profile</a>
-            <a href="{{ url_for('auth.logout') }}">Logout</a>
-        </div>
     </nav>
     
     <div class="container">
-        <a href="{{ url_for('user.find_contractors') }}" class="back-link">
+        <a href="#" class="back-link" onclick="history.back(); return false;">
             ← Back to Contractors
         </a>
         
@@ -449,56 +494,39 @@
                 <div class="contractor-avatar">🔨</div>
                 
                 <div class="contractor-info">
-                    <h1 class="contractor-name">{{ contractor.company_name or contractor.name }}</h1>
-                    <div class="contractor-company">
-                        {{ contractor.name if contractor.company_name else 'Professional Contractor' }}
-                    </div>
+                    <h1 class="contractor-name">Green Age Construction</h1>
+                    <div class="contractor-company">Aswin - Professional Contractor</div>
                     
-                    <div class="badges">
-                        {% if contractor.verified %}
-                        <span class="badge badge-verified">
-                            ✓ Verified Contractor
-                        </span>
-                        {% endif %}
-                        
-                        <span class="badge badge-experience">
-                            📅 {{ contractor.experience or 0 }} years experience
-                        </span>
-                    </div>
+                    <span class="verified-badge">✓ Verified Contractor</span>
                     
-                    <div class="rating-section">
-                        <span class="stars">
-                            {% set rating = contractor.rating or 0 %}
-                            {% for i in range(5) %}
-                                {% if i < rating %}★{% else %}☆{% endif %}
-                            {% endfor %}
-                        </span>
-                        <span class="rating-value">{{ "%.1f"|format(contractor.rating or 0) }}</span>
-                        <span class="rating-text">
-                            Based on {{ contractor.completed_projects or 0 }} completed projects
+                    <div class="rating">
+                        <span class="stars">☆☆☆☆☆</span>
+                        <span class="rating-value">0.0</span>
+                        <span style="color: #666; font-size: 14px;">
+                            Based on 0 completed projects
                         </span>
                     </div>
                     
                     <div class="stats-row">
                         <div class="stat-box">
-                            <div class="stat-number">{{ contractor.experience or 0 }}</div>
+                            <div class="stat-number">5</div>
                             <div class="stat-label">Years Experience</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-number">{{ contractor.completed_projects or 0 }}</div>
+                            <div class="stat-number">0</div>
                             <div class="stat-label">Projects Completed</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-number">{{ "%.1f"|format(contractor.rating or 0) }}⭐</div>
-                            <div class="stat-label">Average Rating</div>
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">Active Projects</div>
                         </div>
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn btn-primary" onclick="contactContractor()">
+                        <button class="btn btn-primary" onclick="openContactModal()">
                             📞 Contact Contractor
                         </button>
-                        <button class="btn btn-outline" onclick="requestQuote()">
+                        <button class="btn btn-outline" onclick="openQuoteModal()">
                             💰 Request Quote
                         </button>
                         <button class="btn btn-outline" onclick="shareProfile()">
@@ -517,42 +545,8 @@
                 <div class="section">
                     <h2 class="section-title">📝 About</h2>
                     <p style="color: #666; line-height: 1.8;">
-                        {{ contractor.bio or 'This contractor has not provided a bio yet.' }}
+                        This contractor has not provided a bio yet.
                     </p>
-                </div>
-                
-                <!-- Specializations -->
-                <div class="section">
-                    <h2 class="section-title">🔧 Specializations</h2>
-                    {% if contractor.specializations %}
-                    <div class="specialization-tags">
-                        {% for spec in contractor.specializations %}
-                        <span class="tag">{{ spec }}</span>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <p>No specializations listed</p>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <!-- Portfolio -->
-                <div class="section">
-                    <h2 class="section-title">📸 Portfolio</h2>
-                    <div class="empty-state">
-                        <div class="empty-icon">🏗️</div>
-                        <p>Portfolio images coming soon</p>
-                    </div>
-                </div>
-                
-                <!-- Reviews -->
-                <div class="section">
-                    <h2 class="section-title">⭐ Reviews & Ratings</h2>
-                    <div class="empty-state">
-                        <div class="empty-icon">💬</div>
-                        <p>No reviews yet. Be the first to work with this contractor!</p>
-                    </div>
                 </div>
             </div>
             
@@ -565,7 +559,7 @@
                     <div class="contact-text">
                         Connect with this contractor for your project
                     </div>
-                    <button class="contact-button" onclick="contactContractor()">
+                    <button class="contact-button" onclick="openMessageModal()">
                         Send Message
                     </button>
                 </div>
@@ -576,88 +570,340 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Company</span>
-                            <span class="info-value">{{ contractor.company_name or 'N/A' }}</span>
+                            <span class="info-value">Green Age Construction</span>
                         </div>
                         
                         <div class="info-item">
                             <span class="info-label">License</span>
-                            <span class="info-value">{{ contractor.license_number or 'Not provided' }}</span>
+                            <span class="info-value">Not provided</span>
                         </div>
                         
                         <div class="info-item">
                             <span class="info-label">Location</span>
-                            <span class="info-value">{{ contractor.location or 'Not specified' }}</span>
+                            <span class="info-value">Not specified</span>
                         </div>
                         
                         <div class="info-item">
                             <span class="info-label">Phone</span>
-                            <span class="info-value">{{ contractor.phone or 'Contact for details' }}</span>
+                            <span class="info-value">Available after contact</span>
                         </div>
                         
                         <div class="info-item">
                             <span class="info-label">Email</span>
-                            <span class="info-value">{{ contractor.email or 'Contact for details' }}</span>
+                            <span class="info-value">Available after contact</span>
                         </div>
-                        
-                        <div class="info-item">
-                            <span class="info-label">Member Since</span>
-                            <span class="info-value">
-                                {% if contractor.created_at %}
-                                    {{ contractor.created_at.strftime('%B %Y') if contractor.created_at is not string else contractor.created_at }}
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Quick Actions -->
-                <div class="section">
-                    <h3 class="section-title">⚡ Quick Actions</h3>
-                    <div style="display: grid; gap: 10px;">
-                        <button class="btn btn-outline" onclick="reportContractor()" style="width: 100%;">
-                            ⚠️ Report Issue
-                        </button>
-                        <button class="btn btn-outline" onclick="saveContractor()" style="width: 100%;">
-                            ❤️ Save to Favorites
-                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📞 Contact Contractor</h2>
+                <button class="close-modal" onclick="closeContactModal()">&times;</button>
+            </div>
+            
+            <div class="contact-info-display">
+                <h3 style="margin-bottom: 15px; color: #333;">Contact Information</h3>
+                
+                <div class="contact-item">
+                    <div class="contact-item-icon">📞</div>
+                    <div class="contact-item-info">
+                        <div class="contact-item-label">Phone</div>
+                        <div class="contact-item-value">+91 98765 43210</div>
+                    </div>
+                    <a href="tel:+919876543210" class="contact-item-action">Call Now</a>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-item-icon">✉️</div>
+                    <div class="contact-item-info">
+                        <div class="contact-item-label">Email</div>
+                        <div class="contact-item-value">greenage@example.com</div>
+                    </div>
+                    <a href="mailto:greenage@example.com" class="contact-item-action">Send Email</a>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-item-icon">💬</div>
+                    <div class="contact-item-info">
+                        <div class="contact-item-label">WhatsApp</div>
+                        <div class="contact-item-value">+91 98765 43210</div>
+                    </div>
+                    <a href="https://wa.me/919876543210" target="_blank" class="contact-item-action">Chat</a>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                💡 Tip: Save this contractor's contact information for easy access later.
+            </div>
+        </div>
+    </div>
+    
+    <!-- Request Quote Modal -->
+    <div id="quoteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">💰 Request Quote</h2>
+                <button class="close-modal" onclick="closeQuoteModal()">&times;</button>
+            </div>
+            
+            <form onsubmit="submitQuoteRequest(event)">
+                <div class="form-group">
+                    <label for="projectType">Project Type *</label>
+                    <select id="projectType" required>
+                        <option value="">Select project type</option>
+                        <option value="new_construction">New Construction</option>
+                        <option value="renovation">Renovation</option>
+                        <option value="extension">Extension</option>
+                        <option value="repair">Repair</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="projectArea">Project Area (sq ft) *</label>
+                    <input type="number" id="projectArea" min="100" required placeholder="e.g., 2000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="projectLocation">Location *</label>
+                    <input type="text" id="projectLocation" required placeholder="City, State">
+                </div>
+                
+                <div class="form-group">
+                    <label for="projectBudget">Budget Range *</label>
+                    <select id="projectBudget" required>
+                        <option value="">Select budget range</option>
+                        <option value="low">Budget (₹1000-1500/sq ft)</option>
+                        <option value="medium">Standard (₹1500-2500/sq ft)</option>
+                        <option value="high">Premium (₹2500+/sq ft)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="projectDetails">Project Details *</label>
+                    <textarea id="projectDetails" required placeholder="Please describe your project requirements, timeline expectations, and any specific needs..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactName">Your Name *</label>
+                    <input type="text" id="contactName" required placeholder="Full Name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactPhone">Your Phone *</label>
+                    <input type="tel" id="contactPhone" required placeholder="+91 00000 00000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactEmail">Your Email *</label>
+                    <input type="email" id="contactEmail" required placeholder="email@example.com">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeQuoteModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Send Quote Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Message Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">💬 Send Message</h2>
+                <button class="close-modal" onclick="closeMessageModal()">&times;</button>
+            </div>
+            
+            <form onsubmit="submitMessage(event)">
+                <div class="form-group">
+                    <label for="messageName">Your Name *</label>
+                    <input type="text" id="messageName" required placeholder="Full Name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="messageEmail">Your Email *</label>
+                    <input type="email" id="messageEmail" required placeholder="email@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="messagePhone">Your Phone</label>
+                    <input type="tel" id="messagePhone" placeholder="+91 00000 00000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="messageSubject">Subject *</label>
+                    <input type="text" id="messageSubject" required placeholder="Brief subject of your message">
+                </div>
+                
+                <div class="form-group">
+                    <label for="messageContent">Message *</label>
+                    <textarea id="messageContent" required placeholder="Write your message here..."></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeMessageModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <script>
-        function contactContractor() {
-            alert('Contact feature coming soon!\n\nYou can reach out to:\n{{ contractor.company_name or contractor.name }}\n\nPhone: {{ contractor.phone or "Not available" }}\nEmail: {{ contractor.email or "Not available" }}');
+        // Get contractor ID from URL or set it here
+        const contractorId = window.location.pathname.split('/').pop();
+        
+        // Contact Modal Functions
+        function openContactModal() {
+            document.getElementById('contactModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
         
-        function requestQuote() {
-            alert('Quote request feature coming soon!\n\nYou will be able to:\n- Select your project\n- Request detailed quotes\n- Compare estimates');
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
         }
         
+        // Quote Modal Functions
+        function openQuoteModal() {
+            document.getElementById('quoteModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeQuoteModal() {
+            document.getElementById('quoteModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        function submitQuoteRequest(event) {
+            event.preventDefault();
+            
+            // Create FormData object from the form
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            
+            // Send to backend
+            fetch(`/user/contractor/${contractorId}/request-quote`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ ' + data.message + '\n\nThe contractor will review your request and contact you within 24-48 hours with a detailed quote.');
+                    closeQuoteModal();
+                    form.reset();
+                } else {
+                    alert('❌ Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('❌ An error occurred while sending your quote request. Please try again.');
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        }
+        
+        // Message Modal Functions
+        function openMessageModal() {
+            document.getElementById('messageModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMessageModal() {
+            document.getElementById('messageModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        function submitMessage(event) {
+            event.preventDefault();
+            
+            // Create FormData object from the form
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            
+            // Send to backend
+            fetch(`/user/contractor/${contractorId}/send-message`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ ' + data.message + '\n\nThe contractor will receive your message and respond to your email address.');
+                    closeMessageModal();
+                    form.reset();
+                } else {
+                    alert('❌ Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('❌ An error occurred while sending your message. Please try again.');
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        }
+        
+        // Share Profile Function
         function shareProfile() {
             const url = window.location.href;
+            
             if (navigator.share) {
                 navigator.share({
-                    title: '{{ contractor.company_name or contractor.name }} - House-Forge',
+                    title: 'Green Age Construction - House-Forge',
                     text: 'Check out this contractor on House-Forge',
                     url: url
                 }).catch(err => console.log('Error sharing:', err));
             } else {
-                navigator.clipboard.writeText(url);
-                alert('Profile link copied to clipboard!');
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('✅ Profile link copied to clipboard!\n\nYou can now paste and share it.');
+                }).catch(() => {
+                    alert('Profile URL: ' + url);
+                });
             }
         }
         
-        function reportContractor() {
-            alert('Report feature coming soon!\n\nFor urgent issues, please contact:\nsupport@house-forge.com');
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
         }
         
-        function saveContractor() {
-            alert('Save to favorites feature coming soon!\n\nYou will be able to save contractors for easy access later.');
-        }
+        // Close modals with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const activeModal = document.querySelector('.modal.active');
+                if (activeModal) {
+                    activeModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        });
     </script>
 </body>
 </html>

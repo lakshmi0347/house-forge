@@ -535,3 +535,51 @@ def delete_bid(bid_id):
         flash(f'Error deleting bid: {str(e)}', 'error')
     
     return redirect(url_for('contractor.my_bids'))
+    
+@contractor_bp.route('/messages')
+@login_required
+def messages():
+    """View all messages received by contractor"""
+    db = get_db()
+    
+    try:
+        # Get all messages for this contractor
+        messages_ref = db.collection('messages').where('contractor_id', '==', current_user.id).order_by('created_at', direction=firestore.Query.DESCENDING).stream()
+        messages_list = []
+        
+        for doc in messages_ref:
+            message_data = doc.to_dict()
+            message_data['id'] = doc.id
+            messages_list.append(message_data)
+        
+        # Count unread messages
+        unread_count = len([m for m in messages_list if not m.get('read', False)])
+        
+        # Mark all as read when viewing
+        for message in messages_list:
+            if not message.get('read', False):
+                db.collection('messages').document(message['id']).update({
+                    'read': True,
+                    'read_at': datetime.now()
+                })
+        
+        return render_template('contractor/messages.html', 
+                             messages=messages_list, 
+                             unread_count=unread_count)
+        
+    except Exception as e:
+        flash(f'Error loading messages: {str(e)}', 'error')
+        return redirect(url_for('contractor.dashboard'))
+
+@contractor_bp.route('/messages/unread-count')
+@login_required
+def unread_messages_count():
+    """API endpoint to get unread message count"""
+    db = get_db()
+    
+    try:
+        messages_ref = db.collection('messages').where('contractor_id', '==', current_user.id).where('read', '==', False).stream()
+        count = len(list(messages_ref))
+        return jsonify({'count': count})
+    except Exception as e:
+        return jsonify({'count': 0})

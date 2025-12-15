@@ -243,6 +243,10 @@
             <a href="{{ url_for('contractor.browse_projects') }}">Browse Projects</a>
             <a href="{{ url_for('contractor.my_bids') }}">My Bids</a>
             <a href="{{ url_for('contractor.my_projects') }}">My Projects</a>
+            <a href="{{ url_for('contractor.messages') }}" style="position: relative;">
+        Messages
+        <span class="badge-notification" id="messagesBadge" style="display: none;">0</span>
+    </a>
             <a href="{{ url_for('contractor.profile') }}">Profile</a>
             <a href="{{ url_for('auth.logout') }}">Logout</a>
         </div>

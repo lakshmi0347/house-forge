@@ -798,12 +798,20 @@ def create_order():
         material_ids = request.form.getlist('material_ids[]')
         quantities = request.form.getlist('quantities[]')
         
+        print("=" * 50)
+        print("ORDER CREATION DEBUG")
+        print(f"Project ID: {project_id}")
+        print(f"Material IDs: {material_ids}")
+        print(f"Quantities: {quantities}")
+        print("=" * 50)
+        
         if not material_ids or not quantities:
             return jsonify({'success': False, 'message': 'No materials selected'}), 400
         
         # Calculate total
         total_cost = 0
         order_items = []
+        supplier_ids = set()
         
         for i, material_id in enumerate(material_ids):
             material_doc = db.collection('materials').document(material_id).get()
@@ -823,26 +831,63 @@ def create_order():
                 })
                 
                 total_cost += item_cost
+                supplier_ids.add(material_data.get('supplier_id'))
         
-        # Create order
-        order_data = {
-            'user_id': current_user.id,
-            'project_id': project_id,
-            'items': order_items,
-            'total': total_cost,
-            'status': 'pending',
-            'created_at': datetime.now(),
-            'updated_at': datetime.now()
-        }
+        print(f"Total order items: {len(order_items)}")
+        print(f"Total cost: ₹{total_cost}")
+        print(f"Supplier IDs: {supplier_ids}")
         
-        order_ref = db.collection('orders').add(order_data)
+        # Get project info
+        project_doc = db.collection('projects').document(project_id).get()
+        project_data = project_doc.to_dict() if project_doc.exists else {}
+        
+        # Create separate orders for each supplier
+        created_orders = []
+        for supplier_id in supplier_ids:
+            if not supplier_id:
+                print("⚠️ Skipping None supplier_id")
+                continue
+                
+            supplier_items = [item for item in order_items if item.get('supplier_id') == supplier_id]
+            supplier_total = sum(item.get('total', 0) for item in supplier_items)
+            
+            # Get supplier info
+            supplier_doc = db.collection('suppliers').document(supplier_id).get()
+            supplier_data = supplier_doc.to_dict() if supplier_doc.exists else {}
+            
+            supplier_order = {
+                'user_id': current_user.id,
+                'user_name': current_user.name,
+                'user_email': current_user.email if hasattr(current_user, 'email') else '',
+                'project_id': project_id,
+                'project_title': project_data.get('title', 'Untitled Project'),
+                'supplier_id': supplier_id,
+                'supplier_name': supplier_data.get('company_name') or supplier_data.get('name', 'Supplier'),
+                'items': supplier_items,
+                'total': supplier_total,
+                'status': 'pending',
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
+            }
+            
+            print(f"Creating order for supplier: {supplier_data.get('company_name', 'Unknown')}")
+            print(f"Items: {len(supplier_items)}, Total: ₹{supplier_total}")
+            
+            order_ref = db.collection('orders').add(supplier_order)
+            created_orders.append(order_ref[1].id)
+            print(f"✅ Order created with ID: {order_ref[1].id}")
+        
+        print(f"✅ Total {len(created_orders)} order(s) created successfully!")
+        print("=" * 50)
         
         return jsonify({
             'success': True, 
-            'message': 'Order placed successfully!',
-            'order_id': order_ref[1].id
+            'message': f'Order placed successfully! {len(created_orders)} order(s) created.',
+            'order_ids': created_orders
         })
         
     except Exception as e:
-        print(f"Error creating order: {str(e)}")
+        print(f"❌ Error creating order: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500

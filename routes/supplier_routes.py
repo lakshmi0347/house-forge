@@ -70,13 +70,18 @@ def inventory():
 def orders():
     """View all orders"""
     orders_ref = db.collection('orders').where('supplier_id', '==', current_user.id).stream()
-    orders = []
+    orders_list = []
     for doc in orders_ref:
         order_data = doc.to_dict()
         order_data['id'] = doc.id
-        orders.append(order_data)
+        
+        # Convert items to order_items to avoid conflict with dict.items() method
+        if 'items' in order_data:
+            order_data['order_items'] = order_data['items']
+        
+        orders_list.append(order_data)
     
-    return render_template('supplier/orders.html', orders=orders)
+    return render_template('supplier/orders.html', orders=orders_list)
 
 @supplier_bp.route('/add-material', methods=['GET', 'POST'])
 @login_required
@@ -395,6 +400,104 @@ def change_password():
     
     except Exception as e:
         print(f"Error changing password: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@supplier_bp.route('/order/<order_id>/accept', methods=['POST'])
+@login_required
+def accept_order(order_id):
+    """Accept an order"""
+    try:
+        order_ref = db.collection('orders').document(order_id)
+        order_doc = order_ref.get()
+        
+        if not order_doc.exists:
+            return jsonify({'success': False, 'message': 'Order not found'}), 404
+        
+        order_data = order_doc.to_dict()
+        
+        # Verify this is the supplier's order
+        if order_data.get('supplier_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+        
+        # Update order status
+        order_ref.update({
+            'status': 'processing',
+            'accepted_at': datetime.now(),
+            'updated_at': datetime.now()
+        })
+        
+        return jsonify({'success': True, 'message': 'Order accepted successfully!'})
+        
+    except Exception as e:
+        print(f"Error accepting order: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@supplier_bp.route('/order/<order_id>/reject', methods=['POST'])
+@login_required
+def reject_order(order_id):
+    """Reject an order"""
+    try:
+        order_ref = db.collection('orders').document(order_id)
+        order_doc = order_ref.get()
+        
+        if not order_doc.exists:
+            return jsonify({'success': False, 'message': 'Order not found'}), 404
+        
+        order_data = order_doc.to_dict()
+        
+        # Verify this is the supplier's order
+        if order_data.get('supplier_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+        
+        # Update order status
+        order_ref.update({
+            'status': 'cancelled',
+            'rejected_at': datetime.now(),
+            'updated_at': datetime.now()
+        })
+        
+        return jsonify({'success': True, 'message': 'Order rejected'})
+        
+    except Exception as e:
+        print(f"Error rejecting order: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@supplier_bp.route('/order/<order_id>/complete', methods=['POST'])
+@login_required
+def complete_order(order_id):
+    """Mark order as completed"""
+    try:
+        order_ref = db.collection('orders').document(order_id)
+        order_doc = order_ref.get()
+        
+        if not order_doc.exists:
+            return jsonify({'success': False, 'message': 'Order not found'}), 404
+        
+        order_data = order_doc.to_dict()
+        
+        # Verify this is the supplier's order
+        if order_data.get('supplier_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+        
+        # Update order status
+        order_ref.update({
+            'status': 'completed',
+            'completed_at': datetime.now(),
+            'updated_at': datetime.now()
+        })
+        
+        return jsonify({'success': True, 'message': 'Order marked as completed!'})
+        
+    except Exception as e:
+        print(f"Error completing order: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500

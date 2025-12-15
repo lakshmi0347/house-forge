@@ -320,7 +320,7 @@
                 </div>
                 
                 <div class="order-items">
-                    {% for item in order.items %}
+                    {% for item in order.order_items %}
                     <div class="item-row">
                         <div>
                             <div class="item-name">{{ item.material_name }}</div>
@@ -362,23 +362,68 @@
     </div>
     
     <script>
-        function acceptOrder(orderId) {
-            if (confirm('Accept this order?')) {
-                alert('Accept order functionality coming soon! Order ID: ' + orderId);
-            }
+    function acceptOrder(orderId) {
+        if (confirm('Accept this order?')) {
+            fetch(`/supplier/order/${orderId}/accept`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while accepting the order');
+            });
         }
-        
-        function rejectOrder(orderId) {
-            if (confirm('Are you sure you want to reject this order?')) {
-                alert('Reject order functionality coming soon! Order ID: ' + orderId);
-            }
+    }
+    
+    function rejectOrder(orderId) {
+        if (confirm('Are you sure you want to reject this order?')) {
+            fetch(`/supplier/order/${orderId}/reject`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while rejecting the order');
+            });
         }
-        
-        function completeOrder(orderId) {
-            if (confirm('Mark this order as completed?')) {
-                alert('Complete order functionality coming soon! Order ID: ' + orderId);
-            }
+    }
+    
+    function completeOrder(orderId) {
+        if (confirm('Mark this order as completed?')) {
+            fetch(`/supplier/order/${orderId}/complete`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while completing the order');
+            });
         }
-    </script>
+    }
+</script>
 </body>
 </html>

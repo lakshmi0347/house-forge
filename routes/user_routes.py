@@ -891,3 +891,45 @@ def create_order():
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
+@user_bp.route('/my-orders')
+@login_required
+def my_orders():
+    """View all material orders placed by the user"""
+    db = get_db()
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.dashboard'))
+    
+    try:
+        # Get all orders for this user
+        orders_ref = db.collection('orders').where('user_id', '==', current_user.id).stream()
+        orders = []
+        
+        for doc in orders_ref:
+            order_data = doc.to_dict()
+            order_data['id'] = doc.id
+            
+            # Convert items to order_items to avoid conflict with dict.items() method
+            if 'items' in order_data:
+                order_data['order_items'] = order_data['items']
+            
+            orders.append(order_data)
+        
+        # Sort by created_at descending
+        orders.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
+        
+        # Calculate statistics
+        stats = {
+            'total': len(orders),
+            'pending': len([o for o in orders if o.get('status') == 'pending']),
+            'processing': len([o for o in orders if o.get('status') == 'processing']),
+            'completed': len([o for o in orders if o.get('status') == 'completed']),
+            'cancelled': len([o for o in orders if o.get('status') == 'cancelled']),
+            'total_spent': sum(o.get('total', 0) for o in orders if o.get('status') == 'completed')
+        }
+        
+        return render_template('user/my_orders.html', orders=orders, stats=stats)
+        
+    except Exception as e:
+        flash(f'Error loading orders: {str(e)}', 'error')
+        return redirect(url_for('user.dashboard'))

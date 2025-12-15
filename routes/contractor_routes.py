@@ -535,7 +535,26 @@ def delete_bid(bid_id):
         flash(f'Error deleting bid: {str(e)}', 'error')
     
     return redirect(url_for('contractor.my_bids'))
+@contractor_bp.route('/messages/unread-count')
+@login_required
+def unread_messages_count():
+    """API endpoint to get unread message count"""
+    db = get_db()
     
+    try:
+        # Get all messages for this contractor (simpler query)
+        messages_ref = db.collection('messages').where('contractor_id', '==', current_user.id).stream()
+        
+        # Count unread in Python instead of Firestore
+        count = 0
+        for doc in messages_ref:
+            if not doc.to_dict().get('read', False):
+                count += 1
+        
+        return jsonify({'count': count})
+    except Exception as e:
+        print(f"Error in unread count: {str(e)}")
+        return jsonify({'count': 0})  
 @contractor_bp.route('/messages')
 @login_required
 def messages():
@@ -543,14 +562,58 @@ def messages():
     db = get_db()
     
     try:
+        print(f"=" * 50)
+        print(f"🔍 Fetching messages for contractor: {current_user.id}")
+        print(f"=" * 50)
+        
         # Get all messages for this contractor
-        messages_ref = db.collection('messages').where('contractor_id', '==', current_user.id).order_by('created_at', direction=firestore.Query.DESCENDING).stream()
+        messages_ref = db.collection('messages').where('contractor_id', '==', current_user.id).stream()
         messages_list = []
         
         for doc in messages_ref:
             message_data = doc.to_dict()
             message_data['id'] = doc.id
+            
+            # DEBUG: Print the actual message data
+            print(f"\n📨 Message ID: {doc.id}")
+            print(f"   Keys in message: {list(message_data.keys())}")
+            print(f"   sender_name: {message_data.get('sender_name')}")
+            print(f"   sender_email: {message_data.get('sender_email')}")
+            print(f"   subject: {message_data.get('subject')}")
+            print(f"   message: {message_data.get('message')}")
+            print(f"   type: {message_data.get('type')}")
+            print(f"   Full data: {message_data}")
+            
+            # Format created_at for display
+            if 'created_at' in message_data and message_data['created_at']:
+                try:
+                    now = datetime.now()
+                    created = message_data['created_at']
+                    diff = now - created
+                    
+                    if diff.days > 0:
+                        message_data['time_ago'] = f"{diff.days} day{'s' if diff.days > 1 else ''} ago"
+                    elif diff.seconds // 3600 > 0:
+                        hours = diff.seconds // 3600
+                        message_data['time_ago'] = f"{hours} hour{'s' if hours > 1 else ''} ago"
+                    elif diff.seconds // 60 > 0:
+                        minutes = diff.seconds // 60
+                        message_data['time_ago'] = f"{minutes} minute{'s' if minutes > 1 else ''} ago"
+                    else:
+                        message_data['time_ago'] = 'Just now'
+                except Exception as e:
+                    print(f"⚠️ Error formatting time: {e}")
+                    message_data['time_ago'] = 'Recently'
+            else:
+                message_data['time_ago'] = 'Recently'
+            
             messages_list.append(message_data)
+        
+        print(f"\n✅ Total messages found: {len(messages_list)}")
+        print(f"=" * 50)
+        
+        # Sort in Python instead of Firestore
+        messages_list.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
         
         # Count unread messages
         unread_count = len([m for m in messages_list if not m.get('read', False)])
@@ -568,18 +631,8 @@ def messages():
                              unread_count=unread_count)
         
     except Exception as e:
+        print(f'❌ Error loading messages: {str(e)}')
+        import traceback
+        traceback.print_exc()
         flash(f'Error loading messages: {str(e)}', 'error')
         return redirect(url_for('contractor.dashboard'))
-
-@contractor_bp.route('/messages/unread-count')
-@login_required
-def unread_messages_count():
-    """API endpoint to get unread message count"""
-    db = get_db()
-    
-    try:
-        messages_ref = db.collection('messages').where('contractor_id', '==', current_user.id).where('read', '==', False).stream()
-        count = len(list(messages_ref))
-        return jsonify({'count': count})
-    except Exception as e:
-        return jsonify({'count': 0})

@@ -652,106 +652,106 @@
             </div>
             
             <form onsubmit="submitQuoteRequest(event)">
-                <div class="form-group">
-                    <label for="projectType">Project Type *</label>
-                    <select id="projectType" required>
-                        <option value="">Select project type</option>
-                        <option value="new_construction">New Construction</option>
-                        <option value="renovation">Renovation</option>
-                        <option value="extension">Extension</option>
-                        <option value="repair">Repair</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="projectArea">Project Area (sq ft) *</label>
-                    <input type="number" id="projectArea" min="100" required placeholder="e.g., 2000">
-                </div>
-                
-                <div class="form-group">
-                    <label for="projectLocation">Location *</label>
-                    <input type="text" id="projectLocation" required placeholder="City, State">
-                </div>
-                
-                <div class="form-group">
-                    <label for="projectBudget">Budget Range *</label>
-                    <select id="projectBudget" required>
-                        <option value="">Select budget range</option>
-                        <option value="low">Budget (₹1000-1500/sq ft)</option>
-                        <option value="medium">Standard (₹1500-2500/sq ft)</option>
-                        <option value="high">Premium (₹2500+/sq ft)</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="projectDetails">Project Details *</label>
-                    <textarea id="projectDetails" required placeholder="Please describe your project requirements, timeline expectations, and any specific needs..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="contactName">Your Name *</label>
-                    <input type="text" id="contactName" required placeholder="Full Name">
-                </div>
-                
-                <div class="form-group">
-                    <label for="contactPhone">Your Phone *</label>
-                    <input type="tel" id="contactPhone" required placeholder="+91 00000 00000">
-                </div>
-                
-                <div class="form-group">
-                    <label for="contactEmail">Your Email *</label>
-                    <input type="email" id="contactEmail" required placeholder="email@example.com">
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeQuoteModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Send Quote Request</button>
-                </div>
-            </form>
+    <div class="form-group">
+        <label for="projectType">Project Type *</label>
+        <select id="projectType" name="project_type" required>
+            <option value="">Select project type</option>
+            <option value="new_construction">New Construction</option>
+            <option value="renovation">Renovation</option>
+            <option value="extension">Extension</option>
+            <option value="repair">Repair</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="projectArea">Project Area (sq ft) *</label>
+        <input type="number" id="projectArea" name="project_area" min="100" required placeholder="e.g., 2000">
+    </div>
+    
+    <div class="form-group">
+        <label for="projectLocation">Location *</label>
+        <input type="text" id="projectLocation" name="project_location" required placeholder="City, State">
+    </div>
+    
+    <div class="form-group">
+        <label for="projectBudget">Budget Range *</label>
+        <select id="projectBudget" name="project_budget" required>
+            <option value="">Select budget range</option>
+            <option value="low">Budget (₹1000-1500/sq ft)</option>
+            <option value="medium">Standard (₹1500-2500/sq ft)</option>
+            <option value="high">Premium (₹2500+/sq ft)</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="projectDetails">Project Details *</label>
+        <textarea id="projectDetails" name="project_details" required placeholder="Please describe your project requirements, timeline expectations, and any specific needs..."></textarea>
+    </div>
+    
+    <div class="form-group">
+        <label for="contactName">Your Name *</label>
+        <input type="text" id="contactName" name="name" required placeholder="Full Name">
+    </div>
+    
+    <div class="form-group">
+        <label for="contactPhone">Your Phone *</label>
+        <input type="tel" id="contactPhone" name="phone" required placeholder="+91 00000 00000">
+    </div>
+    
+    <div class="form-group">
+        <label for="contactEmail">Your Email *</label>
+        <input type="email" id="contactEmail" name="email" required placeholder="email@example.com">
+    </div>
+    
+    <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeQuoteModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Send Quote Request</button>
+    </div>
+</form>
         </div>
     </div>
     
     <!-- Message Modal -->
-    <div id="messageModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">💬 Send Message</h2>
-                <button class="close-modal" onclick="closeMessageModal()">&times;</button>
+<div id="messageModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">💬 Send Message</h2>
+            <button class="close-modal" onclick="closeMessageModal()">&times;</button>
+        </div>
+        
+        <form onsubmit="submitMessage(event)">
+            <div class="form-group">
+                <label for="messageName">Your Name *</label>
+                <input type="text" id="messageName" name="name" required placeholder="Full Name">
             </div>
             
-            <form onsubmit="submitMessage(event)">
-                <div class="form-group">
-                    <label for="messageName">Your Name *</label>
-                    <input type="text" id="messageName" required placeholder="Full Name">
-                </div>
-                
-                <div class="form-group">
-                    <label for="messageEmail">Your Email *</label>
-                    <input type="email" id="messageEmail" required placeholder="email@example.com">
-                </div>
-                
-                <div class="form-group">
-                    <label for="messagePhone">Your Phone</label>
-                    <input type="tel" id="messagePhone" placeholder="+91 00000 00000">
-                </div>
-                
-                <div class="form-group">
-                    <label for="messageSubject">Subject *</label>
-                    <input type="text" id="messageSubject" required placeholder="Brief subject of your message">
-                </div>
-                
-                <div class="form-group">
-                    <label for="messageContent">Message *</label>
-                    <textarea id="messageContent" required placeholder="Write your message here..."></textarea>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeMessageModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Send Message</button>
-                </div>
-            </form>
-        </div>
+            <div class="form-group">
+                <label for="messageEmail">Your Email *</label>
+                <input type="email" id="messageEmail" name="email" required placeholder="email@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="messagePhone">Your Phone</label>
+                <input type="tel" id="messagePhone" name="phone" placeholder="+91 00000 00000">
+            </div>
+            
+            <div class="form-group">
+                <label for="messageSubject">Subject *</label>
+                <input type="text" id="messageSubject" name="subject" required placeholder="Brief subject of your message">
+            </div>
+            
+            <div class="form-group">
+                <label for="messageContent">Message *</label>
+                <textarea id="messageContent" name="message" required placeholder="Write your message here..."></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeMessageModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </div>
+        </form>
     </div>
+</div>
     
     <script>
         // Get contractor ID from URL or set it here

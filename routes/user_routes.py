@@ -947,9 +947,14 @@ def send_message_to_contractor(contractor_id):
         subject = request.form.get('subject')
         message_content = request.form.get('message')
         
+        print(f"📧 Sending message to contractor: {contractor_id}")
+        print(f"   From: {name} ({email})")
+        print(f"   Subject: {subject}")
+        
         # Get contractor info
         contractor_doc = db.collection('contractors').document(contractor_id).get()
         if not contractor_doc.exists:
+            print(f"❌ Contractor {contractor_id} not found!")
             return jsonify({'success': False, 'message': 'Contractor not found'}), 404
         
         contractor_data = contractor_doc.to_dict()
@@ -970,12 +975,15 @@ def send_message_to_contractor(contractor_id):
         }
         
         # Save to database
-        db.collection('messages').add(message_data)
+        doc_ref = db.collection('messages').add(message_data)
+        print(f"✅ Message saved with ID: {doc_ref[1].id}")
         
         return jsonify({'success': True, 'message': 'Message sent successfully!'})
         
     except Exception as e:
-        print(f"Error sending message: {str(e)}")
+        print(f"❌ Error sending message: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @user_bp.route('/contractor/<contractor_id>/request-quote', methods=['POST'])
@@ -988,9 +996,14 @@ def request_quote_from_contractor(contractor_id):
         # Get form data
         data = request.form
         
+        print(f"💰 Sending quote request to contractor: {contractor_id}")
+        print(f"   From: {data.get('name')} ({data.get('email')})")
+        print(f"   Project: {data.get('project_type')}")
+        
         # Get contractor info
         contractor_doc = db.collection('contractors').document(contractor_id).get()
         if not contractor_doc.exists:
+            print(f"❌ Contractor {contractor_id} not found!")
             return jsonify({'success': False, 'message': 'Contractor not found'}), 404
         
         contractor_data = contractor_doc.to_dict()
@@ -1015,10 +1028,13 @@ def request_quote_from_contractor(contractor_id):
         }
         
         # Save to database
-        db.collection('messages').add(quote_data)
+        doc_ref = db.collection('messages').add(quote_data)
+        print(f"✅ Quote request saved with ID: {doc_ref[1].id}")
         
         return jsonify({'success': True, 'message': 'Quote request sent successfully!'})
         
     except Exception as e:
-        print(f"Error sending quote request: {str(e)}")
+        print(f"❌ Error sending quote request: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500

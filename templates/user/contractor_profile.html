@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contractor Profile - House-Forge</title>
     <style>
+        /* KEEP ALL YOUR EXISTING CSS - NOT CHANGING IT */
         * {
             margin: 0;
             padding: 0;
@@ -651,107 +652,107 @@
                 <button class="close-modal" onclick="closeQuoteModal()">&times;</button>
             </div>
             
-            <form onsubmit="submitQuoteRequest(event)">
-    <div class="form-group">
-        <label for="projectType">Project Type *</label>
-        <select id="projectType" name="project_type" required>
-            <option value="">Select project type</option>
-            <option value="new_construction">New Construction</option>
-            <option value="renovation">Renovation</option>
-            <option value="extension">Extension</option>
-            <option value="repair">Repair</option>
-        </select>
-    </div>
-    
-    <div class="form-group">
-        <label for="projectArea">Project Area (sq ft) *</label>
-        <input type="number" id="projectArea" name="project_area" min="100" required placeholder="e.g., 2000">
-    </div>
-    
-    <div class="form-group">
-        <label for="projectLocation">Location *</label>
-        <input type="text" id="projectLocation" name="project_location" required placeholder="City, State">
-    </div>
-    
-    <div class="form-group">
-        <label for="projectBudget">Budget Range *</label>
-        <select id="projectBudget" name="project_budget" required>
-            <option value="">Select budget range</option>
-            <option value="low">Budget (₹1000-1500/sq ft)</option>
-            <option value="medium">Standard (₹1500-2500/sq ft)</option>
-            <option value="high">Premium (₹2500+/sq ft)</option>
-        </select>
-    </div>
-    
-    <div class="form-group">
-        <label for="projectDetails">Project Details *</label>
-        <textarea id="projectDetails" name="project_details" required placeholder="Please describe your project requirements, timeline expectations, and any specific needs..."></textarea>
-    </div>
-    
-    <div class="form-group">
-        <label for="contactName">Your Name *</label>
-        <input type="text" id="contactName" name="name" required placeholder="Full Name">
-    </div>
-    
-    <div class="form-group">
-        <label for="contactPhone">Your Phone *</label>
-        <input type="tel" id="contactPhone" name="phone" required placeholder="+91 00000 00000">
-    </div>
-    
-    <div class="form-group">
-        <label for="contactEmail">Your Email *</label>
-        <input type="email" id="contactEmail" name="email" required placeholder="email@example.com">
-    </div>
-    
-    <div class="form-actions">
-        <button type="button" class="btn btn-secondary" onclick="closeQuoteModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Send Quote Request</button>
-    </div>
-</form>
+            <form id="quoteForm" onsubmit="submitQuoteRequest(event)">
+                <div class="form-group">
+                    <label for="projectType">Project Type *</label>
+                    <select id="projectType" name="project_type" required>
+                        <option value="">Select project type</option>
+                        <option value="new_construction">New Construction</option>
+                        <option value="renovation">Renovation</option>
+                        <option value="extension">Extension</option>
+                        <option value="repair">Repair</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="projectArea">Project Area (sq ft) *</label>
+                    <input type="number" id="projectArea" name="project_area" min="100" required placeholder="e.g., 2000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="projectLocation">Location *</label>
+                    <input type="text" id="projectLocation" name="project_location" required placeholder="City, State">
+                </div>
+                
+                <div class="form-group">
+                    <label for="projectBudget">Budget Range *</label>
+                    <select id="projectBudget" name="project_budget" required>
+                        <option value="">Select budget range</option>
+                        <option value="low">Budget (₹1000-1500/sq ft)</option>
+                        <option value="medium">Standard (₹1500-2500/sq ft)</option>
+                        <option value="high">Premium (₹2500+/sq ft)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="projectDetails">Project Details *</label>
+                    <textarea id="projectDetails" name="project_details" required placeholder="Please describe your project requirements, timeline expectations, and any specific needs..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactName">Your Name *</label>
+                    <input type="text" id="contactName" name="name" required placeholder="Full Name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactPhone">Your Phone *</label>
+                    <input type="tel" id="contactPhone" name="phone" required placeholder="+91 00000 00000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactEmail">Your Email *</label>
+                    <input type="email" id="contactEmail" name="email" required placeholder="email@example.com">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeQuoteModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Send Quote Request</button>
+                </div>
+            </form>
         </div>
     </div>
     
     <!-- Message Modal -->
-<div id="messageModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title">💬 Send Message</h2>
-            <button class="close-modal" onclick="closeMessageModal()">&times;</button>
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">💬 Send Message</h2>
+                <button class="close-modal" onclick="closeMessageModal()">&times;</button>
+            </div>
+            
+            <form id="messageForm" onsubmit="submitMessage(event)">
+                <div class="form-group">
+                    <label for="messageName">Your Name *</label>
+                    <input type="text" id="messageName" name="name" required placeholder="Full Name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="messageEmail">Your Email *</label>
+                    <input type="email" id="messageEmail" name="email" required placeholder="email@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="messagePhone">Your Phone</label>
+                    <input type="tel" id="messagePhone" name="phone" placeholder="+91 00000 00000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="messageSubject">Subject *</label>
+                    <input type="text" id="messageSubject" name="subject" required placeholder="Brief subject of your message">
+                </div>
+                
+                <div class="form-group">
+                    <label for="messageContent">Message *</label>
+                    <textarea id="messageContent" name="message" required placeholder="Write your message here..."></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeMessageModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </div>
+            </form>
         </div>
-        
-        <form onsubmit="submitMessage(event)">
-            <div class="form-group">
-                <label for="messageName">Your Name *</label>
-                <input type="text" id="messageName" name="name" required placeholder="Full Name">
-            </div>
-            
-            <div class="form-group">
-                <label for="messageEmail">Your Email *</label>
-                <input type="email" id="messageEmail" name="email" required placeholder="email@example.com">
-            </div>
-            
-            <div class="form-group">
-                <label for="messagePhone">Your Phone</label>
-                <input type="tel" id="messagePhone" name="phone" placeholder="+91 00000 00000">
-            </div>
-            
-            <div class="form-group">
-                <label for="messageSubject">Subject *</label>
-                <input type="text" id="messageSubject" name="subject" required placeholder="Brief subject of your message">
-            </div>
-            
-            <div class="form-group">
-                <label for="messageContent">Message *</label>
-                <textarea id="messageContent" name="message" required placeholder="Write your message here..."></textarea>
-            </div>
-            
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeMessageModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Send Message</button>
-            </div>
-        </form>
     </div>
-</div>
     
     <script>
         // Get contractor ID from URL or set it here
@@ -779,20 +780,33 @@
             document.body.style.overflow = 'auto';
         }
         
+        // ⭐ FIXED QUOTE REQUEST FUNCTION
         function submitQuoteRequest(event) {
             event.preventDefault();
             
-            // Create FormData object from the form
             const form = event.target;
             const formData = new FormData(form);
             
-            // Show loading state
+            // ✅ VALIDATE - Ensure no empty values
+            const requiredFields = ['project_type', 'project_area', 'project_location', 'project_budget', 'project_details', 'name', 'phone', 'email'];
+            for (const field of requiredFields) {
+                const value = formData.get(field);
+                if (!value || value.trim() === '') {
+                    alert(`❌ Please fill in: ${field.replace('_', ' ')}`);
+                    return;
+                }
+            }
+            
+            console.log('🔍 Quote Request Data:');
+            for (const [key, value] of formData.entries()) {
+                console.log(`  ${key}: ${value}`);
+            }
+            
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalText = submitBtn.textContent;
             submitBtn.textContent = 'Sending...';
             submitBtn.disabled = true;
             
-            // Send to backend
             fetch(`/user/contractor/${contractorId}/request-quote`, {
                 method: 'POST',
                 body: formData
@@ -828,26 +842,76 @@
             document.body.style.overflow = 'auto';
         }
         
+        // ⭐ FIXED MESSAGE FUNCTION
         function submitMessage(event) {
             event.preventDefault();
             
-            // Create FormData object from the form
             const form = event.target;
             const formData = new FormData(form);
             
-            // Show loading state
+            // ✅ GET AND VALIDATE VALUES
+            const name = formData.get('name')?.trim();
+            const email = formData.get('email')?.trim();
+            const phone = formData.get('phone')?.trim();
+            const subject = formData.get('subject')?.trim();
+            const message = formData.get('message')?.trim();
+            
+            // ✅ VALIDATION
+            if (!name || name === '') {
+                alert('❌ Please enter your name');
+                document.getElementById('messageName').focus();
+                return;
+            }
+            
+            if (!email || email === '' || !email.includes('@')) {
+                alert('❌ Please enter a valid email address');
+                document.getElementById('messageEmail').focus();
+                return;
+            }
+            
+            if (!subject || subject === '') {
+                alert('❌ Please enter a subject');
+                document.getElementById('messageSubject').focus();
+                return;
+            }
+            
+            if (!message || message === '') {
+                alert('❌ Please enter your message');
+                document.getElementById('messageContent').focus();
+                return;
+            }
+            
+            // ✅ DEBUG LOG - Check what we're sending
+            console.log('🔍 Message Data Being Sent:');
+            console.log('  name:', name);
+            console.log('  email:', email);
+            console.log('  phone:', phone);
+            console.log('  subject:', subject);
+            console.log('  message:', message);
+            
+            // ✅ CREATE CLEAN FORMDATA (no empty/null values)
+            const cleanFormData = new FormData();
+            cleanFormData.append('name', name);
+            cleanFormData.append('email', email);
+            cleanFormData.append('phone', phone || '');  // Empty string if no phone
+            cleanFormData.append('subject', subject);
+            cleanFormData.append('message', message);
+            
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalText = submitBtn.textContent;
             submitBtn.textContent = 'Sending...';
             submitBtn.disabled = true;
             
-            // Send to backend
             fetch(`/user/contractor/${contractorId}/send-message`, {
                 method: 'POST',
-                body: formData
+                body: cleanFormData
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
             .then(data => {
+                console.log('Response data:', data);
                 if (data.success) {
                     alert('✅ ' + data.message + '\n\nThe contractor will receive your message and respond to your email address.');
                     closeMessageModal();
@@ -857,7 +921,7 @@
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('❌ Error:', error);
                 alert('❌ An error occurred while sending your message. Please try again.');
             })
             .finally(() => {
@@ -877,7 +941,6 @@
                     url: url
                 }).catch(err => console.log('Error sharing:', err));
             } else {
-                // Fallback: copy to clipboard
                 navigator.clipboard.writeText(url).then(() => {
                     alert('✅ Profile link copied to clipboard!\n\nYou can now paste and share it.');
                 }).catch(() => {

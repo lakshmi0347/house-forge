@@ -343,8 +343,8 @@
             <a href="/contractor/dashboard">Dashboard</a>
             <a href="/contractor/browse-projects">Browse Projects</a>
             <a href="/contractor/my-bids">My Bids</a>
-            <a href="{{ url_for('contractor.messages') }}" style="position: relative;">Messages
-            <span class="badge-notification" id="messagesBadge" style="display: none;">0</span>
+            <a href="/contractor/messages" style="position: relative;">Messages
+                <span class="badge-notification" id="messagesBadge" style="display: none;">0</span>
             </a>
             <a href="/contractor/profile">Profile</a>
             <a href="/auth/logout">Logout</a>
@@ -367,81 +367,77 @@
             </div>
         </div>
         
-       <!-- Messages List -->
+        <!-- Messages List -->
         {% if messages %}
         <div class="messages-container" id="messagesContainer">
             {% for message in messages %}
-            <div class="message-card {% if not message.get('read', False) %}unread{% endif %} {% if message.type == 'quote_request' %}quote-request{% endif %}" data-type="{{ message.type }}">
+            <div class="message-card {% if not message.get('read', False) %}unread{% endif %} {% if message.get('type') == 'quote_request' %}quote-request{% endif %}" data-type="{{ message.get('type', 'message') }}">
                 <div class="message-header">
                     <div class="message-sender">
-                        <div class="sender-name">{{ message.sender_name }}</div>
-                        <div class="sender-email">{{ message.sender_email }}</div>
+                        <div class="sender-name">{{ message.get('sender_name', 'Unknown Sender') }}</div>
+                        <div class="sender-email">{{ message.get('sender_email', 'No email provided') }}</div>
                     </div>
                     <div class="message-meta">
                         <div class="message-date">
-                            {% if message.created_at %}
-                                {{ message.created_at.strftime('%d %b %Y, %I:%M %p') }}
-                            {% else %}
-                                Recently
-                            {% endif %}
+                            {{ message.get('time_ago', 'Recently') }}
                         </div>
-                        <span class="message-type-badge {% if message.type == 'quote_request' %}type-quote{% else %}type-message{% endif %}">
-                            {% if message.type == 'quote_request' %}💰 Quote Request{% else %}💬 Message{% endif %}
+                        <span class="message-type-badge {% if message.get('type') == 'quote_request' %}type-quote{% else %}type-message{% endif %}">
+                            {% if message.get('type') == 'quote_request' %}💰 Quote Request{% else %}💬 Message{% endif %}
                         </span>
                     </div>
                 </div>
                 
-                <div class="message-subject">{{ message.subject }}</div>
+                <div class="message-subject">{{ message.get('subject', 'No subject') }}</div>
                 
-                {% if message.type == 'quote_request' %}
+                {% if message.get('type') == 'quote_request' %}
                 <div class="quote-details">
                     <div class="quote-details-grid">
                         <div class="quote-detail-item">
                             <span class="quote-label">Project Type</span>
-                            <span class="quote-value">{{ message.project_type or 'N/A' }}</span>
+                            <span class="quote-value">{{ message.get('project_type', 'N/A') }}</span>
                         </div>
                         <div class="quote-detail-item">
                             <span class="quote-label">Area</span>
-                            <span class="quote-value">{{ message.project_area or 'N/A' }}</span>
+                            <span class="quote-value">{{ message.get('project_area', 'N/A') }}</span>
                         </div>
                         <div class="quote-detail-item">
                             <span class="quote-label">Location</span>
-                            <span class="quote-value">{{ message.project_location or 'N/A' }}</span>
+                            <span class="quote-value">{{ message.get('project_location', 'N/A') }}</span>
                         </div>
                         <div class="quote-detail-item">
                             <span class="quote-label">Budget Range</span>
-                            <span class="quote-value">{{ message.project_budget or 'N/A' }}</span>
+                            <span class="quote-value">{{ message.get('project_budget', 'N/A') }}</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="message-content">
                     <strong>Project Details:</strong><br>
-                    {{ message.project_details or message.message }}
+                    {{ message.get('project_details', message.get('message', 'No details provided')) }}
                 </div>
                 {% else %}
                 <div class="message-content">
-                    {{ message.message }}
+                    {{ message.get('message', 'No message content') }}
                 </div>
                 {% endif %}
                 
                 <div class="contact-info">
                     <div class="contact-item">
-                        📧 <strong>Email:</strong> {{ message.sender_email }}
+                        📧 <strong>Email:</strong> {{ message.get('sender_email', 'Not provided') }}
                     </div>
-                    {% if message.sender_phone %}
+                    {% if message.get('sender_phone') %}
                     <div class="contact-item">
-                        📞 <strong>Phone:</strong> {{ message.sender_phone }}
+                        📞 <strong>Phone:</strong> {{ message.get('sender_phone') }}
                     </div>
                     {% endif %}
                 </div>
                 
                 <div class="message-actions">
-                    <a href="mailto:{{ message.sender_email }}" class="btn btn-primary">
-                        {% if message.type == 'quote_request' %}Send Quote{% else %}Reply via Email{% endif %}
+                    <a href="mailto:{{ message.get('sender_email', '') }}" class="btn btn-primary">
+                        {% if message.get('type') == 'quote_request' %}Send Quote{% else %}Reply via Email{% endif %}
                     </a>
-                    {% if message.sender_phone %}
-                    <a href="tel:{{ message.sender_phone.replace(' ', '') }}" class="btn btn-outline">Call</a>
+                    {% if message.get('sender_phone') %}
+                    <a href="tel:{{ message.get('sender_phone', '').replace(' ', '') }}" class="btn btn-outline">Call</a>
                     {% endif %}
                 </div>
             </div>
@@ -480,46 +476,38 @@
             });
             
             // Show/hide empty state
-            document.getElementById('emptyState').style.display = visibleCount === 0 ? 'block' : 'none';
-            document.getElementById('messagesContainer').style.display = visibleCount === 0 ? 'none' : 'grid';
-        }
-        
-        // Format relative time
-        function formatRelativeTime(date) {
-            const now = new Date();
-            const diff = now - date;
-            const seconds = Math.floor(diff / 1000);
-            const minutes = Math.floor(seconds / 60);
-            const hours = Math.floor(minutes / 60);
-            const days = Math.floor(hours / 24);
+            const emptyState = document.getElementById('emptyState');
+            const messagesContainer = document.getElementById('messagesContainer');
             
-            if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
-            if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-            if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-            return 'Just now';
+            if (emptyState) {
+                emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+            if (messagesContainer) {
+                messagesContainer.style.display = visibleCount === 0 ? 'none' : 'grid';
+            }
         }
         
-       // Update message badge
-    function updateMessageBadge() {
-        fetch('/contractor/messages/unread-count')
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.getElementById('messagesBadge');
-                if (data.count > 0) {
-                    badge.textContent = data.count;
-                    badge.style.display = 'flex';
-                } else {
-                    badge.style.display = 'none';
-                }
-            })
-            .catch(error => console.error('Error fetching unread count:', error));
-    }
-    
-    // Update badge on page load
-    updateMessageBadge();
-    
-    // Update badge every 30 seconds
-    setInterval(updateMessageBadge, 30000); 
+        // Update message badge
+        function updateMessageBadge() {
+            fetch('/contractor/messages/unread-count')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('messagesBadge');
+                    if (data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                })
+                .catch(error => console.error('Error fetching unread count:', error));
+        }
+        
+        // Update badge on page load
+        updateMessageBadge();
+        
+        // Update badge every 30 seconds
+        setInterval(updateMessageBadge, 30000); 
     </script>
 </body>
 </html>

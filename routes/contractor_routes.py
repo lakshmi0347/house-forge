@@ -577,18 +577,40 @@ def messages():
             # DEBUG: Print the actual message data
             print(f"\n📨 Message ID: {doc.id}")
             print(f"   Keys in message: {list(message_data.keys())}")
+            
+            # IMPORTANT: Set default values for all fields to prevent "None" display
+            message_data.setdefault('sender_name', 'Unknown Sender')
+            message_data.setdefault('sender_email', 'No email provided')
+            message_data.setdefault('sender_phone', '')
+            message_data.setdefault('subject', 'No subject')
+            message_data.setdefault('message', 'No message content')
+            message_data.setdefault('type', 'message')
+            message_data.setdefault('read', False)
+            
+            # For quote requests, ensure quote-specific fields exist
+            if message_data.get('type') == 'quote_request':
+                message_data.setdefault('project_type', 'N/A')
+                message_data.setdefault('project_area', 'N/A')
+                message_data.setdefault('project_location', 'N/A')
+                message_data.setdefault('project_budget', 'N/A')
+                message_data.setdefault('project_details', message_data.get('message', 'No details provided'))
+            
+            # Print actual values after defaults
             print(f"   sender_name: {message_data.get('sender_name')}")
             print(f"   sender_email: {message_data.get('sender_email')}")
             print(f"   subject: {message_data.get('subject')}")
-            print(f"   message: {message_data.get('message')}")
-            print(f"   type: {message_data.get('type')}")
-            print(f"   Full data: {message_data}")
+            print(f"   message: {message_data.get('message')[:50] if message_data.get('message') else 'N/A'}...")
             
             # Format created_at for display
             if 'created_at' in message_data and message_data['created_at']:
                 try:
                     now = datetime.now()
                     created = message_data['created_at']
+                    
+                    # Handle if created is a timestamp
+                    if hasattr(created, 'timestamp'):
+                        created = datetime.fromtimestamp(created.timestamp())
+                    
                     diff = now - created
                     
                     if diff.days > 0:
@@ -610,6 +632,15 @@ def messages():
             messages_list.append(message_data)
         
         print(f"\n✅ Total messages found: {len(messages_list)}")
+        
+        # Print sample message for debugging
+        if messages_list:
+            print(f"\n📊 Sample message data structure:")
+            sample = messages_list[0]
+            for key, value in sample.items():
+                if key != 'created_at':  # Skip timestamp objects
+                    print(f"   {key}: {repr(value)}")
+        
         print(f"=" * 50)
         
         # Sort in Python instead of Firestore
@@ -621,10 +652,13 @@ def messages():
         # Mark all as read when viewing
         for message in messages_list:
             if not message.get('read', False):
-                db.collection('messages').document(message['id']).update({
-                    'read': True,
-                    'read_at': datetime.now()
-                })
+                try:
+                    db.collection('messages').document(message['id']).update({
+                        'read': True,
+                        'read_at': datetime.now()
+                    })
+                except Exception as e:
+                    print(f"⚠️ Error marking message as read: {e}")
         
         return render_template('contractor/messages.html', 
                              messages=messages_list, 

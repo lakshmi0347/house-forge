@@ -367,7 +367,7 @@
                     
                     <div class="supplier-actions">
                         <a href="{{ url_for('user.view_supplier', supplier_id=supplier.id) }}" class="btn btn-primary">View Profile</a>
-                        <a href="#" class="btn btn-outline" onclick="alert('Contact feature coming soon!'); return false;">Contact</a>
+                        <a href="{{ url_for('user.contact_supplier', supplier_id=supplier.id) }}" class="btn btn-outline">Contact</a>
                     </div>
                 </div>
                 {% endfor %}

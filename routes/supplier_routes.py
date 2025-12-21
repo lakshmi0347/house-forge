@@ -501,3 +501,112 @@ def complete_order(order_id):
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
+
+@supplier_bp.route('/messages')
+@login_required
+def messages():
+    """View all messages received by supplier"""
+    try:
+        print("=" * 80)
+        print("📬 SUPPLIER MESSAGES PAGE ACCESSED")
+        print(f"Supplier ID: {current_user.id}")
+        print(f"Supplier Name: {getattr(current_user, 'name', 'Unknown')}")
+        print("=" * 80)
+        
+        # Get all messages for this supplier
+        messages_ref = db.collection('messages').where('supplier_id', '==', current_user.id).stream()
+        
+        messages_list = []
+        for doc in messages_ref:
+            message_data = doc.to_dict()
+            message_data['id'] = doc.id
+            messages_list.append(message_data)
+            
+            # Debug print each message
+            print(f"\n📧 Message ID: {doc.id}")
+            print(f"   Type: {message_data.get('type', 'N/A')}")
+            print(f"   From: {message_data.get('sender_name', 'N/A')}")
+            print(f"   Subject: {message_data.get('subject', 'N/A')}")
+            print(f"   Read: {message_data.get('read', False)}")
+        
+        print(f"\n✅ Total messages found: {len(messages_list)}")
+        
+        # Sort by created_at if available
+        messages_list.sort(
+            key=lambda x: x.get('created_at', datetime.min), 
+            reverse=True
+        )
+        
+        # Count unread messages
+        unread_count = len([m for m in messages_list if not m.get('read', False)])
+        print(f"📊 Unread messages: {unread_count}")
+        print("=" * 80)
+        
+        return render_template('supplier/messages.html', 
+                             messages=messages_list,
+                             unread_count=unread_count)
+        
+    except Exception as e:
+        print(f"❌ ERROR loading messages: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        print("=" * 80)
+        flash('An error occurred while loading messages', 'error')
+        return redirect(url_for('supplier.dashboard'))
+
+
+@supplier_bp.route('/message/<message_id>/mark-read', methods=['POST'])
+@login_required
+def mark_message_read(message_id):
+    """Mark a message as read"""
+    try:
+        message_ref = db.collection('messages').document(message_id)
+        message_doc = message_ref.get()
+        
+        if not message_doc.exists:
+            return jsonify({'success': False, 'message': 'Message not found'}), 404
+        
+        message_data = message_doc.to_dict()
+        
+        # Verify this is the supplier's message
+        if message_data.get('supplier_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+        
+        # Mark as read
+        message_ref.update({
+            'read': True,
+            'read_at': datetime.now()
+        })
+        
+        return jsonify({'success': True, 'message': 'Message marked as read'})
+        
+    except Exception as e:
+        print(f"Error marking message as read: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@supplier_bp.route('/message/<message_id>/delete', methods=['POST'])
+@login_required
+def delete_message(message_id):
+    """Delete a message"""
+    try:
+        message_ref = db.collection('messages').document(message_id)
+        message_doc = message_ref.get()
+        
+        if not message_doc.exists:
+            return jsonify({'success': False, 'message': 'Message not found'}), 404
+        
+        message_data = message_doc.to_dict()
+        
+        # Verify this is the supplier's message
+        if message_data.get('supplier_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+        
+        # Delete message
+        message_ref.delete()
+        
+        return jsonify({'success': True, 'message': 'Message deleted'})
+        
+    except Exception as e:
+        print(f"Error deleting message: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500

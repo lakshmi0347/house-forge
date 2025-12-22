@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Contractor - House-Forge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .contact-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .contractor-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.3);
+        }
+        
+        .contractor-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .contractor-type {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .contact-methods {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        
+        .contact-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .contact-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .contact-details {
+            flex: 1;
+        }
+        
+        .contact-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .contact-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .contact-action {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .contact-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .info-note {
+            background: #fff9e6;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .info-note-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .info-note-text {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-outline {
+            background: white;
+            color: #f5576c;
+            border: 2px solid #f5576c;
+        }
+        .btn-outline:hover { background: #f5576c; color: white; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">🏗️ House-Forge</div>
+    </nav>
+    
+    <div class="container">
+        <a href="javascript:history.back()" class="back-link">
+            ← Back
+        </a>
+        
+        <div class="contact-card">
+            <div class="card-header">
+                <div class="contractor-avatar">🔨</div>
+                <h1 class="contractor-name">{{ contractor.company_name or contractor.name }}</h1>
+                <div class="contractor-type">Professional Contractor</div>
+            </div>
+            
+            <div class="contact-methods">
+                <!-- Phone -->
+                <div class="contact-item">
+                    <div class="contact-info">
+                        <div class="contact-icon">📞</div>
+                        <div class="contact-details">
+                            <div class="contact-label">Phone</div>
+                            <div class="contact-value">{{ contractor.phone or 'Not available' }}</div>
+                        </div>
+                    </div>
+                    {% if contractor.phone %}
+                    <a href="tel:{{ contractor.phone }}" class="contact-action">Call Now</a>
+                    {% endif %}
+                </div>
+                
+                <!-- Email -->
+                <div class="contact-item">
+                    <div class="contact-info">
+                        <div class="contact-icon">✉️</div>
+                        <div class="contact-details">
+                            <div class="contact-label">Email</div>
+                            <div class="contact-value">{{ contractor.email or 'Not available' }}</div>
+                        </div>
+                    </div>
+                    {% if contractor.email %}
+                    <a href="mailto:{{ contractor.email }}" class="contact-action">Send Email</a>
+                    {% endif %}
+                </div>
+                
+                <!-- WhatsApp -->
+                {% if contractor.phone %}
+                <div class="contact-item">
+                    <div class="contact-info">
+                        <div class="contact-icon">💬</div>
+                        <div class="contact-details">
+                            <div class="contact-label">WhatsApp</div>
+                            <div class="contact-value">{{ contractor.phone }}</div>
+                        </div>
+                    </div>
+                    <a href="https://wa.me/{{ contractor.phone.replace('+', '').replace(' ', '').replace('-', '') }}" 
+                       target="_blank" 
+                       class="contact-action">Chat</a>
+                </div>
+                {% endif %}
+                
+                <!-- Location -->
+                {% if contractor.location %}
+                <div class="contact-item">
+                    <div class="contact-info">
+                        <div class="contact-icon">📍</div>
+                        <div class="contact-details">
+                            <div class="contact-label">Location</div>
+                            <div class="contact-value">{{ contractor.location }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="info-note">
+                <div class="info-note-title">💡 Tip</div>
+                <div class="info-note-text">
+                    When contacting the contractor, mention your project details (type, size, location, budget) to get accurate quotes. 
+                    Save their contact information for easy access later.
+                </div>
+            </div>
+            
+            <!-- Message Form Section -->
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #f0f0f0;">
+                <h3 style="font-size: 22px; color: #333; margin-bottom: 20px; font-weight: 600;">
+                    💬 Send Message Through Platform
+                </h3>
+                
+                <div id="messageAlert" style="display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
+                
+                <form id="messageForm" style="display: grid; gap: 20px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
+                            Subject *
+                        </label>
+                        <input type="text" 
+                               name="subject" 
+                               required 
+                               placeholder="e.g., Inquiry about construction services"
+                               style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
+                            Message *
+                        </label>
+                        <textarea name="message" 
+                                  required 
+                                  rows="5"
+                                  placeholder="Describe your project requirements and any specific questions..."
+                                  style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical;"></textarea>
+                    </div>
+                    
+                    <button type="submit" 
+                            style="padding: 14px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.3s;">
+                        Send Message
+                    </button>
+                </form>
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <button onclick="openQuoteModal()" 
+                            style="padding: 12px 24px; background: white; color: #f5576c; border: 2px solid #f5576c; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s;">
+                        📋 Request Detailed Quote
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quote Request Modal -->
+    <div id="quoteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 20px; padding: 40px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 50px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 style="font-size: 24px; font-weight: 600; color: #333;">💰 Request Quote</h2>
+                <button onclick="closeQuoteModal()" style="background: none; border: none; font-size: 28px; color: #999; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+            
+            <div id="quoteAlert" style="display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
+            
+            <form id="quoteForm" style="display: grid; gap: 20px;">
+                <div>
+                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
+                        Project Type *
+                    </label>
+                    <select name="project_type" 
+                            required 
+                            style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                        <option value="">Select project type</option>
+                        <option value="new_construction">New Construction</option>
+                        <option value="renovation">Renovation</option>
+                        <option value="extension">Extension</option>
+                        <option value="repair">Repair</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
+                        Project Area (sq ft) *
+                    </label>
+                    <input type="number" 
+                           name="project_area" 
+                           required 
+                           min="100"
+                           placeholder="e.g., 2000"
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
+                        Location *
+                    </label>
+                    <input type="text" 
+                           name="project_location" 
+                           required 
+                           placeholder="City, State"
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
+                        Budget Range *
+                    </label>
+                    <select name="project_budget" 
+                            required 
+                            style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                        <option value="">Select budget range</option>
+                        <option value="low">Budget (₹1000-1500/sq ft)</option>
+                        <option value="medium">Standard (₹1500-2500/sq ft)</option>
+                        <option value="high">Premium (₹2500+/sq ft)</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
+                        Project Details *
+                    </label>
+                    <textarea name="project_details" 
+                              required 
+                              rows="4"
+                              placeholder="Provide details about your project, timeline, specific requirements..."
+                              style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical;"></textarea>
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
+                        Your Name *
+                    </label>
+                    <input type="text" 
+                           name="name" 
+                           required 
+                           placeholder="Full Name"
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
+                        Your Phone *
+                    </label>
+                    <input type="tel" 
+                           name="phone" 
+                           required 
+                           placeholder="+91 00000 00000"
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
+                        Your Email *
+                    </label>
+                    <input type="email" 
+                           name="email" 
+                           required 
+                           placeholder="email@example.com"
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                </div>
+                
+                <div style="display: flex; gap: 15px;">
+                    <button type="button" 
+                            onclick="closeQuoteModal()" 
+                            style="flex: 1; padding: 14px; background: #f0f0f0; color: #333; border: none; border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer;">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            style="flex: 1; padding: 14px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer;">
+                        Send Quote Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        const contractorId = '{{ contractor.id }}';
+        
+        // Message Form Submission
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            
+            // Validate
+            const subject = formData.get('subject')?.trim();
+            const message = formData.get('message')?.trim();
+            
+            if (!subject || !message) {
+                showAlert('messageAlert', 'Please fill in all required fields', 'error');
+                return;
+            }
+            
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            
+            fetch(`/user/contractor/${contractorId}/send-message`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('messageAlert', data.message, 'success');
+                    this.reset();
+                } else {
+                    showAlert('messageAlert', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('messageAlert', 'An error occurred while sending your message', 'error');
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+        
+        // Quote Form Submission
+        document.getElementById('quoteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            
+            // Validate all fields
+            const required = ['project_type', 'project_area', 'project_location', 'project_budget', 'project_details', 'name', 'phone', 'email'];
+            for (const field of required) {
+                const value = formData.get(field)?.trim();
+                if (!value) {
+                    showAlert('quoteAlert', `Please fill in: ${field.replace('_', ' ')}`, 'error');
+                    return;
+                }
+            }
+            
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            
+            fetch(`/user/contractor/${contractorId}/request-quote`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('quoteAlert', data.message, 'success');
+                    this.reset();
+                    setTimeout(() => closeQuoteModal(), 2000);
+                } else {
+                    showAlert('quoteAlert', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('quoteAlert', 'An error occurred while sending your quote request', 'error');
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+        
+        // Modal Functions
+        function openQuoteModal() {
+            const modal = document.getElementById('quoteModal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeQuoteModal() {
+            const modal = document.getElementById('quoteModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('quoteForm').reset();
+            document.getElementById('quoteAlert').style.display = 'none';
+        }
+        
+        // Close modal on background click
+        document.getElementById('quoteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeQuoteModal();
+            }
+        });
+        
+        // Show Alert Function
+        function showAlert(elementId, message, type) {
+            const alert = document.getElementById(elementId);
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            if (type === 'success') {
+                alert.style.background = '#d4edda';
+                alert.style.color = '#155724';
+                alert.style.border = '1px solid #c3e6cb';
+            } else {
+                alert.style.background = '#f8d7da';
+                alert.style.color = '#721c24';
+                alert.style.border = '1px solid #f5c6cb';
+            }
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

@@ -1139,3 +1139,210 @@ def request_quote_from_supplier(supplier_id):
         traceback.print_exc()
         print("=" * 80)
         return jsonify({'success': False, 'message': str(e)}), 500
+
+@user_bp.route('/contractor/<contractor_id>/contact')
+@login_required
+def contact_contractor(contractor_id):
+    """Show contact information for a contractor"""
+    db = get_db()
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.find_contractor'))
+    
+    try:
+        contractor_doc = db.collection('contractor').document(contractor_id).get()
+        
+        if not contractor_doc.exists:
+            flash('contractor not found', 'error')
+            return redirect(url_for('user.find_contractor'))
+        
+        contractor_data = contractor_doc.to_dict()
+        contractor_data['id'] = contractor_id
+        
+        return render_template('user/contractor_contact.html', contractor=contractor_data)
+        
+    except Exception as e:
+        flash(f'Error loading supplier contact: {str(e)}', 'error')
+        return redirect(url_for('user.find_contractor'))
+
+@user_bp.route('/contractor/<contractor_id>/send-message', methods=['POST'])
+@login_required
+def send_message_to_contractor(contractor_id):
+    """Send a message to a contractor"""
+    db = get_db()
+    if not db:
+        return jsonify({'success': False, 'message': 'Database connection error'}), 500
+    
+    try:
+        print("=" * 80)
+        print("📤 USER SENDING MESSAGE TO CONTRACTOR")
+        print(f"User ID: {current_user.id}")
+        print(f"User Name: {current_user.name}")
+        print(f"Target Contractor ID: {contractor_id}")
+        print("=" * 80)
+        
+        # Get form data with validation
+        subject = request.form.get('subject', '').strip()
+        message_content = request.form.get('message', '').strip()
+        
+        print(f"Subject: {repr(subject)}")
+        print(f"Message: {repr(message_content)}")
+        
+        # Validate - Reject empty values
+        if not subject or not message_content:
+            print("❌ Validation failed: Empty fields")
+            return jsonify({
+                'success': False,
+                'message': 'Please fill in all required fields'
+            }), 400
+        
+        # Get contractor info
+        contractor_ref = db.collection('contractors').document(contractor_id)
+        contractor_doc = contractor_ref.get()
+        
+        if not contractor_doc.exists:
+            print(f"❌ Contractor not found: {contractor_id}")
+            return jsonify({'success': False, 'message': 'Contractor not found'}), 404
+        
+        contractor_data = contractor_doc.to_dict()
+        contractor_name = contractor_data.get('company_name') or contractor_data.get('name', 'Unknown Contractor')
+        
+        print(f"Contractor Name: {contractor_name}")
+        
+        # Create message with guaranteed non-null values
+        message_data = {
+            'contractor_id': contractor_id,
+            'contractor_name': contractor_name,
+            'user_id': current_user.id,
+            'sender_name': current_user.name,
+            'sender_email': current_user.email if hasattr(current_user, 'email') else '',
+            'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
+            'subject': subject,
+            'message': message_content,
+            'type': 'inquiry',
+            'read': False,
+            'created_at': datetime.now()
+        }
+        
+        print("\n📝 Message data to be saved:")
+        for key, value in message_data.items():
+            if key != 'created_at':
+                print(f"  {key}: {repr(value)}")
+        
+        # Save to Firebase
+        doc_ref = db.collection('messages').add(message_data)
+        message_id = doc_ref[1].id
+        
+        print(f"\n✅ Message saved successfully!")
+        print(f"Message ID: {message_id}")
+        print("=" * 80)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Message sent successfully! The contractor will respond soon.'
+        })
+        
+    except Exception as e:
+        print(f"❌ ERROR sending message: {e}")
+        import traceback
+        traceback.print_exc()
+        print("=" * 80)
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@user_bp.route('/contractor/<contractor_id>/request-quote', methods=['POST'])
+@login_required
+def request_quote_from_contractor(contractor_id):
+    """Request a quote from a contractor"""
+    db = get_db()
+    if not db:
+        return jsonify({'success': False, 'message': 'Database connection error'}), 500
+    
+    try:
+        print("=" * 80)
+        print("💰 USER REQUESTING QUOTE FROM CONTRACTOR")
+        print(f"User ID: {current_user.id}")
+        print(f"User Name: {current_user.name}")
+        print(f"Target Contractor ID: {contractor_id}")
+        print("=" * 80)
+        
+        # Get form data with validation
+        project_type = request.form.get('project_type', '').strip()
+        project_area = request.form.get('project_area', '').strip()
+        project_location = request.form.get('project_location', '').strip()
+        project_budget = request.form.get('project_budget', '').strip()
+        project_details = request.form.get('project_details', '').strip()
+        name = request.form.get('name', '').strip()
+        phone = request.form.get('phone', '').strip()
+        email = request.form.get('email', '').strip()
+        
+        print(f"Project Type: {repr(project_type)}")
+        print(f"Project Area: {repr(project_area)}")
+        print(f"Location: {repr(project_location)}")
+        print(f"Budget: {repr(project_budget)}")
+        
+        # Validate
+        if not all([project_type, project_area, project_location, project_budget, project_details, name, phone, email]):
+            print("❌ Validation failed: Missing fields")
+            return jsonify({
+                'success': False,
+                'message': 'Please fill in all required fields'
+            }), 400
+        
+        # Get contractor info
+        contractor_ref = db.collection('contractors').document(contractor_id)
+        contractor_doc = contractor_ref.get()
+        
+        if not contractor_doc.exists:
+            print(f"❌ Contractor not found: {contractor_id}")
+            return jsonify({'success': False, 'message': 'Contractor not found'}), 404
+        
+        contractor_data = contractor_doc.to_dict()
+        contractor_name = contractor_data.get('company_name') or contractor_data.get('name', 'Unknown Contractor')
+        
+        print(f"Contractor Name: {contractor_name}")
+        
+        # Create quote request with guaranteed non-null values
+        quote_data = {
+            'contractor_id': contractor_id,
+            'contractor_name': contractor_name,
+            'user_id': current_user.id,
+            'sender_name': name,
+            'sender_email': email,
+            'sender_phone': phone,
+            'subject': f'Quote Request: {project_type}',
+            'message': project_details,
+            'type': 'quote_request',
+            'project_type': project_type,
+            'project_area': project_area,
+            'project_location': project_location,
+            'project_budget': project_budget,
+            'project_details': project_details,
+            'read': False,
+            'created_at': datetime.now()
+        }
+        
+        print("\n📝 Quote request data to be saved:")
+        for key, value in quote_data.items():
+            if key != 'created_at':
+                print(f"  {key}: {repr(value)}")
+        
+        # Save to Firebase
+        doc_ref = db.collection('messages').add(quote_data)
+        quote_id = doc_ref[1].id
+        
+        print(f"\n✅ Quote request saved successfully!")
+        print(f"Message ID: {quote_id}")
+        print("=" * 80)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Quote request sent successfully! The contractor will review it and contact you.'
+        })
+        
+    except Exception as e:
+        print(f"❌ ERROR sending quote request: {e}")
+        import traceback
+        traceback.print_exc()
+        print("=" * 80)
+        return jsonify({'success': False, 'message': str(e)}), 500

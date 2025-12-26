@@ -1147,14 +1147,14 @@ def contact_contractor(contractor_id):
     db = get_db()
     if not db:
         flash('Database connection error', 'error')
-        return redirect(url_for('user.find_contractor'))
+        return redirect(url_for('user.find_contractors'))
     
     try:
-        contractor_doc = db.collection('contractor').document(contractor_id).get()
+        contractor_doc = db.collection('contractors').document(contractor_id).get()
         
         if not contractor_doc.exists:
-            flash('contractor not found', 'error')
-            return redirect(url_for('user.find_contractor'))
+            flash('Contractor not found', 'error')
+            return redirect(url_for('user.find_contractors'))
         
         contractor_data = contractor_doc.to_dict()
         contractor_data['id'] = contractor_id
@@ -1162,8 +1162,9 @@ def contact_contractor(contractor_id):
         return render_template('user/contractor_contact.html', contractor=contractor_data)
         
     except Exception as e:
-        flash(f'Error loading supplier contact: {str(e)}', 'error')
-        return redirect(url_for('user.find_contractor'))
+        flash(f'Error loading contractor contact: {str(e)}', 'error')
+        return redirect(url_for('user.find_contractors'))
+
 
 @user_bp.route('/contractor/<contractor_id>/send-message', methods=['POST'])
 @login_required

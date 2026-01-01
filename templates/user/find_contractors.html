@@ -377,9 +377,11 @@
                         </div>
                     </div>
                     
+                   <!-- Replace the contractor-actions section in find_contractors.html (around line 367) -->
+
                     <div class="contractor-actions">
-                        <a href="{{ url_for('user.view_contractor', contractor_id=contractor.id) }}" class="btn btn-primary">View Profile</a>
-                        <a href="#" class="btn btn-outline">Contact</a>
+                    <a href="{{ url_for('user.view_contractor', contractor_id=contractor.id) }}" class="btn btn-primary">View Profile</a>
+                    <a href="{{ url_for('user.contact_contractor', contractor_id=contractor.id) }}" class="btn btn-outline">Contact</a>
                     </div>
                 </div>
                 {% endfor %}

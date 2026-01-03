@@ -1347,3 +1347,72 @@ def request_quote_from_contractor(contractor_id):
         traceback.print_exc()
         print("=" * 80)
         return jsonify({'success': False, 'message': str(e)}), 500
+    
+@user_bp.route('/project/<project_id>/delete', methods=['POST', 'DELETE'])
+@login_required
+def delete_project(project_id):
+    """Delete a project"""
+    db = get_db()
+    if not db:
+        return jsonify({'success': False, 'message': 'Database connection error'}), 500
+    
+    try:
+        print("=" * 80)
+        print("🗑️ DELETING PROJECT")
+        print(f"User ID: {current_user.id}")
+        print(f"Project ID: {project_id}")
+        print("=" * 80)
+        
+        # Get project to verify ownership
+        project_doc = db.collection('projects').document(project_id).get()
+        
+        if not project_doc.exists:
+            print(f"❌ Project not found: {project_id}")
+            return jsonify({'success': False, 'message': 'Project not found'}), 404
+        
+        project_data = project_doc.to_dict()
+        
+        # Check ownership
+        if project_data.get('user_id') != current_user.id:
+            print(f"❌ Access denied")
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+        
+        # Delete related bids first (if any)
+        try:
+            bids_ref = db.collection('bids').where('project_id', '==', project_id).stream()
+            deleted_bids = 0
+            for bid in bids_ref:
+                db.collection('bids').document(bid.id).delete()
+                deleted_bids += 1
+            print(f"✅ Deleted {deleted_bids} related bids")
+        except Exception as e:
+            print(f"⚠️ Error deleting bids: {e}")
+        
+        # Delete related orders (if any)
+        try:
+            orders_ref = db.collection('orders').where('project_id', '==', project_id).stream()
+            deleted_orders = 0
+            for order in orders_ref:
+                db.collection('orders').document(order.id).delete()
+                deleted_orders += 1
+            print(f"✅ Deleted {deleted_orders} related orders")
+        except Exception as e:
+            print(f"⚠️ Error deleting orders: {e}")
+        
+        # Delete the project
+        db.collection('projects').document(project_id).delete()
+        
+        print(f"✅ Project '{project_data.get('title')}' deleted successfully!")
+        print("=" * 80)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Project deleted successfully!'
+        })
+        
+    except Exception as e:
+        print(f"❌ ERROR deleting project: {e}")
+        import traceback
+        traceback.print_exc()
+        print("=" * 80)
+        return jsonify({'success': False, 'message': str(e)}), 500

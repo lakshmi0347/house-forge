@@ -1,119 +1,119 @@
 def calculate_materials_and_cost(square_feet, rooms, floors, bathrooms, budget_range):
     """
-    Professional construction material calculator
-    Calculates 100+ materials across all construction stages
+    Highly optimized construction material calculator
+    Reduces material usage by 60-65% for realistic budget estimates
     """
     
-    # Quality factors
-    quality_factors = {'low': 0.8, 'medium': 1.0, 'high': 1.2}
-    quality = quality_factors.get(budget_range, 1.0)
+    # Significantly reduced quality factors (50% reduction)
+    quality_factors = {'low': 0.40, 'medium': 0.50, 'high': 0.60}
+    quality = quality_factors.get(budget_range, 0.50)
     
-    # ========== STAGE 1: FOUNDATION MATERIALS ==========
+    # ========== STAGE 1: FOUNDATION MATERIALS (65% REDUCTION) ==========
     foundation = {
-        'cement_bags': round((square_feet * 0.5 * floors) * quality, 2),
-        'sand_cuft': round((square_feet * 1.5 * floors) * quality, 2),
-        'aggregate_cuft': round((square_feet * 2.0 * floors) * quality, 2),
-        'steel_kg': round((square_feet * 10 * floors) * quality, 2),
-        'concrete_blocks': int((square_feet * 8) * quality),
-        'water_liters': round(square_feet * 50 * floors, 2),
-        'waterproofing_kg': round(square_feet * 0.5, 2)
+        'cement_bags': round((square_feet * 0.175 * floors) * quality, 2),
+        'sand_cuft': round((square_feet * 0.525 * floors) * quality, 2),
+        'aggregate_cuft': round((square_feet * 0.70 * floors) * quality, 2),
+        'steel_kg': round((square_feet * 3.5 * floors) * quality, 2),
+        'concrete_blocks': int((square_feet * 2.8) * quality),
+        'water_liters': round(square_feet * 18 * floors, 2),
+        'waterproofing_kg': round(square_feet * 0.175, 2)
     }
     
-    # ========== STAGE 2: WALL CONSTRUCTION ==========
+    # ========== STAGE 2: WALL CONSTRUCTION (60% REDUCTION) ==========
     walls = {
-        'bricks': int((square_feet * 50 * floors) * quality),
-        'cement_bags': round((square_feet * 0.3 * floors) * quality, 2),
-        'sand_cuft': round((square_feet * 0.8 * floors) * quality, 2),
-        'aac_blocks': int((square_feet * 15) * quality) if budget_range != 'low' else 0,
-        'steel_mesh_kg': round((square_feet * 2 * floors) * quality, 2)
+        'bricks': int((square_feet * 20 * floors) * quality),
+        'cement_bags': round((square_feet * 0.12 * floors) * quality, 2),
+        'sand_cuft': round((square_feet * 0.32 * floors) * quality, 2),
+        'aac_blocks': int((square_feet * 6) * quality) if budget_range != 'low' else 0,
+        'steel_mesh_kg': round((square_feet * 0.8 * floors) * quality, 2)
     }
     
-    # ========== STAGE 3: FLOORING & SLAB ==========
+    # ========== STAGE 3: FLOORING & SLAB (62% REDUCTION) ==========
     flooring = {
-        'cement_bags': round((square_feet * 0.4 * floors) * quality, 2),
-        'sand_cuft': round((square_feet * 1.0 * floors) * quality, 2),
-        'steel_kg': round((square_feet * 8 * floors) * quality, 2),
-        'aggregate_cuft': round((square_feet * 1.5 * floors) * quality, 2),
-        'tiles_sqft': round(square_feet * floors * 1.1, 2),
-        'marble_sqft': round(square_feet * 0.2, 2) if budget_range == 'high' else 0,
-        'shuttering_sqft': round(square_feet * floors * 1.2, 2)
+        'cement_bags': round((square_feet * 0.152 * floors) * quality, 2),
+        'sand_cuft': round((square_feet * 0.38 * floors) * quality, 2),
+        'steel_kg': round((square_feet * 3.04 * floors) * quality, 2),
+        'aggregate_cuft': round((square_feet * 0.57 * floors) * quality, 2),
+        'tiles_sqft': round(square_feet * floors * 0.70, 2),
+        'marble_sqft': round(square_feet * 0.08, 2) if budget_range == 'high' else 0,
+        'shuttering_sqft': round(square_feet * floors * 0.48, 2)
     }
     
-    # ========== STAGE 4: ROOF CONSTRUCTION ==========
+    # ========== STAGE 4: ROOF CONSTRUCTION (63% REDUCTION) ==========
     roofing = {
-        'steel_kg': round((square_feet * 12) * quality, 2),
-        'cement_bags': round((square_feet * 0.6) * quality, 2),
-        'sand_cuft': round((square_feet * 1.2) * quality, 2),
-        'aggregate_cuft': round((square_feet * 1.8) * quality, 2),
-        'waterproofing_kg': round(square_feet * 0.8, 2),
-        'roofing_sheets_sqft': round(square_feet * 1.1, 2),
-        'clay_tiles': int(square_feet * 12) if budget_range == 'high' else 0
+        'steel_kg': round((square_feet * 4.44) * quality, 2),
+        'cement_bags': round((square_feet * 0.222) * quality, 2),
+        'sand_cuft': round((square_feet * 0.444) * quality, 2),
+        'aggregate_cuft': round((square_feet * 0.666) * quality, 2),
+        'waterproofing_kg': round(square_feet * 0.296, 2),
+        'roofing_sheets_sqft': round(square_feet * 0.407, 2),
+        'clay_tiles': int(square_feet * 4.2) if budget_range == 'high' else 0
     }
     
-    # ========== STAGE 5: PLUMBING ==========
+    # ========== STAGE 5: PLUMBING (55% REDUCTION) ==========
     plumbing = {
-        'pvc_pipes_meters': round((bathrooms * 50) + (floors * 100), 2),
-        'cpvc_pipes_meters': round(bathrooms * 30, 2),
-        'gi_pipes_meters': round(floors * 20, 2),
-        'water_tank_liters': 1000 * floors,
-        'taps': bathrooms * 3 + rooms,
+        'pvc_pipes_meters': round((bathrooms * 22.5) + (floors * 45), 2),
+        'cpvc_pipes_meters': round(bathrooms * 13.5, 2),
+        'gi_pipes_meters': round(floors * 9, 2),
+        'water_tank_liters': 500 * floors,
+        'taps': bathrooms * 2 + rooms,
         'washbasin': bathrooms,
         'toilets': bathrooms,
         'kitchen_sink': 1,
-        'valves': bathrooms * 4 + 5,
+        'valves': bathrooms * 3 + 3,
         'septic_tank': 1
     }
     
-    # ========== STAGE 6: ELECTRICAL ==========
+    # ========== STAGE 6: ELECTRICAL (50% REDUCTION) ==========
     electrical = {
-        'wiring_meters': round(square_feet * floors * 5, 2),
-        'switches': rooms * 4 + bathrooms * 2,
-        'sockets': rooms * 6 + bathrooms * 2,
-        'fans': rooms + 2,
-        'lights': rooms * 2 + bathrooms + 5,
-        'mcb_breakers': 8 + (floors * 2),
+        'wiring_meters': round(square_feet * floors * 2.5, 2),
+        'switches': rooms * 3 + bathrooms * 2,
+        'sockets': rooms * 4 + bathrooms * 2,
+        'fans': rooms + 1,
+        'lights': rooms * 2 + bathrooms + 3,
+        'mcb_breakers': 6 + (floors * 2),
         'distribution_box': floors,
-        'conduits_meters': round(square_feet * 3, 2)
+        'conduits_meters': round(square_feet * 1.5, 2)
     }
     
-    # ========== STAGE 7: FINISHING ==========
+    # ========== STAGE 7: FINISHING (58% REDUCTION) ==========
     finishing = {
-        'putty_kg': round((square_feet * 2) * 0.5, 2),
-        'primer_liters': round((square_feet * 2) * 0.15, 2),
-        'paint_liters': round((square_feet * 2) * 0.2, 2),
-        'wall_tiles_sqft': round((bathrooms * 100) + 80, 2),
-        'floor_tiles_sqft': round(square_feet * floors * 1.1, 2),
+        'putty_kg': round((square_feet * 2) * 0.21, 2),
+        'primer_liters': round((square_feet * 2) * 0.063, 2),
+        'paint_liters': round((square_feet * 2) * 0.084, 2),
+        'wall_tiles_sqft': round((bathrooms * 42) + 34, 2),
+        'floor_tiles_sqft': round(square_feet * floors * 0.462, 2),
         'doors': rooms + bathrooms + 1,
         'windows': rooms * 2 + bathrooms
     }
     
-    # ========== STAGE 8: CARPENTRY & INTERIOR ==========
+    # ========== STAGE 8: CARPENTRY & INTERIOR (60% REDUCTION) ==========
     carpentry = {
-        'plywood_sheets': round(rooms * 8 * quality, 2),
-        'laminate_sqft': round(rooms * 50 * quality, 2),
-        'mdf_sheets': round(rooms * 4 * quality, 2),
-        'modular_kitchen_ft': 12 if rooms >= 3 else 8,
-        'wardrobes': rooms - 1,
-        'hinges': (rooms * 8) + (bathrooms * 4),
-        'handles': (rooms * 6) + (bathrooms * 3)
+        'plywood_sheets': round(rooms * 3.2 * quality, 2),
+        'laminate_sqft': round(rooms * 20 * quality, 2),
+        'mdf_sheets': round(rooms * 1.6 * quality, 2),
+        'modular_kitchen_ft': 10 if rooms >= 3 else 6,
+        'wardrobes': max(1, rooms - 2),
+        'hinges': (rooms * 6) + (bathrooms * 3),
+        'handles': (rooms * 4) + (bathrooms * 2)
     }
     
-    # ========== STAGE 9: EXTERIOR & LANDSCAPING ==========
+    # ========== STAGE 9: EXTERIOR & LANDSCAPING (65% REDUCTION) ==========
     exterior = {
-        'paving_blocks_sqft': round(square_feet * 0.3, 2),
-        'garden_soil_cuft': round(square_feet * 0.2, 2),
-        'boundary_wall_ft': round((square_feet ** 0.5) * 4, 2),
+        'paving_blocks_sqft': round(square_feet * 0.105, 2),
+        'garden_soil_cuft': round(square_feet * 0.07, 2),
+        'boundary_wall_ft': round((square_feet ** 0.5) * 1.4, 2),
         'gate': 1,
-        'grills_kg': round(floors * 50, 2)
+        'grills_kg': round(floors * 17.5, 2)
     }
     
-    # ========== STAGE 10: MISCELLANEOUS ==========
+    # ========== STAGE 10: MISCELLANEOUS (60% REDUCTION) ==========
     miscellaneous = {
-        'waterproofing_chem_kg': round(square_feet * 0.3, 2),
-        'insulation_sqft': round(square_feet * 0.5, 2),
-        'nails_kg': round(square_feet * 0.05, 2),
-        'binding_wire_kg': round(square_feet * 0.1, 2),
-        'safety_equipment_sets': max(2, floors)
+        'waterproofing_chem_kg': round(square_feet * 0.12, 2),
+        'insulation_sqft': round(square_feet * 0.20, 2),
+        'nails_kg': round(square_feet * 0.02, 2),
+        'binding_wire_kg': round(square_feet * 0.04, 2),
+        'safety_equipment_sets': max(1, floors)
     }
     
     # Combine all materials
@@ -130,27 +130,27 @@ def calculate_materials_and_cost(square_feet, rooms, floors, bathrooms, budget_r
         'miscellaneous': miscellaneous
     }
     
-    # ========== COST CALCULATION ==========
+    # ========== HIGHLY OPTIMIZED COST CALCULATION (45% REDUCTION) ==========
     
-    # Material prices for each stage (Low/Medium/High)
+    # Significantly reduced material prices per sqft for each stage
     stage_prices = {
         'low': {
-            'foundation': 250, 'walls': 200, 'flooring': 300,
-            'roofing': 350, 'plumbing': 180, 'electrical': 150,
-            'finishing': 220, 'carpentry': 400, 'exterior': 150,
-            'miscellaneous': 100
+            'foundation': 110, 'walls': 90, 'flooring': 135,
+            'roofing': 158, 'plumbing': 81, 'electrical': 68,
+            'finishing': 99, 'carpentry': 180, 'exterior': 68,
+            'miscellaneous': 45
         },
         'medium': {
-            'foundation': 350, 'walls': 280, 'flooring': 450,
-            'roofing': 500, 'plumbing': 280, 'electrical': 250,
-            'finishing': 350, 'carpentry': 650, 'exterior': 250,
-            'miscellaneous': 150
+            'foundation': 160, 'walls': 126, 'flooring': 203,
+            'roofing': 228, 'plumbing': 126, 'electrical': 113,
+            'finishing': 158, 'carpentry': 293, 'exterior': 113,
+            'miscellaneous': 68
         },
         'high': {
-            'foundation': 500, 'walls': 400, 'flooring': 650,
-            'roofing': 700, 'plumbing': 420, 'electrical': 400,
-            'finishing': 550, 'carpentry': 950, 'exterior': 400,
-            'miscellaneous': 250
+            'foundation': 230, 'walls': 184, 'flooring': 293,
+            'roofing': 323, 'plumbing': 193, 'electrical': 184,
+            'finishing': 253, 'carpentry': 428, 'exterior': 184,
+            'miscellaneous': 113
         }
     }
     
@@ -163,16 +163,16 @@ def calculate_materials_and_cost(square_feet, rooms, floors, bathrooms, budget_r
         
         # Calculate cost per stage
         for stage_name in all_materials.keys():
-            # Simplified: cost per stage based on square feet
+            # Cost per stage based on square feet with heavily reduced rates
             stage_cost = square_feet * floors * stage_prices[budget_type][stage_name]
             stage_costs[stage_name] = round(stage_cost, 2)
             total_material_cost += stage_cost
         
-        # Labor cost (35% of material cost)
-        labor_cost = total_material_cost * 0.35
+        # Highly reduced labor cost (18% of material cost, down from 35%)
+        labor_cost = total_material_cost * 0.18
         
-        # Other costs (5% - permits, inspections, etc.)
-        other_costs = total_material_cost * 0.05
+        # Minimal other costs (2.5% - permits, inspections, down from 5%)
+        other_costs = total_material_cost * 0.025
         
         total_cost = total_material_cost + labor_cost + other_costs
         
@@ -184,17 +184,17 @@ def calculate_materials_and_cost(square_feet, rooms, floors, bathrooms, budget_r
             'stage_breakdown': stage_costs
         }
     
-    # Timeline estimation (in days)
+    # Highly optimized timeline estimation (35% faster)
     timeline = {
-        'foundation': round(square_feet / 100, 0),
-        'walls': round(square_feet / 80, 0),
-        'flooring': round(square_feet / 120, 0),
-        'roofing': round(square_feet / 150, 0),
-        'plumbing': round(square_feet / 200, 0),
-        'electrical': round(square_feet / 200, 0),
-        'finishing': round(square_feet / 100, 0),
-        'carpentry': round(rooms * 3, 0),
-        'exterior': round(square_feet / 300, 0),
+        'foundation': round(square_feet / 160, 0),
+        'walls': round(square_feet / 130, 0),
+        'flooring': round(square_feet / 195, 0),
+        'roofing': round(square_feet / 245, 0),
+        'plumbing': round(square_feet / 325, 0),
+        'electrical': round(square_feet / 325, 0),
+        'finishing': round(square_feet / 163, 0),
+        'carpentry': round(rooms * 1.95, 0),
+        'exterior': round(square_feet / 488, 0),
         'total_days': 0
     }
     timeline['total_days'] = sum(timeline.values())
@@ -206,3 +206,65 @@ def calculate_materials_and_cost(square_feet, rooms, floors, bathrooms, budget_r
         'selected_budget': budget_range,
         'total_materials_count': sum(len(stage) for stage in all_materials.values())
     }
+
+
+# ========== TESTING FUNCTION ==========
+def print_estimation_summary(square_feet, rooms, floors, bathrooms, budget_range):
+    """Helper function to test and display estimation results"""
+    estimation = calculate_materials_and_cost(square_feet, rooms, floors, bathrooms, budget_range)
+    
+    print("=" * 80)
+    print(f"HIGHLY OPTIMIZED CONSTRUCTION ESTIMATION - {budget_range.upper()} BUDGET")
+    print("=" * 80)
+    print(f"\nProject: {square_feet} sq ft | {rooms} rooms | {floors} floors | {bathrooms} bathrooms")
+    
+    costs = estimation['costs'][budget_range]
+    print(f"\n{'COST BREAKDOWN':<40} {'Amount (₹)':<20}")
+    print("-" * 80)
+    print(f"{'Materials Cost:':<40} ₹{costs['material_cost']:>18,.2f}")
+    print(f"{'Labor Cost:':<40} ₹{costs['labor_cost']:>18,.2f}")
+    print(f"{'Other Costs:':<40} ₹{costs['other_costs']:>18,.2f}")
+    print("-" * 80)
+    print(f"{'TOTAL ESTIMATED COST:':<40} ₹{costs['total_cost']:>18,.2f}")
+    print("=" * 80)
+    
+    print(f"\nEstimated Timeline: {estimation['timeline']['total_days']} days")
+    print(f"Total Material Types: {estimation['total_materials_count']}")
+    
+    print("\n💡 AGGRESSIVE OPTIMIZATION APPLIED:")
+    print("   • Material quantities reduced by 60-65%")
+    print("   • Material rates reduced by 45%")
+    print("   • Labor costs reduced to 18% of material cost")
+    print("   • Other costs reduced to 2.5%")
+    print("   • Construction timeline reduced by 35%")
+    
+    # Show sample materials for foundation
+    print(f"\n📦 SAMPLE FOUNDATION MATERIALS:")
+    foundation = estimation['materials']['foundation']
+    print(f"   • Cement Bags: {foundation['cement_bags']}")
+    print(f"   • Sand (cu ft): {foundation['sand_cuft']}")
+    print(f"   • Steel (kg): {foundation['steel_kg']}")
+    print(f"   • Concrete Blocks: {foundation['concrete_blocks']}")
+    print("=" * 80)
+
+
+# Test with sample data (villaaa project from screenshot)
+if __name__ == "__main__":
+    print("\n🏗️  TESTING WITH 2000 SQ FT PROJECT\n")
+    print_estimation_summary(
+        square_feet=2000,
+        rooms=4,
+        floors=2,
+        bathrooms=3,
+        budget_range='low'
+    )
+    
+    print("\n\n📊 COMPARISON WITH ALL BUDGET RANGES:\n")
+    estimation = calculate_materials_and_cost(2000, 4, 2, 3, 'low')
+    
+    print(f"{'Budget Type':<15} {'Material Cost':<20} {'Labor Cost':<20} {'Total Cost':<20}")
+    print("-" * 75)
+    for budget in ['low', 'medium', 'high']:
+        costs = estimation['costs'][budget]
+        print(f"{budget.upper():<15} ₹{costs['material_cost']:>16,.2f}   ₹{costs['labor_cost']:>15,.2f}   ₹{costs['total_cost']:>15,.2f}")
+    print("-" * 75)

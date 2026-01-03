@@ -554,7 +554,6 @@ def messages():
         flash('An error occurred while loading messages', 'error')
         return redirect(url_for('supplier.dashboard'))
 
-
 @supplier_bp.route('/message/<message_id>/mark-read', methods=['POST'])
 @login_required
 def mark_message_read(message_id):
@@ -583,7 +582,6 @@ def mark_message_read(message_id):
     except Exception as e:
         print(f"Error marking message as read: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
-
 
 @supplier_bp.route('/message/<message_id>/delete', methods=['POST'])
 @login_required

@@ -142,6 +142,11 @@ def register():
         return redirect(url_for('index'))
     
     if request.method == 'POST':
+        # Get database connection
+        db = get_db()
+        if not db:
+            flash('Database connection error', 'error')
+            return render_template('register.html')
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip().lower()
         phone = request.form.get('phone', '').strip()

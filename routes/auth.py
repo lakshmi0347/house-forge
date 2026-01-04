@@ -5,6 +5,7 @@ from models.user import User
 from datetime import datetime
 import re
 
+# Create Blueprint
 auth_bp = Blueprint('auth', __name__)
 
 # Import db from app.py after it's initialized
@@ -24,9 +25,9 @@ def validate_phone(phone):
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    """Login page for all users"""
     db = get_db()
     
-    """Login page for all users"""
     if current_user.is_authenticated:
         # Redirect based on role
         if current_user.role == 'admin':
@@ -42,11 +43,11 @@ def login():
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         
-        print("=" * 50)
-        print("LOGIN ATTEMPT")
+        print("=" * 80)
+        print("🔐 LOGIN ATTEMPT")
         print(f"Email: {email}")
         print(f"Password length: {len(password)}")
-        print("=" * 50)
+        print("=" * 80)
         
         # Validate inputs
         if not email or not password:
@@ -65,7 +66,7 @@ def login():
             collection_name = None
             
             for collection in collections:
-                print(f"Searching in {collection}...")
+                print(f"🔍 Searching in {collection}...")
                 users_ref = db.collection(collection)
                 query = users_ref.where('email', '==', email).limit(1).stream()
                 
@@ -74,7 +75,9 @@ def login():
                     user_data = doc.to_dict()
                     collection_name = collection
                     print(f"✅ Found user in {collection}")
-                    print(f"User data: {user_data.get('name')}, Role: {user_data.get('role')}")
+                    print(f"   Document ID: {doc.id}")
+                    print(f"   User Name: {user_data.get('name')}")
+                    print(f"   User Role: {user_data.get('role')}")
                     break
                 
                 if user_doc:
@@ -88,11 +91,10 @@ def login():
             
             # Get stored password hash
             stored_password_hash = user_data.get('password', '')
-            print(f"Stored password hash: {stored_password_hash[:50]}...")
             
             # Verify password
             password_match = check_password_hash(stored_password_hash, password)
-            print(f"Password match: {password_match}")
+            print(f"🔑 Password verification: {password_match}")
             
             if not password_match:
                 print("❌ Password verification failed")
@@ -101,11 +103,23 @@ def login():
             
             # Check if account is active
             if not user_data.get('active', True):
+                print("❌ Account is inactive")
                 flash('Your account has been deactivated. Please contact admin.', 'error')
                 return render_template('login.html')
             
-            # Create user object and login
+            # Create user object with document ID
             user = User(user_doc.id, user_data)
+            
+            # Verify the user object was created correctly
+            print("=" * 80)
+            print("✅ USER OBJECT CREATED")
+            print(f"   User ID: {user.id}")
+            print(f"   User Name: {user.name}")
+            print(f"   User Email: {user.email}")
+            print(f"   User Role: {user.role}")
+            print("=" * 80)
+            
+            # Login the user
             login_user(user, remember=True)
             
             # Update last login
@@ -113,7 +127,9 @@ def login():
                 'last_login': datetime.now()
             })
             
-            print(f"✅ Login successful for {user.name}, Role: {user.role}")
+            print(f"✅ Login successful for {user.name} (ID: {user.id}), Role: {user.role}")
+            print("=" * 80)
+            
             flash(f'Welcome back, {user.name}!', 'success')
             
             # Redirect based on role
@@ -130,6 +146,7 @@ def login():
             print(f"❌ Login error: {str(e)}")
             import traceback
             traceback.print_exc()
+            print("=" * 80)
             flash(f'Login error: {str(e)}', 'error')
             return render_template('login.html')
     
@@ -147,6 +164,7 @@ def register():
         if not db:
             flash('Database connection error', 'error')
             return render_template('register.html')
+        
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip().lower()
         phone = request.form.get('phone', '').strip()
@@ -154,15 +172,13 @@ def register():
         confirm_password = request.form.get('confirm_password', '')
         role = request.form.get('role', 'user')
         
-        print("=" * 50)
-        print("REGISTRATION ATTEMPT")
+        print("=" * 80)
+        print("📝 REGISTRATION ATTEMPT")
         print(f"Name: {name}")
         print(f"Email: {email}")
         print(f"Role: {role}")
-        print(f"Password: {password}")
-        print(f"Confirm Password: {confirm_password}")
         print(f"Passwords match: {password == confirm_password}")
-        print("=" * 50)
+        print("=" * 80)
         
         # Role-specific fields
         company_name = request.form.get('company_name', '').strip() or name
@@ -186,10 +202,8 @@ def register():
         if len(password) < 6:
             errors.append('Password must be at least 6 characters')
         
-        # FIXED: Direct string comparison instead of relying on form validation
         if password != confirm_password:
             errors.append('Passwords do not match')
-            print(f"❌ Password mismatch - Password: '{password}', Confirm: '{confirm_password}'")
         
         if role not in ['user', 'contractor', 'supplier']:
             errors.append('Invalid role selected')
@@ -210,6 +224,7 @@ def register():
             for collection in collections:
                 existing = db.collection(collection).where('email', '==', email).limit(1).stream()
                 if any(existing):
+                    print(f"❌ Email already exists in {collection}")
                     flash('Email already registered', 'error')
                     return render_template('register.html')
             
@@ -223,7 +238,6 @@ def register():
             
             # Hash password
             hashed_password = generate_password_hash(password)
-            print(f"Generated password hash: {hashed_password[:50]}...")
             
             # Create user data
             user_data = {
@@ -256,7 +270,16 @@ def register():
             
             # Add to database
             doc_ref = db.collection(collection).add(user_data)
-            print(f"✅ User created successfully in {collection} with ID: {doc_ref[1].id}")
+            new_user_id = doc_ref[1].id
+            
+            print("=" * 80)
+            print("✅ USER REGISTERED SUCCESSFULLY")
+            print(f"   Collection: {collection}")
+            print(f"   Document ID: {new_user_id}")
+            print(f"   Name: {name}")
+            print(f"   Email: {email}")
+            print(f"   Role: {role}")
+            print("=" * 80)
             
             if role in ['contractor', 'supplier']:
                 flash('Registration successful! Your account will be verified by admin soon.', 'success')
@@ -269,6 +292,7 @@ def register():
             print(f"❌ Registration error: {str(e)}")
             import traceback
             traceback.print_exc()
+            print("=" * 80)
             flash(f'Registration error: {str(e)}', 'error')
             return render_template('register.html')
     
@@ -278,6 +302,12 @@ def register():
 @login_required
 def logout():
     """Logout user"""
+    print("=" * 80)
+    print("👋 USER LOGGED OUT")
+    if current_user.is_authenticated:
+        print(f"   User: {current_user.name}")
+        print(f"   User ID: {current_user.id}")
+    print("=" * 80)
     logout_user()
     flash('You have been logged out successfully', 'success')
     return redirect(url_for('index'))

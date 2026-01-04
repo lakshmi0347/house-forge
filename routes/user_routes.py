@@ -6,6 +6,17 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 import os
 
+def debug_user_info(action=""):
+    """Debug helper to print current user information"""
+    print("=" * 80)
+    print(f"🔍 USER DEBUG - {action}")
+    print(f"User ID: {current_user.id}")
+    print(f"User Name: {current_user.name if hasattr(current_user, 'name') else 'N/A'}")
+    print(f"User Email: {current_user.email if hasattr(current_user, 'email') else 'N/A'}")
+    print(f"Is Authenticated: {current_user.is_authenticated}")
+    print(f"Is Active: {current_user.is_active if hasattr(current_user, 'is_active') else 'N/A'}")
+    print("=" * 80)
+
 user_bp = Blueprint('user', __name__)
 db = firestore.client()
 
@@ -207,12 +218,18 @@ def projects():
         flash('Database connection error', 'error')
         return redirect(url_for('user.dashboard'))
     
+    debug_user_info("LIST PROJECTS")
+    
     projects_ref = db.collection('projects').where('user_id', '==', current_user.id).stream()
     projects = []
     for doc in projects_ref:
         project_data = doc.to_dict()
         project_data['id'] = doc.id
+        print(f"📋 Found project: {project_data.get('title')} (ID: {doc.id})")
         projects.append(project_data)
+    
+    print(f"✅ Total projects found: {len(projects)}")
+    print("=" * 80)
     
     return render_template('user/my_projects.html', projects=projects)
 
@@ -274,20 +291,35 @@ def view_project(project_id):
         return redirect(url_for('user.projects'))
     
     try:
+        debug_user_info(f"VIEW PROJECT: {project_id}")
+        
         project_doc = db.collection('projects').document(project_id).get()
         
         if not project_doc.exists:
+            print(f"❌ Project not found: {project_id}")
             flash('Project not found', 'error')
             return redirect(url_for('user.projects'))
         
         project_data = project_doc.to_dict()
         
+        # Debug project ownership
+        print(f"📋 Project user_id: {project_data.get('user_id')}")
+        print(f"👤 Current user_id: {current_user.id}")
+        print(f"🔐 Match: {project_data.get('user_id') == current_user.id}")
+        
+        # Verify ownership
         if project_data.get('user_id') != current_user.id:
+            print(f"❌ Access denied - User ID mismatch")
+            print(f"   Expected: {project_data.get('user_id')}")
+            print(f"   Got: {current_user.id}")
             flash('Access denied', 'error')
             return redirect(url_for('user.projects'))
         
         project_data['id'] = project_id
         estimation = project_data.get('estimation', {})
+        
+        print(f"✅ Project loaded successfully: {project_data.get('title')}")
+        print("=" * 80)
         
         return render_template(
             'user/project_detail.html',
@@ -296,9 +328,12 @@ def view_project(project_id):
         )
                              
     except Exception as e:
+        print(f"❌ Error loading project: {str(e)}")
+        import traceback
+        traceback.print_exc()
         flash(f'Error loading project: {str(e)}', 'error')
         return redirect(url_for('user.projects'))
-
+    
 @user_bp.route('/project/<project_id>/download-pdf')
 @login_required
 def download_pdf(project_id):
@@ -1348,7 +1383,7 @@ def request_quote_from_contractor(contractor_id):
         print("=" * 80)
         return jsonify({'success': False, 'message': str(e)}), 500
     
-@user_bp.route('/project/<project_id>/delete', methods=['POST', 'DELETE'])
+@user_bp.route('/project-delete/<project_id>', methods=['POST', 'DELETE'])
 @login_required
 def delete_project(project_id):
     """Delete a project"""
@@ -1357,11 +1392,7 @@ def delete_project(project_id):
         return jsonify({'success': False, 'message': 'Database connection error'}), 500
     
     try:
-        print("=" * 80)
-        print("🗑️ DELETING PROJECT")
-        print(f"User ID: {current_user.id}")
-        print(f"Project ID: {project_id}")
-        print("=" * 80)
+        debug_user_info(f"DELETE PROJECT: {project_id}")
         
         # Get project to verify ownership
         project_doc = db.collection('projects').document(project_id).get()
@@ -1372,10 +1403,17 @@ def delete_project(project_id):
         
         project_data = project_doc.to_dict()
         
+        # Debug ownership check
+        print(f"📋 Project user_id: {project_data.get('user_id')}")
+        print(f"👤 Current user_id: {current_user.id}")
+        print(f"🔐 Match: {project_data.get('user_id') == current_user.id}")
+        
         # Check ownership
         if project_data.get('user_id') != current_user.id:
-            print(f"❌ Access denied")
-            return jsonify({'success': False, 'message': 'Access denied'}), 403
+            print(f"❌ Access denied - User ID mismatch")
+            print(f"   Expected: {project_data.get('user_id')}")
+            print(f"   Got: {current_user.id}")
+            return jsonify({'success': False, 'message': 'Access denied - You do not own this project'}), 403
         
         # Delete related bids first (if any)
         try:

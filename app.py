@@ -22,29 +22,29 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message = 'Please log in to access this page.'
 
-# Initialize Firebase - Check if already initialized
+# Initialize Firebase - Render safe
 db = None
 try:
-    # Check if Firebase is already initialized
     if not firebase_admin._apps:
-        # Read the config file with utf-8-sig to remove BOM
-        with open(app.config['FIREBASE_CONFIG'], 'r', encoding='utf-8-sig') as f:
-            firebase_config = json.load(f)
-        
+        if os.environ.get("FIREBASE_CONFIG"):
+            # 🔹 Render / Production
+            firebase_config = json.loads(os.environ.get("FIREBASE_CONFIG"))
+        else:
+            # 🔹 Local development
+            with open(app.config['FIREBASE_CONFIG'], 'r', encoding='utf-8-sig') as f:
+                firebase_config = json.load(f)
+
         cred = credentials.Certificate(firebase_config)
         firebase_admin.initialize_app(cred)
         print("✅ Firebase initialized successfully!")
     else:
         print("✅ Firebase already initialized!")
-    
-    # Get Firestore client
+
     db = firestore.client()
     print("✅ Firestore client ready!")
-    
+
 except Exception as e:
     print(f"❌ Firebase initialization error: {e}")
-    import traceback
-    traceback.print_exc()
     db = None
 
 # User loader for Flask-Login

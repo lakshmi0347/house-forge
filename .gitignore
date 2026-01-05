@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 .env
 firebase_config.json
+*.db
+.DS_Store

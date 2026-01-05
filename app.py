@@ -138,6 +138,31 @@ def inject_globals():
         'current_year': 2024
     }
 
+@app.context_processor
+def inject_user_data():
+    """Inject user data from Firebase into all templates"""
+    if current_user.is_authenticated:
+        try:
+            if db is not None:
+                user_ref = db.collection('users').document(current_user.id)
+                user_doc = user_ref.get()
+                
+                if user_doc.exists:
+                    user_data = user_doc.to_dict()
+                    profile_picture = user_data.get('profile_picture')
+                    
+                    # Debug print
+                    print(f"📸 Loading profile picture for {current_user.name}: {profile_picture}")
+                    
+                    return {
+                        'user_profile_picture': profile_picture,
+                        'user_data': user_data
+                    }
+        except Exception as e:
+            print(f"⚠️ Error loading user data in context processor: {e}")
+    
+    return {'user_profile_picture': None, 'user_data': {}}
+
 if __name__ == '__main__':
     # Create upload folders if they don't exist
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)

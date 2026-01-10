@@ -502,58 +502,6 @@ def complete_order(order_id):
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
-@supplier_bp.route('/messages')
-@login_required
-def messages():
-    """View all messages received by supplier"""
-    try:
-        print("=" * 80)
-        print("📬 SUPPLIER MESSAGES PAGE ACCESSED")
-        print(f"Supplier ID: {current_user.id}")
-        print(f"Supplier Name: {getattr(current_user, 'name', 'Unknown')}")
-        print("=" * 80)
-        
-        # Get all messages for this supplier
-        messages_ref = db.collection('messages').where('supplier_id', '==', current_user.id).stream()
-        
-        messages_list = []
-        for doc in messages_ref:
-            message_data = doc.to_dict()
-            message_data['id'] = doc.id
-            messages_list.append(message_data)
-            
-            # Debug print each message
-            print(f"\n📧 Message ID: {doc.id}")
-            print(f"   Type: {message_data.get('type', 'N/A')}")
-            print(f"   From: {message_data.get('sender_name', 'N/A')}")
-            print(f"   Subject: {message_data.get('subject', 'N/A')}")
-            print(f"   Read: {message_data.get('read', False)}")
-        
-        print(f"\n✅ Total messages found: {len(messages_list)}")
-        
-        # Sort by created_at if available
-        messages_list.sort(
-            key=lambda x: x.get('created_at', datetime.min), 
-            reverse=True
-        )
-        
-        # Count unread messages
-        unread_count = len([m for m in messages_list if not m.get('read', False)])
-        print(f"📊 Unread messages: {unread_count}")
-        print("=" * 80)
-        
-        return render_template('supplier/messages.html', 
-                             messages=messages_list,
-                             unread_count=unread_count)
-        
-    except Exception as e:
-        print(f"❌ ERROR loading messages: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        print("=" * 80)
-        flash('An error occurred while loading messages', 'error')
-        return redirect(url_for('supplier.dashboard'))
-
 @supplier_bp.route('/message/<message_id>/mark-read', methods=['POST'])
 @login_required
 def mark_message_read(message_id):
@@ -609,7 +557,7 @@ def delete_message(message_id):
         print(f"Error deleting message: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
     
-# Add this route to your supplier_routes.py file (after the existing routes)
+# Add this updated reply endpoint to supplier_routes.py
 
 @supplier_bp.route('/message/<message_id>/reply', methods=['POST'])
 @login_required
@@ -635,10 +583,11 @@ def reply_to_message(message_id):
         if not reply_content:
             return jsonify({'success': False, 'message': 'Reply content is required'}), 400
         
-        # Create reply message for the user
+        # Create reply message for the user (ONLY user_id, no supplier_id)
         reply_data = {
-            'user_id': message_data.get('user_id'),
-            'supplier_id': current_user.id,
+            'user_id': message_data.get('user_id'),  # Only recipient ID
+            'sender_id': current_user.id,  # Track who sent it
+            'sender_type': 'supplier',  # Track sender type
             'sender_name': current_user.company_name or current_user.name,
             'sender_email': current_user.email if hasattr(current_user, 'email') else '',
             'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
@@ -654,7 +603,7 @@ def reply_to_message(message_id):
         # Save reply
         db.collection('messages').add(reply_data)
         
-        # Mark original message as read
+        # Mark original message as read and replied
         message_ref.update({
             'read': True,
             'replied': True,
@@ -668,3 +617,63 @@ def reply_to_message(message_id):
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
+
+
+# Update the messages route to only show messages TO supplier
+@supplier_bp.route('/messages')
+@login_required
+def messages():
+    """View all messages received by supplier (ONLY incoming messages)"""
+    try:
+        print("=" * 80)
+        print("📬 SUPPLIER MESSAGES PAGE ACCESSED")
+        print(f"Supplier ID: {current_user.id}")
+        print(f"Supplier Name: {getattr(current_user, 'name', 'Unknown')}")
+        print("=" * 80)
+        
+        # Get ONLY messages where supplier_id matches (incoming messages)
+        # Exclude messages where sender_id matches (outgoing messages)
+        messages_ref = db.collection('messages').where('supplier_id', '==', current_user.id).stream()
+        
+        messages_list = []
+        for doc in messages_ref:
+            message_data = doc.to_dict()
+            
+            # Skip if this is an outgoing message (sender is this supplier)
+            if message_data.get('sender_id') == current_user.id:
+                continue
+            
+            message_data['id'] = doc.id
+            messages_list.append(message_data)
+            
+            # Debug print each message
+            print(f"\n📧 Message ID: {doc.id}")
+            print(f"   Type: {message_data.get('type', 'N/A')}")
+            print(f"   From: {message_data.get('sender_name', 'N/A')}")
+            print(f"   Subject: {message_data.get('subject', 'N/A')}")
+            print(f"   Read: {message_data.get('read', False)}")
+        
+        print(f"\n✅ Total incoming messages: {len(messages_list)}")
+        
+        # Sort by created_at
+        messages_list.sort(
+            key=lambda x: x.get('created_at', datetime.min), 
+            reverse=True
+        )
+        
+        # Count unread messages
+        unread_count = len([m for m in messages_list if not m.get('read', False)])
+        print(f"📊 Unread messages: {unread_count}")
+        print("=" * 80)
+        
+        return render_template('supplier/messages.html', 
+                             messages=messages_list,
+                             unread_count=unread_count)
+        
+    except Exception as e:
+        print(f"❌ ERROR loading messages: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        print("=" * 80)
+        flash('An error occurred while loading messages', 'error')
+        return redirect(url_for('supplier.dashboard'))

@@ -608,3 +608,63 @@ def delete_message(message_id):
     except Exception as e:
         print(f"Error deleting message: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
+    
+# Add this route to your supplier_routes.py file (after the existing routes)
+
+@supplier_bp.route('/message/<message_id>/reply', methods=['POST'])
+@login_required
+def reply_to_message(message_id):
+    """Reply to a message from user"""
+    try:
+        # Get the original message
+        message_ref = db.collection('messages').document(message_id)
+        message_doc = message_ref.get()
+        
+        if not message_doc.exists:
+            return jsonify({'success': False, 'message': 'Message not found'}), 404
+        
+        message_data = message_doc.to_dict()
+        
+        # Verify this is the supplier's message
+        if message_data.get('supplier_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+        
+        # Get reply content
+        reply_content = request.form.get('reply', '').strip()
+        
+        if not reply_content:
+            return jsonify({'success': False, 'message': 'Reply content is required'}), 400
+        
+        # Create reply message for the user
+        reply_data = {
+            'user_id': message_data.get('user_id'),
+            'supplier_id': current_user.id,
+            'sender_name': current_user.company_name or current_user.name,
+            'sender_email': current_user.email if hasattr(current_user, 'email') else '',
+            'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
+            'subject': f"Re: {message_data.get('subject', 'Your Inquiry')}",
+            'message': reply_content,
+            'type': 'reply',
+            'reply_to': message_id,
+            'original_type': message_data.get('type'),
+            'read': False,
+            'created_at': datetime.now()
+        }
+        
+        # Save reply
+        db.collection('messages').add(reply_data)
+        
+        # Mark original message as read
+        message_ref.update({
+            'read': True,
+            'replied': True,
+            'replied_at': datetime.now()
+        })
+        
+        return jsonify({'success': True, 'message': 'Reply sent successfully!'})
+        
+    except Exception as e:
+        print(f"Error replying to message: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500

@@ -149,6 +149,33 @@
             font-weight: 600;
         }
         
+        .reply-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            display: none;
+        }
+        
+        .reply-section.active {
+            display: block;
+        }
+        
+        .reply-form textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 15px;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        
+        .reply-form textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+        
         .message-meta {
             display: flex;
             justify-content: space-between;
@@ -272,6 +299,25 @@
                 </div>
                 {% endif %}
                 
+                <!-- Reply Section -->
+                <div class="reply-section" id="reply-{{ message.id }}">
+                    <h4 style="margin-bottom: 15px; color: #333;">✉️ Reply to {{ message.sender_name }}</h4>
+                    <form class="reply-form" onsubmit="sendReply(event, '{{ message.id }}')">
+                        <textarea name="reply" 
+                                  rows="4" 
+                                  placeholder="Type your reply here..."
+                                  required></textarea>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn btn-primary">
+                                Send Reply
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="toggleReply('{{ message.id }}')">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
                 <div class="message-meta">
                     <span>Received: {{ message.created_at.strftime('%d %b %Y, %I:%M %p') if message.created_at else 'N/A' }}</span>
                     <div class="message-actions">
@@ -280,9 +326,9 @@
                             ✓ Mark as Read
                         </button>
                         {% endif %}
-                        <a href="mailto:{{ message.sender_email }}?subject=Re: {{ message.subject }}" class="btn btn-outline">
-                            ✉️ Reply via Email
-                        </a>
+                        <button class="btn btn-primary" onclick="toggleReply('{{ message.id }}')">
+                            ✉️ Reply
+                        </button>
                         {% if message.sender_phone %}
                         <a href="tel:{{ message.sender_phone }}" class="btn btn-outline">
                             📞 Call
@@ -305,6 +351,47 @@
     </div>
     
     <script>
+        function toggleReply(messageId) {
+            const replySection = document.getElementById('reply-' + messageId);
+            replySection.classList.toggle('active');
+        }
+        
+        function sendReply(event, messageId) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            
+            fetch(`/supplier/message/${messageId}/reply`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    form.reset();
+                    toggleReply(messageId);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while sending reply');
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        }
+        
         function markAsRead(messageId) {
             fetch(`/supplier/message/${messageId}/mark-read`, {
                 method: 'POST'

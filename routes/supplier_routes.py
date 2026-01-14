@@ -559,6 +559,9 @@ def delete_message(message_id):
     
 # Add this updated reply endpoint to supplier_routes.py
 
+# Add this updated reply endpoint to supplier_routes.py
+# Replace the existing reply_to_message function
+
 @supplier_bp.route('/message/<message_id>/reply', methods=['POST'])
 @login_required
 def reply_to_message(message_id):
@@ -583,9 +586,10 @@ def reply_to_message(message_id):
         if not reply_content:
             return jsonify({'success': False, 'message': 'Reply content is required'}), 400
         
-        # Create reply message for the user (ONLY user_id, no supplier_id)
+        # ✅ CRITICAL FIX: Create reply message for the user ONLY
+        # DO NOT include supplier_id - only user_id so it appears in user's inbox
         reply_data = {
-            'user_id': message_data.get('user_id'),  # Only recipient ID
+            'user_id': message_data.get('user_id'),  # ✅ ONLY recipient ID
             'sender_id': current_user.id,  # Track who sent it
             'sender_type': 'supplier',  # Track sender type
             'sender_name': current_user.company_name or current_user.name,
@@ -619,7 +623,7 @@ def reply_to_message(message_id):
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
-# Update the messages route to only show messages TO supplier
+# ✅ UPDATED: Messages route to ONLY show incoming messages
 @supplier_bp.route('/messages')
 @login_required
 def messages():
@@ -631,16 +635,17 @@ def messages():
         print(f"Supplier Name: {getattr(current_user, 'name', 'Unknown')}")
         print("=" * 80)
         
-        # Get ONLY messages where supplier_id matches (incoming messages)
-        # Exclude messages where sender_id matches (outgoing messages)
+        # ✅ Get ONLY messages where supplier_id matches (incoming messages)
+        # ✅ Exclude messages where sender_id matches (outgoing messages)
         messages_ref = db.collection('messages').where('supplier_id', '==', current_user.id).stream()
         
         messages_list = []
         for doc in messages_ref:
             message_data = doc.to_dict()
             
-            # Skip if this is an outgoing message (sender is this supplier)
+            # ✅ CRITICAL: Skip if this is an outgoing message (sender is this supplier)
             if message_data.get('sender_id') == current_user.id:
+                print(f"⏭️  Skipping outgoing message: {doc.id}")
                 continue
             
             message_data['id'] = doc.id

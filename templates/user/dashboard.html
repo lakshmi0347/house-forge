@@ -43,10 +43,30 @@
             padding: 8px 16px;
             border-radius: 5px;
             transition: background 0.3s;
+            position: relative;
+            display: inline-block;
         }
         
         .navbar-menu a:hover {
             background: rgba(255,255,255,0.2);
+        }
+        
+        .badge-notification {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff3b30;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            pointer-events: none; /* THIS IS KEY - Badge won't block clicks */
+            z-index: 10;
         }
         
         .profile-pic {
@@ -283,6 +303,10 @@
             <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('user.projects') }}">My Projects</a>
             <a href="{{ url_for('user.my_orders') }}">My Orders</a>
+            <a href="{{ url_for('user.messages') }}" id="messagesLink">
+                Messages
+                <span class="badge-notification" id="messagesBadge">0</span>
+            </a>
             <a href="{{ url_for('user.profile') }}">
                 {% if user_profile_picture %}
                     <img src="/static/uploads/profiles/{{ user_profile_picture }}" 
@@ -332,7 +356,7 @@
             </div>
         </div>
         
-      <!-- Quick Actions -->
+        <!-- Quick Actions -->
         <div class="section">
             <div class="section-header">
                 <h2 class="section-title">Quick Actions</h2>
@@ -351,6 +375,11 @@
                 <a href="{{ url_for('user.find_suppliers') }}" class="action-card">
                     <div class="action-icon">📦</div>
                     <div class="action-label">Find Suppliers</div>
+                </a>
+                
+                <a href="{{ url_for('user.messages') }}" class="action-card">
+                    <div class="action-icon">💬</div>
+                    <div class="action-label">View Messages</div>
                 </a>
             </div>
         </div>
@@ -386,5 +415,60 @@
             {% endif %}
         </div>
     </div>
+    
+    <script>
+        // Update message badge
+        function updateMessageBadge() {
+            console.log('🔄 Fetching unread message count...');
+            fetch('/user/messages/unread-count')
+                .then(response => {
+                    console.log('✅ Response received:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('📊 Unread count:', data.count);
+                    const badge = document.getElementById('messagesBadge');
+                    if (!badge) {
+                        console.error('❌ Badge element not found!');
+                        return;
+                    }
+                    if (data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.style.display = 'flex';
+                        console.log('✅ Badge updated to show:', data.count);
+                    } else {
+                        badge.style.display = 'none';
+                        console.log('✅ Badge hidden (no unread messages)');
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Error fetching unread count:', error);
+                });
+        }
+        
+        // Test messages link clickability
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Page loaded, initializing...');
+            
+            const messagesLink = document.getElementById('messagesLink');
+            if (messagesLink) {
+                console.log('✅ Messages link found:', messagesLink.href);
+                
+                // Test click handler
+                messagesLink.addEventListener('click', function(e) {
+                    console.log('🖱️ Messages link clicked!');
+                    console.log('Target URL:', this.href);
+                });
+            } else {
+                console.error('❌ Messages link not found!');
+            }
+            
+            // Update badge
+            updateMessageBadge();
+        });
+        
+        // Update badge every 30 seconds
+        setInterval(updateMessageBadge, 30000);
+    </script>
 </body>
 </html>

@@ -1460,7 +1460,7 @@ def delete_project(project_id):
 @user_bp.route('/messages')
 @login_required
 def messages():
-    """View all messages received by user (ONLY incoming messages)"""
+    """View all messages received by user (ONLY incoming messages from suppliers/contractors)"""
     db = get_db()
     if not db:
         flash('Database connection error', 'error')
@@ -1473,31 +1473,41 @@ def messages():
         print(f"User Name: {getattr(current_user, 'name', 'Unknown')}")
         print("=" * 80)
         
-        # ✅ Get ONLY messages where user_id matches (incoming messages)
-        # ✅ Exclude messages where sender_id matches (outgoing messages)
+        # ✅ Get ALL messages where user_id matches
         messages_ref = db.collection('messages').where('user_id', '==', current_user.id).stream()
         
         messages_list = []
         for doc in messages_ref:
             message_data = doc.to_dict()
             
-            # ✅ CRITICAL: Skip if this is an outgoing message (sender is this user)
-            if message_data.get('sender_id') == current_user.id:
-                print(f"⏭️  Skipping outgoing message: {doc.id}")
+            # ✅ CRITICAL FILTER: Only show messages FROM suppliers/contractors
+            # Skip if sender_type is 'user' (user's own messages)
+            sender_type = message_data.get('sender_type')
+            
+            print(f"\n📧 Processing Message ID: {doc.id}")
+            print(f"   Sender Type: {sender_type}")
+            print(f"   Sender ID: {message_data.get('sender_id')}")
+            print(f"   Current User ID: {current_user.id}")
+            
+            # Skip messages sent by this user
+            if sender_type == 'user' or message_data.get('sender_id') == current_user.id:
+                print(f"   ⏭️  SKIPPING: This is user's own message")
+                continue
+            
+            # Only include messages from suppliers or contractors
+            if sender_type not in ['supplier', 'contractor']:
+                print(f"   ⏭️  SKIPPING: Invalid sender type")
                 continue
             
             message_data['id'] = doc.id
             messages_list.append(message_data)
             
-            # Debug print each message
-            print(f"\n📧 Message ID: {doc.id}")
-            print(f"   Type: {message_data.get('type', 'N/A')}")
-            print(f"   From: {message_data.get('sender_name', 'N/A')}")
-            print(f"   Sender Type: {message_data.get('sender_type', 'N/A')}")
-            print(f"   Subject: {message_data.get('subject', 'N/A')}")
-            print(f"   Read: {message_data.get('read', False)}")
+            print(f"   ✅ INCLUDED: Message from {sender_type}")
+            print(f"      From: {message_data.get('sender_name', 'N/A')}")
+            print(f"      Subject: {message_data.get('subject', 'N/A')}")
+            print(f"      Read: {message_data.get('read', False)}")
         
-        print(f"\n✅ Total incoming messages: {len(messages_list)}")
+        print(f"\n✅ Total incoming messages from suppliers/contractors: {len(messages_list)}")
         
         # Sort by created_at
         messages_list.sort(
@@ -1543,8 +1553,13 @@ def messages_unread_count():
         for doc in messages_ref:
             message_data = doc.to_dict()
             
-            # Skip outgoing messages
-            if message_data.get('sender_id') == current_user.id:
+            # ✅ Skip messages sent by this user (sender_type == 'user')
+            sender_type = message_data.get('sender_type')
+            if sender_type == 'user' or message_data.get('sender_id') == current_user.id:
+                continue
+            
+            # ✅ Only count messages from suppliers/contractors
+            if sender_type not in ['supplier', 'contractor']:
                 continue
             
             # Count unread
@@ -1662,8 +1677,8 @@ def reply_to_message(message_id):
         if not sender_type or not sender_id:
             return jsonify({'success': False, 'message': 'Cannot determine message sender'}), 400
         
-        # ✅ CRITICAL FIX: Create reply message for the original sender ONLY
-        # Include supplier_id OR contractor_id based on sender_type
+        # ✅ FIXED: Create reply message for the original sender ONLY
+        # DO NOT include user_id - only supplier_id OR contractor_id
         reply_data = {
             'sender_id': current_user.id,  # Track who sent it
             'sender_type': 'user',  # Track sender type
@@ -1679,13 +1694,19 @@ def reply_to_message(message_id):
             'created_at': datetime.now()
         }
         
-        # Add appropriate recipient field
+        # ✅ CRITICAL FIX: Add ONLY the recipient field (supplier_id OR contractor_id)
+        # Never add user_id when user is sending a message
         if sender_type == 'supplier':
-            reply_data['supplier_id'] = sender_id
+            reply_data['supplier_id'] = sender_id  # Only recipient ID
             reply_data['supplier_name'] = message_data.get('sender_name', 'Supplier')
         elif sender_type == 'contractor':
-            reply_data['contractor_id'] = sender_id
+            reply_data['contractor_id'] = sender_id  # Only recipient ID
             reply_data['contractor_name'] = message_data.get('sender_name', 'Contractor')
+        
+        print("\n✅ CREATING REPLY MESSAGE (should NOT have user_id):")
+        for key, value in reply_data.items():
+            if key != 'created_at':
+                print(f"  {key}: {repr(value)}")
         
         # Save reply
         db.collection('messages').add(reply_data)

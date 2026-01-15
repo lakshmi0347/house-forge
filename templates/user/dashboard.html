@@ -376,6 +376,12 @@
                     <div class="action-icon">📦</div>
                     <div class="action-label">Find Suppliers</div>
                 </a>
+                {% if projects %}
+                  <a href="{{ url_for('user.project_bids', project_id=projects[0].id) }}" class="action-card">
+                    <div class="action-icon">💼</div>
+                    <div class="action-label">View Bids</div>
+                </a>
+             {% endif %}
                 
             </div>
         </div>

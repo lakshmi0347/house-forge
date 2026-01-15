@@ -682,3 +682,31 @@ def messages():
         print("=" * 80)
         flash('An error occurred while loading messages', 'error')
         return redirect(url_for('supplier.dashboard'))
+
+# Add this route to supplier_routes.py after the messages route
+
+@supplier_bp.route('/messages/unread-count')
+@login_required
+def messages_unread_count():
+    """Get count of unread messages for badge"""
+    try:
+        # Get all messages for this supplier
+        messages_ref = db.collection('messages').where('supplier_id', '==', current_user.id).stream()
+        
+        unread_count = 0
+        for doc in messages_ref:
+            message_data = doc.to_dict()
+            
+            # Skip outgoing messages (where this supplier is the sender)
+            if message_data.get('sender_id') == current_user.id:
+                continue
+            
+            # Count unread
+            if not message_data.get('read', False):
+                unread_count += 1
+        
+        return jsonify({'count': unread_count})
+        
+    except Exception as e:
+        print(f"Error getting unread count: {str(e)}")
+        return jsonify({'count': 0})

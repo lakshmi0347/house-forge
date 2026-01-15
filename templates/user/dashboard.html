@@ -65,7 +65,7 @@
             justify-content: center;
             font-size: 11px;
             font-weight: bold;
-            pointer-events: none; /* THIS IS KEY - Badge won't block clicks */
+            pointer-events: none;
             z-index: 10;
         }
         
@@ -303,6 +303,10 @@
             <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('user.projects') }}">My Projects</a>
             <a href="{{ url_for('user.my_orders') }}">My Orders</a>
+            <a href="{{ url_for('user.messages') }}" style="position: relative;">
+                Messages
+                <span class="badge-notification" id="messagesBadge">0</span>
+            </a>
             <a href="{{ url_for('user.profile') }}">
                 {% if user_profile_picture %}
                     <img src="/static/uploads/profiles/{{ user_profile_picture }}" 
@@ -372,7 +376,11 @@
                     <div class="action-icon">📦</div>
                     <div class="action-label">Find Suppliers</div>
                 </a>
-        
+                
+                <a href="{{ url_for('user.messages') }}" class="action-card">
+                    <div class="action-icon">💬</div>
+                    <div class="action-label">Messages</div>
+                </a>
             </div>
         </div>
         
@@ -413,10 +421,7 @@
         function updateMessageBadge() {
             console.log('🔄 Fetching unread message count...');
             fetch('/user/messages/unread-count')
-                .then(response => {
-                    console.log('✅ Response received:', response.status);
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     console.log('📊 Unread count:', data.count);
                     const badge = document.getElementById('messagesBadge');
@@ -438,24 +443,9 @@
                 });
         }
         
-        // Test messages link clickability
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Page loaded, initializing...');
-            
-            const messagesLink = document.getElementById('messagesLink');
-            if (messagesLink) {
-                console.log('✅ Messages link found:', messagesLink.href);
-                
-                // Test click handler
-                messagesLink.addEventListener('click', function(e) {
-                    console.log('🖱️ Messages link clicked!');
-                    console.log('Target URL:', this.href);
-                });
-            } else {
-                console.error('❌ Messages link not found!');
-            }
-            
-            // Update badge
             updateMessageBadge();
         });
         

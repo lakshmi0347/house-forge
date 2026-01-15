@@ -1454,3 +1454,253 @@ def delete_project(project_id):
         traceback.print_exc()
         print("=" * 80)
         return jsonify({'success': False, 'message': str(e)}), 500
+    
+# Add these routes to the end of routes/user_routes.py
+
+@user_bp.route('/messages')
+@login_required
+def messages():
+    """View all messages received by user (ONLY incoming messages)"""
+    db = get_db()
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.dashboard'))
+    
+    try:
+        print("=" * 80)
+        print("📬 USER MESSAGES PAGE ACCESSED")
+        print(f"User ID: {current_user.id}")
+        print(f"User Name: {getattr(current_user, 'name', 'Unknown')}")
+        print("=" * 80)
+        
+        # ✅ Get ONLY messages where user_id matches (incoming messages)
+        # ✅ Exclude messages where sender_id matches (outgoing messages)
+        messages_ref = db.collection('messages').where('user_id', '==', current_user.id).stream()
+        
+        messages_list = []
+        for doc in messages_ref:
+            message_data = doc.to_dict()
+            
+            # ✅ CRITICAL: Skip if this is an outgoing message (sender is this user)
+            if message_data.get('sender_id') == current_user.id:
+                print(f"⏭️  Skipping outgoing message: {doc.id}")
+                continue
+            
+            message_data['id'] = doc.id
+            messages_list.append(message_data)
+            
+            # Debug print each message
+            print(f"\n📧 Message ID: {doc.id}")
+            print(f"   Type: {message_data.get('type', 'N/A')}")
+            print(f"   From: {message_data.get('sender_name', 'N/A')}")
+            print(f"   Sender Type: {message_data.get('sender_type', 'N/A')}")
+            print(f"   Subject: {message_data.get('subject', 'N/A')}")
+            print(f"   Read: {message_data.get('read', False)}")
+        
+        print(f"\n✅ Total incoming messages: {len(messages_list)}")
+        
+        # Sort by created_at
+        messages_list.sort(
+            key=lambda x: x.get('created_at', datetime.min), 
+            reverse=True
+        )
+        
+        # Count unread messages
+        unread_count = len([m for m in messages_list if not m.get('read', False)])
+        print(f"📊 Unread messages: {unread_count}")
+        print("=" * 80)
+        
+        return render_template('user/messages.html', 
+                             messages=messages_list,
+                             unread_count=unread_count)
+        
+    except Exception as e:
+        print(f"❌ ERROR loading messages: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        print("=" * 80)
+        flash('An error occurred while loading messages', 'error')
+        return redirect(url_for('user.dashboard'))
+
+
+@user_bp.route('/messages/unread-count')
+@login_required
+def messages_unread_count():
+    """Get count of unread messages for badge"""
+    db = get_db()
+    if not db:
+        return jsonify({'count': 0})
+    
+    try:
+        print("=" * 50)
+        print("🔢 UNREAD COUNT REQUEST")
+        print(f"User ID: {current_user.id}")
+        
+        # Get all messages for this user
+        messages_ref = db.collection('messages').where('user_id', '==', current_user.id).stream()
+        
+        unread_count = 0
+        for doc in messages_ref:
+            message_data = doc.to_dict()
+            
+            # Skip outgoing messages
+            if message_data.get('sender_id') == current_user.id:
+                continue
+            
+            # Count unread
+            if not message_data.get('read', False):
+                unread_count += 1
+        
+        print(f"✅ Unread count: {unread_count}")
+        print("=" * 50)
+        
+        return jsonify({'count': unread_count})
+        
+    except Exception as e:
+        print(f"❌ Error getting unread count: {str(e)}")
+        print("=" * 50)
+        return jsonify({'count': 0})
+
+
+@user_bp.route('/message/<message_id>/mark-read', methods=['POST'])
+@login_required
+def mark_message_read(message_id):
+    """Mark a message as read"""
+    db = get_db()
+    if not db:
+        return jsonify({'success': False, 'message': 'Database connection error'}), 500
+    
+    try:
+        message_ref = db.collection('messages').document(message_id)
+        message_doc = message_ref.get()
+        
+        if not message_doc.exists:
+            return jsonify({'success': False, 'message': 'Message not found'}), 404
+        
+        message_data = message_doc.to_dict()
+        
+        # Verify this is the user's message
+        if message_data.get('user_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+        
+        # Mark as read
+        message_ref.update({
+            'read': True,
+            'read_at': datetime.now()
+        })
+        
+        return jsonify({'success': True, 'message': 'Message marked as read'})
+        
+    except Exception as e:
+        print(f"Error marking message as read: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@user_bp.route('/message/<message_id>/delete', methods=['POST'])
+@login_required
+def delete_message(message_id):
+    """Delete a message"""
+    db = get_db()
+    if not db:
+        return jsonify({'success': False, 'message': 'Database connection error'}), 500
+    
+    try:
+        message_ref = db.collection('messages').document(message_id)
+        message_doc = message_ref.get()
+        
+        if not message_doc.exists:
+            return jsonify({'success': False, 'message': 'Message not found'}), 404
+        
+        message_data = message_doc.to_dict()
+        
+        # Verify this is the user's message
+        if message_data.get('user_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+        
+        # Delete message
+        message_ref.delete()
+        
+        return jsonify({'success': True, 'message': 'Message deleted'})
+        
+    except Exception as e:
+        print(f"Error deleting message: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@user_bp.route('/message/<message_id>/reply', methods=['POST'])
+@login_required
+def reply_to_message(message_id):
+    """Reply to a message from supplier or contractor"""
+    db = get_db()
+    if not db:
+        return jsonify({'success': False, 'message': 'Database connection error'}), 500
+    
+    try:
+        # Get the original message
+        message_ref = db.collection('messages').document(message_id)
+        message_doc = message_ref.get()
+        
+        if not message_doc.exists:
+            return jsonify({'success': False, 'message': 'Message not found'}), 404
+        
+        message_data = message_doc.to_dict()
+        
+        # Verify this is the user's message
+        if message_data.get('user_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+        
+        # Get reply content
+        reply_content = request.form.get('reply', '').strip()
+        
+        if not reply_content:
+            return jsonify({'success': False, 'message': 'Reply content is required'}), 400
+        
+        # Determine recipient type and create appropriate reply
+        sender_type = message_data.get('sender_type')  # 'supplier' or 'contractor'
+        sender_id = message_data.get('sender_id')
+        
+        if not sender_type or not sender_id:
+            return jsonify({'success': False, 'message': 'Cannot determine message sender'}), 400
+        
+        # ✅ CRITICAL FIX: Create reply message for the original sender ONLY
+        # Include supplier_id OR contractor_id based on sender_type
+        reply_data = {
+            'sender_id': current_user.id,  # Track who sent it
+            'sender_type': 'user',  # Track sender type
+            'sender_name': current_user.name,
+            'sender_email': current_user.email if hasattr(current_user, 'email') else '',
+            'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
+            'subject': f"Re: {message_data.get('subject', 'Your Message')}",
+            'message': reply_content,
+            'type': 'reply',
+            'reply_to': message_id,
+            'original_type': message_data.get('type'),
+            'read': False,
+            'created_at': datetime.now()
+        }
+        
+        # Add appropriate recipient field
+        if sender_type == 'supplier':
+            reply_data['supplier_id'] = sender_id
+            reply_data['supplier_name'] = message_data.get('sender_name', 'Supplier')
+        elif sender_type == 'contractor':
+            reply_data['contractor_id'] = sender_id
+            reply_data['contractor_name'] = message_data.get('sender_name', 'Contractor')
+        
+        # Save reply
+        db.collection('messages').add(reply_data)
+        
+        # Mark original message as read and replied
+        message_ref.update({
+            'read': True,
+            'replied': True,
+            'replied_at': datetime.now()
+        })
+        
+        return jsonify({'success': True, 'message': 'Reply sent successfully!'})
+        
+    except Exception as e:
+        print(f"Error replying to message: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500

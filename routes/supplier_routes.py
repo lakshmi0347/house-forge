@@ -627,61 +627,58 @@ def reply_to_message(message_id):
 @supplier_bp.route('/messages')
 @login_required
 def messages():
-    """View all messages received by supplier (ONLY incoming messages)"""
+    """View all message conversations (chat style)"""
     try:
-        print("=" * 80)
-        print("📬 SUPPLIER MESSAGES PAGE ACCESSED")
-        print(f"Supplier ID: {current_user.id}")
-        print(f"Supplier Name: {getattr(current_user, 'name', 'Unknown')}")
-        print("=" * 80)
-        
-        # ✅ Get ONLY messages where supplier_id matches (incoming messages)
-        # ✅ Exclude messages where sender_id matches (outgoing messages)
+        # Get all unique conversations
         messages_ref = db.collection('messages').where('supplier_id', '==', current_user.id).stream()
         
-        messages_list = []
+        conversations = {}
         for doc in messages_ref:
             message_data = doc.to_dict()
             
-            # ✅ CRITICAL: Skip if this is an outgoing message (sender is this supplier)
+            # Skip outgoing messages
             if message_data.get('sender_id') == current_user.id:
-                print(f"⏭️  Skipping outgoing message: {doc.id}")
                 continue
             
-            message_data['id'] = doc.id
-            messages_list.append(message_data)
+            sender_id = message_data.get('user_id')
+            conv_key = f"user_{sender_id}"
             
-            # Debug print each message
-            print(f"\n📧 Message ID: {doc.id}")
-            print(f"   Type: {message_data.get('type', 'N/A')}")
-            print(f"   From: {message_data.get('sender_name', 'N/A')}")
-            print(f"   Subject: {message_data.get('subject', 'N/A')}")
-            print(f"   Read: {message_data.get('read', False)}")
+            if conv_key not in conversations:
+                conversations[conv_key] = {
+                    'id': conv_key,
+                    'sender_id': sender_id,
+                    'sender_type': 'user',
+                    'sender_name': message_data.get('sender_name', 'Customer'),
+                    'sender_email': message_data.get('sender_email', ''),
+                    'sender_phone': message_data.get('sender_phone', ''),
+                    'last_message': message_data.get('message', ''),
+                    'last_message_time': message_data.get('created_at'),
+                    'unread_count': 0
+                }
+            
+            # Update last message if newer
+            if message_data.get('created_at') > conversations[conv_key]['last_message_time']:
+                conversations[conv_key]['last_message'] = message_data.get('message', '')
+                conversations[conv_key]['last_message_time'] = message_data.get('created_at')
+            
+            # Count unread
+            if not message_data.get('read', False):
+                conversations[conv_key]['unread_count'] += 1
         
-        print(f"\n✅ Total incoming messages: {len(messages_list)}")
+        conversations_list = list(conversations.values())
+        conversations_list.sort(key=lambda x: x.get('last_message_time', datetime.min), reverse=True)
         
-        # Sort by created_at
-        messages_list.sort(
-            key=lambda x: x.get('created_at', datetime.min), 
-            reverse=True
-        )
+        total_unread = sum(c['unread_count'] for c in conversations_list)
         
-        # Count unread messages
-        unread_count = len([m for m in messages_list if not m.get('read', False)])
-        print(f"📊 Unread messages: {unread_count}")
-        print("=" * 80)
-        
-        return render_template('supplier/messages.html', 
-                             messages=messages_list,
-                             unread_count=unread_count)
+        return render_template('supplier/messages_chat.html', 
+                             conversations=conversations_list,
+                             total_unread=total_unread)
         
     except Exception as e:
-        print(f"❌ ERROR loading messages: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        print("=" * 80)
-        flash('An error occurred while loading messages', 'error')
+        print(f"Error: {str(e)}")
+        flash('An error occurred', 'error')
         return redirect(url_for('supplier.dashboard'))
+
 
 # Add this route to supplier_routes.py after the messages route
 
@@ -710,3 +707,103 @@ def messages_unread_count():
     except Exception as e:
         print(f"Error getting unread count: {str(e)}")
         return jsonify({'count': 0})
+    
+@supplier_bp.route('/messages/chat/<user_id>')
+@login_required
+def chat_conversation(user_id):
+    """View chat conversation with a user"""
+    try:
+        all_messages = []
+        
+        # Incoming messages
+        incoming = db.collection('messages')\
+            .where('supplier_id', '==', current_user.id)\
+            .where('user_id', '==', user_id)\
+            .stream()
+        
+        for doc in incoming:
+            msg = doc.to_dict()
+            msg['id'] = doc.id
+            msg['direction'] = 'incoming'
+            all_messages.append(msg)
+        
+        # Outgoing messages
+        outgoing = db.collection('messages')\
+            .where('supplier_id', '==', user_id)\
+            .where('sender_id', '==', current_user.id)\
+            .stream()
+        
+        for doc in outgoing:
+            msg = doc.to_dict()
+            msg['id'] = doc.id
+            msg['direction'] = 'outgoing'
+            all_messages.append(msg)
+        
+        all_messages.sort(key=lambda x: x.get('created_at', datetime.min))
+        
+        # Get user info
+        user_doc = db.collection('users').document(user_id).get()
+        user_info = {}
+        if user_doc.exists:
+            user_data = user_doc.to_dict()
+            user_info = {
+                'name': user_data.get('name', 'Customer'),
+                'email': user_data.get('email', ''),
+                'phone': user_data.get('phone', '')
+            }
+        
+        # Mark incoming as read
+        for msg in all_messages:
+            if msg['direction'] == 'incoming' and not msg.get('read', False):
+                db.collection('messages').document(msg['id']).update({
+                    'read': True,
+                    'read_at': datetime.now()
+                })
+        
+        return render_template('supplier/chat_view.html',
+                             messages=all_messages,
+                             user_info=user_info,
+                             user_id=user_id)
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        flash('An error occurred', 'error')
+        return redirect(url_for('supplier.messages'))
+
+
+@supplier_bp.route('/messages/send/<user_id>', methods=['POST'])
+@login_required
+def send_chat_message(user_id):
+    """Send a chat message to user"""
+    try:
+        message_text = request.form.get('message', '').strip()
+        
+        if not message_text:
+            return jsonify({'success': False, 'message': 'Message cannot be empty'}), 400
+        
+        message_data = {
+            'user_id': user_id,
+            'supplier_id': current_user.id,
+            'sender_id': current_user.id,
+            'sender_type': 'supplier',
+            'sender_name': current_user.company_name or current_user.name,
+            'sender_email': current_user.email if hasattr(current_user, 'email') else '',
+            'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
+            'message': message_text,
+            'type': 'chat',
+            'read': False,
+            'created_at': datetime.now()
+        }
+        
+        doc_ref = db.collection('messages').add(message_data)
+        message_id = doc_ref[1].id
+        
+        return jsonify({
+            'success': True,
+            'message_id': message_id,
+            'timestamp': datetime.now().strftime('%I:%M %p')
+        })
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500

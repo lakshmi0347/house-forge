@@ -1461,45 +1461,89 @@ def delete_project(project_id):
 @login_required
 def messages():
     """View all message conversations (chat style)"""
+    db = get_db()
+    if not db:
+        print("❌ DATABASE CONNECTION FAILED")
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.dashboard'))
+    
     try:
-        # Get all unique conversations
-        messages_ref = db.collection('messages').where('user_id', '==', current_user.id).stream()
+        print("=" * 80)
+        print("📬 LOADING MESSAGES FOR USER")
+        print(f"User ID: {current_user.id}")
+        print(f"User Name: {current_user.name}")
+        print(f"Is Authenticated: {current_user.is_authenticated}")
+        print("=" * 80)
         
         conversations = {}
-        for doc in messages_ref:
+        
+        # Strategy 1: Get ALL messages for this user regardless of sender_type
+        print("\n🔍 Querying all messages where user_id matches...")
+        all_user_messages = db.collection('messages').where('user_id', '==', current_user.id).stream()
+        
+        message_count = 0
+        for doc in all_user_messages:
+            message_count += 1
             message_data = doc.to_dict()
+            message_data['id'] = doc.id
             
-            # Skip outgoing messages
-            if message_data.get('sender_id') == current_user.id:
-                continue
+            # Debug: Print message details
+            print(f"\n📧 Message {message_count}:")
+            print(f"   ID: {doc.id}")
+            print(f"   Sender Type: {message_data.get('sender_type')}")
+            print(f"   Sender ID: {message_data.get('sender_id')}")
+            print(f"   Sender Name: {message_data.get('sender_name')}")
+            print(f"   Message: {message_data.get('message', '')[:50]}...")
+            print(f"   Created: {message_data.get('created_at')}")
             
             sender_id = message_data.get('sender_id')
             sender_type = message_data.get('sender_type', 'unknown')
             
+            # Skip if no sender info
+            if not sender_id or not sender_type:
+                print(f"   ⚠️ Skipping - missing sender info")
+                continue
+            
+            # Skip messages sent BY this user (outgoing messages)
+            if sender_id == current_user.id or sender_type == 'user':
+                print(f"   ⚠️ Skipping - outgoing message")
+                continue
+            
+            # Only process messages FROM suppliers or contractors
+            if sender_type not in ['supplier', 'contractor']:
+                print(f"   ⚠️ Skipping - invalid sender_type: {sender_type}")
+                continue
+            
             # Create conversation key
             conv_key = f"{sender_type}_{sender_id}"
+            print(f"   ✅ Adding to conversation: {conv_key}")
             
             if conv_key not in conversations:
                 conversations[conv_key] = {
                     'id': conv_key,
                     'sender_id': sender_id,
                     'sender_type': sender_type,
-                    'sender_name': message_data.get('sender_name', 'Unknown'),
+                    'sender_name': message_data.get('sender_name', f'Unknown {sender_type.title()}'),
                     'sender_email': message_data.get('sender_email', ''),
                     'sender_phone': message_data.get('sender_phone', ''),
                     'last_message': message_data.get('message', ''),
-                    'last_message_time': message_data.get('created_at'),
+                    'last_message_time': message_data.get('created_at', datetime.now()),
                     'unread_count': 0
                 }
             
             # Update last message if this is newer
-            if message_data.get('created_at') > conversations[conv_key]['last_message_time']:
+            current_time = message_data.get('created_at', datetime.min)
+            if current_time > conversations[conv_key]['last_message_time']:
                 conversations[conv_key]['last_message'] = message_data.get('message', '')
-                conversations[conv_key]['last_message_time'] = message_data.get('created_at')
+                conversations[conv_key]['last_message_time'] = current_time
             
             # Count unread
             if not message_data.get('read', False):
                 conversations[conv_key]['unread_count'] += 1
+        
+        print(f"\n📊 SUMMARY:")
+        print(f"   Total messages found: {message_count}")
+        print(f"   Unique conversations: {len(conversations)}")
         
         # Convert to list and sort by last message time
         conversations_list = list(conversations.values())
@@ -1507,17 +1551,32 @@ def messages():
         
         total_unread = sum(c['unread_count'] for c in conversations_list)
         
-        return render_template('user/messages_chat.html', 
-                             conversations=conversations_list,
-                             total_unread=total_unread)
+        print(f"   Total unread: {total_unread}")
+        print("\n📋 Conversations:")
+        for conv in conversations_list:
+            print(f"   - {conv['sender_name']} ({conv['sender_type']}): {conv['unread_count']} unread")
+        print("=" * 80)
+        
+        # Try to render template
+        print("\n🎨 Attempting to render template...")
+        try:
+            return render_template('user/messages_chat.html', 
+                                 conversations=conversations_list,
+                                 total_unread=total_unread)
+        except Exception as template_error:
+            print(f"⚠️ messages_chat.html not found, trying messages.html")
+            print(f"   Error: {template_error}")
+            return render_template('user/messages.html', 
+                                 conversations=conversations_list,
+                                 total_unread=total_unread)
         
     except Exception as e:
-        print(f"Error loading conversations: {str(e)}")
+        print(f"\n❌ ERROR loading conversations: {str(e)}")
         import traceback
         traceback.print_exc()
-        flash('An error occurred while loading messages', 'error')
+        print("=" * 80)
+        flash(f'An error occurred while loading messages: {str(e)}', 'error')
         return redirect(url_for('user.dashboard'))
-
 
 @user_bp.route('/messages/unread-count')
 @login_required
@@ -1716,44 +1775,75 @@ def reply_to_message(message_id):
 @login_required
 def chat_conversation(sender_type, sender_id):
     """View a specific chat conversation"""
+    db = get_db()
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.messages'))
+    
     try:
-        # Get all messages in this conversation
+        print("=" * 80)
+        print("💬 LOADING CHAT CONVERSATION")
+        print(f"User ID: {current_user.id}")
+        print(f"Sender Type: {sender_type}")
+        print(f"Sender ID: {sender_id}")
+        print("=" * 80)
+        
         all_messages = []
         
-        # Incoming messages
+        # Get INCOMING messages (from supplier/contractor TO user)
+        print("\n📥 Fetching incoming messages...")
         incoming = db.collection('messages')\
             .where('user_id', '==', current_user.id)\
+            .where('sender_type', '==', sender_type)\
             .where('sender_id', '==', sender_id)\
             .stream()
         
+        incoming_count = 0
         for doc in incoming:
+            incoming_count += 1
             msg = doc.to_dict()
             msg['id'] = doc.id
             msg['direction'] = 'incoming'
             all_messages.append(msg)
+            print(f"   📨 Incoming: {msg.get('message', '')[:50]}...")
         
-        # Outgoing messages
+        print(f"   Total incoming: {incoming_count}")
+        
+        # Get OUTGOING messages (from user TO supplier/contractor)
+        print("\n📤 Fetching outgoing messages...")
         outgoing_field = f'{sender_type}_id'
+        
         outgoing = db.collection('messages')\
-            .where('user_id', '==', current_user.id)\
+            .where('sender_type', '==', 'user')\
             .where('sender_id', '==', current_user.id)\
             .where(outgoing_field, '==', sender_id)\
             .stream()
         
+        outgoing_count = 0
         for doc in outgoing:
+            outgoing_count += 1
             msg = doc.to_dict()
             msg['id'] = doc.id
             msg['direction'] = 'outgoing'
             all_messages.append(msg)
+            print(f"   📤 Outgoing: {msg.get('message', '')[:50]}...")
+        
+        print(f"   Total outgoing: {outgoing_count}")
+        print(f"\n📊 Total messages in conversation: {len(all_messages)}")
         
         # Sort by timestamp
         all_messages.sort(key=lambda x: x.get('created_at', datetime.min))
         
         # Get sender info
+        print(f"\n👤 Fetching {sender_type} information...")
         if sender_type == 'supplier':
             sender_doc = db.collection('suppliers').document(sender_id).get()
-        else:
+        elif sender_type == 'contractor':
             sender_doc = db.collection('contractors').document(sender_id).get()
+        else:
+            print(f"❌ Invalid sender_type: {sender_type}")
+            flash('Invalid conversation type', 'error')
+            return redirect(url_for('user.messages'))
         
         sender_info = {}
         if sender_doc.exists:
@@ -1764,14 +1854,28 @@ def chat_conversation(sender_type, sender_id):
                 'phone': sender_data.get('phone', ''),
                 'type': sender_type
             }
+            print(f"   ✅ Found: {sender_info['name']}")
+        else:
+            print(f"   ⚠️ {sender_type.title()} not found")
+            sender_info = {
+                'name': f'Unknown {sender_type.title()}',
+                'email': '',
+                'phone': '',
+                'type': sender_type
+            }
         
         # Mark all incoming messages as read
+        print("\n✅ Marking incoming messages as read...")
+        read_count = 0
         for msg in all_messages:
             if msg['direction'] == 'incoming' and not msg.get('read', False):
                 db.collection('messages').document(msg['id']).update({
                     'read': True,
                     'read_at': datetime.now()
                 })
+                read_count += 1
+        print(f"   Marked {read_count} messages as read")
+        print("=" * 80)
         
         return render_template('user/chat_view.html',
                              messages=all_messages,
@@ -1780,12 +1884,12 @@ def chat_conversation(sender_type, sender_id):
                              sender_type=sender_type)
         
     except Exception as e:
-        print(f"Error loading chat: {str(e)}")
+        print(f"\n❌ ERROR loading chat: {str(e)}")
         import traceback
         traceback.print_exc()
-        flash('An error occurred', 'error')
+        print("=" * 80)
+        flash(f'An error occurred: {str(e)}', 'error')
         return redirect(url_for('user.messages'))
-
 
 @user_bp.route('/messages/send/<sender_type>/<sender_id>', methods=['POST'])
 @login_required

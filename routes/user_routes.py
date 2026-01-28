@@ -1454,3 +1454,339 @@ def delete_project(project_id):
         traceback.print_exc()
         print("=" * 80)
         return jsonify({'success': False, 'message': str(e)}), 500
+
+# ======================== MESSAGING ROUTES ========================
+# Add these routes to routes/user_routes.py
+
+@user_bp.route('/messages')
+@login_required
+def messages():
+    """View all message conversations (chat style)"""
+    return render_template('user/messages.html')
+
+
+@user_bp.route('/messages/conversations')
+@login_required
+def messages_conversations():
+    """Get all conversations for the user"""
+    db = get_db()
+    if not db:
+        return jsonify({'conversations': []})
+    
+    try:
+        print("=" * 80)
+        print("📨 LOADING CONVERSATIONS FOR USER")
+        print(f"User ID: {current_user.id}")
+        print("=" * 80)
+        
+        conversations = {}
+        
+        # Get messages from contractors
+        contractor_messages = db.collection('messages')\
+            .where('user_id', '==', current_user.id)\
+            .stream()
+        
+        for doc in contractor_messages:
+            msg = doc.to_dict()
+            
+            # Skip outgoing messages from user
+            if msg.get('sender_id') == current_user.id and msg.get('sender_type') == 'user':
+                continue
+            
+            contractor_id = msg.get('contractor_id')
+            if contractor_id:
+                conv_key = f"contractor_{contractor_id}"
+                
+                if conv_key not in conversations:
+                    conversations[conv_key] = {
+                        'id': contractor_id,
+                        'sender_id': contractor_id,
+                        'sender_type': 'contractor',
+                        'sender_name': msg.get('contractor_name', 'Contractor'),
+                        'sender_email': msg.get('contractor_email', ''),
+                        'sender_phone': msg.get('contractor_phone', ''),
+                        'last_message': msg.get('message', ''),
+                        'last_message_time': msg.get('created_at'),
+                        'unread_count': 0
+                    }
+                
+                # Update if newer
+                if msg.get('created_at', datetime.min) > conversations[conv_key]['last_message_time']:
+                    conversations[conv_key]['last_message'] = msg.get('message', '')
+                    conversations[conv_key]['last_message_time'] = msg.get('created_at')
+                
+                # Count unread
+                if not msg.get('read', False) and msg.get('sender_type') != 'user':
+                    conversations[conv_key]['unread_count'] += 1
+        
+        # Get messages from suppliers
+        supplier_messages = db.collection('messages')\
+            .where('user_id', '==', current_user.id)\
+            .stream()
+        
+        for doc in supplier_messages:
+            msg = doc.to_dict()
+            
+            # Skip outgoing messages from user
+            if msg.get('sender_id') == current_user.id and msg.get('sender_type') == 'user':
+                continue
+            
+            supplier_id = msg.get('supplier_id')
+            if supplier_id:
+                conv_key = f"supplier_{supplier_id}"
+                
+                if conv_key not in conversations:
+                    conversations[conv_key] = {
+                        'id': supplier_id,
+                        'sender_id': supplier_id,
+                        'sender_type': 'supplier',
+                        'sender_name': msg.get('supplier_name', 'Supplier'),
+                        'sender_email': msg.get('supplier_email', ''),
+                        'sender_phone': msg.get('supplier_phone', ''),
+                        'last_message': msg.get('message', ''),
+                        'last_message_time': msg.get('created_at'),
+                        'unread_count': 0
+                    }
+                
+                # Update if newer
+                if msg.get('created_at', datetime.min) > conversations[conv_key]['last_message_time']:
+                    conversations[conv_key]['last_message'] = msg.get('message', '')
+                    conversations[conv_key]['last_message_time'] = msg.get('created_at')
+                
+                # Count unread
+                if not msg.get('read', False) and msg.get('sender_type') != 'user':
+                    conversations[conv_key]['unread_count'] += 1
+        
+        # Convert to list and sort
+        conversations_list = list(conversations.values())
+        conversations_list.sort(key=lambda x: x.get('last_message_time', datetime.min), reverse=True)
+        
+        print(f"✅ Found {len(conversations_list)} conversations")
+        print("=" * 80)
+        
+        return jsonify({'conversations': conversations_list})
+        
+    except Exception as e:
+        print(f"❌ Error loading conversations: {e}")
+        import traceback
+        traceback.print_exc()
+        print("=" * 80)
+        return jsonify({'conversations': []})
+
+
+@user_bp.route('/messages/conversation/<recipient_id>')
+@login_required
+def messages_conversation(recipient_id):
+    """Get conversation with a specific contractor or supplier"""
+    db = get_db()
+    if not db:
+        return jsonify({'messages': [], 'contact_info': {}})
+    
+    recipient_type = request.args.get('type', 'contractor')
+    
+    try:
+        print("=" * 80)
+        print(f"📖 LOADING CONVERSATION")
+        print(f"User ID: {current_user.id}")
+        print(f"Recipient ID: {recipient_id}")
+        print(f"Recipient Type: {recipient_type}")
+        print("=" * 80)
+        
+        all_messages = []
+        
+        if recipient_type == 'contractor':
+            # Get messages from contractor to user
+            incoming = db.collection('messages')\
+                .where('user_id', '==', current_user.id)\
+                .where('contractor_id', '==', recipient_id)\
+                .stream()
+            
+            for doc in incoming:
+                msg = doc.to_dict()
+                msg['id'] = doc.id
+                msg['direction'] = 'incoming' if msg.get('sender_type') != 'user' else 'outgoing'
+                all_messages.append(msg)
+            
+            # Get contractor info
+            contractor_doc = db.collection('contractors').document(recipient_id).get()
+            if contractor_doc.exists:
+                contractor_data = contractor_doc.to_dict()
+                contact_info = {
+                    'name': contractor_data.get('company_name') or contractor_data.get('name', 'Contractor'),
+                    'email': contractor_data.get('email', ''),
+                    'phone': contractor_data.get('phone', '')
+                }
+            else:
+                contact_info = {'name': 'Contractor', 'email': '', 'phone': ''}
+        
+        else:  # supplier
+            # Get messages from supplier to user
+            incoming = db.collection('messages')\
+                .where('user_id', '==', current_user.id)\
+                .where('supplier_id', '==', recipient_id)\
+                .stream()
+            
+            for doc in incoming:
+                msg = doc.to_dict()
+                msg['id'] = doc.id
+                msg['direction'] = 'incoming' if msg.get('sender_type') != 'user' else 'outgoing'
+                all_messages.append(msg)
+            
+            # Get supplier info
+            supplier_doc = db.collection('suppliers').document(recipient_id).get()
+            if supplier_doc.exists:
+                supplier_data = supplier_doc.to_dict()
+                contact_info = {
+                    'name': supplier_data.get('company_name') or supplier_data.get('name', 'Supplier'),
+                    'email': supplier_data.get('email', ''),
+                    'phone': supplier_data.get('phone', '')
+                }
+            else:
+                contact_info = {'name': 'Supplier', 'email': '', 'phone': ''}
+        
+        # Sort by created_at
+        all_messages.sort(key=lambda x: x.get('created_at', datetime.min))
+        
+        # Mark incoming messages as read
+        for msg in all_messages:
+            if msg['direction'] == 'incoming' and not msg.get('read', False):
+                db.collection('messages').document(msg['id']).update({
+                    'read': True,
+                    'read_at': datetime.now()
+                })
+        
+        print(f"✅ Loaded {len(all_messages)} messages")
+        print("=" * 80)
+        
+        return jsonify({
+            'messages': all_messages,
+            'contact_info': contact_info
+        })
+        
+    except Exception as e:
+        print(f"❌ Error loading conversation: {e}")
+        import traceback
+        traceback.print_exc()
+        print("=" * 80)
+        return jsonify({'messages': [], 'contact_info': {}})
+
+
+@user_bp.route('/messages/send/<recipient_id>', methods=['POST'])
+@login_required
+def send_message_to_recipient(recipient_id):
+    """Send a message to contractor or supplier"""
+    db = get_db()
+    if not db:
+        return jsonify({'success': False, 'message': 'Database connection error'}), 500
+    
+    recipient_type = request.form.get('recipient_type', 'contractor')
+    
+    try:
+        message_text = request.form.get('message', '').strip()
+        
+        if not message_text:
+            return jsonify({'success': False, 'message': 'Message cannot be empty'}), 400
+        
+        print("=" * 80)
+        print("📤 USER SENDING MESSAGE")
+        print(f"User ID: {current_user.id}")
+        print(f"Recipient ID: {recipient_id}")
+        print(f"Recipient Type: {recipient_type}")
+        print(f"Message: {message_text[:50]}...")
+        print("=" * 80)
+        
+        if recipient_type == 'contractor':
+            # Get contractor info
+            contractor_doc = db.collection('contractors').document(recipient_id).get()
+            if not contractor_doc.exists:
+                return jsonify({'success': False, 'message': 'Contractor not found'}), 404
+            
+            contractor_data = contractor_doc.to_dict()
+            
+            message_data = {
+                'user_id': current_user.id,
+                'contractor_id': recipient_id,
+                'sender_id': current_user.id,
+                'sender_type': 'user',
+                'sender_name': current_user.name,
+                'sender_email': current_user.email if hasattr(current_user, 'email') else '',
+                'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
+                'contractor_name': contractor_data.get('company_name') or contractor_data.get('name'),
+                'message': message_text,
+                'type': 'chat',
+                'read': False,
+                'created_at': datetime.now()
+            }
+        
+        else:  # supplier
+            # Get supplier info
+            supplier_doc = db.collection('suppliers').document(recipient_id).get()
+            if not supplier_doc.exists:
+                return jsonify({'success': False, 'message': 'Supplier not found'}), 404
+            
+            supplier_data = supplier_doc.to_dict()
+            
+            message_data = {
+                'user_id': current_user.id,
+                'supplier_id': recipient_id,
+                'sender_id': current_user.id,
+                'sender_type': 'user',
+                'sender_name': current_user.name,
+                'sender_email': current_user.email if hasattr(current_user, 'email') else '',
+                'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
+                'supplier_name': supplier_data.get('company_name') or supplier_data.get('name'),
+                'message': message_text,
+                'type': 'chat',
+                'read': False,
+                'created_at': datetime.now()
+            }
+        
+        doc_ref = db.collection('messages').add(message_data)
+        message_id = doc_ref[1].id
+        
+        print(f"✅ Message sent successfully! ID: {message_id}")
+        print("=" * 80)
+        
+        return jsonify({
+            'success': True,
+            'message_id': message_id,
+            'timestamp': datetime.now().strftime('%I:%M %p')
+        })
+        
+    except Exception as e:
+        print(f"❌ Error sending message: {e}")
+        import traceback
+        traceback.print_exc()
+        print("=" * 80)
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@user_bp.route('/messages/unread-count')
+@login_required
+def messages_unread_count():
+    """Get count of unread messages for badge"""
+    db = get_db()
+    if not db:
+        return jsonify({'count': 0})
+    
+    try:
+        # Get all messages for this user
+        messages_ref = db.collection('messages').where('user_id', '==', current_user.id).stream()
+        
+        unread_count = 0
+        for doc in messages_ref:
+            message_data = doc.to_dict()
+            
+            # Skip outgoing messages (where user is the sender)
+            if message_data.get('sender_id') == current_user.id and message_data.get('sender_type') == 'user':
+                continue
+            
+            # Count unread
+            if not message_data.get('read', False):
+                unread_count += 1
+        
+        return jsonify({'count': unread_count})
+        
+    except Exception as e:
+        print(f"Error getting unread count: {e}")
+        return jsonify({'count': 0})

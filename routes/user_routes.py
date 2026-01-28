@@ -1683,16 +1683,37 @@ def send_message_to_recipient(recipient_id):
     
     try:
         message_text = request.form.get('message', '').strip()
+        has_file = 'file' in request.files
+        file_name = None
+        file_url = None
         
-        if not message_text:
-            return jsonify({'success': False, 'message': 'Message cannot be empty'}), 400
+        # Handle file upload
+        if has_file:
+            file = request.files['file']
+            if file.filename:
+                from werkzeug.utils import secure_filename
+                import os
+                
+                filename = secure_filename(f"{current_user.id}_{int(datetime.now().timestamp())}_{file.filename}")
+                upload_folder = os.path.join('static', 'uploads', 'messages')
+                os.makedirs(upload_folder, exist_ok=True)
+                
+                filepath = os.path.join(upload_folder, filename)
+                file.save(filepath)
+                
+                file_name = file.filename
+                file_url = filename
+        
+        if not message_text and not has_file:
+            return jsonify({'success': False, 'message': 'Message or file required'}), 400
         
         print("=" * 80)
         print("📤 USER SENDING MESSAGE")
         print(f"User ID: {current_user.id}")
         print(f"Recipient ID: {recipient_id}")
         print(f"Recipient Type: {recipient_type}")
-        print(f"Message: {message_text[:50]}...")
+        print(f"Message: {message_text[:50] if message_text else 'File only'}...")
+        print(f"Has File: {has_file}")
         print("=" * 80)
         
         if recipient_type == 'contractor':
@@ -1712,10 +1733,13 @@ def send_message_to_recipient(recipient_id):
                 'sender_email': current_user.email if hasattr(current_user, 'email') else '',
                 'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
                 'contractor_name': contractor_data.get('company_name') or contractor_data.get('name'),
-                'message': message_text,
+                'message': message_text or '📎 File attached',
                 'type': 'chat',
                 'read': False,
-                'created_at': datetime.now()
+                'created_at': datetime.now(),
+                'has_attachment': has_file,
+                'file_name': file_name,
+                'attachment_url': file_url
             }
         
         else:  # supplier
@@ -1735,10 +1759,13 @@ def send_message_to_recipient(recipient_id):
                 'sender_email': current_user.email if hasattr(current_user, 'email') else '',
                 'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
                 'supplier_name': supplier_data.get('company_name') or supplier_data.get('name'),
-                'message': message_text,
+                'message': message_text or '📎 File attached',
                 'type': 'chat',
                 'read': False,
-                'created_at': datetime.now()
+                'created_at': datetime.now(),
+                'has_attachment': has_file,
+                'file_name': file_name,
+                'attachment_url': file_url
             }
         
         doc_ref = db.collection('messages').add(message_data)

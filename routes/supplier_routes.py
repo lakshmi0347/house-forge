@@ -502,132 +502,19 @@ def complete_order(order_id):
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
-@supplier_bp.route('/message/<message_id>/mark-read', methods=['POST'])
-@login_required
-def mark_message_read(message_id):
-    """Mark a message as read"""
-    try:
-        message_ref = db.collection('messages').document(message_id)
-        message_doc = message_ref.get()
-        
-        if not message_doc.exists:
-            return jsonify({'success': False, 'message': 'Message not found'}), 404
-        
-        message_data = message_doc.to_dict()
-        
-        # Verify this is the supplier's message
-        if message_data.get('supplier_id') != current_user.id:
-            return jsonify({'success': False, 'message': 'Access denied'}), 403
-        
-        # Mark as read
-        message_ref.update({
-            'read': True,
-            'read_at': datetime.now()
-        })
-        
-        return jsonify({'success': True, 'message': 'Message marked as read'})
-        
-    except Exception as e:
-        print(f"Error marking message as read: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)}), 500
+# ======================== MESSAGING ROUTES ========================
 
-@supplier_bp.route('/message/<message_id>/delete', methods=['POST'])
-@login_required
-def delete_message(message_id):
-    """Delete a message"""
-    try:
-        message_ref = db.collection('messages').document(message_id)
-        message_doc = message_ref.get()
-        
-        if not message_doc.exists:
-            return jsonify({'success': False, 'message': 'Message not found'}), 404
-        
-        message_data = message_doc.to_dict()
-        
-        # Verify this is the supplier's message
-        if message_data.get('supplier_id') != current_user.id:
-            return jsonify({'success': False, 'message': 'Access denied'}), 403
-        
-        # Delete message
-        message_ref.delete()
-        
-        return jsonify({'success': True, 'message': 'Message deleted'})
-        
-    except Exception as e:
-        print(f"Error deleting message: {str(e)}")
-        return jsonify({'success': False, 'message': str(e)}), 500
-    
-# Add this updated reply endpoint to supplier_routes.py
-
-# Add this updated reply endpoint to supplier_routes.py
-# Replace the existing reply_to_message function
-
-@supplier_bp.route('/message/<message_id>/reply', methods=['POST'])
-@login_required
-def reply_to_message(message_id):
-    """Reply to a message from user"""
-    try:
-        # Get the original message
-        message_ref = db.collection('messages').document(message_id)
-        message_doc = message_ref.get()
-        
-        if not message_doc.exists:
-            return jsonify({'success': False, 'message': 'Message not found'}), 404
-        
-        message_data = message_doc.to_dict()
-        
-        # Verify this is the supplier's message
-        if message_data.get('supplier_id') != current_user.id:
-            return jsonify({'success': False, 'message': 'Access denied'}), 403
-        
-        # Get reply content
-        reply_content = request.form.get('reply', '').strip()
-        
-        if not reply_content:
-            return jsonify({'success': False, 'message': 'Reply content is required'}), 400
-        
-        # ✅ CRITICAL FIX: Create reply message for the user ONLY
-        # DO NOT include supplier_id - only user_id so it appears in user's inbox
-        reply_data = {
-            'user_id': message_data.get('user_id'),  # ✅ ONLY recipient ID
-            'sender_id': current_user.id,  # Track who sent it
-            'sender_type': 'supplier',  # Track sender type
-            'sender_name': current_user.company_name or current_user.name,
-            'sender_email': current_user.email if hasattr(current_user, 'email') else '',
-            'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
-            'subject': f"Re: {message_data.get('subject', 'Your Inquiry')}",
-            'message': reply_content,
-            'type': 'reply',
-            'reply_to': message_id,
-            'original_type': message_data.get('type'),
-            'read': False,
-            'created_at': datetime.now()
-        }
-        
-        # Save reply
-        db.collection('messages').add(reply_data)
-        
-        # Mark original message as read and replied
-        message_ref.update({
-            'read': True,
-            'replied': True,
-            'replied_at': datetime.now()
-        })
-        
-        return jsonify({'success': True, 'message': 'Reply sent successfully!'})
-        
-    except Exception as e:
-        print(f"Error replying to message: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-
-# ✅ UPDATED: Messages route to ONLY show incoming messages
 @supplier_bp.route('/messages')
 @login_required
 def messages():
     """View all message conversations (chat style)"""
+    return render_template('supplier/messages.html')
+
+
+@supplier_bp.route('/api/conversations')
+@login_required
+def api_conversations():
+    """API endpoint to get all conversations as JSON"""
     try:
         # Get all unique conversations
         messages_ref = db.collection('messages').where('supplier_id', '==', current_user.id).stream()
@@ -636,18 +523,19 @@ def messages():
         for doc in messages_ref:
             message_data = doc.to_dict()
             
-            # Skip outgoing messages
-            if message_data.get('sender_id') == current_user.id:
+            # Skip outgoing messages from this supplier
+            if message_data.get('sender_id') == current_user.id and message_data.get('sender_type') == 'supplier':
                 continue
             
-            sender_id = message_data.get('user_id')
-            conv_key = f"user_{sender_id}"
+            user_id = message_data.get('user_id')
+            if not user_id:
+                continue
+                
+            conv_key = f"user_{user_id}"
             
             if conv_key not in conversations:
                 conversations[conv_key] = {
-                    'id': conv_key,
-                    'sender_id': sender_id,
-                    'sender_type': 'user',
+                    'user_id': user_id,
                     'sender_name': message_data.get('sender_name', 'Customer'),
                     'sender_email': message_data.get('sender_email', ''),
                     'sender_phone': message_data.get('sender_phone', ''),
@@ -661,84 +549,48 @@ def messages():
                 conversations[conv_key]['last_message'] = message_data.get('message', '')
                 conversations[conv_key]['last_message_time'] = message_data.get('created_at')
             
-            # Count unread
-            if not message_data.get('read', False):
+            # Count unread incoming messages only
+            if not message_data.get('read', False) and message_data.get('sender_type') != 'supplier':
                 conversations[conv_key]['unread_count'] += 1
         
         conversations_list = list(conversations.values())
         conversations_list.sort(key=lambda x: x.get('last_message_time', datetime.min), reverse=True)
         
-        total_unread = sum(c['unread_count'] for c in conversations_list)
-        
-        return render_template('supplier/messages_chat.html', 
-                             conversations=conversations_list,
-                             total_unread=total_unread)
+        return jsonify({'conversations': conversations_list})
         
     except Exception as e:
         print(f"Error: {str(e)}")
-        flash('An error occurred', 'error')
-        return redirect(url_for('supplier.dashboard'))
+        import traceback
+        traceback.print_exc()
+        return jsonify({'conversations': []})
 
 
-# Add this route to supplier_routes.py after the messages route
-
-@supplier_bp.route('/messages/unread-count')
+@supplier_bp.route('/api/messages/<user_id>')
 @login_required
-def messages_unread_count():
-    """Get count of unread messages for badge"""
-    try:
-        # Get all messages for this supplier
-        messages_ref = db.collection('messages').where('supplier_id', '==', current_user.id).stream()
-        
-        unread_count = 0
-        for doc in messages_ref:
-            message_data = doc.to_dict()
-            
-            # Skip outgoing messages (where this supplier is the sender)
-            if message_data.get('sender_id') == current_user.id:
-                continue
-            
-            # Count unread
-            if not message_data.get('read', False):
-                unread_count += 1
-        
-        return jsonify({'count': unread_count})
-        
-    except Exception as e:
-        print(f"Error getting unread count: {str(e)}")
-        return jsonify({'count': 0})
-    
-@supplier_bp.route('/messages/chat/<user_id>')
-@login_required
-def chat_conversation(user_id):
-    """View chat conversation with a user"""
+def api_messages(user_id):
+    """API endpoint to get messages with a specific user"""
     try:
         all_messages = []
         
-        # Incoming messages
-        incoming = db.collection('messages')\
+        # Get all messages involving this supplier and user
+        messages_ref = db.collection('messages')\
             .where('supplier_id', '==', current_user.id)\
             .where('user_id', '==', user_id)\
             .stream()
         
-        for doc in incoming:
+        for doc in messages_ref:
             msg = doc.to_dict()
             msg['id'] = doc.id
-            msg['direction'] = 'incoming'
+            
+            # Determine direction based on sender
+            if msg.get('sender_id') == current_user.id and msg.get('sender_type') == 'supplier':
+                msg['direction'] = 'outgoing'
+            else:
+                msg['direction'] = 'incoming'
+            
             all_messages.append(msg)
         
-        # Outgoing messages
-        outgoing = db.collection('messages')\
-            .where('supplier_id', '==', user_id)\
-            .where('sender_id', '==', current_user.id)\
-            .stream()
-        
-        for doc in outgoing:
-            msg = doc.to_dict()
-            msg['id'] = doc.id
-            msg['direction'] = 'outgoing'
-            all_messages.append(msg)
-        
+        # Sort by created_at
         all_messages.sort(key=lambda x: x.get('created_at', datetime.min))
         
         # Get user info
@@ -751,8 +603,10 @@ def chat_conversation(user_id):
                 'email': user_data.get('email', ''),
                 'phone': user_data.get('phone', '')
             }
+        else:
+            user_info = {'name': 'Customer', 'email': '', 'phone': ''}
         
-        # Mark incoming as read
+        # Mark incoming messages as read
         for msg in all_messages:
             if msg['direction'] == 'incoming' and not msg.get('read', False):
                 db.collection('messages').document(msg['id']).update({
@@ -760,15 +614,16 @@ def chat_conversation(user_id):
                     'read_at': datetime.now()
                 })
         
-        return render_template('supplier/chat_view.html',
-                             messages=all_messages,
-                             user_info=user_info,
-                             user_id=user_id)
+        return jsonify({
+            'messages': all_messages,
+            'user_info': user_info
+        })
         
     except Exception as e:
         print(f"Error: {str(e)}")
-        flash('An error occurred', 'error')
-        return redirect(url_for('supplier.messages'))
+        import traceback
+        traceback.print_exc()
+        return jsonify({'messages': [], 'user_info': {}})
 
 
 @supplier_bp.route('/messages/send/<user_id>', methods=['POST'])
@@ -781,6 +636,7 @@ def send_chat_message(user_id):
         if not message_text:
             return jsonify({'success': False, 'message': 'Message cannot be empty'}), 400
         
+        # Create message for user's inbox
         message_data = {
             'user_id': user_id,
             'supplier_id': current_user.id,
@@ -806,4 +662,33 @@ def send_chat_message(user_id):
         
     except Exception as e:
         print(f"Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@supplier_bp.route('/messages/unread-count')
+@login_required
+def messages_unread_count():
+    """Get count of unread messages for badge"""
+    try:
+        # Get all messages for this supplier
+        messages_ref = db.collection('messages').where('supplier_id', '==', current_user.id).stream()
+        
+        unread_count = 0
+        for doc in messages_ref:
+            message_data = doc.to_dict()
+            
+            # Skip outgoing messages (where this supplier is the sender)
+            if message_data.get('sender_id') == current_user.id and message_data.get('sender_type') == 'supplier':
+                continue
+            
+            # Count unread incoming messages
+            if not message_data.get('read', False):
+                unread_count += 1
+        
+        return jsonify({'count': unread_count})
+        
+    except Exception as e:
+        print(f"Error getting unread count: {str(e)}")
+        return jsonify({'count': 0})

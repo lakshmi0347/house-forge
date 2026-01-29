@@ -200,6 +200,19 @@
             </div>
             
             <div class="contact-methods">
+                <!-- Chat Message -->
+                <div class="contact-item">
+                    <div class="contact-info">
+                        <div class="contact-icon">💬</div>
+                        <div class="contact-details">
+                            <div class="contact-label">Send Message</div>
+                            <div class="contact-value">Chat directly with supplier</div>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('user.messages') }}?open={{ supplier.id }}&type=supplier" 
+                       class="contact-action">Chat</a>
+                </div>
+                
                 <!-- Phone -->
                 <div class="contact-item">
                     <div class="contact-info">
@@ -227,21 +240,6 @@
                     <a href="mailto:{{ supplier.email }}" class="contact-action">Send Email</a>
                     {% endif %}
                 </div>
-                
-                <!-- WhatsApp -->
-                {% if supplier.phone %}
-                <div class="contact-item">
-                    <div class="contact-info">
-                        <div class="contact-icon">💬</div>
-                        <div class="contact-details">
-                            <div class="contact-label">Sendd Message</div>
-                        </div>
-                    </div>
-                    <a  
-                       target="_blank" 
-                       class="contact-action">Chat</a>
-                </div>
-                {% endif %}
                 
                 <!-- Location -->
                 {% if supplier.location %}
@@ -374,49 +372,6 @@
     
     <script>
         const supplierId = '{{ supplier.id }}';
-        
-        // Message Form Submission
-        document.getElementById('messageForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            
-            // Validate
-            const subject = formData.get('subject')?.trim();
-            const message = formData.get('message')?.trim();
-            
-            if (!subject || !message) {
-                showAlert('messageAlert', 'Please fill in all required fields', 'error');
-                return;
-            }
-            
-            submitBtn.textContent = 'Sending...';
-            submitBtn.disabled = true;
-            
-            fetch(`/user/supplier/${supplierId}/send-message`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showAlert('messageAlert', data.message, 'success');
-                    this.reset();
-                } else {
-                    showAlert('messageAlert', data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('messageAlert', 'An error occurred while sending your message', 'error');
-            })
-            .finally(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            });
-        });
         
         // Quote Form Submission
         document.getElementById('quoteForm').addEventListener('submit', function(e) {

@@ -644,6 +644,12 @@
         let currentConversation = null;
         let messages = {};
         
+        // Get URL parameters for auto-opening conversation
+        function getURLParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+        
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             loadConversations();
@@ -673,6 +679,17 @@
                 .then(data => {
                     conversations = data.conversations || [];
                     renderConversations(conversations);
+                    
+                    // Check if we need to auto-open a conversation from URL
+                    const openId = getURLParameter('open');
+                    const openType = getURLParameter('type');
+                    
+                    if (openId && openType) {
+                        // Wait a bit for rendering to complete
+                        setTimeout(() => {
+                            openConversation(openId, openType);
+                        }, 500);
+                    }
                 })
                 .catch(error => {
                     console.error('Error loading conversations:', error);
@@ -728,8 +745,10 @@
             // Update active state
             document.querySelectorAll('.conversation-item').forEach(item => {
                 item.classList.remove('active');
+                if (item.dataset.id === conversationId && item.dataset.type === senderType) {
+                    item.classList.add('active');
+                }
             });
-            event.currentTarget.classList.add('active');
             
             // Load messages
             loadMessages(conversationId, senderType);

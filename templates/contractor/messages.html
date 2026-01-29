@@ -588,14 +588,14 @@
     <nav class="navbar">
         <div class="navbar-brand">📦 House-Forge Supplier</div>
         <div class="navbar-menu">
-            <a href="{{ url_for('supplier.dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('supplier.inventory') }}">Inventory</a>
-            <a href="{{ url_for('supplier.orders') }}">Orders</a>
-            <a href="{{ url_for('supplier.messages') }}" style="background: rgba(255,255,255,0.2);">
+            <a href="{{ url_for('contractor.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('contractor.browse_projects') }}">Browse Projects</a>
+            <a href="{{ url_for('contractor.my_bids') }}">My Bids</a>
+             <a href="{{ url_for('contractor.messages') }}" style="background: rgba(255,255,255,0.2);">
                 Messages
                 <span class="unread-indicator" id="navUnreadBadge" style="display: none;">0</span>
             </a>
-            <a href="{{ url_for('supplier.profile') }}">Profile</a>
+            <a href="{{ url_for('contractor.profile') }}">Profile</a>
             <a href="{{ url_for('auth.logout') }}">Logout</a>
         </div>
     </nav>
@@ -629,11 +629,6 @@
                 <h2>Select a conversation</h2>
                 <p>Choose a customer to view and reply to their messages</p>
             </div>
-            <div class="chat-actions">
-                        <button class="chat-action-btn" onclick="viewProfile('${conversationId}', '${senderType}')">
-                            👤 View Profile
-                        </button>
-                    </div>
         </div>
     </div>
     
@@ -659,7 +654,7 @@
         }
         
         function loadConversations() {
-            fetch('/supplier/messages')
+            fetch('/contractor/messages')
                 .then(response => response.text())
                 .then(html => {
                     // Extract conversations data from the response
@@ -679,7 +674,7 @@
         
         function loadConversationsAPI() {
             // This would be a new endpoint you create
-            fetch('/supplier/api/conversations')
+            fetch('/contractor/api/conversations')
                 .then(response => response.json())
                 .then(data => {
                     conversations = data.conversations || [];
@@ -748,7 +743,7 @@
         }
         
         function loadMessages(userId) {
-            fetch(`/supplier/messages/chat/${userId}`)
+            fetch(`/contractor/messages/chat/${userId}`)
                 .then(response => response.text())
                 .then(html => {
                     // Extract messages from HTML or use API
@@ -763,7 +758,7 @@
         }
         
         function loadMessagesAPI(userId) {
-            fetch(`/supplier/api/messages/${userId}`)
+            fetch(`/contractor/api/messages/${userId}`)
                 .then(response => response.json())
                 .then(data => {
                     messages = data.messages || [];
@@ -880,7 +875,7 @@
             const formData = new FormData();
             formData.append('message', message);
             
-            fetch(`/supplier/messages/send/${userId}`, {
+            fetch(`/contractor/messages/send/${userId}`, {
                 method: 'POST',
                 body: formData
             })
@@ -892,7 +887,7 @@
                         message: message,
                         direction: 'outgoing',
                         created_at: new Date().toISOString(),
-                        sender_type: 'supplier'
+                        sender_type: 'contractor'
                     });
                     
                     // Re-render messages
@@ -957,7 +952,7 @@
         }
         
         function updateUnreadCount() {
-            fetch('/supplier/messages/unread-count')
+            fetch('/contractor/messages/unread-count')
                 .then(response => response.json())
                 .then(data => {
                     const count = data.count || 0;

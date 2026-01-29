@@ -107,8 +107,16 @@
             font-size: 32px;
             font-weight: 700;
             color: #333;
-            margin-bottom: 8px;
+            margin-bottom: 3px;
         }
+        
+        .contractor-company{
+            font-size: 20px;
+            font-weight: 600;
+            color:darkolivegreen;
+            margin-bottom: 6px;
+        }
+
         
         .contractor-type {
             font-size: 18px;
@@ -258,7 +266,8 @@
                 <div class="contractor-avatar">🔨</div>
                 
                 <div class="contractor-info">
-                    <h1 class="contractor-name">{{ contractor.company_name or contractor.name }}</h1>
+                    <h1 class="contractor-name">{{ contractor.name }}</h1>
+                    <div class="contractor-company">{{ contractor.company_name }}</div>
                     <div class="contractor-type">
                         Professional Contractor
                     </div>

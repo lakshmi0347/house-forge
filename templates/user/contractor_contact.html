@@ -222,6 +222,18 @@
             </div>
             
             <div class="contact-methods">
+                <!-- Chat Message -->
+                <div class="contact-item">
+                    <div class="contact-info">
+                        <div class="contact-icon">💬</div>
+                        <div class="contact-details">
+                            <div class="contact-label">Send Message</div>
+                            <div class="contact-value">Chat directly with contractor</div>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('user.messages') }}?open={{ contractor.id }}&type=contractor" 
+                       class="contact-action">Chat</a>
+                </div>
                 <!-- Phone -->
                 <div class="contact-item">
                     <div class="contact-info">
@@ -250,21 +262,6 @@
                     {% endif %}
                 </div>
                 
-                <!-- WhatsApp -->
-                {% if contractor.phone %}
-                <div class="contact-item">
-                    <div class="contact-info">
-                        <div class="contact-icon">💬</div>
-                        <div class="contact-details">
-                            <div class="contact-label">WhatsApp</div>
-                            <div class="contact-value">{{ contractor.phone }}</div>
-                        </div>
-                    </div>
-                    <a href="https://wa.me/{{ contractor.phone.replace('+', '').replace(' ', '').replace('-', '') }}" 
-                       target="_blank" 
-                       class="contact-action">Chat</a>
-                </div>
-                {% endif %}
                 
                 <!-- Location -->
                 {% if contractor.location %}
@@ -288,42 +285,6 @@
                 </div>
             </div>
             
-            <!-- Message Form Section -->
-            <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #f0f0f0;">
-                <h3 style="font-size: 22px; color: #333; margin-bottom: 20px; font-weight: 600;">
-                    💬 Send Message Through Platform
-                </h3>
-                
-                <div id="messageAlert" style="display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
-                
-                <form id="messageForm" style="display: grid; gap: 20px;">
-                    <div>
-                        <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                            Subject *
-                        </label>
-                        <input type="text" 
-                               name="subject" 
-                               required 
-                               placeholder="e.g., Inquiry about construction services"
-                               style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
-                    </div>
-                    
-                    <div>
-                        <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                            Message *
-                        </label>
-                        <textarea name="message" 
-                                  required 
-                                  rows="5"
-                                  placeholder="Describe your project requirements and any specific questions..."
-                                  style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical;"></textarea>
-                    </div>
-                    
-                    <button type="submit" 
-                            style="padding: 14px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.3s;">
-                        Send Message
-                    </button>
-                </form>
                 
                 <div style="margin-top: 20px; text-align: center;">
                     <button onclick="openQuoteModal()" 

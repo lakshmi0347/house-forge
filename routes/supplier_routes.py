@@ -121,32 +121,11 @@ def profile():
         supplier_doc = supplier_ref.get()
         
         if not supplier_doc.exists:
-            print("⚠️ Supplier document not found - Creating default profile...")
-            # Create from current_user data
-            supplier_data = {
-                'name': getattr(current_user, 'name', ''),
-                'email': getattr(current_user, 'email', ''),
-                'role': 'supplier',
-                'company_name': getattr(current_user, 'company_name', ''),
-                'phone': getattr(current_user, 'phone', ''),
-                'location': getattr(current_user, 'location', ''),
-                'bio': getattr(current_user, 'bio', ''),
-                'business_license': getattr(current_user, 'business_license', ''),
-                'business_type': getattr(current_user, 'business_type', 'wholesaler'),
-                'gst_number': getattr(current_user, 'gst_number', ''),
-                'years_in_business': getattr(current_user, 'years_in_business', 0),
-                'categories': getattr(current_user, 'categories', []),
-                'verified': getattr(current_user, 'verified', False),
-                'rating': getattr(current_user, 'rating', 0.0),
-                'total_orders': getattr(current_user, 'total_orders', 0),
-                'profile_picture': getattr(current_user, 'profile_picture', ''),
-                'created_at': datetime.now()
-            }
-            supplier_ref.set(supplier_data)
-            print("✅ Default profile created")
-        else:
+            flash('supplier profile not found. Please contact support.', 'error')
+            return redirect(url_for('supplier.dashboard'))
+        
             supplier_data = supplier_doc.to_dict()
-            print(f"✅ Supplier data loaded: {supplier_data.get('name')}")
+            
         
         # Convert datetime to string if needed
         if 'created_at' in supplier_data and supplier_data['created_at']:

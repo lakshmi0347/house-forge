@@ -121,11 +121,10 @@ def profile():
         supplier_doc = supplier_ref.get()
         
         if not supplier_doc.exists:
-            flash('supplier profile not found. Please contact support.', 'error')
+            flash('Supplier profile not found. Please contact support.', 'error')
             return redirect(url_for('supplier.dashboard'))
         
-            supplier_data = supplier_doc.to_dict()
-            
+        supplier_data = supplier_doc.to_dict()
         
         # Convert datetime to string if needed
         if 'created_at' in supplier_data and supplier_data['created_at']:

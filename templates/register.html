@@ -286,8 +286,8 @@
             <!-- Contractor Additional Fields -->
             <div id="contractor-fields" class="additional-fields">
                 <div class="form-group">
-                    <label for="company_name">Company Name</label>
-                    <input type="text" id="company_name" name="company_name" placeholder="Your company name">
+                    <label for="contractor_company_name">Company Name</label>
+                    <input type="text" id="contractor_company_name" name="company_name" placeholder="Your company name">
                 </div>
                 
                 <div class="form-group">
@@ -304,8 +304,8 @@
             <!-- Supplier Additional Fields -->
             <div id="supplier-fields" class="additional-fields">
                 <div class="form-group">
-                    <label for="company_nam">Company Name</label>
-                    <input type="text" id="company_nam" name="company_nam" placeholder="Your company name">
+                    <label for="supplier_company_name">Company Name</label>
+                    <input type="text" id="company_name" name="company_name" placeholder="Your company name">
                 </div>
                 
                 <div class="form-group">
@@ -367,12 +367,30 @@
                 contractorFields.classList.remove('show');
                 supplierFields.classList.remove('show');
                 
+                // Disable inputs in hidden fields to prevent form submission
+                const contractorInputs = contractorFields.querySelectorAll('input, select');
+                const supplierInputs = supplierFields.querySelectorAll('input, select');
+                
+                contractorInputs.forEach(input => input.disabled = true);
+                supplierInputs.forEach(input => input.disabled = true);
+                
                 if (selectedRole === 'contractor') {
                     contractorFields.classList.add('show');
+                    contractorInputs.forEach(input => input.disabled = false);
                 } else if (selectedRole === 'supplier') {
                     supplierFields.classList.add('show');
+                    supplierInputs.forEach(input => input.disabled = false);
                 }
             });
+        });
+        
+        // Initialize - disable contractor and supplier fields on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const contractorInputs = contractorFields.querySelectorAll('input, select');
+            const supplierInputs = supplierFields.querySelectorAll('input, select');
+            
+            contractorInputs.forEach(input => input.disabled = true);
+            supplierInputs.forEach(input => input.disabled = true);
         });
         
         // Password validation

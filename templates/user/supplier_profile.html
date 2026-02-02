@@ -109,6 +109,13 @@
             color: #333;
             margin-bottom: 8px;
         }
+
+        .supplier-company{
+            font-size: 20px;
+            font-weight: 600;
+            color:darkolivegreen;
+            margin-bottom: 6px;
+        }
         
         .supplier-type {
             font-size: 18px;
@@ -307,7 +314,8 @@
                 <div class="supplier-avatar">📦</div>
                 
                 <div class="supplier-info">
-                    <h1 class="supplier-name">{{ supplier.company_name or supplier.name }}</h1>
+                    <h1 class="supplier-name">{{ supplier.name }}</h1>
+                    <div class="supplier-company">{{ supplier.company_name }}</div>
                     <div class="supplier-type">
                         {{ supplier.business_type.title() if supplier.business_type else 'Material Supplier' }}
                     </div>

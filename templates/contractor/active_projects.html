@@ -328,11 +328,15 @@
                     
                     <div class="project-actions">
                         <a href="/contractor/project/{{ project.id }}/view" class="btn btn-primary">
-                            View Details
+                            View Project
                         </a>
-                        <a href="#" class="btn btn-outline" onclick="alert('Progress tracking coming soon!'); return false;">
-                            Update Progress
-                        </a>
+                        {% if project.status == 'active' %}
+                        <button onclick="completeProject('{{ project.id }}')" class="btn btn-outline">
+                         Mark Complete
+                          </button>
+                        {% else %}
+                        <span class="status-badge status-completed">✅ Completed</span>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
@@ -371,6 +375,29 @@
     
     // Update badge every 30 seconds
     setInterval(updateMessageBadge, 30000);
+
+    // Complete project function
+    function completeProject(projectId) {
+        if (!confirm('Mark this project as completed?')) return;
+        
+        fetch(`/contractor/project/${projectId}/complete`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                window.location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred');
+        });
+    }
     </script>
 </body>
 </html>

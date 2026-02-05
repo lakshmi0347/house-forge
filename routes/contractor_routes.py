@@ -726,3 +726,34 @@ def messages_unread_count():
     except Exception as e:
         print(f"Error getting unread count: {str(e)}")
         return jsonify({'count': 0})
+    
+@contractor_bp.route('/project/<project_id>/complete', methods=['POST'])
+@login_required
+def complete_project(project_id):
+    """Mark project as completed"""
+    try:
+        project_ref = db.collection('projects').document(project_id)
+        project_doc = project_ref.get()
+        
+        if not project_doc.exists:
+            return jsonify({'success': False, 'message': 'Project not found'}), 404
+        
+        project_data = project_doc.to_dict()
+        
+        # Verify this is the contractor's project
+        if project_data.get('contractor_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+        
+        # Update project status to completed
+        project_ref.update({
+            'status': 'completed',
+            'completed_at': datetime.now(),
+            'updated_at': datetime.now()
+        })
+        
+        flash('Project marked as completed!', 'success')
+        return jsonify({'success': True, 'message': 'Project completed successfully!'})
+        
+    except Exception as e:
+        print(f"Error completing project: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500

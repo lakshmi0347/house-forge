@@ -331,14 +331,18 @@
                             View Project
                         </a>
                         {% if project.status == 'active' %}
-                        <button onclick="completeProject('{{ project.id }}')" class="btn btn-outline">
+                         <button onclick="completeProject('{{ project.id }}')" class="btn btn-outline">
                          Mark Complete
-                          </button>
-                        {% else %}
-                        <span class="status-badge status-completed">✅ Completed</span>
-                        {% endif %}
-                    </div>
-                </div>
+                        </button>
+                        {% elif project.user_id %}
+                         <a href="{{ url_for('contractor.view_user_profile', user_id=project.user_id) }}" class="btn btn-outline">
+                          View Owner
+                            </a>
+                          {% else %}
+                            <span class="status-badge status-completed">✅ Completed</span>
+                         {% endif %}
+                          </div>
+                       </div>
                 {% endfor %}
             </div>
         {% else %}

@@ -757,3 +757,98 @@ def complete_project(project_id):
     except Exception as e:
         print(f"Error completing project: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
+    
+@contractor_bp.route('/user/<user_id>/profile')
+@login_required
+def user_profile(user_id):
+    """View user/customer profile"""
+    db = get_db()
+    
+    try:
+        # Get user data
+        user_doc = db.collection('users').document(user_id).get()
+        
+        if not user_doc.exists:
+            flash('User not found', 'error')
+            return redirect(url_for('contractor.dashboard'))
+        
+        user_data = user_doc.to_dict()
+        user_data['id'] = user_id
+        
+        # Get user's projects that this contractor can see
+        # (projects where contractor has bid or is assigned)
+        
+        # 1. Projects where contractor is assigned
+        assigned_projects_ref = db.collection('projects')\
+            .where('user_id', '==', user_id)\
+            .where('contractor_id', '==', current_user.id)\
+            .stream()
+        
+        assigned_projects = []
+        for doc in assigned_projects_ref:
+            project_data = doc.to_dict()
+            project_data['id'] = doc.id
+            assigned_projects.append(project_data)
+        
+        # 2. Projects where contractor has bid
+        bids_ref = db.collection('bids')\
+            .where('contractor_id', '==', current_user.id)\
+            .where('user_id', '==', user_id)\
+            .stream()
+        
+        bid_project_ids = set()
+        for bid_doc in bids_ref:
+            bid_data = bid_doc.to_dict()
+            project_id = bid_data.get('project_id')
+            if project_id:
+                bid_project_ids.add(project_id)
+        
+        # Get these projects
+        bid_projects = []
+        for project_id in bid_project_ids:
+            # Skip if already in assigned projects
+            if any(p['id'] == project_id for p in assigned_projects):
+                continue
+            
+            project_doc = db.collection('projects').document(project_id).get()
+            if project_doc.exists:
+                project_data = project_doc.to_dict()
+                project_data['id'] = project_id
+                bid_projects.append(project_data)
+        
+        # Combine all visible projects
+        all_projects = assigned_projects + bid_projects
+        
+        # Format dates
+        if 'created_at' in user_data and user_data['created_at']:
+            try:
+                user_data['created_at'] = user_data['created_at'].strftime('%B %d, %Y')
+            except:
+                user_data['created_at'] = 'N/A'
+        else:
+            user_data['created_at'] = 'N/A'
+        
+        # Set defaults
+        user_data.setdefault('name', 'User')
+        user_data.setdefault('email', 'N/A')
+        user_data.setdefault('phone', 'N/A')
+        user_data.setdefault('location', 'N/A')
+        user_data.setdefault('profile_picture', '')
+        
+        stats = {
+            'total_projects': len(all_projects),
+            'active_projects': len([p for p in all_projects if p.get('status') == 'active']),
+            'completed_projects': len([p for p in all_projects if p.get('status') == 'completed']),
+        }
+        
+        return render_template('contractor/user_profile.html',
+                             user_data=user_data,
+                             projects=all_projects,
+                             stats=stats)
+    
+    except Exception as e:
+        print(f"Error loading user profile: {e}")
+        import traceback
+        traceback.print_exc()
+        flash('Error loading user profile', 'error')
+        return redirect(url_for('contractor.dashboard'))

@@ -307,6 +307,10 @@
                 Messages
                 <span class="badge-notification" id="messagesBadge">0</span>
             </a>
+            <a href="{{ url_for('user.notifications') }}" style="position: relative;">
+             Notifications
+             <span class="badge-notification" id="notificationsBadge">0</span>
+            </a>
             <a href="{{ url_for('user.profile') }}">
                 {% if user_profile_picture %}
                     <img src="/static/uploads/profiles/{{ user_profile_picture }}" 
@@ -453,6 +457,34 @@
         
         // Update badge every 30 seconds
         setInterval(updateMessageBadge, 30000);
+
+        // Update notification badge
+    function updateNotificationBadge() {
+        fetch('/user/notifications/unread-count')
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.getElementById('notificationsBadge');
+                if (data.count > 0) {
+                    badge.textContent = data.count;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateMessageBadge();
+        updateNotificationBadge(); // ADD THIS
+    });
+    
+    // Update every 30 seconds
+    setInterval(() => {
+        updateMessageBadge();
+        updateNotificationBadge(); // ADD THIS
+    }, 30000);
     </script>
 </body>
 </html>

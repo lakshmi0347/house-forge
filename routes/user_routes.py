@@ -1824,3 +1824,244 @@ def complete_project(project_id):
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
+
+# Add to user_routes.py
+@user_bp.route('/project/<project_id>/rate-contractor', methods=['POST'])
+@login_required
+def rate_contractor(project_id):
+    """Rate contractor after project completion"""
+    db = get_db()
+    if not db:
+        return jsonify({'success': False, 'message': 'Database connection error'}), 500
+    
+    try:
+        project_doc = db.collection('projects').document(project_id).get()
+        
+        if not project_doc.exists:
+            return jsonify({'success': False, 'message': 'Project not found'}), 404
+        
+        project_data = project_doc.to_dict()
+        
+        # Verify ownership
+        if project_data.get('user_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+        
+        # Check if project is completed
+        if project_data.get('status') != 'completed':
+            return jsonify({'success': False, 'message': 'Can only rate completed projects'}), 400
+        
+        rating = float(request.form.get('rating'))
+        review = request.form.get('review', '')
+        contractor_id = project_data.get('contractor_id')
+        
+        if not contractor_id:
+            return jsonify({'success': False, 'message': 'No contractor assigned to this project'}), 400
+        
+        # Save review
+        review_data = {
+            'project_id': project_id,
+            'contractor_id': contractor_id,
+            'user_id': current_user.id,
+            'user_name': current_user.name,
+            'rating': rating,
+            'review': review,
+            'created_at': datetime.now()
+        }
+        db.collection('reviews').add(review_data)
+        
+        # Update contractor's average rating
+        reviews = list(db.collection('reviews').where('contractor_id', '==', contractor_id).stream())
+        avg_rating = sum(r.to_dict().get('rating', 0) for r in reviews) / len(reviews) if reviews else 0
+        
+        db.collection('contractors').document(contractor_id).update({
+            'rating': round(avg_rating, 1),
+            'total_reviews': len(reviews),
+            'updated_at': datetime.now()
+        })
+        
+        # Mark project as reviewed
+        db.collection('projects').document(project_id).update({
+            'reviewed': True,
+            'reviewed_at': datetime.now()
+        })
+        
+        # Create notification for contractor
+        create_notification(
+            contractor_id,
+            'New Review Received',
+            f'{current_user.name} rated your work {rating}/5 stars',
+            'review',
+            f'/contractor/reviews'
+        )
+        
+        return jsonify({'success': True, 'message': 'Thank you for your review!'})
+        
+    except Exception as e:
+        print(f"Error rating contractor: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# Add to user_routes.py
+@user_bp.route('/project/<project_id>/updates')
+@login_required
+def project_updates(project_id):
+    """View project progress updates from contractor"""
+    db = get_db()
+    
+    try:
+        # Get project
+        project_doc = db.collection('projects').document(project_id).get()
+        project_data = project_doc.to_dict()
+        
+        if project_data.get('user_id') != current_user.id:
+            flash('Access denied', 'error')
+            return redirect(url_for('user.projects'))
+        
+        # Get all updates
+        updates_ref = db.collection('project_updates')\
+            .where('project_id', '==', project_id)\
+            .order_by('created_at', direction=firestore.Query.DESCENDING)\
+            .stream()
+        
+        updates = []
+        for doc in updates_ref:
+            update_data = doc.to_dict()
+            update_data['id'] = doc.id
+            updates.append(update_data)
+        
+        return render_template('user/project_updates.html', 
+                             project=project_data, 
+                             updates=updates)
+                             
+    except Exception as e:
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('user.projects'))
+    
+@user_bp.route('/project/<project_id>/upload-document', methods=['POST'])
+@login_required
+def upload_document(project_id):
+    """Upload project documents"""
+    db = get_db()
+    
+    try:
+        if 'document' not in request.files:
+            return jsonify({'success': False, 'message': 'No file uploaded'}), 400
+        
+        file = request.files['document']
+        doc_type = request.form.get('document_type')  # contract, permit, invoice, etc.
+        
+        # Save file
+        filename = secure_filename(f"{project_id}_{doc_type}_{int(datetime.now().timestamp())}_{file.filename}")
+        upload_folder = os.path.join('static', 'uploads', 'documents')
+        os.makedirs(upload_folder, exist_ok=True)
+        
+        filepath = os.path.join(upload_folder, filename)
+        file.save(filepath)
+        
+        # Save document record
+        doc_data = {
+            'project_id': project_id,
+            'user_id': current_user.id,
+            'filename': filename,
+            'original_name': file.filename,
+            'type': doc_type,
+            'uploaded_at': datetime.now()
+        }
+        db.collection('project_documents').add(doc_data)
+        
+        return jsonify({'success': True, 'filename': filename})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# Add to user_routes.py
+@user_bp.route('/notifications')
+@login_required
+def notifications():
+    """View all notifications"""
+    return render_template('user/notifications.html')
+    db = get_db()
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.dashboard'))
+    
+    try:
+        notifications_ref = db.collection('notifications')\
+            .where('user_id', '==', current_user.id)\
+            .order_by('created_at', direction=firestore.Query.DESCENDING)\
+            .limit(50)\
+            .stream()
+        
+        notifications = []
+        unread_count = 0
+        
+        for doc in notifications_ref:
+            notif_data = doc.to_dict()
+            notif_data['id'] = doc.id
+            notifications.append(notif_data)
+            
+            if not notif_data.get('read', False):
+                unread_count += 1
+        
+        return render_template('user/notifications.html', 
+                             notifications=notifications,
+                             unread_count=unread_count)
+    except Exception as e:
+        flash(f'Error loading notifications: {str(e)}', 'error')
+        return redirect(url_for('user.dashboard'))
+
+@user_bp.route('/notifications/mark-read/<notification_id>', methods=['POST'])
+@login_required
+def mark_notification_read(notification_id):
+    """Mark notification as read"""
+    db = get_db()
+    if not db:
+        return jsonify({'success': False, 'message': 'Database connection error'}), 500
+    
+    try:
+        db.collection('notifications').document(notification_id).update({
+            'read': True,
+            'read_at': datetime.now()
+        })
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@user_bp.route('/notifications/unread-count')
+@login_required
+def notifications_unread_count():
+    """Get count of unread notifications"""
+    db = get_db()
+    if not db:
+        return jsonify({'count': 0})
+    
+    try:
+        notifications_ref = db.collection('notifications')\
+            .where('user_id', '==', current_user.id)\
+            .where('read', '==', False)\
+            .stream()
+        
+        count = len(list(notifications_ref))
+        return jsonify({'count': count})
+    except Exception as e:
+        print(f"Error getting unread count: {e}")
+        return jsonify({'count': 0})
+    
+# ======================== HELPER FUNCTIONS ========================
+
+def create_notification(user_id, title, message, type, link=None):
+    """Create a notification for a user"""
+    db = firestore.client()
+    
+    notification_data = {
+        'user_id': user_id,
+        'title': title,
+        'message': message,
+        'type': type,  # 'bid', 'message', 'order', 'project', 'payment', 'review'
+        'link': link,
+        'read': False,
+        'created_at': datetime.now()
+    }
+    
+    db.collection('notifications').add(notification_data)

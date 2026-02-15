@@ -700,12 +700,15 @@ def send_chat_message(user_id):
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
-
 @contractor_bp.route('/messages/unread-count')
 @login_required
 def messages_unread_count():
     """Get count of unread messages for badge"""
     try:
+        db = get_db()
+        if not db:
+            return jsonify({'count': 0})
+        
         # Get all messages for this contractor
         messages_ref = db.collection('messages').where('contractor_id', '==', current_user.id).stream()
         
@@ -721,11 +724,14 @@ def messages_unread_count():
             if not message_data.get('read', False):
                 unread_count += 1
         
-        return jsonify({'count': unread_count})
+        return jsonify({'count': unread_count}), 200, {'Content-Type': 'application/json'}
         
     except Exception as e:
         print(f"Error getting unread count: {str(e)}")
-        return jsonify({'count': 0})
+        import traceback
+        traceback.print_exc()
+        # Always return valid JSON even on error
+        return jsonify({'count': 0, 'error': str(e)}), 200, {'Content-Type': 'application/json'}
     
 @contractor_bp.route('/project/<project_id>/complete', methods=['POST'])
 @login_required

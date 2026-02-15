@@ -48,6 +48,40 @@
         .navbar-menu a:hover {
             background: rgba(255,255,255,0.2);
         }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .profile-pic:hover {
+            transform: scale(1.1);
+        }
+        
+        .profile-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .profile-placeholder:hover {
+            transform: scale(1.1);
+        }
         
         .container {
             max-width: 1200px;
@@ -279,7 +313,17 @@
             <a href="{{ url_for('supplier.inventory') }}">Inventory</a>
             <a href="{{ url_for('supplier.orders') }}">Orders</a>
             <a href="{{ url_for('supplier.messages') }}">Messages</a>
-            <a href="{{ url_for('supplier.profile') }}">Profile</a>
+            <a href="{{ url_for('supplier.profile') }}">
+                {% if supplier_profile_picture %}
+                    <img src="/static/uploads/profiles/{{ supplier_profile_picture }}" 
+                         alt="Profile" 
+                         class="profile-pic">
+                {% else %}
+                    <div class="profile-placeholder">
+                        {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                    </div>
+                {% endif %}
+            </a>
             <a href="{{ url_for('auth.logout') }}">Logout</a>
         </div>
     </nav>

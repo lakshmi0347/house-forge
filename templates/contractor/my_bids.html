@@ -66,6 +66,40 @@
             font-weight: bold;
             pointer-events: none;
         }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .profile-pic:hover {
+            transform: scale(1.1);
+        }
+        
+        .profile-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .profile-placeholder:hover {
+            transform: scale(1.1);
+        }
         
         .container {
             max-width: 1200px;
@@ -334,7 +368,17 @@
             <a href="{{ url_for('contractor.messages') }}" style="position: relative;">Messages
             <span class="badge-notification" id="messagesBadge" style="display: none;">0</span>
             </a>
-            <a href="{{ url_for('contractor.profile') }}">Profile</a>
+            <a href="{{ url_for('contractor.profile') }}">
+                {% if contractor_profile_picture %}
+                    <img src="/static/uploads/profiles/{{ contractor_profile_picture }}" 
+                         alt="Profile" 
+                         class="profile-pic">
+                {% else %}
+                    <div class="profile-placeholder">
+                        {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                    </div>
+                {% endif %}
+            </a>
             <a href="{{ url_for('auth.logout') }}">Logout</a>
         </div>
     </nav>
@@ -432,8 +476,8 @@
                         {% endif %}
                         
                         {% if bid.status == 'accepted' %}
-                        <a href="/contractor/project/{{ bid.project_id }}/view" class="btn btn-outline">
-                            View Contract
+                        <a href="{{ url_for('contractor.user_profile', user_id=bid.user_id) }}" class="btn btn-outline">
+                            👤 View Profile
                         </a>
                         {% endif %}
                     </div>
@@ -473,26 +517,46 @@
     </script>
     <script>
         // Update message badge
-    function updateMessageBadge() {
-        fetch('/contractor/messages/unread-count')
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.getElementById('messagesBadge');
-                if (data.count > 0) {
-                    badge.textContent = data.count;
-                    badge.style.display = 'flex';
-                } else {
-                    badge.style.display = 'none';
-                }
-            })
-            .catch(error => console.error('Error fetching unread count:', error));
-    }
-    
-    // Update badge on page load
-    updateMessageBadge();
-    
-    // Update badge every 30 seconds
-    setInterval(updateMessageBadge, 30000);
+        function updateMessageBadge() {
+            fetch('/contractor/messages/unread-count')
+                .then(response => {
+                    // Check if response is OK and is JSON
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Response is not JSON');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const badge = document.getElementById('messagesBadge');
+                    if (badge && data && typeof data.count === 'number') {
+                        if (data.count > 0) {
+                            badge.textContent = data.count;
+                            badge.style.display = 'flex';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => {
+                    // Silently fail - just hide the badge
+                    const badge = document.getElementById('messagesBadge');
+                    if (badge) {
+                        badge.style.display = 'none';
+                    }
+                    // Only log in development
+                    // console.error('Error fetching unread count:', error);
+                });
+        }
+        
+        // Update badge on page load
+        updateMessageBadge();
+        
+        // Update badge every 30 seconds
+        setInterval(updateMessageBadge, 30000);
     </script>
 </body>
 </html>

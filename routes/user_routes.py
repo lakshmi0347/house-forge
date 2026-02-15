@@ -1481,19 +1481,24 @@ def messages_conversations():
         
         conversations = {}
         
-        # Get messages from contractors
-        contractor_messages = db.collection('messages')\
-            .where('user_id', '==', current_user.id)\
-            .stream()
+        # Get ALL messages involving this user
+        all_messages = db.collection('messages').stream()
         
-        for doc in contractor_messages:
+        for doc in all_messages:
             msg = doc.to_dict()
             
-            # Skip outgoing messages from user
-            if msg.get('sender_id') == current_user.id and msg.get('sender_type') == 'user':
+            # Check if this message involves the current user
+            contractor_id = msg.get('contractor_id')
+            supplier_id = msg.get('supplier_id')
+            msg_user_id = msg.get('user_id')
+            sender_id = msg.get('sender_id')
+            sender_type = msg.get('sender_type')
+            
+            # Skip messages that don't involve this user
+            if msg_user_id != current_user.id and sender_id != current_user.id:
                 continue
             
-            contractor_id = msg.get('contractor_id')
+            # Process contractor conversations
             if contractor_id:
                 conv_key = f"contractor_{contractor_id}"
                 
@@ -1506,32 +1511,22 @@ def messages_conversations():
                         'sender_email': msg.get('contractor_email', ''),
                         'sender_phone': msg.get('contractor_phone', ''),
                         'last_message': msg.get('message', ''),
-                        'last_message_time': msg.get('created_at'),
+                        'last_message_time': msg.get('created_at', datetime.min),
                         'unread_count': 0
                     }
                 
-                # Update if newer
-                if msg.get('created_at', datetime.min) > conversations[conv_key]['last_message_time']:
+                # Update if this message is newer
+                msg_time = msg.get('created_at', datetime.min)
+                if msg_time > conversations[conv_key]['last_message_time']:
                     conversations[conv_key]['last_message'] = msg.get('message', '')
-                    conversations[conv_key]['last_message_time'] = msg.get('created_at')
+                    conversations[conv_key]['last_message_time'] = msg_time
                 
-                # Count unread
-                if not msg.get('read', False) and msg.get('sender_type') != 'user':
+                # Count unread (messages FROM contractor TO user that are unread)
+                is_from_contractor = sender_type == 'contractor' and sender_id == contractor_id
+                if is_from_contractor and not msg.get('read', False):
                     conversations[conv_key]['unread_count'] += 1
-        
-        # Get messages from suppliers
-        supplier_messages = db.collection('messages')\
-            .where('user_id', '==', current_user.id)\
-            .stream()
-        
-        for doc in supplier_messages:
-            msg = doc.to_dict()
             
-            # Skip outgoing messages from user
-            if msg.get('sender_id') == current_user.id and msg.get('sender_type') == 'user':
-                continue
-            
-            supplier_id = msg.get('supplier_id')
+            # Process supplier conversations
             if supplier_id:
                 conv_key = f"supplier_{supplier_id}"
                 
@@ -1544,24 +1539,28 @@ def messages_conversations():
                         'sender_email': msg.get('supplier_email', ''),
                         'sender_phone': msg.get('supplier_phone', ''),
                         'last_message': msg.get('message', ''),
-                        'last_message_time': msg.get('created_at'),
+                        'last_message_time': msg.get('created_at', datetime.min),
                         'unread_count': 0
                     }
                 
-                # Update if newer
-                if msg.get('created_at', datetime.min) > conversations[conv_key]['last_message_time']:
+                # Update if this message is newer
+                msg_time = msg.get('created_at', datetime.min)
+                if msg_time > conversations[conv_key]['last_message_time']:
                     conversations[conv_key]['last_message'] = msg.get('message', '')
-                    conversations[conv_key]['last_message_time'] = msg.get('created_at')
+                    conversations[conv_key]['last_message_time'] = msg_time
                 
-                # Count unread
-                if not msg.get('read', False) and msg.get('sender_type') != 'user':
+                # Count unread (messages FROM supplier TO user that are unread)
+                is_from_supplier = sender_type == 'supplier' and sender_id == supplier_id
+                if is_from_supplier and not msg.get('read', False):
                     conversations[conv_key]['unread_count'] += 1
         
-        # Convert to list and sort
+        # Convert to list and sort by most recent
         conversations_list = list(conversations.values())
         conversations_list.sort(key=lambda x: x.get('last_message_time', datetime.min), reverse=True)
         
         print(f"✅ Found {len(conversations_list)} conversations")
+        for conv in conversations_list[:5]:
+            print(f"   - {conv['sender_name']}: {conv['last_message'][:30]}... (Unread: {conv['unread_count']})")
         print("=" * 80)
         
         return jsonify({'conversations': conversations_list})
@@ -1595,17 +1594,23 @@ def messages_conversation(recipient_id):
         all_messages = []
         
         if recipient_type == 'contractor':
-            # Get messages from contractor to user
-            incoming = db.collection('messages')\
-                .where('user_id', '==', current_user.id)\
+            # Get ALL messages involving this contractor
+            messages_query = db.collection('messages')\
                 .where('contractor_id', '==', recipient_id)\
                 .stream()
             
-            for doc in incoming:
+            for doc in messages_query:
                 msg = doc.to_dict()
-                msg['id'] = doc.id
-                msg['direction'] = 'incoming' if msg.get('sender_type') != 'user' else 'outgoing'
-                all_messages.append(msg)
+                # Only include messages involving this user
+                if msg.get('user_id') == current_user.id or msg.get('sender_id') == current_user.id:
+                    msg['id'] = doc.id
+                    
+                    # Determine direction: outgoing if user sent it, incoming otherwise
+                    is_user_message = (msg.get('sender_id') == current_user.id and msg.get('sender_type') == 'user')
+                    msg['direction'] = 'outgoing' if is_user_message else 'incoming'
+                    
+                    all_messages.append(msg)
+                    print(f"  📨 {msg['direction']}: {msg.get('message')[:40]}...")
             
             # Get contractor info
             contractor_doc = db.collection('contractors').document(recipient_id).get()
@@ -1620,17 +1625,23 @@ def messages_conversation(recipient_id):
                 contact_info = {'name': 'Contractor', 'email': '', 'phone': ''}
         
         else:  # supplier
-            # Get messages from supplier to user
-            incoming = db.collection('messages')\
-                .where('user_id', '==', current_user.id)\
+            # Get ALL messages involving this supplier
+            messages_query = db.collection('messages')\
                 .where('supplier_id', '==', recipient_id)\
                 .stream()
             
-            for doc in incoming:
+            for doc in messages_query:
                 msg = doc.to_dict()
-                msg['id'] = doc.id
-                msg['direction'] = 'incoming' if msg.get('sender_type') != 'user' else 'outgoing'
-                all_messages.append(msg)
+                # Only include messages involving this user
+                if msg.get('user_id') == current_user.id or msg.get('sender_id') == current_user.id:
+                    msg['id'] = doc.id
+                    
+                    # Determine direction: outgoing if user sent it, incoming otherwise
+                    is_user_message = (msg.get('sender_id') == current_user.id and msg.get('sender_type') == 'user')
+                    msg['direction'] = 'outgoing' if is_user_message else 'incoming'
+                    
+                    all_messages.append(msg)
+                    print(f"  📨 {msg['direction']}: {msg.get('message')[:40]}...")
             
             # Get supplier info
             supplier_doc = db.collection('suppliers').document(recipient_id).get()
@@ -1644,7 +1655,7 @@ def messages_conversation(recipient_id):
             else:
                 contact_info = {'name': 'Supplier', 'email': '', 'phone': ''}
         
-        # Sort by created_at
+        # Sort by created_at (oldest first for chat display)
         all_messages.sort(key=lambda x: x.get('created_at', datetime.min))
         
         # Mark incoming messages as read
@@ -1656,6 +1667,8 @@ def messages_conversation(recipient_id):
                 })
         
         print(f"✅ Loaded {len(all_messages)} messages")
+        print(f"   Incoming: {len([m for m in all_messages if m['direction'] == 'incoming'])}")
+        print(f"   Outgoing: {len([m for m in all_messages if m['direction'] == 'outgoing'])}")
         print("=" * 80)
         
         return jsonify({
@@ -1980,17 +1993,15 @@ def upload_document(project_id):
 @login_required
 def notifications():
     """View all notifications"""
-    return render_template('user/notifications.html')
     db = get_db()
     if not db:
         flash('Database connection error', 'error')
         return redirect(url_for('user.dashboard'))
     
     try:
+        # Get notifications without order_by to avoid index requirement
         notifications_ref = db.collection('notifications')\
             .where('user_id', '==', current_user.id)\
-            .order_by('created_at', direction=firestore.Query.DESCENDING)\
-            .limit(50)\
             .stream()
         
         notifications = []
@@ -2004,10 +2015,19 @@ def notifications():
             if not notif_data.get('read', False):
                 unread_count += 1
         
+        # Sort in Python instead of Firestore
+        notifications.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
+        
+        # Limit to 50 most recent
+        notifications = notifications[:50]
+        
         return render_template('user/notifications.html', 
                              notifications=notifications,
                              unread_count=unread_count)
     except Exception as e:
+        print(f"Error loading notifications: {e}")
+        import traceback
+        traceback.print_exc()
         flash(f'Error loading notifications: {str(e)}', 'error')
         return redirect(url_for('user.dashboard'))
 

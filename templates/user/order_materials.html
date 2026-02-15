@@ -111,8 +111,48 @@
             padding-bottom: 15px;
             border-bottom: 2px solid #f0f0f0;
             font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
+        /* Filter Controls */
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        /* Materials List */
         .materials-list {
             max-height: 600px;
             overflow-y: auto;
@@ -127,6 +167,7 @@
             border-radius: 12px;
             margin-bottom: 15px;
             transition: all 0.3s;
+            position: relative;
         }
         
         .material-item:hover {
@@ -134,10 +175,16 @@
             box-shadow: 0 3px 10px rgba(0,0,0,0.08);
         }
         
+        .material-item.selected {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
         .material-checkbox {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             cursor: pointer;
+            flex-shrink: 0;
         }
         
         .material-info {
@@ -155,6 +202,7 @@
             font-size: 13px;
             color: #999;
             text-transform: uppercase;
+            margin-bottom: 5px;
         }
         
         .material-supplier {
@@ -163,12 +211,35 @@
             margin-top: 5px;
         }
         
+        .material-description {
+            font-size: 13px;
+            color: #888;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        
+        .material-stock {
+            font-size: 13px;
+            color: #28a745;
+            margin-top: 5px;
+            font-weight: 600;
+        }
+        
+        .material-stock.low {
+            color: #ffc107;
+        }
+        
+        .material-stock.out {
+            color: #dc3545;
+        }
+        
         .material-price-section {
             text-align: right;
+            flex-shrink: 0;
         }
         
         .material-price {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
             color: #667eea;
             margin-bottom: 5px;
@@ -179,15 +250,66 @@
             color: #999;
         }
         
-        .quantity-input {
-            width: 80px;
-            padding: 8px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: 600;
+        .quantity-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
         }
         
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .qty-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        .qty-btn:hover {
+            background: #e9ecef;
+        }
+        
+        .qty-btn:active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .qty-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .quantity-input {
+            width: 60px;
+            padding: 8px;
+            border: none;
+            text-align: center;
+            font-weight: 600;
+            font-size: 15px;
+            background: white;
+        }
+        
+        .quantity-input:focus {
+            outline: none;
+        }
+        
+        .quantity-input:disabled {
+            background: #f8f9fa;
+            color: #999;
+        }
+        
+        /* Cart Summary */
         .cart-summary {
             position: sticky;
             top: 20px;
@@ -237,6 +359,37 @@
             font-weight: bold;
         }
         
+        .selected-items-list {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 13px;
+        }
+        
+        .selected-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-remove {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .item-remove:hover {
+            opacity: 1;
+        }
+        
         .btn {
             width: 100%;
             padding: 14px 20px;
@@ -268,6 +421,17 @@
             transform: none;
         }
         
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            margin-top: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* Estimated Materials */
         .estimated-materials {
             background: #fff9e6;
             padding: 20px;
@@ -280,6 +444,9 @@
             font-weight: 600;
             color: #856404;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .estimated-list {
@@ -296,6 +463,17 @@
             font-size: 14px;
         }
         
+        .estimated-item-name {
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .estimated-item-qty {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 80px 20px;
@@ -306,6 +484,7 @@
             margin-bottom: 20px;
         }
         
+        /* Alert */
         .alert {
             padding: 15px 20px;
             border-radius: 8px;
@@ -324,9 +503,127 @@
             border: 1px solid #f5c6cb;
         }
         
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        /* Loading State */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Bulk Actions */
+        .bulk-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .bulk-btn {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .bulk-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+        
+        /* Scrollbar */
+        .materials-list::-webkit-scrollbar,
+        .selected-items-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .materials-list::-webkit-scrollbar-track,
+        .selected-items-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .materials-list::-webkit-scrollbar-thumb,
+        .selected-items-list::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+        
+        .materials-list::-webkit-scrollbar-thumb:hover,
+        .selected-items-list::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+        
         @media (max-width: 1024px) {
             .two-column {
                 grid-template-columns: 1fr;
+            }
+            
+            .cart-summary {
+                position: relative;
+                top: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .filter-controls {
+                flex-direction: column;
+            }
+            
+            .material-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .material-price-section {
+                text-align: left;
+                width: 100%;
+            }
+            
+            .quantity-section {
+                width: 100%;
+                justify-content: flex-start;
             }
         }
     </style>
@@ -362,23 +659,83 @@
         <div class="two-column">
             <!-- Materials List -->
             <div class="section">
-                <h2 class="section-title">Available Materials</h2>
+                <h2 class="section-title">
+                    Available Materials
+                    <span style="font-size: 14px; font-weight: normal; color: #666;">
+                        {{ materials|length }} materials
+                    </span>
+                </h2>
                 
                 {% if materials %}
+                    <!-- Filter Controls -->
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <label>Search Materials</label>
+                            <input type="text" id="searchInput" placeholder="Search by name...">
+                        </div>
+                        <div class="filter-group">
+                            <label>Category</label>
+                            <select id="categoryFilter">
+                                <option value="">All Categories</option>
+                                {% set categories = materials|map(attribute='category')|unique|list %}
+                                {% for category in categories %}
+                                <option value="{{ category }}">{{ category }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Supplier</label>
+                            <select id="supplierFilter">
+                                <option value="">All Suppliers</option>
+                                {% set suppliers = materials|map(attribute='supplier_name')|unique|list %}
+                                {% for supplier in suppliers %}
+                                <option value="{{ supplier }}">{{ supplier or 'Unknown' }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Bulk Actions -->
+                    <div class="bulk-actions">
+                        <button class="bulk-btn" onclick="selectAll()">✓ Select All</button>
+                        <button class="bulk-btn" onclick="deselectAll()">✗ Deselect All</button>
+                        <button class="bulk-btn" onclick="selectEstimated()">💡 Select Estimated</button>
+                    </div>
+                    
                     <div class="materials-list" id="materialsList">
                         {% for material in materials %}
-                        <div class="material-item">
+                        <div class="material-item" 
+                             data-id="{{ material.id }}"
+                             data-name="{{ material.name }}"
+                             data-category="{{ material.category }}"
+                             data-supplier="{{ material.supplier_name or '' }}"
+                             data-price="{{ material.price }}"
+                             data-unit="{{ material.unit }}">
+                            
                             <input type="checkbox" class="material-checkbox" 
+                                   id="check-{{ material.id }}"
                                    data-id="{{ material.id }}"
                                    data-name="{{ material.name }}"
                                    data-price="{{ material.price }}"
                                    data-unit="{{ material.unit }}"
-                                   onchange="updateCart()">
+                                   onchange="toggleMaterial(this)">
                             
                             <div class="material-info">
                                 <div class="material-name">{{ material.name }}</div>
                                 <div class="material-category">{{ material.category }}</div>
                                 <div class="material-supplier">🏪 {{ material.supplier_name or 'Supplier' }}</div>
+                                {% if material.description %}
+                                <div class="material-description">{{ material.description[:100] }}{% if material.description|length > 100 %}...{% endif %}</div>
+                                {% endif %}
+                                {% if material.quantity %}
+                                <div class="material-stock {% if material.quantity < 10 %}low{% elif material.quantity == 0 %}out{% endif %}">
+                                    {% if material.quantity > 0 %}
+                                        ✓ In Stock: {{ material.quantity }} {{ material.unit }}
+                                    {% else %}
+                                        ✗ Out of Stock
+                                    {% endif %}
+                                </div>
+                                {% endif %}
                             </div>
                             
                             <div class="material-price-section">
@@ -386,11 +743,18 @@
                                 <div class="material-unit">per {{ material.unit }}</div>
                             </div>
                             
-                            <input type="number" class="quantity-input" 
-                                   id="qty-{{ material.id }}"
-                                   min="1" value="1" 
-                                   onchange="updateCart()"
-                                   disabled>
+                            <div class="quantity-section">
+                                <div class="quantity-controls">
+                                    <button class="qty-btn" onclick="decrementQty('{{ material.id }}')" disabled>−</button>
+                                    <input type="number" class="quantity-input" 
+                                           id="qty-{{ material.id }}"
+                                           min="1" 
+                                           value="1" 
+                                           onchange="updateCart()"
+                                           disabled>
+                                    <button class="qty-btn" onclick="incrementQty('{{ material.id }}')" disabled>+</button>
+                                </div>
+                            </div>
                         </div>
                         {% endfor %}
                     </div>
@@ -414,9 +778,9 @@
                             {% for stage, materials_dict in estimated_materials.items() %}
                                 {% for material, quantity in materials_dict.items() %}
                                     {% if quantity > 0 %}
-                                    <div class="estimated-item">
-                                        <span>{{ material.replace('_', ' ').title() }}</span>
-                                        <span>{{ "{:,.0f}".format(quantity) }}</span>
+                                    <div class="estimated-item" data-material="{{ material }}">
+                                        <span class="estimated-item-name">{{ material.replace('_', ' ').title() }}</span>
+                                        <span class="estimated-item-qty">{{ "{:,.0f}".format(quantity) }}</span>
                                     </div>
                                     {% endif %}
                                 {% endfor %}
@@ -427,11 +791,20 @@
                     
                     <!-- Order Summary -->
                     <div class="summary-card">
-                        <div class="summary-title">Order Summary</div>
+                        <div class="summary-title">🛒 Order Summary</div>
+                        
+                        <div id="selectedItemsList" class="selected-items-list" style="display: none;">
+                            <!-- Selected items will appear here -->
+                        </div>
                         
                         <div class="summary-row">
                             <span class="summary-label">Items Selected</span>
                             <span class="summary-value" id="itemCount">0</span>
+                        </div>
+                        
+                        <div class="summary-row">
+                            <span class="summary-label">Total Quantity</span>
+                            <span class="summary-value" id="totalQty">0</span>
                         </div>
                         
                         <div class="summary-row">
@@ -443,19 +816,68 @@
                     <button class="btn btn-primary" id="placeOrderBtn" onclick="placeOrder()" disabled>
                         Place Order
                     </button>
+                    
+                    <button class="btn btn-secondary" onclick="clearCart()">
+                        Clear Cart
+                    </button>
                 </div>
             </div>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Processing your order...</p>
         </div>
     </div>
     
     <script>
         let selectedMaterials = [];
         
+        // Toggle material selection
+        function toggleMaterial(checkbox) {
+            const materialId = checkbox.dataset.id;
+            const qtyInput = document.getElementById('qty-' + materialId);
+            const qtyButtons = document.querySelectorAll(`[onclick*="'${materialId}'"]`);
+            const materialItem = checkbox.closest('.material-item');
+            
+            if (checkbox.checked) {
+                qtyInput.disabled = false;
+                qtyButtons.forEach(btn => btn.disabled = false);
+                materialItem.classList.add('selected');
+            } else {
+                qtyInput.disabled = true;
+                qtyButtons.forEach(btn => btn.disabled = true);
+                materialItem.classList.remove('selected');
+            }
+            
+            updateCart();
+        }
+        
+        // Increment quantity
+        function incrementQty(materialId) {
+            const qtyInput = document.getElementById('qty-' + materialId);
+            qtyInput.value = parseInt(qtyInput.value) + 1;
+            updateCart();
+        }
+        
+        // Decrement quantity
+        function decrementQty(materialId) {
+            const qtyInput = document.getElementById('qty-' + materialId);
+            if (parseInt(qtyInput.value) > 1) {
+                qtyInput.value = parseInt(qtyInput.value) - 1;
+                updateCart();
+            }
+        }
+        
+        // Update cart
         function updateCart() {
             selectedMaterials = [];
             let totalAmount = 0;
+            let totalQty = 0;
             
-            // Get all checked checkboxes
             const checkboxes = document.querySelectorAll('.material-checkbox:checked');
             
             checkboxes.forEach(checkbox => {
@@ -476,37 +898,69 @@
                 });
                 
                 totalAmount += price * quantity;
+                totalQty += quantity;
             });
             
             // Update summary
             document.getElementById('itemCount').textContent = selectedMaterials.length;
+            document.getElementById('totalQty').textContent = totalQty;
             document.getElementById('totalAmount').textContent = '₹' + totalAmount.toLocaleString('en-IN', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             });
             
+            // Update selected items list
+            updateSelectedItemsList();
+            
             // Enable/disable order button
             document.getElementById('placeOrderBtn').disabled = selectedMaterials.length === 0;
         }
         
-        // Enable/disable quantity input when checkbox changes
-        document.querySelectorAll('.material-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const materialId = this.dataset.id;
-                const qtyInput = document.getElementById('qty-' + materialId);
-                qtyInput.disabled = !this.checked;
-            });
-        });
+        // Update selected items list
+        function updateSelectedItemsList() {
+            const list = document.getElementById('selectedItemsList');
+            
+            if (selectedMaterials.length === 0) {
+                list.style.display = 'none';
+                return;
+            }
+            
+            list.style.display = 'block';
+            list.innerHTML = selectedMaterials.map(item => `
+                <div class="selected-item">
+                    <span>${item.name} (${item.quantity} ${item.unit})</span>
+                    <span>
+                        ₹${item.total.toLocaleString('en-IN')}
+                        <span class="item-remove" onclick="removeItem('${item.id}')" title="Remove">✕</span>
+                    </span>
+                </div>
+            `).join('');
+        }
         
+        // Remove item from cart
+        function removeItem(materialId) {
+            const checkbox = document.getElementById('check-' + materialId);
+            if (checkbox) {
+                checkbox.checked = false;
+                toggleMaterial(checkbox);
+            }
+        }
+        
+        // Place order
         function placeOrder() {
             if (selectedMaterials.length === 0) {
                 showAlert('Please select at least one material', 'error');
                 return;
             }
             
-            if (!confirm('Place order for ' + selectedMaterials.length + ' materials?')) {
+            const confirmMsg = `Place order for ${selectedMaterials.length} material(s)?\n\nTotal: ₹${selectedMaterials.reduce((sum, item) => sum + item.total, 0).toLocaleString('en-IN')}`;
+            
+            if (!confirm(confirmMsg)) {
                 return;
             }
+            
+            // Show loading
+            document.getElementById('loadingOverlay').classList.add('active');
             
             // Prepare form data
             const formData = new FormData();
@@ -524,23 +978,108 @@
             })
             .then(response => response.json())
             .then(data => {
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
                 if (data.success) {
-                    showAlert('Order placed successfully!', 'success');
+                    showAlert(data.message, 'success');
                     
                     // Reset after 2 seconds and redirect
                     setTimeout(() => {
-                        window.location.href = '{{ url_for("user.view_project", project_id=project.id) }}';
+                        window.location.href = '{{ url_for("user.my_orders") }}';
                     }, 2000);
                 } else {
                     showAlert('Error: ' + data.message, 'error');
                 }
             })
             .catch(error => {
+                document.getElementById('loadingOverlay').classList.remove('active');
                 console.error('Error:', error);
                 showAlert('An error occurred while placing the order', 'error');
             });
         }
         
+        // Bulk actions
+        function selectAll() {
+            document.querySelectorAll('.material-checkbox').forEach(checkbox => {
+                if (!checkbox.checked) {
+                    checkbox.checked = true;
+                    toggleMaterial(checkbox);
+                }
+            });
+        }
+        
+        function deselectAll() {
+            document.querySelectorAll('.material-checkbox:checked').forEach(checkbox => {
+                checkbox.checked = false;
+                toggleMaterial(checkbox);
+            });
+        }
+        
+        function selectEstimated() {
+            // Logic to select materials that match estimated materials
+            const estimatedItems = document.querySelectorAll('.estimated-item');
+            estimatedItems.forEach(item => {
+                const materialName = item.dataset.material;
+                // Try to find matching material
+                document.querySelectorAll('.material-item').forEach(materialItem => {
+                    const name = materialItem.dataset.name.toLowerCase();
+                    if (name.includes(materialName.toLowerCase().replace('_', ' '))) {
+                        const checkbox = materialItem.querySelector('.material-checkbox');
+                        if (!checkbox.checked) {
+                            checkbox.checked = true;
+                            toggleMaterial(checkbox);
+                        }
+                    }
+                });
+            });
+        }
+        
+        function clearCart() {
+            if (selectedMaterials.length === 0) return;
+            
+            if (confirm('Clear all items from cart?')) {
+                deselectAll();
+            }
+        }
+        
+        // Filtering
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const supplierFilter = document.getElementById('supplierFilter');
+        
+        function filterMaterials() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const categoryValue = categoryFilter.value;
+            const supplierValue = supplierFilter.value;
+            
+            document.querySelectorAll('.material-item').forEach(item => {
+                const name = item.dataset.name.toLowerCase();
+                const category = item.dataset.category;
+                const supplier = item.dataset.supplier;
+                
+                let show = true;
+                
+                if (searchTerm && !name.includes(searchTerm)) {
+                    show = false;
+                }
+                
+                if (categoryValue && category !== categoryValue) {
+                    show = false;
+                }
+                
+                if (supplierValue && supplier !== supplierValue) {
+                    show = false;
+                }
+                
+                item.style.display = show ? 'flex' : 'none';
+            });
+        }
+        
+        if (searchInput) searchInput.addEventListener('input', filterMaterials);
+        if (categoryFilter) categoryFilter.addEventListener('change', filterMaterials);
+        if (supplierFilter) supplierFilter.addEventListener('change', filterMaterials);
+        
+        // Show alert
         function showAlert(message, type) {
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-' + type;
@@ -554,6 +1093,9 @@
             setTimeout(() => {
                 alertDiv.remove();
             }, 5000);
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>

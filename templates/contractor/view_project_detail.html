@@ -375,13 +375,9 @@
                             <span class="info-label">Name</span>
                             <span class="info-value">{{ project.user_name or 'N/A' }}</span>
                         </div>
-                        <div class="info-item">
-                            <span class="info-label">Contact</span>
-                            <span class="info-value">Contact after bid acceptance</span>
-                        </div>
                         <div style="margin-top: 15px;">
-                         <a href="{{ url_for('contractor.view_user_profile', user_id=project.user_id) }}" class="btn btn-outline">
-                             View Full Profile
+                         <a href="{{ url_for('contractor.user_profile', user_id=project.user_id) }}" class="btn btn-outline">
+                             View Profile
                          </a>
                         </div>
                     </div>

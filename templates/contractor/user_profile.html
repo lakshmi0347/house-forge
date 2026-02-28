@@ -498,65 +498,11 @@
             </div>
         </div>
         
-        <!-- Projects -->
-        <div class="section">
-            <h2 class="section-title">🏗️ Projects</h2>
-            
-            {% if projects %}
-                {% for project in projects %}
-                <div class="project-card">
-                    <div class="project-header">
-                        <div>
-                            <div class="project-title">{{ project.title }}</div>
-                            <div class="project-location">📍 {{ project.location or 'Location not specified' }}</div>
-                        </div>
-                        <span class="status-badge status-{{ project.status }}">
-                            {{ project.status.upper() }}
-                        </span>
-                    </div>
-                    
-                    <div class="project-details">
-                        <div class="detail-item">
-                            <div class="detail-label">Area</div>
-                            <div class="detail-value">{{ project.square_feet }} sq ft</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Rooms</div>
-                            <div class="detail-value">{{ project.rooms }}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Floors</div>
-                            <div class="detail-value">{{ project.floors }}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <a href="{{ url_for('contractor.view_project', project_id=project.id) }}" class="btn btn-primary">
-                            View Project
-                        </a>
-                        {% if project.contractor_id == current_user.id %}
-                        <span class="btn btn-outline" style="cursor: default;">
-                            ✓ Assigned to You
-                        </span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-state">
-                    <div class="empty-icon">📂</div>
-                    <h3>No Projects Found</h3>
-                    <p>You don't have access to view this customer's projects yet.</p>
-                </div>
-            {% endif %}
-        </div>
-        
         <!-- Quick Actions -->
         <div class="section">
-            <h2 class="section-title">⚡ Quick Actions</h2>
             <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                <a href="{{ url_for('contractor.messages') }}" class="btn btn-primary">
-                    💬 Send Message
+                <a href="{{ url_for('contractor.messages') }}?open_user={{ user_data.id }}" class="btn btn-primary">
+                  💬 Send Message
                 </a>
                 <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-outline">
                     🔍 View Available Projects

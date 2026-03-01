@@ -33,7 +33,6 @@
             color: var(--text-primary);
         }
 
-        /* Subtle background image with light overlay */
         body::before {
             content: '';
             position: fixed;
@@ -70,9 +69,7 @@
             gap: 10px;
         }
 
-        .navbar-brand span.icon {
-            font-size: 20px;
-        }
+        .navbar-brand span.icon { font-size: 20px; }
 
         .navbar-menu {
             display: flex;
@@ -174,7 +171,6 @@
         }
 
         .welcome-banner::after {
-            
             position: absolute;
             right: -20px;
             top: -30px;
@@ -205,33 +201,25 @@
             font-weight: 500;
             white-space: nowrap;
             text-align: right;
-            padding-top: 4px;
-            position: relative;
-            z-index: 1;
-            background: var(--warm-white);
             padding: 6px 12px;
             border-radius: 20px;
             border: 1px solid var(--stone);
             flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+            background: var(--warm-white);
         }
 
-        /* ─── MAIN GRID (stats + actions side by side) ─── */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 320px;
-            gap: 20px;
-            margin-bottom: 24px;
-            align-items: start;
-        }
-
-        @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
-
-        /* ─── STATS ─── */
+        /* ─── STATS ROW (full width, 4 columns) ─── */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
+            margin-bottom: 24px;
         }
+
+        @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 560px) { .stats-grid { grid-template-columns: 1fr; } }
 
         .stat-card {
             background: var(--warm-white);
@@ -285,13 +273,22 @@
             letter-spacing: 0.8px;
         }
 
+        /* ─── BOTTOM GRID (projects left + quick actions right) ─── */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) { .bottom-grid { grid-template-columns: 1fr; } }
+
         /* ─── SECTIONS ─── */
         .section {
             background: var(--warm-white);
             border: 1px solid var(--stone);
             border-radius: 16px;
             padding: 28px 32px;
-            margin-bottom: 24px;
             box-shadow: var(--shadow-sm);
         }
 
@@ -342,9 +339,7 @@
             border: 1.5px solid var(--accent);
         }
 
-        .btn-outline:hover {
-            background: var(--accent-light);
-        }
+        .btn-outline:hover { background: var(--accent-light); }
 
         /* ─── QUICK ACTIONS ─── */
         .quick-actions {
@@ -468,7 +463,7 @@
 
         .welcome-banner { animation: fadeUp 0.5s ease both; }
         .stats-grid     { animation: fadeUp 0.5s 0.1s ease both; }
-        .section        { animation: fadeUp 0.5s 0.2s ease both; }
+        .bottom-grid    { animation: fadeUp 0.5s 0.2s ease both; }
     </style>
 </head>
 <body>
@@ -516,34 +511,67 @@
             <div class="welcome-date" id="currentDate"></div>
         </div>
 
-        <!-- Stats LEFT + Quick Actions RIGHT -->
-        <div class="main-grid">
-            <!-- Statistics -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <span class="stat-icon">📁</span>
-                    <div class="stat-number">{{ stats.total_projects }}</div>
-                    <div class="stat-label">Total Projects</div>
+        <!-- Stats Row (full width, 4 columns) -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-icon">📁</span>
+                <div class="stat-number">{{ stats.total_projects }}</div>
+                <div class="stat-label">Total Projects</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🚀</span>
+                <div class="stat-number">{{ stats.active_projects }}</div>
+                <div class="stat-label">Active Projects</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">💰</span>
+                <div class="stat-number">{{ stats.total_estimates }}</div>
+                <div class="stat-label">Estimates Received</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">📦</span>
+                <div class="stat-number">{{ stats.total_orders }}</div>
+                <div class="stat-label">Material Orders</div>
+            </div>
+        </div>
+
+        <!-- Bottom Grid: Recent Projects (left) + Quick Actions (right) -->
+        <div class="bottom-grid">
+
+            <!-- Recent Projects -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Projects</h2>
+                    <a href="{{ url_for('user.projects') }}" class="btn btn-outline">View All</a>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-icon">🚀</span>
-                    <div class="stat-number">{{ stats.active_projects }}</div>
-                    <div class="stat-label">Active Projects</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-icon">💰</span>
-                    <div class="stat-number">{{ stats.total_estimates }}</div>
-                    <div class="stat-label">Estimates Received</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-icon">📦</span>
-                    <div class="stat-number">{{ stats.total_orders }}</div>
-                    <div class="stat-label">Material Orders</div>
-                </div>
+
+                {% if projects %}
+                    {% for project in projects %}
+                    <div class="project-card">
+                        <div class="project-info">
+                            <div class="project-title">{{ project.title }}</div>
+                            <div class="project-details">
+                                <span>📏 {{ project.square_feet }} sq ft</span>
+                                <span>🚪 {{ project.rooms }} rooms</span>
+                                <span>🏢 {{ project.floors }} floors</span>
+                            </div>
+                        </div>
+                        <span class="status-badge status-{{ project.status }}">
+                            {{ project.status.upper() }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📂</div>
+                        <p>No projects yet. Create your first project to get started!</p>
+                        <a href="{{ url_for('user.create_project') }}" class="btn btn-primary">Create Project</a>
+                    </div>
+                {% endif %}
             </div>
 
             <!-- Quick Actions -->
-            <div class="section" style="margin-bottom:0;">
+            <div class="section">
                 <div class="section-header">
                     <h2 class="section-title">Quick Actions</h2>
                 </div>
@@ -568,49 +596,16 @@
                     {% endif %}
                 </div>
             </div>
-        </div>
 
-        <!-- Recent Projects -->
-        <div class="section">
-            <div class="section-header">
-                <h2 class="section-title">Recent Projects</h2>
-                <a href="{{ url_for('user.projects') }}" class="btn btn-outline">View All</a>
-            </div>
-
-            {% if projects %}
-                {% for project in projects %}
-                <div class="project-card">
-                    <div class="project-info">
-                        <div class="project-title">{{ project.title }}</div>
-                        <div class="project-details">
-                            <span>📏 {{ project.square_feet }} sq ft</span>
-                            <span>🚪 {{ project.rooms }} rooms</span>
-                            <span>🏢 {{ project.floors }} floors</span>
-                        </div>
-                    </div>
-                    <span class="status-badge status-{{ project.status }}">
-                        {{ project.status.upper() }}
-                    </span>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-state">
-                    <div class="empty-state-icon">📂</div>
-                    <p>No projects yet. Create your first project to get started!</p>
-                    <a href="{{ url_for('user.create_project') }}" class="btn btn-primary">Create Project</a>
-                </div>
-            {% endif %}
         </div>
 
     </div>
 
     <script>
-        // Show current date in welcome banner
         document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
 
-        // Update message badge
         function updateMessageBadge() {
             fetch('/user/messages/unread-count')
                 .then(response => {
@@ -630,10 +625,9 @@
                         badge.style.display = 'none';
                     }
                 })
-                .catch(() => {}); // silently ignore network/parse errors
+                .catch(() => {});
         }
 
-        // Update notification badge
         function updateNotificationBadge() {
             fetch('/user/notifications/unread-count')
                 .then(response => {
@@ -652,16 +646,14 @@
                         badge.style.display = 'none';
                     }
                 })
-                .catch(() => {}); // silently ignore network/parse errors
+                .catch(() => {});
         }
 
-        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             updateMessageBadge();
             updateNotificationBadge();
         });
 
-        // Update every 30 seconds
         setInterval(() => {
             updateMessageBadge();
             updateNotificationBadge();

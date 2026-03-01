@@ -322,11 +322,6 @@
             color: #999;
         }
         
-        .chat-contact-info {
-            font-size: 12px;
-            color: #666;
-        }
-        
         .messages-container {
             flex: 1;
             overflow-y: auto;
@@ -550,27 +545,10 @@
             border-radius: 3px;
         }
         
-        .conversations-list::-webkit-scrollbar-thumb:hover,
-        .messages-container::-webkit-scrollbar-thumb:hover {
-            background: #999;
-        }
-        
         /* Responsive */
         @media (max-width: 768px) {
             .navbar-menu {
                 display: none;
-            }
-            
-            .navbar-menu.mobile-active {
-                display: flex;
-                position: fixed;
-                top: 60px;
-                left: 0;
-                right: 0;
-                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                flex-direction: column;
-                padding: 20px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             }
             
             .conversations-panel {
@@ -625,7 +603,7 @@
             <a href="{{ url_for('contractor.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('contractor.browse_projects') }}">Browse Projects</a>
             <a href="{{ url_for('contractor.my_bids') }}">My Bids</a>
-             <a href="{{ url_for('contractor.messages') }}" style="background: rgba(255,255,255,0.2);">
+            <a href="{{ url_for('contractor.messages') }}" style="background: rgba(255,255,255,0.2);">
                 Messages
                 <span class="unread-indicator" id="navUnreadBadge" style="display: none;">0</span>
             </a>
@@ -683,52 +661,54 @@
         let messages = [];
         let refreshInterval = null;
         
+        // ✅ Read query params from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoOpenUserId = urlParams.get('open_user');
+        const autoOpenUserName = urlParams.get('user_name') || 'Customer';
+        
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            loadConversations();
+            loadConversationsAPI();
             setupEventListeners();
             startAutoRefresh();
+            updateUnreadCount();
         });
         
         function setupEventListeners() {
-            // Search
             document.getElementById('searchInput').addEventListener('input', function(e) {
                 searchConversations(e.target.value);
             });
         }
         
-        function loadConversations() {
-            fetch('/contractor/messages')
-                .then(response => response.text())
-                .then(html => {
-                    // Extract conversations data from the response
-                    // Since we're getting the full HTML page, we need to adjust this
-                    // Let's create a proper API endpoint instead
-                    console.log('Loaded conversations page');
-                })
-                .catch(error => {
-                    console.error('Error loading conversations:', error);
-                    showEmptyConversations();
-                });
-            
-            // Better approach: use a dedicated API endpoint
-            loadConversationsAPI();
-            updateUnreadCount();
-        }
-        
         function loadConversationsAPI() {
-            // This would be a new endpoint you create
             fetch('/contractor/api/conversations')
                 .then(response => response.json())
                 .then(data => {
                     conversations = data.conversations || [];
                     renderConversations(conversations);
                     updateUnreadCount();
+
+                    // ✅ Auto-open chat if open_user param is present in URL
+                    if (autoOpenUserId) {
+                        // Check if this user already has a conversation
+                        const existing = conversations.find(c => c.user_id === autoOpenUserId);
+                        if (existing) {
+                            // Highlight their conversation item and open it
+                            openConversationById(autoOpenUserId);
+                        } else {
+                            // No prior conversation – open a fresh chat directly
+                            openFreshChat(autoOpenUserId, autoOpenUserName);
+                        }
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    // Fallback: show empty state
                     showEmptyConversations();
+
+                    // Still try to open fresh chat if param is present
+                    if (autoOpenUserId) {
+                        openFreshChat(autoOpenUserId, autoOpenUserName);
+                    }
                 });
         }
         
@@ -742,10 +722,9 @@
             
             container.innerHTML = convs.map(conv => `
                 <div class="conversation-item ${conv.unread_count > 0 ? 'unread' : ''} ${currentUserId === conv.user_id ? 'active' : ''}" 
-                     onclick="openConversation('${conv.user_id}')">
-                    <div class="conversation-avatar">
-                        👤
-                    </div>
+                     id="conv-${conv.user_id}"
+                     onclick="openConversationFromItem(event, '${conv.user_id}')">
+                    <div class="conversation-avatar">👤</div>
                     <div class="conversation-content">
                         <div class="conversation-header">
                             <span class="conversation-name">${conv.sender_name}</span>
@@ -768,37 +747,50 @@
                 </div>
             `;
         }
-        
-        function openConversation(userId) {
+
+        // ✅ Open conversation by user ID (used by auto-open logic)
+        function openConversationById(userId) {
             currentUserId = userId;
-            
-            // Update active state
+
+            document.querySelectorAll('.conversation-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const item = document.getElementById('conv-' + userId);
+            if (item) item.classList.add('active');
+
+            // On mobile: swap panels
+            document.getElementById('conversationsPanel').classList.add('hidden');
+            document.getElementById('chatPanel').classList.remove('hidden');
+
+            loadMessagesAPI(userId);
+        }
+
+        // ✅ Click handler for conversation list items (needs event)
+        function openConversationFromItem(event, userId) {
+            currentUserId = userId;
+
             document.querySelectorAll('.conversation-item').forEach(item => {
                 item.classList.remove('active');
             });
             event.currentTarget.classList.add('active');
-            
-            // Show chat panel on mobile
+
             document.getElementById('conversationsPanel').classList.add('hidden');
             document.getElementById('chatPanel').classList.remove('hidden');
-            
-            // Load messages
-            loadMessages(userId);
-        }
-        
-        function loadMessages(userId) {
-            fetch(`/contractor/messages/chat/${userId}`)
-                .then(response => response.text())
-                .then(html => {
-                    // Extract messages from HTML or use API
-                    console.log('Loaded messages');
-                })
-                .catch(error => {
-                    console.error('Error loading messages:', error);
-                });
-            
-            // Better: use API endpoint
+
             loadMessagesAPI(userId);
+        }
+
+        // ✅ Open a fresh chat window for a user with no prior conversation
+        function openFreshChat(userId, userName) {
+            currentUserId = userId;
+
+            // On mobile: swap panels
+            document.getElementById('conversationsPanel').classList.add('hidden');
+            document.getElementById('chatPanel').classList.remove('hidden');
+
+            // Render the chat UI immediately with empty messages
+            messages = [];
+            renderChat(userId, { name: decodeURIComponent(userName), email: '', phone: '' });
         }
         
         function loadMessagesAPI(userId) {
@@ -806,7 +798,7 @@
                 .then(response => response.json())
                 .then(data => {
                     messages = data.messages || [];
-                    const userInfo = data.user_info || {name: 'Customer', email: '', phone: ''};
+                    const userInfo = data.user_info || { name: 'Customer', email: '', phone: '' };
                     renderChat(userId, userInfo);
                 })
                 .catch(error => {
@@ -824,10 +816,10 @@
                     <div class="chat-info">
                         <div class="chat-name">${userInfo.name}</div>
                     </div>
-                        <div class="chat-status">
+                    <div class="chat-status">
                         <a href="/contractor/user/${userId}/profile" style="color: #4facfe; text-decoration: none; font-size: 13px;">
-                        👤 View Profile
-                    </a>
+                            👤 View Profile
+                        </a>
                     </div>
                 </div>
                 
@@ -838,18 +830,14 @@
                 <div class="message-input-container">
                     <form id="messageForm" onsubmit="sendMessage(event, '${userId}')">
                         <div class="message-input-wrapper">
-                            <button type="button" class="attach-btn" title="Attach file">
-                                📎
-                            </button>
+                            <button type="button" class="attach-btn" title="Attach file">📎</button>
                             <div class="message-input">
                                 <textarea id="messageInput" 
                                           placeholder="Type your message..." 
                                           rows="1"
                                           onkeypress="handleKeyPress(event)"></textarea>
                             </div>
-                            <button type="submit" class="send-button" id="sendBtn">
-                                ➤
-                            </button>
+                            <button type="submit" class="send-button" id="sendBtn">➤</button>
                         </div>
                     </form>
                 </div>
@@ -858,8 +846,8 @@
             // Auto-resize textarea
             const textarea = document.getElementById('messageInput');
             textarea.addEventListener('input', autoResizeTextarea);
+            textarea.focus();
             
-            // Scroll to bottom
             scrollToBottom();
         }
         
@@ -891,16 +879,10 @@
                 const isSent = msg.direction === 'outgoing';
                 html += `
                     <div class="message ${isSent ? 'sent' : 'received'}">
-                        <div class="message-avatar">
-                            ${isSent ? '📦' : '👤'}
-                        </div>
+                        <div class="message-avatar">${isSent ? '📦' : '👤'}</div>
                         <div class="message-content">
-                            <div class="message-bubble">
-                                ${escapeHtml(msg.message)}
-                            </div>
-                            <div class="message-time">
-                                ${formatMessageTime(msg.created_at)}
-                            </div>
+                            <div class="message-bubble">${escapeHtml(msg.message)}</div>
+                            <div class="message-time">${formatMessageTime(msg.created_at)}</div>
                         </div>
                     </div>
                 `;
@@ -930,7 +912,6 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Add message to local array
                     messages.push({
                         message: message,
                         direction: 'outgoing',
@@ -938,18 +919,13 @@
                         sender_type: 'contractor'
                     });
                     
-                    // Re-render messages
                     const container = document.getElementById('messagesContainer');
                     container.innerHTML = renderMessages();
                     
-                    // Clear input
                     input.value = '';
                     input.style.height = 'auto';
                     
-                    // Scroll to bottom
                     scrollToBottom();
-                    
-                    // Reload conversations to update preview
                     loadConversationsAPI();
                 } else {
                     alert('Failed to send message: ' + data.message);
@@ -1004,8 +980,6 @@
                 .then(response => response.json())
                 .then(data => {
                     const count = data.count || 0;
-                    
-                    // Update navbar badge
                     const navBadge = document.getElementById('navUnreadBadge');
                     if (count > 0) {
                         navBadge.textContent = count;
@@ -1013,8 +987,6 @@
                     } else {
                         navBadge.style.display = 'none';
                     }
-                    
-                    // Update conversations header
                     const unreadCountEl = document.getElementById('unreadCount');
                     if (count > 0) {
                         unreadCountEl.textContent = count;
@@ -1023,13 +995,10 @@
                         unreadCountEl.style.display = 'none';
                     }
                 })
-                .catch(error => {
-                    console.error('Error getting unread count:', error);
-                });
+                .catch(error => console.error('Error getting unread count:', error));
         }
         
         function startAutoRefresh() {
-            // Refresh every 30 seconds
             refreshInterval = setInterval(() => {
                 if (currentUserId) {
                     loadMessagesAPI(currentUserId);
@@ -1042,14 +1011,12 @@
         // Utility functions
         function formatTime(timestamp) {
             if (!timestamp) return '';
-            
             const date = new Date(timestamp);
             const now = new Date();
             const diff = now - date;
             const minutes = Math.floor(diff / 60000);
             const hours = Math.floor(diff / 3600000);
             const days = Math.floor(diff / 86400000);
-            
             if (minutes < 1) return 'Just now';
             if (minutes < 60) return `${minutes}m ago`;
             if (hours < 24) return `${hours}h ago`;
@@ -1062,27 +1029,14 @@
             const today = new Date();
             const yesterday = new Date(today);
             yesterday.setDate(yesterday.getDate() - 1);
-            
-            if (date.toDateString() === today.toDateString()) {
-                return 'Today';
-            } else if (date.toDateString() === yesterday.toDateString()) {
-                return 'Yesterday';
-            } else {
-                return date.toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric', 
-                    year: 'numeric' 
-                });
-            }
+            if (date.toDateString() === today.toDateString()) return 'Today';
+            if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         }
         
         function formatMessageTime(timestamp) {
             const date = new Date(timestamp);
-            return date.toLocaleTimeString('en-US', { 
-                hour: 'numeric', 
-                minute: '2-digit', 
-                hour12: true 
-            });
+            return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
         }
         
         function escapeHtml(text) {
@@ -1091,11 +1045,8 @@
             return div.innerHTML;
         }
         
-        // Cleanup on page unload
         window.addEventListener('beforeunload', function() {
-            if (refreshInterval) {
-                clearInterval(refreshInterval);
-            }
+            if (refreshInterval) clearInterval(refreshInterval);
         });
     </script>
 </body>

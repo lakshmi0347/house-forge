@@ -440,33 +440,12 @@
                         <span>📧</span>
                         <span>{{ user_data.email }}</span>
                     </div>
-                    {% if user_data.phone != 'N/A' %}
-                    <div class="profile-meta-item">
-                        <span>📱</span>
-                        <span>{{ user_data.phone }}</span>
-                    </div>
-                    {% endif %}
                     {% if user_data.location != 'N/A' %}
                     <div class="profile-meta-item">
                         <span>📍</span>
                         <span>{{ user_data.location }}</span>
                     </div>
                     {% endif %}
-                </div>
-                
-                <div class="profile-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">{{ stats.total_projects }}</div>
-                        <div class="stat-label">Total Projects</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">{{ stats.active_projects }}</div>
-                        <div class="stat-label">Active</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">{{ stats.completed_projects }}</div>
-                        <div class="stat-label">Completed</div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -501,8 +480,8 @@
         <!-- Quick Actions -->
         <div class="section">
             <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                <a href="{{ url_for('contractor.messages') }}?open_user={{ user_data.id }}" class="btn btn-primary">
-                  💬 Send Message
+                <a href="{{ url_for('contractor.messages') }}?open_user={{ user_data.id }}&user_name={{ user_data.name | urlencode }}" class="btn btn-primary">
+                    💬 Send Message
                 </a>
                 <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-outline">
                     🔍 View Available Projects
@@ -528,10 +507,7 @@
                 .catch(error => console.error('Error fetching unread count:', error));
         }
         
-        // Update badge on page load
         updateMessageBadge();
-        
-        // Update badge every 30 seconds
         setInterval(updateMessageBadge, 30000);
     </script>
 </body>

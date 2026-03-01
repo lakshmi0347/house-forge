@@ -707,31 +707,30 @@ def messages_unread_count():
     try:
         db = get_db()
         if not db:
-            return jsonify({'count': 0})
-        
-        # Get all messages for this contractor
+            return jsonify({'count': 0}), 200
+
         messages_ref = db.collection('messages').where('contractor_id', '==', current_user.id).stream()
-        
+
         unread_count = 0
         for doc in messages_ref:
             message_data = doc.to_dict()
-            
-            # Skip outgoing messages (where this contractor is the sender)
+            # Skip messages sent BY this contractor
             if message_data.get('sender_id') == current_user.id and message_data.get('sender_type') == 'contractor':
                 continue
-            
-            # Count unread incoming messages
             if not message_data.get('read', False):
                 unread_count += 1
-        
-        return jsonify({'count': unread_count}), 200, {'Content-Type': 'application/json'}
-        
+
+        response = jsonify({'count': unread_count})
+        response.headers['Content-Type'] = 'application/json'
+        return response, 200
+
     except Exception as e:
         print(f"Error getting unread count: {str(e)}")
         import traceback
         traceback.print_exc()
-        # Always return valid JSON even on error
-        return jsonify({'count': 0, 'error': str(e)}), 200, {'Content-Type': 'application/json'}
+        response = jsonify({'count': 0, 'error': str(e)})
+        response.headers['Content-Type'] = 'application/json'
+        return response, 200
     
 @contractor_bp.route('/project/<project_id>/complete', methods=['POST'])
 @login_required

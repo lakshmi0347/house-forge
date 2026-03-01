@@ -4,301 +4,481 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard - House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --cream: #FAF8F5;
+            --warm-white: #FFFFFF;
+            --sand: #F0EBE3;
+            --stone: #E2D9CE;
+            --accent: #B5804F;
+            --accent-dark: #8C5E35;
+            --accent-light: #F7EDE2;
+            --text-primary: #1C1917;
+            --text-secondary: #6B5E52;
+            --text-muted: #9C8E84;
+            --border: rgba(181,128,79,0.15);
+            --shadow-sm: 0 1px 3px rgba(28,25,23,0.06), 0 1px 2px rgba(28,25,23,0.04);
+            --shadow-md: 0 4px 16px rgba(28,25,23,0.08), 0 2px 6px rgba(28,25,23,0.05);
+            --shadow-lg: 0 12px 40px rgba(28,25,23,0.10), 0 4px 12px rgba(28,25,23,0.06);
         }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--cream);
+            min-height: 100vh;
+            position: relative;
+            color: var(--text-primary);
         }
-        
+
+        /* Subtle background image with light overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: url('/static/images/house.jpg') no-repeat center center / cover;
+            opacity: 0.10;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ─── NAVBAR ─── */
         .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 30px;
+            background: var(--warm-white);
+            border-bottom: 1px solid var(--stone);
+            padding: 0 40px;
+            height: 68px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
         }
-        
+
         .navbar-brand {
-            font-size: 24px;
-            font-weight: bold;
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
+
+        .navbar-brand span.icon {
+            font-size: 20px;
+        }
+
         .navbar-menu {
             display: flex;
-            gap: 20px;
             align-items: center;
+            gap: 4px;
         }
-        
+
         .navbar-menu a {
-            color: white;
+            color: var(--text-secondary);
             text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            transition: background 0.3s;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
             position: relative;
-            display: inline-block;
         }
-        
+
         .navbar-menu a:hover {
-            background: rgba(255,255,255,0.2);
+            color: var(--accent);
+            background: var(--accent-light);
         }
-        
+
         .badge-notification {
             position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #ff3b30;
+            top: 2px;
+            right: 2px;
+            background: #DC2626;
             color: white;
             border-radius: 50%;
-            width: 22px;
-            height: 22px;
+            width: 18px;
+            height: 18px;
             display: none;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
-            font-weight: bold;
-            pointer-events: none;
-            z-index: 10;
+            font-size: 10px;
+            font-weight: 700;
+            border: 2px solid var(--warm-white);
         }
-        
+
         .profile-pic {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid white;
+            border: 2px solid var(--stone);
             cursor: pointer;
-            transition: transform 0.3s;
+            transition: all 0.2s;
         }
-        
-        .profile-pic:hover {
-            transform: scale(1.1);
-        }
-        
+
+        .profile-pic:hover { border-color: var(--accent); }
+
         .profile-placeholder {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: white;
-            color: #667eea;
+            background: var(--accent-light);
+            color: var(--accent);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-            border: 2px solid white;
+            font-weight: 600;
+            font-size: 14px;
+            border: 2px solid var(--stone);
             cursor: pointer;
-            transition: transform 0.3s;
+            transition: all 0.2s;
         }
-        
-        .profile-placeholder:hover {
-            transform: scale(1.1);
+
+        .profile-placeholder:hover { border-color: var(--accent); }
+
+        .logout-link {
+            color: var(--text-muted) !important;
+            font-size: 13px !important;
         }
-        
+
+        /* ─── LAYOUT ─── */
         .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
+            max-width: 1180px;
+            margin: 40px auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
         }
-        
+
+        /* ─── WELCOME BANNER ─── */
         .welcome-banner {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            background: var(--warm-white);
+            border: 1px solid var(--stone);
+            border-radius: 16px;
+            padding: 36px 40px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .welcome-banner h1 {
-            color: #333;
-            margin-bottom: 10px;
+
+        .welcome-banner::after {
+            
+            position: absolute;
+            right: -20px;
+            top: -30px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--accent-light) 0%, transparent 70%);
+            pointer-events: none;
         }
-        
-        .welcome-banner p {
-            color: #666;
+
+        .welcome-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
         }
-        
+
+        .welcome-text p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        .welcome-date {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            white-space: nowrap;
+            text-align: right;
+            padding-top: 4px;
+            position: relative;
+            z-index: 1;
+            background: var(--warm-white);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--stone);
+            flex-shrink: 0;
+        }
+
+        /* ─── MAIN GRID (stats + actions side by side) ─── */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px;
+            margin-bottom: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+
+        /* ─── STATS ─── */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
         }
-        
+
         .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            text-align: center;
+            background: var(--warm-white);
+            border: 1px solid var(--stone);
+            border-radius: 14px;
+            padding: 24px 22px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), #D4A27A);
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .stat-card:hover::before { opacity: 1; }
+
         .stat-icon {
-            font-size: 48px;
-            margin-bottom: 10px;
+            font-size: 28px;
+            margin-bottom: 12px;
+            display: block;
         }
-        
+
         .stat-number {
-            font-size: 36px;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 5px;
+            font-family: 'Playfair Display', serif;
+            font-size: 38px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 6px;
         }
-        
+
         .stat-label {
-            color: #666;
-            font-size: 14px;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
         }
-        
+
+        /* ─── SECTIONS ─── */
         .section {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            background: var(--warm-white);
+            border: 1px solid var(--stone);
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
         }
-        
+
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--sand);
         }
-        
+
         .section-title {
-            font-size: 20px;
-            color: #333;
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
             font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
         }
-        
+
+        /* ─── BUTTONS ─── */
         .btn {
-            padding: 10px 20px;
+            padding: 9px 20px;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.3s;
+            font-size: 13px;
+            transition: all 0.2s;
             border: none;
             cursor: pointer;
             display: inline-block;
         }
-        
+
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--accent);
             color: white;
         }
-        
+
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            background: var(--accent-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(181,128,79,0.3);
         }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
+
+        .btn-outline {
+            background: transparent;
+            color: var(--accent);
+            border: 1.5px solid var(--accent);
         }
-        
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 15px;
+
+        .btn-outline:hover {
+            background: var(--accent-light);
         }
-        
-        .project-card {
-            border: 2px solid #f0f0f0;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-        }
-        
-        .project-card:hover {
-            border-color: #667eea;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .project-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .project-details {
-            display: flex;
-            gap: 20px;
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .status-planning {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
-        .status-active {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-        
-        .status-completed {
-            background: #d4edda;
-            color: #155724;
-        }
-        
+
+        /* ─── QUICK ACTIONS ─── */
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
-        
+
         .action-card {
-            padding: 20px;
-            border: 2px solid #f0f0f0;
-            border-radius: 10px;
+            padding: 24px 18px;
+            border: 1.5px solid var(--stone);
+            background: var(--sand);
+            border-radius: 14px;
             text-align: center;
             text-decoration: none;
-            color: #333;
-            transition: all 0.3s;
+            color: var(--text-primary);
+            transition: all 0.25s;
+            display: block;
         }
-        
+
         .action-card:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
+            border-color: var(--accent);
+            background: var(--accent-light);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
         }
-        
+
         .action-icon {
-            font-size: 36px;
+            font-size: 30px;
             margin-bottom: 10px;
+            display: block;
         }
-        
+
         .action-label {
             font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
         }
+
+        /* ─── PROJECT CARDS ─── */
+        .project-card {
+            border: 1px solid var(--stone);
+            background: var(--cream);
+            padding: 20px 22px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .project-card:last-child { margin-bottom: 0; }
+
+        .project-card:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            box-shadow: var(--shadow-sm);
+            transform: translateX(4px);
+        }
+
+        .project-info { flex: 1; }
+
+        .project-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .project-details {
+            display: flex;
+            gap: 18px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .project-details span { display: flex; align-items: center; gap: 4px; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .status-planning  { background: #FEF3C7; color: #92400E; }
+        .status-active    { background: #DBEAFE; color: #1E40AF; }
+        .status-completed { background: #D1FAE5; color: #065F46; }
+
+        /* ─── EMPTY STATE ─── */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon { font-size: 52px; margin-bottom: 14px; opacity: 0.6; }
+        .empty-state p { font-size: 15px; margin-bottom: 20px; }
+
+        /* ─── DIVIDER ─── */
+        .divider {
+            width: 40px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+            margin-top: 8px;
+        }
+
+        /* ─── ANIMATIONS ─── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-banner { animation: fadeUp 0.5s ease both; }
+        .stats-grid     { animation: fadeUp 0.5s 0.1s ease both; }
+        .section        { animation: fadeUp 0.5s 0.2s ease both; }
     </style>
 </head>
 <body>
+
     <!-- Navigation Bar -->
     <nav class="navbar">
-        <div class="navbar-brand">🏗️ House-Forge</div>
+        <div class="navbar-brand">
+            <span class="icon">🏗️</span>
+            House-Forge
+        </div>
         <div class="navbar-menu">
             <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('user.projects') }}">My Projects</a>
@@ -308,103 +488,105 @@
                 <span class="badge-notification" id="messagesBadge">0</span>
             </a>
             <a href="{{ url_for('user.notifications') }}" style="position: relative;">
-             Notifications
-             <span class="badge-notification" id="notificationsBadge">0</span>
+                Notifications
+                <span class="badge-notification" id="notificationsBadge">0</span>
             </a>
-            <a href="{{ url_for('user.profile') }}">
+            <a href="{{ url_for('user.profile') }}" style="padding: 8px 10px;">
                 {% if user_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" 
-                         alt="Profile" 
-                         class="profile-pic">
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
                 {% else %}
                     <div class="profile-placeholder">
                         {{ current_user.name[0].upper() if current_user.name else 'U' }}
                     </div>
                 {% endif %}
             </a>
-            <a href="{{ url_for('auth.logout') }}">Logout</a>
+            <a href="{{ url_for('auth.logout') }}" class="logout-link">Logout</a>
         </div>
     </nav>
-    
+
     <div class="container">
+
         <!-- Welcome Banner -->
         <div class="welcome-banner">
-            <h1>👋 Welcome back, {{ current_user.name }}!</h1>
-            <p>Here's what's happening with your projects</p>
+            <div class="welcome-text">
+                <h1>Welcome back, {{ current_user.name }} 👋</h1>
+                <div class="divider" style="margin-top:12px; margin-bottom:10px;"></div>
+                <p>Here's what's happening with your projects</p>
+            </div>
+            <div class="welcome-date" id="currentDate"></div>
         </div>
-        
-        <!-- Statistics -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">📁</div>
-                <div class="stat-number">{{ stats.total_projects }}</div>
-                <div class="stat-label">Total Projects</div>
+
+        <!-- Stats LEFT + Quick Actions RIGHT -->
+        <div class="main-grid">
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-icon">📁</span>
+                    <div class="stat-number">{{ stats.total_projects }}</div>
+                    <div class="stat-label">Total Projects</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🚀</span>
+                    <div class="stat-number">{{ stats.active_projects }}</div>
+                    <div class="stat-label">Active Projects</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">💰</span>
+                    <div class="stat-number">{{ stats.total_estimates }}</div>
+                    <div class="stat-label">Estimates Received</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">📦</span>
+                    <div class="stat-number">{{ stats.total_orders }}</div>
+                    <div class="stat-label">Material Orders</div>
+                </div>
             </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">🚀</div>
-                <div class="stat-number">{{ stats.active_projects }}</div>
-                <div class="stat-label">Active Projects</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">💰</div>
-                <div class="stat-number">{{ stats.total_estimates }}</div>
-                <div class="stat-label">Estimates Received</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">📦</div>
-                <div class="stat-number">{{ stats.total_orders }}</div>
-                <div class="stat-label">Material Orders</div>
-            </div>
-        </div>
-        
-        <!-- Quick Actions -->
-        <div class="section">
-            <div class="section-header">
-                <h2 class="section-title">Quick Actions</h2>
-            </div>
-            <div class="quick-actions">
-                <a href="{{ url_for('user.create_project') }}" class="action-card">
-                    <div class="action-icon">➕</div>
-                    <div class="action-label">New Project</div>
-                </a>
-                
-                <a href="{{ url_for('user.find_contractors') }}" class="action-card">
-                    <div class="action-icon">🔨</div>
-                    <div class="action-label">Find Contractors</div>
-                </a>
-                
-                <a href="{{ url_for('user.find_suppliers') }}" class="action-card">
-                    <div class="action-icon">📦</div>
-                    <div class="action-label">Find Suppliers</div>
-                </a>
-                {% if projects %}
-                  <a href="{{ url_for('user.project_bids', project_id=projects[0].id) }}" class="action-card">
-                    <div class="action-icon">💼</div>
-                    <div class="action-label">View Bids</div>
-                </a>
-             {% endif %}
-                
+
+            <!-- Quick Actions -->
+            <div class="section" style="margin-bottom:0;">
+                <div class="section-header">
+                    <h2 class="section-title">Quick Actions</h2>
+                </div>
+                <div class="quick-actions">
+                    <a href="{{ url_for('user.create_project') }}" class="action-card">
+                        <span class="action-icon">➕</span>
+                        <div class="action-label">New Project</div>
+                    </a>
+                    <a href="{{ url_for('user.find_contractors') }}" class="action-card">
+                        <span class="action-icon">🔨</span>
+                        <div class="action-label">Find Contractors</div>
+                    </a>
+                    <a href="{{ url_for('user.find_suppliers') }}" class="action-card">
+                        <span class="action-icon">📦</span>
+                        <div class="action-label">Find Suppliers</div>
+                    </a>
+                    {% if projects %}
+                    <a href="{{ url_for('user.project_bids', project_id=projects[0].id) }}" class="action-card">
+                        <span class="action-icon">💼</span>
+                        <div class="action-label">View Bids</div>
+                    </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        
+
         <!-- Recent Projects -->
         <div class="section">
             <div class="section-header">
                 <h2 class="section-title">Recent Projects</h2>
-                <a href="{{ url_for('user.projects') }}" class="btn btn-primary">View All</a>
+                <a href="{{ url_for('user.projects') }}" class="btn btn-outline">View All</a>
             </div>
-            
+
             {% if projects %}
                 {% for project in projects %}
                 <div class="project-card">
-                    <div class="project-title">{{ project.title }}</div>
-                    <div class="project-details">
-                        <span>📏 {{ project.square_feet }} sq ft</span>
-                        <span>🚪 {{ project.rooms }} rooms</span>
-                        <span>🏢 {{ project.floors }} floors</span>
+                    <div class="project-info">
+                        <div class="project-title">{{ project.title }}</div>
+                        <div class="project-details">
+                            <span>📏 {{ project.square_feet }} sq ft</span>
+                            <span>🚪 {{ project.rooms }} rooms</span>
+                            <span>🏢 {{ project.floors }} floors</span>
+                        </div>
                     </div>
                     <span class="status-badge status-{{ project.status }}">
                         {{ project.status.upper() }}
@@ -415,76 +597,75 @@
                 <div class="empty-state">
                     <div class="empty-state-icon">📂</div>
                     <p>No projects yet. Create your first project to get started!</p>
-                    <br>
                     <a href="{{ url_for('user.create_project') }}" class="btn btn-primary">Create Project</a>
                 </div>
             {% endif %}
         </div>
+
     </div>
-    
+
     <script>
+        // Show current date in welcome banner
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+
         // Update message badge
         function updateMessageBadge() {
-            console.log('🔄 Fetching unread message count...');
             fetch('/user/messages/unread-count')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) return null;
+                    const ct = response.headers.get('content-type') || '';
+                    if (!ct.includes('application/json')) return null;
+                    return response.json();
+                })
                 .then(data => {
-                    console.log('📊 Unread count:', data.count);
+                    if (!data) return;
                     const badge = document.getElementById('messagesBadge');
-                    if (!badge) {
-                        console.error('❌ Badge element not found!');
-                        return;
-                    }
+                    if (!badge) return;
                     if (data.count > 0) {
                         badge.textContent = data.count;
                         badge.style.display = 'flex';
-                        console.log('✅ Badge updated to show:', data.count);
                     } else {
                         badge.style.display = 'none';
-                        console.log('✅ Badge hidden (no unread messages)');
                     }
                 })
-                .catch(error => {
-                    console.error('❌ Error fetching unread count:', error);
-                });
+                .catch(() => {}); // silently ignore network/parse errors
         }
-        
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Page loaded, initializing...');
-            updateMessageBadge();
-        });
-        
-        // Update badge every 30 seconds
-        setInterval(updateMessageBadge, 30000);
 
         // Update notification badge
-    function updateNotificationBadge() {
-        fetch('/user/notifications/unread-count')
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.getElementById('notificationsBadge');
-                if (data.count > 0) {
-                    badge.textContent = data.count;
-                    badge.style.display = 'flex';
-                } else {
-                    badge.style.display = 'none';
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    }
-    
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        updateMessageBadge();
-        updateNotificationBadge(); // ADD THIS
-    });
-    
-    // Update every 30 seconds
-    setInterval(() => {
-        updateMessageBadge();
-        updateNotificationBadge(); // ADD THIS
-    }, 30000);
+        function updateNotificationBadge() {
+            fetch('/user/notifications/unread-count')
+                .then(response => {
+                    if (!response.ok) return null;
+                    const ct = response.headers.get('content-type') || '';
+                    if (!ct.includes('application/json')) return null;
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data) return;
+                    const badge = document.getElementById('notificationsBadge');
+                    if (data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                })
+                .catch(() => {}); // silently ignore network/parse errors
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateMessageBadge();
+            updateNotificationBadge();
+        });
+
+        // Update every 30 seconds
+        setInterval(() => {
+            updateMessageBadge();
+            updateNotificationBadge();
+        }, 30000);
     </script>
 </body>
 </html>

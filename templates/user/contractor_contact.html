@@ -4,271 +4,151 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Contractor - House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-        }
-        
-        .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .navbar-brand {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 0 20px;
-        }
-        
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-        
-        .back-link:hover {
-            text-decoration: underline;
-        }
-        
-        .contact-card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .card-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .contractor-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            color: white;
-            margin: 0 auto 20px;
-            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.3);
-        }
-        
-        .contractor-name {
-            font-size: 28px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        
-        .contractor-type {
-            font-size: 16px;
-            color: #666;
-        }
-        
-        .contact-methods {
-            display: grid;
-            gap: 20px;
-        }
-        
-        .contact-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            transition: all 0.3s;
-        }
-        
-        .contact-item:hover {
-            background: #e9ecef;
-            transform: translateX(5px);
-        }
-        
-        .contact-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .contact-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
-        
-        .contact-details {
-            flex: 1;
-        }
-        
-        .contact-label {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-        
-        .contact-value {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .contact-action {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-        
-        .contact-action:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
-        }
-        
-        .info-note {
-            background: #fff9e6;
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 30px;
-            border-left: 4px solid #ffc107;
-        }
-        
-        .info-note-title {
-            font-weight: 600;
-            color: #856404;
-            margin-bottom: 10px;
-        }
-        
-        .info-note-text {
-            color: #856404;
-            font-size: 14px;
-            line-height: 1.6;
-        }
+        :root{--cream:#FAF8F5;--warm-white:#FFFFFF;--sand:#F0EBE3;--stone:#E2D9CE;--accent:#B5804F;--accent-dark:#8C5E35;--accent-light:#F7EDE2;--text-primary:#1C1917;--text-secondary:#6B5E52;--text-muted:#9C8E84;--shadow-sm:0 1px 3px rgba(28,25,23,0.06);--shadow-md:0 4px 16px rgba(28,25,23,0.08);--shadow-lg:0 12px 40px rgba(28,25,23,0.10);}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;color:var(--text-primary);position:relative;}
+        body::before{content:'';position:fixed;inset:0;background:url('/static/images/house.jpg') no-repeat center/cover;opacity:0.08;z-index:0;pointer-events:none;}
 
-        .btn {
-            padding: 8px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-        }
-        .btn-primary:hover { transform: translateY(-2px); }
-        .btn-outline {
-            background: white;
-            color: #f5576c;
-            border: 2px solid #f5576c;
-        }
-        .btn-outline:hover { background: #f5576c; color: white; }
+        /* NAVBAR */
+        .navbar{background:var(--warm-white);border-bottom:1px solid var(--stone);padding:0 40px;height:68px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+        .navbar-brand{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:10px;text-decoration:none;}
+        .navbar-menu{display:flex;align-items:center;gap:4px;}
+        .navbar-menu a{color:var(--text-secondary);text-decoration:none;padding:8px 14px;border-radius:8px;font-size:14px;font-weight:500;transition:all 0.2s;}
+        .navbar-menu a:hover{color:var(--accent);background:var(--accent-light);}
+        .profile-pic{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--stone);cursor:pointer;}
+        .profile-pic:hover{border-color:var(--accent);}
+        .profile-placeholder{width:36px;height:36px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;border:2px solid var(--stone);cursor:pointer;}
+        .profile-placeholder:hover{border-color:var(--accent);}
+
+        /* LAYOUT */
+        .container{max-width:760px;margin:36px auto;padding:0 24px;position:relative;z-index:1;}
+        .back-link{display:inline-flex;align-items:center;gap:7px;color:var(--accent);text-decoration:none;font-weight:600;font-size:14px;margin-bottom:20px;transition:all 0.2s;}
+        .back-link:hover{color:var(--accent-dark);transform:translateX(-3px);}
+
+        /* CONTACT CARD */
+        .contact-card{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:40px;box-shadow:var(--shadow-md);}
+        .card-header{text-align:center;margin-bottom:36px;}
+        .entity-avatar{width:96px;height:96px;border-radius:50%;background:var(--accent-light);border:3px solid var(--stone);display:flex;align-items:center;justify-content:center;font-size:44px;margin:0 auto 18px;}
+        .entity-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--text-primary);margin-bottom:6px;}
+        .entity-type{color:var(--text-muted);font-size:14px;font-weight:500;}
+        .divider{width:40px;height:3px;background:var(--accent);border-radius:2px;margin:12px auto 0;}
+
+        /* CONTACT ITEMS */
+        .contact-methods{display:grid;gap:14px;}
+        .contact-item{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:var(--sand);border:1px solid var(--stone);border-radius:12px;transition:all 0.2s;gap:16px;}
+        .contact-item:hover{border-color:var(--accent);background:var(--accent-light);transform:translateX(4px);}
+        .contact-left{display:flex;align-items:center;gap:14px;}
+        .contact-icon{width:46px;height:46px;border-radius:50%;background:var(--warm-white);border:1px solid var(--stone);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+        .contact-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:3px;}
+        .contact-value{font-size:16px;font-weight:600;color:var(--text-primary);}
+        .contact-action{padding:9px 18px;background:var(--accent);color:white;text-decoration:none;border-radius:8px;font-weight:600;font-size:13px;transition:all 0.2s;white-space:nowrap;border:none;cursor:pointer;}
+        .contact-action:hover{background:var(--accent-dark);transform:translateY(-1px);}
+
+        /* TIP BOX */
+        .tip-box{background:#FEF9F0;border:1px solid #F0D9B0;border-left:4px solid var(--accent);border-radius:10px;padding:18px 20px;margin-top:28px;}
+        .tip-title{font-weight:600;color:var(--accent-dark);margin-bottom:6px;font-size:14px;}
+        .tip-text{color:var(--text-secondary);font-size:13px;line-height:1.6;}
+
+        /* QUOTE BTN */
+        .quote-btn-wrap{margin-top:24px;text-align:center;}
+        .btn-outline-accent{padding:11px 24px;background:transparent;color:var(--accent);border:1.5px solid var(--accent);border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+        .btn-outline-accent:hover{background:var(--accent-light);}
+
+        /* MODAL */
+        .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(28,25,23,0.5);z-index:1000;align-items:center;justify-content:center;}
+        .modal-overlay.open{display:flex;}
+        .modal-box{background:var(--warm-white);border-radius:16px;padding:36px;max-width:560px;width:90%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:modalIn 0.25s ease;}
+        @keyframes modalIn{from{opacity:0;transform:translateY(-20px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--sand);}
+        .modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--text-primary);}
+        .modal-close{background:none;border:none;font-size:24px;color:var(--text-muted);cursor:pointer;}
+        .modal-close:hover{color:var(--text-primary);}
+        .form-group{margin-bottom:18px;}
+        .form-label{display:block;margin-bottom:7px;color:var(--text-secondary);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;}
+        .form-control{width:100%;padding:11px 14px;border:1.5px solid var(--stone);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--warm-white);color:var(--text-primary);transition:all 0.2s;}
+        .form-control:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(181,128,79,0.12);}
+        textarea.form-control{resize:vertical;min-height:100px;}
+        .modal-footer{display:flex;gap:12px;margin-top:24px;}
+        .btn-ghost{flex:1;padding:12px;background:var(--sand);color:var(--text-secondary);border:1px solid var(--stone);border-radius:8px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+        .btn-primary{flex:1;padding:12px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+        .btn-primary:hover{background:var(--accent-dark);}
+        .alert-box{padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:14px;display:none;}
+        .alert-success{background:#D1FAE5;color:#065F46;border:1px solid #A7F3D0;}
+        .alert-error{background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        .contact-card{animation:fadeUp 0.5s ease both;}
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <div class="navbar-brand">🏗️ House-Forge</div>
+        <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">🏗️ House-Forge</a>
+        <div class="navbar-menu">
+            <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('user.projects') }}">My Projects</a>
+            <a href="{{ url_for('user.find_contractors') }}">Contractors</a>
+            <a href="{{ url_for('user.profile') }}" style="padding:8px 10px;">
+                {% if user_profile_picture %}
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
+                {% else %}
+                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('auth.logout') }}" style="color:var(--text-muted);font-size:13px;">Logout</a>
+        </div>
     </nav>
-    
+
     <div class="container">
-        <a href="javascript:history.back()" class="back-link">
-            ← Back
-        </a>
-        
+        <a href="javascript:history.back()" class="back-link">← Back</a>
+
         <div class="contact-card">
             <div class="card-header">
-                <div class="contractor-avatar">🔨</div>
-                <h1 class="contractor-name">{{ contractor.company_name or contractor.name }}</h1>
-                <div class="contractor-type">Professional Contractor</div>
+                <div class="entity-avatar">🔨</div>
+                <div class="entity-name">{{ contractor.company_name or contractor.name }}</div>
+                <div class="entity-type">Professional Contractor</div>
+                <div class="divider"></div>
             </div>
-            
+
             <div class="contact-methods">
-                <!-- Chat Message -->
                 <div class="contact-item">
-                    <div class="contact-info">
+                    <div class="contact-left">
                         <div class="contact-icon">💬</div>
-                        <div class="contact-details">
+                        <div>
                             <div class="contact-label">Send Message</div>
-                            <div class="contact-value">Chat directly with contractor</div>
+                            <div class="contact-value">Chat directly</div>
                         </div>
                     </div>
-                    <a href="{{ url_for('user.messages') }}?open={{ contractor.id }}&type=contractor" 
-                       class="contact-action">Chat</a>
+                    <a href="{{ url_for('user.messages') }}?open={{ contractor.id }}&type=contractor" class="contact-action">Chat</a>
                 </div>
-                <!-- Phone -->
+
                 <div class="contact-item">
-                    <div class="contact-info">
+                    <div class="contact-left">
                         <div class="contact-icon">📞</div>
-                        <div class="contact-details">
+                        <div>
                             <div class="contact-label">Phone</div>
                             <div class="contact-value">{{ contractor.phone or 'Not available' }}</div>
                         </div>
                     </div>
-                    {% if contractor.phone %}
-                    <a href="tel:{{ contractor.phone }}" class="contact-action">Call Now</a>
-                    {% endif %}
+                    {% if contractor.phone %}<a href="tel:{{ contractor.phone }}" class="contact-action">Call Now</a>{% endif %}
                 </div>
-                
-                <!-- Email -->
+
                 <div class="contact-item">
-                    <div class="contact-info">
+                    <div class="contact-left">
                         <div class="contact-icon">✉️</div>
-                        <div class="contact-details">
+                        <div>
                             <div class="contact-label">Email</div>
                             <div class="contact-value">{{ contractor.email or 'Not available' }}</div>
                         </div>
                     </div>
-                    {% if contractor.email %}
-                    <a href="mailto:{{ contractor.email }}" class="contact-action">Send Email</a>
-                    {% endif %}
+                    {% if contractor.email %}<a href="mailto:{{ contractor.email }}" class="contact-action">Send Email</a>{% endif %}
                 </div>
-                
-                
-                <!-- Location -->
+
                 {% if contractor.location %}
                 <div class="contact-item">
-                    <div class="contact-info">
+                    <div class="contact-left">
                         <div class="contact-icon">📍</div>
-                        <div class="contact-details">
+                        <div>
                             <div class="contact-label">Location</div>
                             <div class="contact-value">{{ contractor.location }}</div>
                         </div>
@@ -276,281 +156,92 @@
                 </div>
                 {% endif %}
             </div>
-            
-            <div class="info-note">
-                <div class="info-note-title">💡 Tip</div>
-                <div class="info-note-text">
-                    When contacting the contractor, mention your project details (type, size, location, budget) to get accurate quotes. 
-                    Save their contact information for easy access later.
-                </div>
+
+            <div class="tip-box">
+                <div class="tip-title">💡 Tip</div>
+                <div class="tip-text">Mention your project type, size, location and budget when reaching out to receive accurate quotes faster.</div>
             </div>
-            
-                
-                <div style="margin-top: 20px; text-align: center;">
-                    <button onclick="openQuoteModal()" 
-                            style="padding: 12px 24px; background: white; color: #f5576c; border: 2px solid #f5576c; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s;">
-                        📋 Request Detailed Quote
-                    </button>
-                </div>
+
+            <div class="quote-btn-wrap">
+                <button onclick="openModal()" class="btn-outline-accent">📋 Request Detailed Quote</button>
             </div>
         </div>
     </div>
-    
-    <!-- Quote Request Modal -->
-    <div id="quoteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: white; border-radius: 20px; padding: 40px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 50px rgba(0,0,0,0.3);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h2 style="font-size: 24px; font-weight: 600; color: #333;">💰 Request Quote</h2>
-                <button onclick="closeQuoteModal()" style="background: none; border: none; font-size: 28px; color: #999; cursor: pointer; line-height: 1;">&times;</button>
+
+    <!-- Quote Modal -->
+    <div id="quoteModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title">Request a Quote</div>
+                <button class="modal-close" onclick="closeModal()">×</button>
             </div>
-            
-            <div id="quoteAlert" style="display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
-            
-            <form id="quoteForm" style="display: grid; gap: 20px;">
-                <div>
-                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                        Project Type *
-                    </label>
-                    <select name="project_type" 
-                            required 
-                            style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
-                        <option value="">Select project type</option>
-                        <option value="new_construction">New Construction</option>
-                        <option value="renovation">Renovation</option>
-                        <option value="extension">Extension</option>
-                        <option value="repair">Repair</option>
+            <div id="quoteAlert" class="alert-box"></div>
+            <form id="quoteForm">
+                <div class="form-group">
+                    <label class="form-label">Project Type *</label>
+                    <select name="project_type" required class="form-control">
+                        <option value="">Select type</option>
+                        <option>New Construction</option>
+                        <option>Renovation</option>
+                        <option>Extension</option>
+                        <option>Repair</option>
                     </select>
                 </div>
-                
-                <div>
-                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                        Project Area (sq ft) *
-                    </label>
-                    <input type="number" 
-                           name="project_area" 
-                           required 
-                           min="100"
-                           placeholder="e.g., 2000"
-                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                <div class="form-group">
+                    <label class="form-label">Project Area (sq ft) *</label>
+                    <input type="number" name="project_area" required min="100" placeholder="e.g. 2000" class="form-control">
                 </div>
-                
-                <div>
-                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                        Location *
-                    </label>
-                    <input type="text" 
-                           name="project_location" 
-                           required 
-                           placeholder="City, State"
-                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                <div class="form-group">
+                    <label class="form-label">Location *</label>
+                    <input type="text" name="project_location" required placeholder="City, State" class="form-control">
                 </div>
-                
-                <div>
-                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                        Budget Range *
-                    </label>
-                    <select name="project_budget" 
-                            required 
-                            style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
-                        <option value="">Select budget range</option>
-                        <option value="low">Budget (₹1000-1500/sq ft)</option>
-                        <option value="medium">Standard (₹1500-2500/sq ft)</option>
+                <div class="form-group">
+                    <label class="form-label">Budget Range *</label>
+                    <select name="project_budget" required class="form-control">
+                        <option value="">Select budget</option>
+                        <option value="low">Budget (₹1000–1500/sq ft)</option>
+                        <option value="medium">Standard (₹1500–2500/sq ft)</option>
                         <option value="high">Premium (₹2500+/sq ft)</option>
                     </select>
                 </div>
-                
-                <div>
-                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                        Project Details *
-                    </label>
-                    <textarea name="project_details" 
-                              required 
-                              rows="4"
-                              placeholder="Provide details about your project, timeline, specific requirements..."
-                              style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical;"></textarea>
+                <div class="form-group">
+                    <label class="form-label">Project Details *</label>
+                    <textarea name="project_details" required placeholder="Timeline, requirements, special notes…" class="form-control"></textarea>
                 </div>
-                
-                <div>
-                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                        Your Name *
-                    </label>
-                    <input type="text" 
-                           name="name" 
-                           required 
-                           placeholder="Full Name"
-                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                <div class="form-group">
+                    <label class="form-label">Your Name *</label>
+                    <input type="text" name="name" required class="form-control">
                 </div>
-                
-                <div>
-                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                        Your Phone *
-                    </label>
-                    <input type="tel" 
-                           name="phone" 
-                           required 
-                           placeholder="+91 00000 00000"
-                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                <div class="form-group">
+                    <label class="form-label">Your Phone *</label>
+                    <input type="tel" name="phone" required placeholder="+91 00000 00000" class="form-control">
                 </div>
-                
-                <div>
-                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                        Your Email *
-                    </label>
-                    <input type="email" 
-                           name="email" 
-                           required 
-                           placeholder="email@example.com"
-                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                <div class="form-group">
+                    <label class="form-label">Your Email *</label>
+                    <input type="email" name="email" required class="form-control">
                 </div>
-                
-                <div style="display: flex; gap: 15px;">
-                    <button type="button" 
-                            onclick="closeQuoteModal()" 
-                            style="flex: 1; padding: 14px; background: #f0f0f0; color: #333; border: none; border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer;">
-                        Cancel
-                    </button>
-                    <button type="submit" 
-                            style="flex: 1; padding: 14px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer;">
-                        Send Quote Request
-                    </button>
+                <div class="modal-footer">
+                    <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Send Quote Request</button>
                 </div>
             </form>
         </div>
     </div>
-    
+
     <script>
         const contractorId = '{{ contractor.id }}';
-        
-        // Message Form Submission
-        document.getElementById('messageForm').addEventListener('submit', function(e) {
+        function openModal(){ document.getElementById('quoteModal').classList.add('open'); document.body.style.overflow='hidden'; }
+        function closeModal(){ document.getElementById('quoteModal').classList.remove('open'); document.body.style.overflow=''; document.getElementById('quoteForm').reset(); hideAlert(); }
+        document.getElementById('quoteModal').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeModal(); });
+        function showAlert(msg, type){ const el=document.getElementById('quoteAlert'); el.textContent=msg; el.className='alert-box alert-'+type; el.style.display='block'; }
+        function hideAlert(){ document.getElementById('quoteAlert').style.display='none'; }
+        document.getElementById('quoteForm').addEventListener('submit', function(e){
             e.preventDefault();
-            
-            const formData = new FormData(this);
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            
-            // Validate
-            const subject = formData.get('subject')?.trim();
-            const message = formData.get('message')?.trim();
-            
-            if (!subject || !message) {
-                showAlert('messageAlert', 'Please fill in all required fields', 'error');
-                return;
-            }
-            
-            submitBtn.textContent = 'Sending...';
-            submitBtn.disabled = true;
-            
-            fetch(`/user/contractor/${contractorId}/send-message`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showAlert('messageAlert', data.message, 'success');
-                    this.reset();
-                } else {
-                    showAlert('messageAlert', data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('messageAlert', 'An error occurred while sending your message', 'error');
-            })
-            .finally(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            });
+            const btn=this.querySelector('[type="submit"]'); btn.textContent='Sending…'; btn.disabled=true;
+            fetch(`/user/contractor/${contractorId}/request-quote`,{method:'POST',body:new FormData(this)})
+            .then(r=>r.json()).then(d=>{ if(d.success){ showAlert(d.message,'success'); this.reset(); setTimeout(closeModal,2000); } else showAlert(d.message,'error'); })
+            .catch(()=>showAlert('An error occurred','error')).finally(()=>{ btn.textContent='Send Quote Request'; btn.disabled=false; });
         });
-        
-        // Quote Form Submission
-        document.getElementById('quoteForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            
-            // Validate all fields
-            const required = ['project_type', 'project_area', 'project_location', 'project_budget', 'project_details', 'name', 'phone', 'email'];
-            for (const field of required) {
-                const value = formData.get(field)?.trim();
-                if (!value) {
-                    showAlert('quoteAlert', `Please fill in: ${field.replace('_', ' ')}`, 'error');
-                    return;
-                }
-            }
-            
-            submitBtn.textContent = 'Sending...';
-            submitBtn.disabled = true;
-            
-            fetch(`/user/contractor/${contractorId}/request-quote`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showAlert('quoteAlert', data.message, 'success');
-                    this.reset();
-                    setTimeout(() => closeQuoteModal(), 2000);
-                } else {
-                    showAlert('quoteAlert', data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('quoteAlert', 'An error occurred while sending your quote request', 'error');
-            })
-            .finally(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            });
-        });
-        
-        // Modal Functions
-        function openQuoteModal() {
-            const modal = document.getElementById('quoteModal');
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function closeQuoteModal() {
-            const modal = document.getElementById('quoteModal');
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            document.getElementById('quoteForm').reset();
-            document.getElementById('quoteAlert').style.display = 'none';
-        }
-        
-        // Close modal on background click
-        document.getElementById('quoteModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeQuoteModal();
-            }
-        });
-        
-        // Show Alert Function
-        function showAlert(elementId, message, type) {
-            const alert = document.getElementById(elementId);
-            alert.textContent = message;
-            alert.style.display = 'block';
-            
-            if (type === 'success') {
-                alert.style.background = '#d4edda';
-                alert.style.color = '#155724';
-                alert.style.border = '1px solid #c3e6cb';
-            } else {
-                alert.style.background = '#f8d7da';
-                alert.style.color = '#721c24';
-                alert.style.border = '1px solid #f5c6cb';
-            }
-            
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
-        }
     </script>
 </body>
 </html>

@@ -4,410 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ contractor.company_name or contractor.name }} - House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-        }
-        
-        .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .navbar-brand {
-            font-size: 24px;
-            font-weight: bold;
-        }
+        :root{--cream:#FAF8F5;--warm-white:#FFFFFF;--sand:#F0EBE3;--stone:#E2D9CE;--accent:#B5804F;--accent-dark:#8C5E35;--accent-light:#F7EDE2;--text-primary:#1C1917;--text-secondary:#6B5E52;--text-muted:#9C8E84;--shadow-sm:0 1px 3px rgba(28,25,23,0.06);--shadow-md:0 4px 16px rgba(28,25,23,0.08);}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;color:var(--text-primary);position:relative;}
+        body::before{content:'';position:fixed;inset:0;background:url('/static/images/house.jpg') no-repeat center/cover;opacity:0.08;z-index:0;pointer-events:none;}
+        .navbar{background:var(--warm-white);border-bottom:1px solid var(--stone);padding:0 40px;height:68px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+        .navbar-brand{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:10px;text-decoration:none;}
+        .navbar-menu{display:flex;align-items:center;gap:4px;}
+        .navbar-menu a{color:var(--text-secondary);text-decoration:none;padding:8px 14px;border-radius:8px;font-size:14px;font-weight:500;transition:all 0.2s;}
+        .navbar-menu a:hover{color:var(--accent);background:var(--accent-light);}
+        .profile-pic{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--stone);}
+        .profile-placeholder{width:36px;height:36px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;border:2px solid var(--stone);}
+        .container{max-width:1100px;margin:36px auto;padding:0 24px;position:relative;z-index:1;}
+        .back-link{display:inline-flex;align-items:center;gap:7px;color:var(--accent);text-decoration:none;font-weight:600;font-size:14px;margin-bottom:20px;transition:all 0.2s;}
+        .back-link:hover{color:var(--accent-dark);transform:translateX(-3px);}
 
-        .navbar-menu {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        
-        .navbar-menu a {
-            color: white;
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
+        /* PROFILE HEADER */
+        .profile-header{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:36px 40px;margin-bottom:24px;box-shadow:var(--shadow-md);display:flex;gap:28px;align-items:flex-start;position:relative;overflow:hidden;}
+        .profile-header::after{content:'';position:absolute;right:-20px;top:-30px;width:200px;height:200px;background:radial-gradient(circle,var(--accent-light) 0%,transparent 70%);pointer-events:none;}
+        .entity-avatar{width:110px;height:110px;border-radius:50%;background:var(--accent-light);border:3px solid var(--stone);display:flex;align-items:center;justify-content:center;font-size:48px;flex-shrink:0;}
+        .entity-info{flex:1;}
+        .entity-name{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--text-primary);margin-bottom:4px;}
+        .entity-company{font-size:16px;color:var(--accent);font-weight:600;margin-bottom:4px;}
+        .entity-sub{color:var(--text-muted);font-size:14px;margin-bottom:14px;}
+        .badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+        .badge-verified{background:#D1FAE5;color:#065F46;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;}
+        .stars{color:#F59E0B;font-size:20px;letter-spacing:2px;}
+        .rating-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+        .rating-val{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--text-primary);}
+        .rating-sub{color:var(--text-muted);font-size:13px;}
+        .stats-row{display:flex;gap:28px;}
+        .stat-box{text-align:center;}
+        .stat-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--accent);display:block;}
+        .stat-lbl{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.7px;}
 
-        .navbar-menu a:hover {
-            background: rgba(255,255,255,0.2);
-        }
+        /* CARDS */
+        .card{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:28px 32px;margin-bottom:24px;box-shadow:var(--shadow-sm);}
+        .card-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--sand);}
+        .info-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--sand);}
+        .info-row:last-child{border-bottom:none;}
+        .info-label{color:var(--text-muted);font-weight:600;font-size:13px;}
+        .info-value{color:var(--text-primary);font-weight:500;}
+        .about-text{color:var(--text-secondary);line-height:1.8;font-size:15px;}
+        .btn-primary{display:inline-block;padding:12px 28px;background:var(--accent);color:white;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;transition:all 0.2s;}
+        .btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);}
 
-        .profile-pic {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid white;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        
-        .profile-pic:hover {
-            transform: scale(1.1);
-        }
-        
-        .profile-placeholder {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: white;
-            color: #667eea;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-            border: 2px solid white;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        
-        .profile-placeholder:hover {
-            transform: scale(1.1);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-        
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-        
-        .back-link:hover {
-            color: #5568d3;
-            transform: translateX(-5px);
-        }
-
-        .profile-header {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-        }
-        
-        .header-content {
-            display: flex;
-            gap: 30px;
-            align-items: start;
-        }
-        
-        .contractor-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 50px;
-            color: white;
-            flex-shrink: 0;
-            box-shadow: 0 5px 20px rgba(79, 172, 254, 0.3);
-        }
-        
-        .contractor-info {
-            flex: 1;
-        }
-        
-        .contractor-name {
-            font-size: 32px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 3px;
-        }
-        
-        .contractor-company{
-            font-size: 20px;
-            font-weight: 600;
-            color:darkolivegreen;
-            margin-bottom: 6px;
-        }
-
-        
-        .contractor-type {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 15px;
-        }
-        
-        .badges {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .badge {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        
-        .badge-verified {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .rating-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .stars {
-            font-size: 24px;
-            color: #ffa500;
-        }
-        
-        .rating-value {
-            font-size: 32px;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .rating-text {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .contractor-stats {
-            display: flex;
-            gap: 30px;
-        }
-        
-        .stat-box {
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 28px;
-            font-weight: bold;
-            color: #4facfe;
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 13px;
-            color: #666;
-        }
-        
-        .section {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .section-title {
-            font-size: 22px;
-            color: #333;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .info-grid {
-            display: grid;
-            gap: 15px;
-        }
-        
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-        
-        .info-label {
-            color: #666;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .info-value {
-            color: #333;
-            font-weight: 500;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-        
-        .empty-icon {
-            font-size: 64px;
-            margin-bottom: 15px;
-        }
+        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        .profile-header{animation:fadeUp 0.5s ease both;}
+        .card{animation:fadeUp 0.5s 0.1s ease both;}
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <div class="navbar-brand">🏗️ House-Forge</div>
+        <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">🏗️ House-Forge</a>
         <div class="navbar-menu">
             <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('user.projects') }}">My Projects</a>
             <a href="{{ url_for('user.find_contractors') }}">Contractors</a>
-            <a href="{{ url_for('user.profile') }}">
+            <a href="{{ url_for('user.profile') }}" style="padding:8px 10px;">
                 {% if user_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" 
-                         alt="Profile" 
-                         class="profile-pic">
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
                 {% else %}
-                    <div class="profile-placeholder">
-                        {{ current_user.name[0].upper() if current_user.name else 'U' }}
-                    </div>
+                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
                 {% endif %}
             </a>
-            <a href="{{ url_for('auth.logout') }}">Logout</a>
+            <a href="{{ url_for('auth.logout') }}" style="color:var(--text-muted);font-size:13px;">Logout</a>
         </div>
     </nav>
-    
+
     <div class="container">
-        <a href="{{ url_for('user.find_contractors') }}" class="back-link">
-            ← Back to Contractors
-        </a>
-        
-        <!-- Profile Header -->
+        <a href="{{ url_for('user.find_contractors') }}" class="back-link">← Back to Contractors</a>
+
         <div class="profile-header">
-            <div class="header-content">
-                <div class="contractor-avatar">🔨</div>
-                
-                <div class="contractor-info">
-                    <h1 class="contractor-name">{{ contractor.name }}</h1>
-                    <div class="contractor-company">{{ contractor.company_name }}</div>
-                    <div class="contractor-type">
-                        Professional Contractor
-                    </div>
-                    
-                    <div class="badges">
-                        {% if contractor.verified %}
-                        <span class="badge badge-verified">✓ Verified Contractor</span>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="rating-section">
-                        <span class="stars">
-                            {% set rating = contractor.rating or 0 %}
-                            {% for i in range(5) %}
-                                {% if i < rating %}★{% else %}☆{% endif %}
-                            {% endfor %}
-                        </span>
-                        <span class="rating-value">{{ "%.1f"|format(contractor.rating or 0) }}</span>
-                        <span class="rating-text">
-                            ({{ contractor.completed_projects or 0 }} projects)
-                        </span>
-                    </div>
-                    
-                    <div class="contractor-stats">
-                        <div class="stat-box">
-                            <div class="stat-number">{{ contractor.experience or 0 }}</div>
-                            <div class="stat-label">Years Experience</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-number">{{ contractor.completed_projects or 0 }}</div>
-                            <div class="stat-label">Projects Completed</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-number">{{ "%.1f"|format(contractor.rating or 0) }}</div>
-                            <div class="stat-label">Rating</div>
-                        </div>
-                    </div>
+            <div class="entity-avatar">🔨</div>
+            <div class="entity-info">
+                <div class="entity-name">{{ contractor.name }}</div>
+                <div class="entity-company">{{ contractor.company_name }}</div>
+                <div class="entity-sub">Professional Contractor</div>
+                <div class="badges">
+                    {% if contractor.verified %}<span class="badge-verified">✓ Verified Contractor</span>{% endif %}
                 </div>
-            </div>
-        </div>
-        
-        <!-- About Section -->
-        {% if contractor.bio %}
-        <div class="section">
-            <h2 class="section-title">📝 About</h2>
-            <p style="color: #666; line-height: 1.8;">{{ contractor.bio }}</p>
-        </div>
-        {% endif %}
-        
-        <!-- Business Information -->
-        <div class="section">
-            <h2 class="section-title">📋 Business Details</h2>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="info-label">Company</span>
-                    <span class="info-value">{{ contractor.company_name or 'N/A' }}</span>
+                <div class="rating-row">
+                    <span class="stars">{% set r=contractor.rating or 0 %}{% for i in range(5) %}{% if i<r %}★{% else %}☆{% endif %}{% endfor %}</span>
+                    <span class="rating-val">{{ "%.1f"|format(contractor.rating or 0) }}</span>
+                    <span class="rating-sub">({{ contractor.completed_projects or 0 }} projects)</span>
                 </div>
-                
-                {% if contractor.license_number %}
-                <div class="info-item">
-                    <span class="info-label">License Number</span>
-                    <span class="info-value">{{ contractor.license_number }}</span>
+                <div class="stats-row">
+                    <div class="stat-box"><span class="stat-num">{{ contractor.experience or 0 }}</span><span class="stat-lbl">Yrs Experience</span></div>
+                    <div class="stat-box"><span class="stat-num">{{ contractor.completed_projects or 0 }}</span><span class="stat-lbl">Projects Done</span></div>
+                    <div class="stat-box"><span class="stat-num">{{ "%.1f"|format(contractor.rating or 0) }}</span><span class="stat-lbl">Rating</span></div>
                 </div>
-                {% endif %}
-                
-                <div class="info-item">
-                    <span class="info-label">Location</span>
-                    <span class="info-value">{{ contractor.location or 'Not specified' }}</span>
-                </div>
-                
-                <div class="info-item">
-                    <span class="info-label">Phone</span>
-                    <span class="info-value">{{ contractor.phone or 'Contact for details' }}</span>
-                </div>
-                
-                <div class="info-item">
-                    <span class="info-label">Email</span>
-                    <span class="info-value">{{ contractor.email or 'Contact for details' }}</span>
-                </div>
-                
-                {% if contractor.specializations %}
-                <div class="info-item">
-                    <span class="info-label">Specializations</span>
-                    <span class="info-value">{{ ', '.join(contractor.specializations) }}</span>
-                </div>
-                {% endif %}
             </div>
         </div>
 
-        <!-- Contact Section -->
-        <div class="section">
-            <h2 class="section-title">📞 Contact Contractor</h2>
-            <a href="{{ url_for('user.contact_contractor', contractor_id=contractor.id) }}" 
-               style="display: inline-block; padding: 14px 30px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; text-decoration: none; border-radius: 10px; font-weight: 600; transition: all 0.3s;">
-                Get Contact Information
-            </a>
+        {% if contractor.bio %}
+        <div class="card">
+            <div class="card-title">📝 About</div>
+            <p class="about-text">{{ contractor.bio }}</p>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-title">📋 Business Details</div>
+            <div class="info-row"><span class="info-label">Company</span><span class="info-value">{{ contractor.company_name or 'N/A' }}</span></div>
+            {% if contractor.license_number %}<div class="info-row"><span class="info-label">License No.</span><span class="info-value">{{ contractor.license_number }}</span></div>{% endif %}
+            <div class="info-row"><span class="info-label">Location</span><span class="info-value">{{ contractor.location or 'Not specified' }}</span></div>
+            <div class="info-row"><span class="info-label">Phone</span><span class="info-value">{{ contractor.phone or 'Contact for details' }}</span></div>
+            <div class="info-row"><span class="info-label">Email</span><span class="info-value">{{ contractor.email or 'Contact for details' }}</span></div>
+            {% if contractor.specializations %}<div class="info-row"><span class="info-label">Specializations</span><span class="info-value">{{ ', '.join(contractor.specializations) }}</span></div>{% endif %}
+        </div>
+
+        <div class="card">
+            <div class="card-title">📞 Contact Contractor</div>
+            <a href="{{ url_for('user.contact_contractor', contractor_id=contractor.id) }}" class="btn-primary">Get Contact Information</a>
         </div>
     </div>
 </body>

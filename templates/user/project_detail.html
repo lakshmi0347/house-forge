@@ -4,446 +4,177 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ project.title }} - House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-        }
-        
-        .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .navbar-brand {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .navbar-menu {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        
-        .navbar-menu a {
-            color: white;
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        
-        .navbar-menu a:hover {
-            background: rgba(255,255,255,0.2);
-        }
+        :root{--cream:#FAF8F5;--warm-white:#FFFFFF;--sand:#F0EBE3;--stone:#E2D9CE;--accent:#B5804F;--accent-dark:#8C5E35;--accent-light:#F7EDE2;--text-primary:#1C1917;--text-secondary:#6B5E52;--text-muted:#9C8E84;--shadow-sm:0 1px 3px rgba(28,25,23,0.06);--shadow-md:0 4px 16px rgba(28,25,23,0.08);--shadow-lg:0 12px 40px rgba(28,25,23,0.10);}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;color:var(--text-primary);position:relative;}
+        body::before{content:'';position:fixed;inset:0;background:url('/static/images/house.jpg') no-repeat center/cover;opacity:0.08;z-index:0;pointer-events:none;}
 
-        .profile-pic {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid white;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
+        /* NAVBAR */
+        .navbar{background:var(--warm-white);border-bottom:1px solid var(--stone);padding:0 40px;height:68px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+        .navbar-brand{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:10px;text-decoration:none;}
+        .navbar-menu{display:flex;align-items:center;gap:4px;}
+        .navbar-menu a{color:var(--text-secondary);text-decoration:none;padding:8px 14px;border-radius:8px;font-size:14px;font-weight:500;transition:all 0.2s;}
+        .navbar-menu a:hover{color:var(--accent);background:var(--accent-light);}
+        .profile-pic{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--stone);}
+        .profile-placeholder{width:36px;height:36px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;border:2px solid var(--stone);}
+
+        /* LAYOUT */
+        .container{max-width:1280px;margin:36px auto;padding:0 24px;position:relative;z-index:1;}
+        .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-size:14px;font-weight:600;text-decoration:none;margin-bottom:20px;transition:gap 0.2s;}
+        .back-link:hover{gap:10px;}
+
+        /* PAGE HEADER */
+        .page-header{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:30px 40px;margin-bottom:24px;box-shadow:var(--shadow-md);}
+        .page-header h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--text-primary);margin-bottom:10px;}
+        .divider{width:40px;height:3px;background:var(--accent);border-radius:2px;margin:10px 0 14px;}
+        .project-meta{display:flex;gap:18px;flex-wrap:wrap;align-items:center;}
+        .meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);}
+        .status-badge{display:inline-block;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;}
+        .status-planning{background:#FEF3C7;color:#92400E;}
+        .status-active{background:#DBEAFE;color:#1E40AF;}
+        .status-completed{background:#D1FAE5;color:#065F46;}
+
+        /* TWO COLUMN */
+        .two-column{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
+        @media(max-width:1024px){.two-column{grid-template-columns:1fr;}}
+
+        /* CARDS */
+        .card{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:28px 32px;margin-bottom:20px;box-shadow:var(--shadow-sm);}
+        .section-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--text-primary);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--sand);}
+
+        /* COST SUMMARY */
+        .cost-summary{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:28px 32px;margin-bottom:20px;box-shadow:var(--shadow-md);position:relative;overflow:hidden;}
         
-        .profile-pic:hover {
-            transform: scale(1.1);
-        }
-        
-        .profile-placeholder {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: white;
-            color: #667eea;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-            border: 2px solid white;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        
-        .profile-placeholder:hover {
-            transform: scale(1.1);
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-        
-        .page-header {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .back-link {
-            color: #667eea;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-        
-        .back-link:hover {
-            text-decoration: underline;
-        }
-        
-        .project-title {
-            font-size: 32px;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .project-meta {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            color: #666;
-        }
-        
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .status-badge {
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .status-planning {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
-        .two-column {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 30px;
-        }
-        
-        .section {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .section-title {
-            font-size: 22px;
-            color: #333;
-            margin-bottom: 20px;
-            font-weight: 600;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-        
-        .cost-summary-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .total-label {
-            font-size: 16px;
-            opacity: 0.9;
-            margin-bottom: 10px;
-        }
-        
-        .total-amount {
-            font-size: 48px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        
-        .cost-breakdown {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .breakdown-item {
-            text-align: center;
-            padding: 15px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-        }
-        
-        .breakdown-label {
-            font-size: 12px;
-            opacity: 0.8;
-            margin-bottom: 5px;
-        }
-        
-        .breakdown-value {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        
-        .stage-accordion {
-            margin-bottom: 15px;
-        }
-        
-        .stage-header {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-        }
-        
-        .stage-header:hover {
-            background: #e9ecef;
-        }
-        
-        .stage-header.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .stage-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .stage-icon {
-            font-size: 32px;
-        }
-        
-        .stage-details h3 {
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-        
-        .stage-meta {
-            font-size: 13px;
-            opacity: 0.8;
-        }
-        
-        .stage-cost {
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .stage-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-        
-        .stage-content.active {
-            max-height: 2000px;
-        }
-        
-        .materials-table {
-            width: 100%;
-            margin-top: 15px;
-        }
-        
-        .materials-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .materials-table th,
-        .materials-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .materials-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .materials-table tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .info-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .info-row:last-child {
-            border-bottom: none;
-        }
-        
-        .info-label {
-            color: #666;
-            font-weight: 600;
-        }
-        
-        .info-value {
-            color: #333;
-        }
-        
-        .timeline-card {
-            background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-        }
-        
-        .timeline-value {
-            font-size: 42px;
-            font-weight: bold;
-            color: #ff6b35;
-            margin: 10px 0;
-        }
-        
-        .timeline-label {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .action-buttons {
-            display: grid;
-            gap: 15px;
-        }
-        
-        .btn {
-            padding: 14px 20px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            display: block;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .btn-outline {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-        }
-        
-        .btn-outline:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        @media (max-width: 1024px) {
-            .two-column {
-                grid-template-columns: 1fr;
-            }
-        }
+        .cost-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);margin-bottom:6px;}
+        .cost-total{font-family:'Trafalgar', sans-serif;font-size:42px;font-weight:700;color:var(--text-primary);line-height:1;margin-bottom:20px;}
+        .cost-total span{font-size:22px;color:var(--accent);}
+        .cost-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+        @media(max-width:600px){.cost-breakdown{grid-template-columns:1fr;}}
+        .breakdown-item{background:var(--sand);border:1px solid var(--stone);border-radius:10px;padding:16px;text-align:center;}
+        .breakdown-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+        .breakdown-value{font-family:'Trafalgar', sans-serif;font-size:19px;font-weight:700;color:var(--text-primary);}
+
+        /* STAGE ACCORDION */
+        .stage-accordion{margin-bottom:10px;border:1.5px solid var(--stone);border-radius:10px;overflow:hidden;transition:border-color 0.2s;}
+        .stage-accordion:hover{border-color:rgba(181,128,79,0.4);}
+        .stage-header{padding:16px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--cream);transition:background 0.2s;}
+        .stage-header:hover{background:var(--sand);}
+        .stage-header.active{background:var(--accent);color:white;}
+        .stage-info{display:flex;align-items:center;gap:12px;}
+        .stage-icon{font-size:26px;}
+        .stage-name{font-size:15px;font-weight:600;color:var(--text-primary);}
+        .stage-header.active .stage-name{color:white;}
+        .stage-meta-count{font-size:12px;color:var(--text-muted);margin-top:2px;}
+        .stage-header.active .stage-meta-count{color:rgba(255,255,255,0.75);}
+        .stage-cost{font-size:16px;font-weight:700;color:var(--accent);}
+        .stage-header.active .stage-cost{color:white;}
+        .stage-toggle{font-size:12px;color:var(--text-muted);transition:transform 0.3s;}
+        .stage-header.active .stage-toggle{transform:rotate(180deg);color:white;}
+
+        .stage-content{max-height:0;overflow:hidden;transition:max-height 0.35s ease;}
+        .stage-content.active{max-height:2000px;}
+
+        /* MATERIALS TABLE */
+        .materials-wrap{padding:16px 20px;}
+        table{width:100%;border-collapse:collapse;}
+        th{padding:10px 12px;text-align:left;background:var(--sand);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);}
+        th:first-child{border-radius:6px 0 0 6px;}
+        th:last-child{border-radius:0 6px 6px 0;}
+        td{padding:10px 12px;font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--sand);}
+        tr:last-child td{border-bottom:none;}
+        tr:hover td{background:var(--cream);}
+
+        /* SIDEBAR CARDS */
+        .info-list{display:flex;flex-direction:column;}
+        .info-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--sand);}
+        .info-row:last-child{border-bottom:none;}
+        .info-label{font-size:13px;color:var(--text-muted);font-weight:500;}
+        .info-value{font-size:13px;font-weight:600;color:var(--text-primary);}
+
+        /* TIMELINE */
+        .timeline-block{background:linear-gradient(135deg,var(--accent-light),#FEF3C7);border:1px solid rgba(181,128,79,0.2);border-radius:10px;padding:20px;text-align:center;}
+        .timeline-num{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:var(--accent);line-height:1;}
+        .timeline-sub{font-size:13px;color:var(--text-secondary);margin-top:4px;}
+
+        /* ACTION BUTTONS */
+        .action-buttons{display:flex;flex-direction:column;gap:10px;}
+        .btn-primary{padding:12px 18px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;text-align:center;transition:all 0.2s;display:block;font-family:'DM Sans',sans-serif;}
+        .btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 14px rgba(181,128,79,0.3);}
+        .btn-outline{padding:12px 18px;background:transparent;color:var(--accent);border:1.5px solid rgba(181,128,79,0.5);border-radius:8px;font-weight:600;font-size:14px;text-decoration:none;text-align:center;transition:all 0.2s;display:block;}
+        .btn-outline:hover{background:var(--accent-light);border-color:var(--accent);}
+
+        /* RATING MODAL */
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,25,23,0.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+        .modal-overlay.show{display:flex;}
+        .modal-box{background:var(--warm-white);border:1px solid var(--stone);border-radius:20px;padding:36px;max-width:480px;width:90%;box-shadow:var(--shadow-lg);animation:fadeUp 0.3s ease;}
+        .modal-box h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:6px;}
+        .modal-divider{width:36px;height:3px;background:var(--accent);border-radius:2px;margin:8px 0 20px;}
+        .modal-label{display:block;margin-bottom:8px;font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;}
+        .star-rating{display:flex;gap:4px;margin-bottom:20px;}
+        .star{font-size:36px;cursor:pointer;color:var(--stone);transition:color 0.15s,transform 0.15s;}
+        .star:hover,.star.filled{color:#F59E0B;transform:scale(1.15);}
+        .modal-textarea{width:100%;padding:11px 14px;border:1.5px solid var(--stone);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text-primary);resize:vertical;min-height:100px;margin-bottom:20px;transition:border-color 0.2s;}
+        .modal-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(181,128,79,0.12);}
+        .modal-actions{display:flex;gap:12px;}
+        .btn-ghost{flex:1;padding:11px;background:var(--sand);color:var(--text-secondary);border:1px solid var(--stone);border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+        .btn-ghost:hover{background:var(--stone);}
+        .modal-submit{flex:1;padding:11px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+        .modal-submit:hover{background:var(--accent-dark);}
+
+        @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        .page-header{animation:fadeUp 0.5s ease both;}
+        .two-column{animation:fadeUp 0.5s 0.1s ease both;}
     </style>
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- Navbar -->
     <nav class="navbar">
-        <div class="navbar-brand">🏗️ House-Forge</div>
+        <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">🏗️ House-Forge</a>
         <div class="navbar-menu">
             <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('user.projects') }}">My Projects</a>
             <a href="{{ url_for('user.my_orders') }}">My Orders</a>
-            <a href="{{ url_for('user.profile') }}">
+            <a href="{{ url_for('user.profile') }}" style="padding:8px 10px;">
                 {% if user_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" 
-                         alt="Profile" 
-                         class="profile-pic">
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
                 {% else %}
-                    <div class="profile-placeholder">
-                        {{ current_user.name[0].upper() if current_user.name else 'U' }}
-                    </div>
+                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
                 {% endif %}
             </a>
-            <a href="{{ url_for('auth.logout') }}">Logout</a>
+            <a href="{{ url_for('auth.logout') }}" style="color:var(--text-muted);font-size:13px;">Logout</a>
         </div>
     </nav>
-    
+
     <div class="container">
+        <a href="{{ url_for('user.projects') }}" class="back-link">← Back to Projects</a>
+
         <!-- Page Header -->
         <div class="page-header">
-            <a href="{{ url_for('user.projects') }}" class="back-link">← Back to Projects</a>
-            <h1 class="project-title">{{ project.title }}</h1>
+            <h1>{{ project.title }}</h1>
+            <div class="divider"></div>
             <div class="project-meta">
-                <div class="meta-item">
-                    <span>📍</span>
-                    <span>{{ project.location }}</span>
-                </div>
-                <div class="meta-item">
-                    <span>📅</span>
-                    <span>Created: {{ project.created_at.strftime('%d %b %Y') if project.created_at else 'N/A' }}</span>
-                </div>
+                <div class="meta-item">📍 {{ project.location }}</div>
+                <div class="meta-item">📅 Created: {{ project.created_at.strftime('%d %b %Y') if project.created_at else 'N/A' }}</div>
                 <span class="status-badge status-{{ project.status }}">{{ project.status.upper() }}</span>
             </div>
         </div>
-        
+
         <div class="two-column">
-            <!-- Main Content -->
+            <!-- LEFT COLUMN -->
             <div>
                 <!-- Cost Summary -->
-                <div class="cost-summary-card">
-                    <div class="total-label">Total Estimated Cost ({{ project.budget_range.title() }} Budget)</div>
-                    <div class="total-amount">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].total_cost) }}</div>
-                    
+                <div class="cost-summary">
+                    <div class="cost-label">Total Estimated Cost · {{ project.budget_range.title() }} Budget</div>
+                    <div class="cost-total"><span>₹</span>{{ "{:,.0f}".format(estimation.costs[project.budget_range].total_cost) }}</div>
                     <div class="cost-breakdown">
                         <div class="breakdown-item">
                             <div class="breakdown-label">Materials</div>
                             <div class="breakdown-value">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].material_cost) }}</div>
                         </div>
                         <div class="breakdown-item">
-                            <div class="breakdown-label">Labor</div>
+                            <div class="breakdown-label">Labour</div>
                             <div class="breakdown-value">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].labor_cost) }}</div>
                         </div>
                         <div class="breakdown-item">
@@ -452,39 +183,41 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- Stage-by-Stage Breakdown -->
-                <div class="section">
-                    <h2 class="section-title">🏗️ Construction Stages & Materials</h2>
-                    
+
+                <!-- Stages & Materials -->
+                <div class="card">
+                    <div class="section-title">🏗️ Construction Stages & Materials</div>
+
                     {% set stages = [
-                        ('foundation', '🏗️', 'Foundation'),
-                        ('walls', '🧱', 'Walls'),
-                        ('flooring', '🪟', 'Flooring & Slab'),
-                        ('roofing', '🏠', 'Roofing'),
-                        ('plumbing', '🚰', 'Plumbing'),
-                        ('electrical', '⚡', 'Electrical'),
-                        ('finishing', '🎨', 'Finishing'),
-                        ('carpentry', '🪑', 'Carpentry'),
-                        ('exterior', '🌳', 'Exterior'),
-                        ('miscellaneous', '🔧', 'Miscellaneous')
+                        ('foundation','🏗️','Foundation'),
+                        ('walls','🧱','Walls'),
+                        ('flooring','🪟','Flooring & Slab'),
+                        ('roofing','🏠','Roofing'),
+                        ('plumbing','🚰','Plumbing'),
+                        ('electrical','⚡','Electrical'),
+                        ('finishing','🎨','Finishing'),
+                        ('carpentry','🪑','Carpentry'),
+                        ('exterior','🌳','Exterior'),
+                        ('miscellaneous','🔧','Miscellaneous')
                     ] %}
-                    
+
                     {% for stage_key, icon, stage_name in stages %}
                     <div class="stage-accordion">
                         <div class="stage-header" onclick="toggleStage('{{ stage_key }}')">
                             <div class="stage-info">
                                 <span class="stage-icon">{{ icon }}</span>
-                                <div class="stage-details">
-                                    <h3>{{ stage_name }}</h3>
-                                    <div class="stage-meta">{{ estimation.materials[stage_key] | length }} materials</div>
+                                <div>
+                                    <div class="stage-name">{{ stage_name }}</div>
+                                    <div class="stage-meta-count">{{ estimation.materials[stage_key] | length }} materials</div>
                                 </div>
                             </div>
-                            <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown[stage_key]) }}</div>
+                            <div style="display:flex;align-items:center;gap:14px;">
+                                <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown[stage_key]) }}</div>
+                                <span class="stage-toggle">▼</span>
+                            </div>
                         </div>
-                        
                         <div class="stage-content" id="stage-{{ stage_key }}">
-                            <div class="materials-table">
+                            <div class="materials-wrap">
                                 <table>
                                     <thead>
                                         <tr>
@@ -497,7 +230,7 @@
                                         {% for material, quantity in estimation.materials[stage_key].items() %}
                                         {% if quantity > 0 %}
                                         <tr>
-                                            <td>{{ material.replace('_', ' ').title() }}</td>
+                                            <td>{{ material.replace('_',' ').title() }}</td>
                                             <td>{{ "{:,.0f}".format(quantity) }}</td>
                                             <td>
                                                 {% if 'bags' in material %}bags
@@ -507,8 +240,7 @@
                                                 {% elif 'meters' in material %}meters
                                                 {% elif 'liters' in material %}liters
                                                 {% elif 'sheets' in material %}sheets
-                                                {% else %}units
-                                                {% endif %}
+                                                {% else %}units{% endif %}
                                             </td>
                                         </tr>
                                         {% endif %}
@@ -521,171 +253,125 @@
                     {% endfor %}
                 </div>
             </div>
-            
-            <!-- Sidebar -->
+
+            <!-- RIGHT SIDEBAR -->
             <div>
-                <!-- Project Info -->
-                <div class="section">
-                    <h3 class="section-title">📋 Project Details</h3>
-                    <div class="info-card">
-                        <div class="info-row">
-                            <span class="info-label">Area</span>
-                            <span class="info-value">{{ project.square_feet }} sq ft</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Rooms</span>
-                            <span class="info-value">{{ project.rooms }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Floors</span>
-                            <span class="info-value">{{ project.floors }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Bathrooms</span>
-                            <span class="info-value">{{ project.bathrooms }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Property Type</span>
-                            <span class="info-value">{{ project.property_type.title() }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Budget Range</span>
-                            <span class="info-value">{{ project.budget_range.title() }}</span>
-                        </div>
+                <!-- Project Details -->
+                <div class="card">
+                    <div class="section-title">📋 Project Details</div>
+                    <div class="info-list">
+                        <div class="info-row"><span class="info-label">Area</span><span class="info-value">{{ project.square_feet }} sq ft</span></div>
+                        <div class="info-row"><span class="info-label">Rooms</span><span class="info-value">{{ project.rooms }}</span></div>
+                        <div class="info-row"><span class="info-label">Floors</span><span class="info-value">{{ project.floors }}</span></div>
+                        <div class="info-row"><span class="info-label">Bathrooms</span><span class="info-value">{{ project.bathrooms }}</span></div>
+                        <div class="info-row"><span class="info-label">Property Type</span><span class="info-value">{{ project.property_type.title() }}</span></div>
+                        <div class="info-row"><span class="info-label">Budget Range</span><span class="info-value">{{ project.budget_range.title() }}</span></div>
                     </div>
                 </div>
-                
+
                 <!-- Timeline -->
-                <div class="section">
-                    <h3 class="section-title">⏱️ Timeline</h3>
-                    <div class="timeline-card">
-                        <div class="timeline-label">Estimated Duration</div>
-                        <div class="timeline-value">{{ estimation.timeline.total_days }}</div>
-                        <div class="timeline-label">Days (≈ {{ (estimation.timeline.total_days / 30) | round(1) }} months)</div>
+                <div class="card">
+                    <div class="section-title">⏱️ Timeline</div>
+                    <div class="timeline-block">
+                        <div class="timeline-num">{{ estimation.timeline.total_days }}</div>
+                        <div class="timeline-sub">Days · ≈ {{ (estimation.timeline.total_days / 30) | round(1) }} months</div>
                     </div>
                 </div>
-                
+
                 <!-- Actions -->
-                <div class="section">
-                    <h3 class="section-title">⚡ Actions</h3>
+                <div class="card">
+                    <div class="section-title">⚡ Actions</div>
                     <div class="action-buttons">
-                        <a href="{{ url_for('user.download_pdf', project_id=project.id) }}" class="btn btn-primary">📄 Download PDF</a>
-                         <a href="{{ url_for('user.project_bids', project_id=project.id) }}" class="btn btn-primary">📋 View Bids</a>
-                        <a href="{{ url_for('user.find_contractors') }}" class="btn btn-outline">🔨 Find Contractors</a>
-                        <a href="{{ url_for('user.order_materials', project_id=project.id) }}" class="btn btn-outline">📦 Order Materials</a>
-                        <a href="{{ url_for('user.edit_project', project_id=project.id) }}" class="btn btn-outline">✏️ Edit Project</a>
+                        <a href="{{ url_for('user.download_pdf', project_id=project.id) }}" class="btn-primary">📄 Download PDF</a>
+                        <a href="{{ url_for('user.project_bids', project_id=project.id) }}" class="btn-primary">📋 View Bids</a>
+                        <a href="{{ url_for('user.find_contractors') }}" class="btn-outline">🔨 Find Contractors</a>
+                        <a href="{{ url_for('user.order_materials', project_id=project.id) }}" class="btn-outline">📦 Order Materials</a>
+                        <a href="{{ url_for('user.edit_project', project_id=project.id) }}" class="btn-outline">✏️ Edit Project</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
+    <!-- Rating Modal -->
+    {% if project.status == 'completed' and not project.get('reviewed', False) and project.get('contractor_id') %}
+    <div id="ratingModal" class="modal-overlay">
+        <div class="modal-box">
+            <h2>⭐ Rate Your Contractor</h2>
+            <div class="modal-divider"></div>
+            <form id="ratingForm">
+                <label class="modal-label">Your Rating *</label>
+                <div class="star-rating" id="starRating">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+                <input type="hidden" name="rating" id="ratingValue" required>
+                <label class="modal-label">Your Review</label>
+                <textarea name="review" class="modal-textarea" placeholder="Share your experience with this contractor…"></textarea>
+                <div class="modal-actions">
+                    <button type="button" class="btn-ghost" onclick="closeRatingModal()">Cancel</button>
+                    <button type="submit" class="modal-submit">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
     <script>
-        function toggleStage(stageKey) {
-            const content = document.getElementById('stage-' + stageKey);
+        function toggleStage(key) {
+            const content = document.getElementById('stage-' + key);
             const header = content.previousElementSibling;
-            
-            // Close all other stages
             document.querySelectorAll('.stage-content').forEach(el => {
-                if (el.id !== 'stage-' + stageKey) {
-                    el.classList.remove('active');
-                    el.previousElementSibling.classList.remove('active');
-                }
+                if (el.id !== 'stage-' + key) { el.classList.remove('active'); el.previousElementSibling.classList.remove('active'); }
             });
-            
-            // Toggle current stage
             content.classList.toggle('active');
             header.classList.toggle('active');
         }
-    </script>
 
-<!-- Rating Modal (show only if project is completed and not reviewed) -->
-{% if project.status == 'completed' and not project.get('reviewed', False) and project.get('contractor_id') %}
-<div id="ratingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; box-shadow: 0 10px 50px rgba(0,0,0,0.3);">
-        <h2 style="margin-bottom: 20px; color: #333;">⭐ Rate Your Contractor</h2>
-        
-        <form id="ratingForm">
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 10px; font-weight: 600;">Rating *</label>
-                <div class="star-rating" style="font-size: 40px; cursor: pointer;">
-                    <span class="star" data-rating="1">☆</span>
-                    <span class="star" data-rating="2">☆</span>
-                    <span class="star" data-rating="3">☆</span>
-                    <span class="star" data-rating="4">☆</span>
-                    <span class="star" data-rating="5">☆</span>
-                </div>
-                <input type="hidden" name="rating" id="ratingValue" required>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 10px; font-weight: 600;">Review</label>
-                <textarea name="review" rows="4" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit;" placeholder="Share your experience..."></textarea>
-            </div>
-            
-            <div style="display: flex; gap: 15px;">
-                <button type="button" onclick="closeRatingModal()" style="flex: 1; padding: 12px; background: #f0f0f0; border: none; border-radius: 8px; cursor: pointer;">Cancel</button>
-                <button type="submit" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Submit Review</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-    let selectedRating = 0;
-    
-    // Star rating interaction
-    document.querySelectorAll('.star').forEach(star => {
-        star.addEventListener('click', function() {
-            selectedRating = parseInt(this.dataset.rating);
-            document.getElementById('ratingValue').value = selectedRating;
-            
-            document.querySelectorAll('.star').forEach((s, index) => {
-                s.textContent = index < selectedRating ? '★' : '☆';
-                s.style.color = index < selectedRating ? '#ffa500' : '#ccc';
+        // Rating modal
+        let selectedRating = 0;
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('mouseenter', function() {
+                const r = parseInt(this.dataset.rating);
+                document.querySelectorAll('.star').forEach((s,i) => s.style.color = i < r ? '#F59E0B' : 'var(--stone)');
+            });
+            star.addEventListener('mouseleave', () => {
+                document.querySelectorAll('.star').forEach((s,i) => s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
+            });
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.dataset.rating);
+                document.getElementById('ratingValue').value = selectedRating;
+                document.querySelectorAll('.star').forEach((s,i) => s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
             });
         });
-    });
-    
-    // Show modal on page load
-    window.addEventListener('load', () => {
-        document.getElementById('ratingModal').style.display = 'flex';
-    });
-    
-    function closeRatingModal() {
-        document.getElementById('ratingModal').style.display = 'none';
-    }
-    
-    document.getElementById('ratingForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        if (!selectedRating) {
-            alert('Please select a rating');
-            return;
-        }
-        
-        const formData = new FormData(this);
-        
-        fetch('/user/project/{{ project.id }}/rate-contractor', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                closeRatingModal();
-                location.reload();
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred');
+
+        window.addEventListener('load', () => {
+            const modal = document.getElementById('ratingModal');
+            if (modal) modal.classList.add('show');
         });
-    });
-</script>
-{% endif %}
+
+        function closeRatingModal() {
+            const modal = document.getElementById('ratingModal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        const ratingForm = document.getElementById('ratingForm');
+        if (ratingForm) {
+            ratingForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!selectedRating) { alert('Please select a rating'); return; }
+                const fd = new FormData(this);
+                fetch('/user/project/{{ project.id }}/rate-contractor', { method: 'POST', body: fd })
+                    .then(r => r.json())
+                    .then(d => {
+                        if (d.success) { closeRatingModal(); location.reload(); }
+                        else alert(d.message);
+                    }).catch(() => alert('An error occurred'));
+            });
+        }
+    </script>
 </body>
 </html>

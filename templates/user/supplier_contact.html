@@ -4,220 +4,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Supplier - House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-        }
-        
-        .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .navbar-brand {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 0 20px;
-        }
-        
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-        
-        .back-link:hover {
-            text-decoration: underline;
-        }
-        
-        .contact-card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .card-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .supplier-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            color: white;
-            margin: 0 auto 20px;
-            box-shadow: 0 5px 20px rgba(79, 172, 254, 0.3);
-        }
-        
-        .supplier-name {
-            font-size: 28px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        
-        .supplier-type {
-            font-size: 16px;
-            color: #666;
-        }
-        
-        .contact-methods {
-            display: grid;
-            gap: 20px;
-        }
-        
-        .contact-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            transition: all 0.3s;
-        }
-        
-        .contact-item:hover {
-            background: #e9ecef;
-            transform: translateX(5px);
-        }
-        
-        .contact-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .contact-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
-        
-        .contact-details {
-            flex: 1;
-        }
-        
-        .contact-label {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-        
-        .contact-value {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .contact-action {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-        
-        .contact-action:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
-        }
-        
-        .info-note {
-            background: #fff9e6;
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 30px;
-            border-left: 4px solid #ffc107;
-        }
-        
-        .info-note-title {
-            font-weight: 600;
-            color: #856404;
-            margin-bottom: 10px;
-        }
-        
-        .info-note-text {
-            color: #856404;
-            font-size: 14px;
-            line-height: 1.6;
-        }
+        :root{--cream:#FAF8F5;--warm-white:#FFFFFF;--sand:#F0EBE3;--stone:#E2D9CE;--accent:#B5804F;--accent-dark:#8C5E35;--accent-light:#F7EDE2;--text-primary:#1C1917;--text-secondary:#6B5E52;--text-muted:#9C8E84;--shadow-sm:0 1px 3px rgba(28,25,23,0.06);--shadow-md:0 4px 16px rgba(28,25,23,0.08);--shadow-lg:0 12px 40px rgba(28,25,23,0.10);}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;color:var(--text-primary);position:relative;}
+        body::before{content:'';position:fixed;inset:0;background:url('/static/images/house.jpg') no-repeat center/cover;opacity:0.08;z-index:0;pointer-events:none;}
+
+        /* NAVBAR */
+        .navbar{background:var(--warm-white);border-bottom:1px solid var(--stone);padding:0 40px;height:68px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+        .navbar-brand{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:10px;text-decoration:none;}
+
+        /* LAYOUT */
+        .container{max-width:760px;margin:40px auto;padding:0 24px;position:relative;z-index:1;}
+        .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-size:14px;font-weight:600;text-decoration:none;margin-bottom:22px;transition:gap 0.2s;}
+        .back-link:hover{gap:10px;}
+
+        /* SUPPLIER CARD */
+        .contact-card{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:36px 40px;box-shadow:var(--shadow-md);}
+
+        /* HEADER */
+        .card-header{text-align:center;margin-bottom:32px;padding-bottom:28px;border-bottom:1px solid var(--sand);}
+        .supplier-avatar{width:88px;height:88px;border-radius:50%;background:var(--accent-light);border:3px solid var(--stone);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 16px;}
+        .supplier-name{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--text-primary);margin-bottom:6px;}
+        .supplier-type{font-size:13px;color:var(--text-muted);font-weight:500;background:var(--sand);display:inline-block;padding:4px 14px;border-radius:20px;border:1px solid var(--stone);}
+
+        /* CONTACT ITEMS */
+        .contact-methods{display:flex;flex-direction:column;gap:12px;margin-bottom:24px;}
+        .contact-item{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--cream);border:1.5px solid var(--stone);border-radius:10px;transition:all 0.2s;gap:12px;}
+        .contact-item:hover{border-color:var(--accent);background:var(--accent-light);transform:translateX(4px);}
+        .contact-info{display:flex;align-items:center;gap:14px;flex:1;min-width:0;}
+        .contact-icon{width:44px;height:44px;border-radius:50%;background:var(--sand);border:1px solid var(--stone);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+        .contact-label{font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;}
+        .contact-value{font-size:14px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .contact-action{padding:8px 18px;background:var(--accent);color:white;text-decoration:none;border-radius:7px;font-weight:600;font-size:13px;transition:all 0.2s;white-space:nowrap;flex-shrink:0;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
+        .contact-action:hover{background:var(--accent-dark);transform:translateY(-1px);}
+
+        /* INFO NOTE */
+        .info-note{background:linear-gradient(135deg,var(--accent-light),#FEF3C7);border:1px solid rgba(181,128,79,0.25);border-left:3px solid var(--accent);border-radius:10px;padding:16px 20px;margin-bottom:24px;}
+        .info-note-title{font-weight:700;font-size:13px;color:var(--accent-dark);margin-bottom:6px;}
+        .info-note-text{font-size:13px;color:var(--text-secondary);line-height:1.65;}
+
+        /* QUOTE BUTTON */
+        .quote-btn-wrap{text-align:center;}
+        .btn-outline{padding:12px 28px;background:transparent;color:var(--accent);border:1.5px solid var(--accent);border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+        .btn-outline:hover{background:var(--accent-light);}
+
+        /* MODAL */
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,25,23,0.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+        .modal-overlay.show{display:flex;}
+        .modal-box{background:var(--warm-white);border:1px solid var(--stone);border-radius:20px;padding:36px;max-width:580px;width:90%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:fadeUp 0.3s ease;}
+        .modal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+        .modal-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text-primary);}
+        .modal-close{background:var(--sand);border:1px solid var(--stone);width:34px;height:34px;border-radius:50%;font-size:18px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:all 0.2s;}
+        .modal-close:hover{background:var(--stone);color:var(--text-primary);}
+        .modal-divider{width:36px;height:3px;background:var(--accent);border-radius:2px;margin:8px 0 22px;}
+
+        /* MODAL FORM */
+        .quote-form{display:grid;gap:18px;}
+        .form-label{display:block;margin-bottom:7px;color:var(--text-secondary);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;}
+        .form-control{width:100%;padding:11px 14px;border:1.5px solid var(--stone);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--warm-white);color:var(--text-primary);transition:all 0.2s;}
+        .form-control:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(181,128,79,0.12);}
+        textarea.form-control{resize:vertical;min-height:100px;}
+        .form-row{display:grid;grid-template-columns:2fr 1fr;gap:14px;}
+        @media(max-width:480px){.form-row{grid-template-columns:1fr;}}
+
+        /* MODAL ALERT */
+        .modal-alert{padding:12px 14px;border-radius:8px;font-size:13px;display:none;}
+        .modal-alert.show{display:block;}
+        .modal-alert.success{background:#D1FAE5;color:#065F46;border:1px solid #A7F3D0;}
+        .modal-alert.error{background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;}
+
+        /* MODAL ACTIONS */
+        .modal-actions{display:flex;gap:12px;margin-top:6px;}
+        .btn-ghost{flex:1;padding:12px;background:var(--sand);color:var(--text-secondary);border:1px solid var(--stone);border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+        .btn-ghost:hover{background:var(--stone);}
+        .btn-submit{flex:1;padding:12px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+        .btn-submit:hover{background:var(--accent-dark);}
+        .btn-submit:disabled{opacity:0.6;cursor:not-allowed;}
+
+        @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        .contact-card{animation:fadeUp 0.5s ease both;}
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <div class="navbar-brand">🏗️ House-Forge</div>
+        <a href="/" class="navbar-brand">🏗️ House-Forge</a>
     </nav>
-    
+
     <div class="container">
-        <a href="javascript:history.back()" class="back-link">
-            ← Back
-        </a>
-        
+        <a href="javascript:history.back()" class="back-link">← Back</a>
+
         <div class="contact-card">
+            <!-- Header -->
             <div class="card-header">
                 <div class="supplier-avatar">📦</div>
                 <h1 class="supplier-name">{{ supplier.company_name or supplier.name }}</h1>
-                <div class="supplier-type">{{ supplier.business_type.title() if supplier.business_type else 'Material Supplier' }}</div>
+                <span class="supplier-type">{{ supplier.business_type.title() if supplier.business_type else 'Material Supplier' }}</span>
             </div>
-            
+
+            <!-- Contact Methods -->
             <div class="contact-methods">
-                <!-- Chat Message -->
                 <div class="contact-item">
                     <div class="contact-info">
                         <div class="contact-icon">💬</div>
-                        <div class="contact-details">
+                        <div>
                             <div class="contact-label">Send Message</div>
                             <div class="contact-value">Chat directly with supplier</div>
                         </div>
                     </div>
-                    <a href="{{ url_for('user.messages') }}?open={{ supplier.id }}&type=supplier" 
-                       class="contact-action">Chat</a>
+                    <a href="{{ url_for('user.messages') }}?open={{ supplier.id }}&type=supplier" class="contact-action">Chat</a>
                 </div>
-                
-                <!-- Phone -->
+
                 <div class="contact-item">
                     <div class="contact-info">
                         <div class="contact-icon">📞</div>
-                        <div class="contact-details">
+                        <div>
                             <div class="contact-label">Phone</div>
                             <div class="contact-value">{{ supplier.phone or 'Not available' }}</div>
                         </div>
@@ -226,12 +128,11 @@
                     <a href="tel:{{ supplier.phone }}" class="contact-action">Call Now</a>
                     {% endif %}
                 </div>
-                
-                <!-- Email -->
+
                 <div class="contact-item">
                     <div class="contact-info">
                         <div class="contact-icon">✉️</div>
-                        <div class="contact-details">
+                        <div>
                             <div class="contact-label">Email</div>
                             <div class="contact-value">{{ supplier.email or 'Not available' }}</div>
                         </div>
@@ -240,13 +141,12 @@
                     <a href="mailto:{{ supplier.email }}" class="contact-action">Send Email</a>
                     {% endif %}
                 </div>
-                
-                <!-- Location -->
+
                 {% if supplier.location %}
                 <div class="contact-item">
                     <div class="contact-info">
                         <div class="contact-icon">📍</div>
-                        <div class="contact-details">
+                        <div>
                             <div class="contact-label">Location</div>
                             <div class="contact-value">{{ supplier.location }}</div>
                         </div>
@@ -254,43 +154,35 @@
                 </div>
                 {% endif %}
             </div>
-            
+
+            <!-- Tip -->
             <div class="info-note">
                 <div class="info-note-title">💡 Tip</div>
-                <div class="info-note-text">
-                    When contacting the supplier, mention your project details (size, location, budget) to get accurate quotes. 
-                    Save their contact information for easy access later.
-                </div>
+                <div class="info-note-text">When contacting the supplier, mention your project details (size, location, budget) to get accurate quotes. Save their contact information for easy access later.</div>
             </div>
-                
-                <div style="margin-top: 20px; text-align: center;">
-                    <button onclick="openQuoteModal()" 
-                            style="padding: 12px 24px; background: white; color: #4facfe; border: 2px solid #4facfe; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s;">
-                        📋 Request Detailed Quote
-                    </button>
-                </div>
+
+            <!-- Quote Button -->
+            <div class="quote-btn-wrap">
+                <button onclick="openQuoteModal()" class="btn-outline">📋 Request Detailed Quote</button>
             </div>
         </div>
     </div>
-    
-    <!-- Quote Request Modal -->
-    <div id="quoteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: white; border-radius: 20px; padding: 40px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 50px rgba(0,0,0,0.3);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h2 style="font-size: 24px; font-weight: 600; color: #333;">💰 Request Quote</h2>
-                <button onclick="closeQuoteModal()" style="background: none; border: none; font-size: 28px; color: #999; cursor: pointer; line-height: 1;">&times;</button>
+
+    <!-- Quote Modal -->
+    <div id="quoteModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-top">
+                <h2 class="modal-title">💰 Request Quote</h2>
+                <button class="modal-close" onclick="closeQuoteModal()">✕</button>
             </div>
-            
-            <div id="quoteAlert" style="display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
-            
-            <form id="quoteForm" style="display: grid; gap: 20px;">
+            <div class="modal-divider"></div>
+
+            <div id="quoteAlert" class="modal-alert"></div>
+
+            <form id="quoteForm" class="quote-form">
                 <div>
-                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                        Project Type *
-                    </label>
-                    <select name="project_type" 
-                            required 
-                            style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                    <label class="form-label">Project Type *</label>
+                    <select name="project_type" required class="form-control">
                         <option value="">Select project type</option>
                         <option value="residential">Residential Construction</option>
                         <option value="commercial">Commercial Building</option>
@@ -299,38 +191,20 @@
                         <option value="other">Other</option>
                     </select>
                 </div>
-                
+
                 <div>
-                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                        Material Type *
-                    </label>
-                    <input type="text" 
-                           name="material_type" 
-                           required 
-                           placeholder="e.g., Cement, Steel, Bricks, Tiles"
-                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                    <label class="form-label">Material Type *</label>
+                    <input type="text" name="material_type" required placeholder="e.g. Cement, Steel, Bricks, Tiles" class="form-control">
                 </div>
-                
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+
+                <div class="form-row">
                     <div>
-                        <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                            Quantity *
-                        </label>
-                        <input type="number" 
-                               name="quantity" 
-                               required 
-                               min="1"
-                               placeholder="e.g., 100"
-                               style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                        <label class="form-label">Quantity *</label>
+                        <input type="number" name="quantity" required min="1" placeholder="e.g. 100" class="form-control">
                     </div>
-                    
                     <div>
-                        <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                            Unit *
-                        </label>
-                        <select name="unit" 
-                                required 
-                                style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit;">
+                        <label class="form-label">Unit *</label>
+                        <select name="unit" required class="form-control">
                             <option value="">Unit</option>
                             <option value="bags">Bags</option>
                             <option value="kg">Kg</option>
@@ -343,123 +217,65 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div>
-                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px;">
-                        Project Details *
-                    </label>
-                    <textarea name="project_details" 
-                              required 
-                              rows="4"
-                              placeholder="Provide details about your project, timeline, delivery location, quality requirements..."
-                              style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical;"></textarea>
+                    <label class="form-label">Project Details *</label>
+                    <textarea name="project_details" required class="form-control" placeholder="Provide details about your project, timeline, delivery location, quality requirements…"></textarea>
                 </div>
-                
-                <div style="display: flex; gap: 15px;">
-                    <button type="button" 
-                            onclick="closeQuoteModal()" 
-                            style="flex: 1; padding: 14px; background: #f0f0f0; color: #333; border: none; border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer;">
-                        Cancel
-                    </button>
-                    <button type="submit" 
-                            style="flex: 1; padding: 14px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer;">
-                        Send Quote Request
-                    </button>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-ghost" onclick="closeQuoteModal()">Cancel</button>
+                    <button type="submit" class="btn-submit" id="submitBtn">Send Quote Request</button>
                 </div>
             </form>
         </div>
     </div>
-    
+
     <script>
         const supplierId = '{{ supplier.id }}';
-        
-        // Quote Form Submission
-        document.getElementById('quoteForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            
-            // Validate all fields
-            const required = ['project_type', 'material_type', 'quantity', 'unit', 'project_details'];
-            for (const field of required) {
-                const value = formData.get(field)?.trim();
-                if (!value) {
-                    showAlert('quoteAlert', `Please fill in: ${field.replace('_', ' ')}`, 'error');
-                    return;
-                }
-            }
-            
-            submitBtn.textContent = 'Sending...';
-            submitBtn.disabled = true;
-            
-            fetch(`/user/supplier/${supplierId}/request-quote`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showAlert('quoteAlert', data.message, 'success');
-                    this.reset();
-                    setTimeout(() => closeQuoteModal(), 2000);
-                } else {
-                    showAlert('quoteAlert', data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('quoteAlert', 'An error occurred while sending your quote request', 'error');
-            })
-            .finally(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            });
-        });
-        
-        // Modal Functions
-        function openQuoteModal() {
-            const modal = document.getElementById('quoteModal');
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+
+        function openQuoteModal(){
+            document.getElementById('quoteModal').classList.add('show');
+            document.body.style.overflow='hidden';
         }
-        
-        function closeQuoteModal() {
-            const modal = document.getElementById('quoteModal');
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
+        function closeQuoteModal(){
+            document.getElementById('quoteModal').classList.remove('show');
+            document.body.style.overflow='auto';
             document.getElementById('quoteForm').reset();
-            document.getElementById('quoteAlert').style.display = 'none';
+            hideAlert();
         }
-        
-        // Close modal on background click
-        document.getElementById('quoteModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeQuoteModal();
+        document.getElementById('quoteModal').addEventListener('click',function(e){if(e.target===this)closeQuoteModal();});
+
+        function showAlert(msg,type){
+            const el=document.getElementById('quoteAlert');
+            el.textContent=msg;
+            el.className='modal-alert show '+type;
+            setTimeout(hideAlert,5000);
+        }
+        function hideAlert(){
+            const el=document.getElementById('quoteAlert');
+            el.className='modal-alert';
+        }
+
+        document.getElementById('quoteForm').addEventListener('submit',function(e){
+            e.preventDefault();
+            const fd=new FormData(this);
+            const btn=document.getElementById('submitBtn');
+            const orig=btn.textContent;
+            const required=['project_type','material_type','quantity','unit','project_details'];
+            for(const f of required){
+                if(!fd.get(f)?.trim()){showAlert('Please fill in: '+f.replace('_',' '),'error');return;}
             }
+            btn.textContent='Sending…';btn.disabled=true;
+            fetch(`/user/supplier/${supplierId}/request-quote`,{method:'POST',body:fd})
+            .then(r=>r.json())
+            .then(d=>{
+                if(d.success){showAlert(d.message,'success');this.reset();setTimeout(closeQuoteModal,2000);}
+                else showAlert(d.message,'error');
+            })
+            .catch(()=>showAlert('An error occurred while sending your request','error'))
+            .finally(()=>{btn.textContent=orig;btn.disabled=false;});
         });
-        
-        // Show Alert Function
-        function showAlert(elementId, message, type) {
-            const alert = document.getElementById(elementId);
-            alert.textContent = message;
-            alert.style.display = 'block';
-            
-            if (type === 'success') {
-                alert.style.background = '#d4edda';
-                alert.style.color = '#155724';
-                alert.style.border = '1px solid #c3e6cb';
-            } else {
-                alert.style.background = '#f8d7da';
-                alert.style.color = '#721c24';
-                alert.style.border = '1px solid #f5c6cb';
-            }
-            
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
-        }
     </script>
 </body>
 </html>

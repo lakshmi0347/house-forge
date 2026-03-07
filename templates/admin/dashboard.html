@@ -368,7 +368,7 @@
                 <a href="{{ url_for('admin.manage_contractors') }}" class="btn btn-primary">View All</a>
             </div>
             
-            {% if pending_contractors or pending_suppliers %}
+            {% if pending_contractors or pending_suppliers or pending_users  %}
                 <!-- Pending Contractors -->
                 {% for contractor in pending_contractors %}
                 <div class="verification-card">
@@ -404,6 +404,26 @@
                     <span class="badge badge-warning">Pending Verification</span>
                 </div>
                 {% endfor %}
+
+                <!-- Pending Users -->
+                {% for user in pending_users %}
+                <div class="verification-card">
+                    <div class="verification-header">
+                        <div>
+                            <div class="verification-name">👤 {{ user.to_dict().get('name') }}</div>
+                            <div class="verification-details">
+                                User • {{ user.to_dict().get('email') }}
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.verify_user', user_id=user.id) }}" style="display: inline;">
+                            <button type="submit" class="btn btn-success">Verify</button>
+                        </form>
+                    </div>
+                    <span class="badge badge-warning">Pending Verification</span>
+                </div>
+                {% endfor %}
+
+                
             {% else %}
                 <div class="empty-state">
                     <p>✅ No pending verifications</p>

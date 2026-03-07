@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project.title }} — 3D Model · House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #FAF8F5;
+            --warm-white: #FFFFFF;
+            --sand: #F0EBE3;
+            --stone: #E2D9CE;
+            --accent: #B5804F;
+            --accent-dark: #8C5E35;
+            --accent-light: #F7EDE2;
+            --text-primary: #1C1917;
+            --text-secondary: #6B5E52;
+            --text-muted: #9C8E84;
+            --shadow-sm: 0 1px 3px rgba(28,25,23,0.06);
+            --shadow-md: 0 4px 16px rgba(28,25,23,0.10);
+            --shadow-lg: 0 12px 40px rgba(28,25,23,0.16);
+            --zone-structure: #9E9E9E;
+            --zone-finishes: #B5804F;
+            --zone-mep: #1565C0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #0F0D0B;
+            color: var(--cream);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── TOP BAR ── */
+        .topbar {
+            height: 56px;
+            background: rgba(28,25,23,0.95);
+            border-bottom: 1px solid rgba(181,128,79,0.2);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 16px;
+            flex-shrink: 0;
+            backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+        .topbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            color: var(--accent);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .topbar-sep { width: 1px; height: 24px; background: rgba(181,128,79,0.3); }
+        .topbar-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--cream);
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .topbar-type-badge {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            white-space: nowrap;
+        }
+        .topbar-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: rgba(181,128,79,0.15);
+            border: 1px solid rgba(181,128,79,0.35);
+            border-radius: 8px;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .topbar-btn:hover { background: rgba(181,128,79,0.3); }
+
+        /* ── MAIN LAYOUT ── */
+        .viewer-wrap {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ── CANVAS ── */
+        #three-canvas {
+            flex: 1;
+            display: block;
+            cursor: grab;
+        }
+        #three-canvas:active { cursor: grabbing; }
+
+        /* ── SIDE PANEL ── */
+        .side-panel {
+            width: 280px;
+            background: rgba(20,17,14,0.92);
+            border-left: 1px solid rgba(181,128,79,0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            flex-shrink: 0;
+            backdrop-filter: blur(8px);
+        }
+        .panel-section {
+            padding: 16px;
+            border-bottom: 1px solid rgba(181,128,79,0.1);
+        }
+        .panel-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        /* ── ZONE LEGEND ── */
+        .legend-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 6px;
+            transition: background 0.15s;
+            user-select: none;
+        }
+        .legend-row:hover { background: rgba(181,128,79,0.08); }
+        .legend-row.dimmed { opacity: 0.4; }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+        .legend-text { font-size: 12px; font-weight: 500; color: var(--cream); }
+        .legend-sub { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+
+        /* ── STATS ── */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .stat-card {
+            background: rgba(181,128,79,0.06);
+            border: 1px solid rgba(181,128,79,0.12);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .stat-val {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1;
+        }
+        .stat-lbl { font-size: 10px; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
+
+        /* ── FLOOR PROGRESS ── */
+        .floor-progress { flex: 1; overflow-y: auto; padding: 12px 16px; }
+        .floor-progress::-webkit-scrollbar { width: 4px; }
+        .floor-progress::-webkit-scrollbar-track { background: transparent; }
+        .floor-progress::-webkit-scrollbar-thumb { background: rgba(181,128,79,0.3); border-radius: 2px; }
+        .floor-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            opacity: 0.3;
+            transition: opacity 0.4s ease;
+        }
+        .floor-row.built { opacity: 1; }
+        .floor-row.active {
+            opacity: 1;
+        }
+        .floor-bar-wrap {
+            flex: 1;
+            height: 5px;
+            background: rgba(181,128,79,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .floor-bar {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 3px;
+        }
+        .floor-row.built .floor-bar { width: 100%; }
+        .floor-label { font-size: 10px; color: var(--text-muted); white-space: nowrap; min-width: 70px; }
+
+        /* ── CONTROLS OVERLAY ── */
+        .controls-hint {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+        .ctrl-pill {
+            background: rgba(20,17,14,0.85);
+            border: 1px solid rgba(181,128,79,0.2);
+            border-radius: 20px;
+            padding: 5px 11px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            backdrop-filter: blur(8px);
+        }
+        .ctrl-pill span { color: var(--accent); }
+
+        /* ── TOOLTIP ── */
+        #tooltip {
+            position: absolute;
+            background: rgba(15,12,9,0.96);
+            border: 1px solid rgba(181,128,79,0.4);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 50;
+            max-width: 220px;
+            display: none;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(12px);
+        }
+        .tt-zone {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .tt-zone.structure { color: #9E9E9E; }
+        .tt-zone.finishes  { color: var(--accent); }
+        .tt-zone.mep       { color: #64B5F6; }
+        .tt-label { font-weight: 600; color: var(--cream); margin-bottom: 4px; font-size: 13px; }
+        .tt-cost {
+            font-size: 11px;
+            color: var(--text-muted);
+            padding-top: 6px;
+            margin-top: 4px;
+            border-top: 1px solid rgba(181,128,79,0.15);
+            line-height: 1.4;
+        }
+
+        /* ── REPLAY BTN ── */
+        .replay-btn {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(20,17,14,0.88);
+            border: 1px solid rgba(181,128,79,0.3);
+            border-radius: 8px;
+            padding: 7px 13px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 20;
+            transition: all 0.2s;
+        }
+        .replay-btn:hover { background: rgba(181,128,79,0.15); }
+
+        /* ── LOADING OVERLAY ── */
+        #loading {
+            position: absolute;
+            inset: 0;
+            background: #0F0D0B;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            transition: opacity 0.6s ease;
+        }
+        #loading.hidden { opacity: 0; pointer-events: none; }
+        .loading-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+        .loading-bar-wrap {
+            width: 200px;
+            height: 3px;
+            background: rgba(181,128,79,0.15);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .loading-bar {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            animation: loadpulse 1.2s ease infinite;
+        }
+        @keyframes loadpulse {
+            0%   { width: 0%;   margin-left: 0; }
+            50%  { width: 60%;  margin-left: 20%; }
+            100% { width: 0%;   margin-left: 100%; }
+        }
+        .loading-sub { font-size: 12px; color: var(--text-muted); margin-top: 14px; }
+    </style>
+</head>
+<body>
+
+<!-- Loading screen -->
+<div id="loading">
+    <div class="loading-brand">🏗️ House-Forge</div>
+    <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+    <div class="loading-sub">Constructing your 3D model…</div>
+</div>
+
+<!-- Top bar -->
+<div class="topbar">
+    <div class="topbar-brand">🏗️ House-Forge</div>
+    <div class="topbar-sep"></div>
+    <div class="topbar-title">{{ project.title }}</div>
+    <div class="topbar-type-badge" id="typeBadge">—</div>
+    <a href="{{ url_for('user.projects') }}" class="topbar-btn">← Projects</a>
+    <a href="{{ url_for('user.project_detail', project_id=project.id) }}" class="topbar-btn">📋 Details</a>
+</div>
+
+<!-- Main viewer -->
+<div class="viewer-wrap">
+    <canvas id="three-canvas"></canvas>
+
+    <!-- Controls hint overlay -->
+    <div class="controls-hint">
+        <div class="ctrl-pill"><span>🖱 Drag</span> Orbit</div>
+        <div class="ctrl-pill"><span>Scroll</span> Zoom</div>
+        <div class="ctrl-pill"><span>Right-drag</span> Pan</div>
+    </div>
+
+    <!-- Replay animation button -->
+    <button class="replay-btn" onclick="replayAnimation()" id="replayBtn" style="display:none;">
+        ▶ Replay Build
+    </button>
+
+    <!-- Hover tooltip -->
+    <div id="tooltip">
+        <div class="tt-zone" id="tt-zone">Structure</div>
+        <div class="tt-label" id="tt-label">—</div>
+        <div class="tt-cost" id="tt-cost">—</div>
+    </div>
+
+    <!-- Side panel -->
+    <div class="side-panel">
+
+        <!-- Zone legend -->
+        <div class="panel-section">
+            <div class="panel-label">Colour Zones — click to toggle</div>
+            <div class="legend-row" id="leg-structure" onclick="toggleZone('structure')">
+                <div class="legend-dot" style="background:#9E9E9E;"></div>
+                <div>
+                    <div class="legend-text">Structure</div>
+                    <div class="legend-sub">RCC slabs, columns, foundation</div>
+                </div>
+            </div>
+            <div class="legend-row" id="leg-finishes" onclick="toggleZone('finishes')">
+                <div class="legend-dot" style="background:#B5804F;"></div>
+                <div>
+                    <div class="legend-text">Finishes</div>
+                    <div class="legend-sub">Flooring, paint, cladding, roof</div>
+                </div>
+            </div>
+            <div class="legend-row" id="leg-mep" onclick="toggleZone('mep')">
+                <div class="legend-dot" style="background:#1565C0;"></div>
+                <div>
+                    <div class="legend-text">MEP</div>
+                    <div class="legend-sub">Plumbing, electrical, HVAC</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="panel-section">
+            <div class="panel-label">Project Summary</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-val" id="stat-area">—</div>
+                    <div class="stat-lbl">Built-up sq ft</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="stat-floors">—</div>
+                    <div class="stat-lbl">Floors</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="stat-plot">—</div>
+                    <div class="stat-lbl">Plot sq ft</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="stat-budget">—</div>
+                    <div class="stat-lbl">Budget tier</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floor-by-floor progress -->
+        <div class="panel-section" style="padding-bottom:8px;">
+            <div class="panel-label">Construction Progress</div>
+        </div>
+        <div class="floor-progress" id="floorProgress"></div>
+
+    </div>
+</div>
+
+<!-- Three.js r128 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  MODEL DATA  (injected by Flask)
+// ════════════════════════════════════════════════════════════════
+const MODEL = JSON.parse(document.getElementById('__model_data__').textContent);
+
+// ════════════════════════════════════════════════════════════════
+//  SCENE SETUP
+// ════════════════════════════════════════════════════════════════
+const canvas  = document.getElementById('three-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+renderer.setClearColor(0x0F0D0B);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x0F0D0B, 80, 220);
+
+// Camera
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 500);
+
+// Lights
+const ambient = new THREE.AmbientLight(0xFFF8F0, 0.55);
+scene.add(ambient);
+
+const sun = new THREE.DirectionalLight(0xFFF5E0, 1.2);
+sun.position.set(20, 40, 15);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.near = 0.5;
+sun.shadow.camera.far = 200;
+sun.shadow.camera.left = sun.shadow.camera.bottom = -60;
+sun.shadow.camera.right = sun.shadow.camera.top = 60;
+sun.shadow.bias = -0.0005;
+scene.add(sun);
+
+const fill = new THREE.DirectionalLight(0xC5E8FF, 0.35);
+fill.position.set(-15, 20, -10);
+scene.add(fill);
+
+const rimLight = new THREE.DirectionalLight(0xB5804F, 0.4);
+rimLight.position.set(5, -10, -20);
+scene.add(rimLight);
+
+// ════════════════════════════════════════════════════════════════
+//  ORBIT CONTROLS  (manual — CDN r128 doesn't bundle OrbitControls)
+// ════════════════════════════════════════════════════════════════
+const orbit = {
+    theta: -Math.PI / 5,
+    phi: Math.PI / 3.5,
+    radius: 0,       // set after scene build
+    target: new THREE.Vector3(0, 0, 0),
+    dragging: false,
+    rightDrag: false,
+    lastX: 0, lastY: 0,
+    minPhi: 0.1,
+    maxPhi: Math.PI / 2.05,
+    minR: 5,
+    maxR: 200,
+};
+
+canvas.addEventListener('mousedown', e => {
+    orbit.dragging = true;
+    orbit.rightDrag = e.button === 2;
+    orbit.lastX = e.clientX;
+    orbit.lastY = e.clientY;
+});
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+window.addEventListener('mouseup', () => { orbit.dragging = false; });
+window.addEventListener('mousemove', e => {
+    if (!orbit.dragging) return;
+    const dx = e.clientX - orbit.lastX;
+    const dy = e.clientY - orbit.lastY;
+    orbit.lastX = e.clientX;
+    orbit.lastY = e.clientY;
+    if (orbit.rightDrag) {
+        // Pan
+        const right = new THREE.Vector3();
+        const up    = new THREE.Vector3();
+        camera.matrix.extractBasis(right, up, new THREE.Vector3());
+        orbit.target.addScaledVector(right, -dx * 0.015 * orbit.radius / 20);
+        orbit.target.addScaledVector(up,    dy  * 0.015 * orbit.radius / 20);
+    } else {
+        // Orbit
+        orbit.theta -= dx * 0.006;
+        orbit.phi   = Math.max(orbit.minPhi, Math.min(orbit.maxPhi, orbit.phi - dy * 0.005));
+    }
+});
+canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    orbit.radius = Math.max(orbit.minR, Math.min(orbit.maxR, orbit.radius + e.deltaY * 0.05));
+}, { passive: false });
+
+// Touch support
+let lastTouchDist = 0;
+canvas.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) {
+        orbit.dragging = true;
+        orbit.rightDrag = false;
+        orbit.lastX = e.touches[0].clientX;
+        orbit.lastY = e.touches[0].clientY;
+    } else if (e.touches.length === 2) {
+        lastTouchDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+    }
+});
+canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (e.touches.length === 1 && orbit.dragging) {
+        const dx = e.touches[0].clientX - orbit.lastX;
+        const dy = e.touches[0].clientY - orbit.lastY;
+        orbit.lastX = e.touches[0].clientX;
+        orbit.lastY = e.touches[0].clientY;
+        orbit.theta -= dx * 0.006;
+        orbit.phi = Math.max(orbit.minPhi, Math.min(orbit.maxPhi, orbit.phi - dy * 0.005));
+    } else if (e.touches.length === 2) {
+        const d = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+        orbit.radius = Math.max(orbit.minR, Math.min(orbit.maxR, orbit.radius - (d - lastTouchDist) * 0.05));
+        lastTouchDist = d;
+    }
+}, { passive: false });
+canvas.addEventListener('touchend', () => { orbit.dragging = false; });
+
+function updateCamera() {
+    const x = orbit.target.x + orbit.radius * Math.sin(orbit.phi) * Math.sin(orbit.theta);
+    const y = orbit.target.y + orbit.radius * Math.cos(orbit.phi);
+    const z = orbit.target.z + orbit.radius * Math.sin(orbit.phi) * Math.cos(orbit.theta);
+    camera.position.set(x, y, z);
+    camera.lookAt(orbit.target);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  ZONE VISIBILITY TOGGLE
+// ════════════════════════════════════════════════════════════════
+const zoneVisible = { structure: true, finishes: true, mep: true };
+const zoneMeshes  = { structure: [], finishes: [], mep: [] };
+
+function toggleZone(zone) {
+    zoneVisible[zone] = !zoneVisible[zone];
+    zoneMeshes[zone].forEach(m => { m.visible = zoneVisible[zone]; });
+    const row = document.getElementById(`leg-${zone}`);
+    row.classList.toggle('dimmed', !zoneVisible[zone]);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  MATERIAL FACTORY
+// ════════════════════════════════════════════════════════════════
+function makeMat(color, opacity = 1, roughness = 0.75, metalness = 0.05) {
+    return new THREE.MeshStandardMaterial({
+        color,
+        roughness,
+        metalness,
+        transparent: opacity < 1,
+        opacity,
+        side: THREE.DoubleSide,
+    });
+}
+
+// ════════════════════════════════════════════════════════════════
+//  GEOMETRY HELPERS
+// ════════════════════════════════════════════════════════════════
+function addBox(x, y, z, w, h, d, color, opacity, zone, label, costHint) {
+    const geo  = new THREE.BoxGeometry(w, h, d);
+    const mat  = makeMat(color, opacity);
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, y + h / 2, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.userData = { zone, label, costHint };
+    scene.add(mesh);
+    if (zone && zoneMeshes[zone]) zoneMeshes[zone].push(mesh);
+    return mesh;
+}
+
+function addWallShell(fp, h, y, color, opacity, zone, label, costHint) {
+    const t = 0.23;
+    const group = new THREE.Group();
+    const positions = [
+        [0, -fp/2, fp, t],
+        [0,  fp/2, fp, t],
+        [-fp/2, 0, t, fp],
+        [ fp/2, 0, t, fp],
+    ];
+    positions.forEach(([px, pz, w, d]) => {
+        const geo  = new THREE.BoxGeometry(w, h, d);
+        const mat  = makeMat(color, opacity, 0.8, 0.02);
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(px, h / 2, pz);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        mesh.userData = { zone, label, costHint };
+        group.add(mesh);
+        if (zone && zoneMeshes[zone]) zoneMeshes[zone].push(mesh);
+    });
+    group.position.set(0, y, 0);
+    scene.add(group);
+    return group;
+}
+
+function addFlatRoof(x, y, z, side, h, color, zone, label, costHint) {
+    return addBox(x, y, z, side, h, side, color, 1, zone, label, costHint);
+}
+
+function addSlopedRoof(fp_side, base_y, peak_h, color, zone, label, costHint) {
+    // Build as a simple pyramid using ConeGeometry
+    const geo  = new THREE.ConeGeometry(fp_side * 0.72, peak_h, 4);
+    const mat  = makeMat(color, 1, 0.85, 0.0);
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.rotation.y = Math.PI / 4;
+    mesh.position.set(0, base_y + peak_h / 2, 0);
+    mesh.castShadow = true;
+    mesh.userData = { zone, label, costHint };
+    scene.add(mesh);
+    if (zone && zoneMeshes[zone]) zoneMeshes[zone].push(mesh);
+    return mesh;
+}
+
+function addPergola(fp_side, base_y, color, zone, label, costHint) {
+    const group = new THREE.Group();
+    const beamMat = makeMat(color, 1, 0.9, 0.0);
+    const beamW = 0.15;
+    const count = 5;
+    for (let i = 0; i < count; i++) {
+        const t = i / (count - 1);
+        const geo = new THREE.BoxGeometry(fp_side, beamW, beamW);
+        const m   = new THREE.Mesh(geo, beamMat);
+        m.position.set(0, 0, -fp_side/2 + t * fp_side);
+        m.userData = { zone, label, costHint };
+        group.add(m);
+        if (zone && zoneMeshes[zone]) zoneMeshes[zone].push(m);
+    }
+    group.position.set(0, base_y + beamW / 2, 0);
+    scene.add(group);
+    return group;
+}
+
+function addBoundaryWall(plot_side, height, color, zone, label, costHint) {
+    const t = 0.23;
+    const group = new THREE.Group();
+    const sides = [
+        { x: 0,            z: -plot_side/2, w: plot_side, d: t },
+        { x: 0,            z:  plot_side/2, w: plot_side, d: t },
+        { x: -plot_side/2, z: 0,            w: t,         d: plot_side },
+        { x:  plot_side/2, z: 0,            w: t,         d: plot_side },
+    ];
+    sides.forEach(s => {
+        const geo  = new THREE.BoxGeometry(s.w, height, s.d);
+        const mat  = makeMat(color, 0.9, 0.85, 0.0);
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(s.x, height / 2, s.z);
+        mesh.castShadow = true;
+        mesh.userData = { zone, label, costHint };
+        group.add(mesh);
+        if (zone && zoneMeshes[zone]) zoneMeshes[zone].push(mesh);
+    });
+    scene.add(group);
+    return group;
+}
+
+function addGroundPlane(plot_side) {
+    const geo  = new THREE.PlaneGeometry(plot_side * 2.5, plot_side * 2.5);
+    const mat  = new THREE.MeshStandardMaterial({
+        color: 0x1A1612, roughness: 0.95, metalness: 0.0
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.rotation.x = -Math.PI / 2;
+    mesh.receiveShadow = true;
+    mesh.position.y = -0.02;
+    scene.add(mesh);
+
+    // Plot boundary outline (slightly lighter ground)
+    const plotGeo = new THREE.PlaneGeometry(plot_side, plot_side);
+    const plotMat = new THREE.MeshStandardMaterial({ color: 0x211D18, roughness: 0.98 });
+    const plotMesh = new THREE.Mesh(plotGeo, plotMat);
+    plotMesh.rotation.x = -Math.PI / 2;
+    plotMesh.position.y = -0.01;
+    scene.add(plotMesh);
+
+    // Thin grid on ground
+    const grid = new THREE.GridHelper(plot_side * 2, Math.floor(plot_side * 2), 0x2A2520, 0x231E19);
+    grid.position.y = 0.001;
+    scene.add(grid);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  SCENE BUILDER  — reads MODEL data, builds meshes
+// ════════════════════════════════════════════════════════════════
+const floorMeshGroups = []; // for animation — each entry = { meshes:[], built: false }
+let   totalBuildHeight = 0;
+
+function buildScene() {
+    const ptype  = MODEL.property_type;
+    const data   = MODEL;
+    const fp     = data.fp_side;
+    const ps     = data.plot_side;
+
+    addGroundPlane(ps);
+
+    // ── FLOORS  (collected for animation) ──
+    const floors = data.floors || [];
+    floors.forEach(floor => {
+        const group = { meshes: [], index: floor.index, label: floor.label, y: floor.y };
+        const baseY = floor.y;
+        const h     = floor.height;
+
+        // Add each zone element
+        (floor.zones || []).forEach(z => {
+            let mesh;
+            if (z.type === 'wall') {
+                mesh = addWallShell(fp, h, baseY + z.y, z.color, z.opacity ?? 0.92,
+                                    z.zone, z.label, z.cost_hint);
+            } else {
+                mesh = addBox(
+                    z.x, baseY + z.y, z.z,
+                    z.w, z.h, z.d,
+                    z.color, z.opacity ?? 1,
+                    z.zone, z.label, z.cost_hint
+                );
+            }
+            // Flatten group children for animation
+            if (mesh.isGroup) {
+                mesh.children.forEach(c => group.meshes.push(c));
+            } else {
+                group.meshes.push(mesh);
+            }
+        });
+
+        // Hide all meshes initially — animation will reveal them
+        group.meshes.forEach(m => { m.visible = false; });
+        floorMeshGroups.push(group);
+        totalBuildHeight = Math.max(totalBuildHeight, baseY + h);
+    });
+
+    // ── ROOF ──
+    const roof = data.roof;
+    if (roof) {
+        let roofMesh;
+        if (roof.type === 'flat') {
+            roofMesh = addFlatRoof(0, roof.base_y, 0, roof.fp_side, roof.h,
+                                    roof.color, roof.zone, roof.label, roof.cost_hint);
+        } else if (roof.type === 'pyramid') {
+            roofMesh = addSlopedRoof(fp, roof.base_y, roof.peak_h,
+                                      roof.color, roof.zone, roof.label, roof.cost_hint);
+        } else if (roof.type === 'pergola') {
+            roofMesh = addPergola(fp, roof.base_y, roof.color,
+                                   roof.zone, roof.label, roof.cost_hint);
+        }
+        if (roofMesh) {
+            const rg = { meshes: roofMesh.isGroup ? [...roofMesh.children] : [roofMesh],
+                         index: 999, label: 'Roof', y: roof.base_y };
+            rg.meshes.forEach(m => { m.visible = false; });
+            floorMeshGroups.push(rg);
+            totalBuildHeight = Math.max(totalBuildHeight, roof.base_y + (roof.h || roof.peak_h || 0.5));
+        }
+    }
+
+    // ── STATIC ELEMENTS  (visible from start) ──
+
+    // Car porch
+    if (data.porch) {
+        const p = data.porch;
+        const m = addBox(p.x, p.h / 2, p.z, p.w, p.h, p.d,
+                          p.color, 0.88, p.zone, p.label, p.cost_hint);
+        m.visible = true;
+    }
+
+    // Swimming pool
+    const pool = data.pool;
+    if (pool) {
+        // Water
+        const waterGeo = new THREE.BoxGeometry(pool.w, 0.8, pool.d);
+        const waterMat = new THREE.MeshStandardMaterial({
+            color: 0x29B6F6, roughness: 0.05, metalness: 0.05,
+            transparent: true, opacity: 0.82
+        });
+        const wm = new THREE.Mesh(waterGeo, waterMat);
+        wm.position.set(pool.x, 0.4, pool.z);
+        wm.userData = { zone: 'mep', label: pool.label, costHint: pool.cost_hint };
+        scene.add(wm);
+        zoneMeshes['mep'].push(wm);
+        // Pool shell
+        addBox(pool.x, 0, pool.z, pool.w + 0.3, 0.15, pool.d + 0.3,
+               0x37474F, 1, 'structure', 'Pool Shell', pool.cost_hint);
+    }
+
+    // Boundary wall
+    const bw = data.boundary;
+    if (bw) {
+        addBoundaryWall(ps, bw.height, bw.color, bw.zone, bw.label, bw.cost_hint);
+    }
+
+    // Garden
+    const garden = data.garden;
+    if (garden) {
+        const garden_side = Math.sqrt(garden.area_sqft * 0.0929);
+        const gardenGeo = new THREE.PlaneGeometry(garden_side, garden_side);
+        const gardenMat = new THREE.MeshStandardMaterial({ color: 0x2E7D32, roughness: 0.9 });
+        const gm = new THREE.Mesh(gardenGeo, gardenMat);
+        gm.rotation.x = -Math.PI / 2;
+        gm.position.set(-fp / 2 - garden_side / 2 - 0.5, 0.01, 0);
+        gm.userData = { zone: 'finishes', label: garden.label, costHint: garden.cost_hint };
+        scene.add(gm);
+        zoneMeshes['finishes'].push(gm);
+    }
+
+    // Lift core (apartment)
+    const lc = data.lift_core;
+    if (lc) {
+        const m = addBox(lc.x, lc.h / 2, lc.z, lc.w, lc.h, lc.d,
+                          lc.color, 0.95, lc.zone, lc.label, lc.cost_hint);
+        m.visible = true;
+    }
+
+    // Clubhouse (apartment)
+    const cb = data.clubhouse_block;
+    if (cb) {
+        addBox(cb.x, cb.h / 2, cb.z, cb.w, cb.h, cb.d,
+               cb.color, 0.9, cb.zone, cb.label, cb.cost_hint);
+    }
+
+    // ── CAMERA SETUP ──
+    const buildingCentre = new THREE.Vector3(0, totalBuildHeight / 2, 0);
+    orbit.target.copy(buildingCentre);
+    orbit.radius  = Math.max(fp * 2.5, totalBuildHeight * 2.2, 20);
+    orbit.radius  = Math.min(orbit.radius, orbit.maxR);
+    updateCamera();
+}
+
+// ════════════════════════════════════════════════════════════════
+//  FLOOR-BY-FLOOR ANIMATION
+// ════════════════════════════════════════════════════════════════
+let animQueue      = [];
+let animRunning    = false;
+const FLOOR_DELAY  = 420;  // ms between floors
+const FADE_STEPS   = 14;
+
+function buildFloorProgressUI() {
+    const fp = document.getElementById('floorProgress');
+    fp.innerHTML = '';
+    floorMeshGroups.forEach((g, i) => {
+        const row = document.createElement('div');
+        row.className = 'floor-row';
+        row.id = `frow-${i}`;
+        row.innerHTML = `
+            <div class="floor-label">${g.label}</div>
+            <div class="floor-bar-wrap"><div class="floor-bar" id="fbar-${i}"></div></div>
+        `;
+        fp.appendChild(row);
+    });
+}
+
+function replayAnimation() {
+    // Reset all floors invisible
+    floorMeshGroups.forEach((g, i) => {
+        g.built = false;
+        g.meshes.forEach(m => {
+            m.visible = false;
+            if (m.material) { m.material.opacity = 0; m.material.transparent = true; }
+        });
+        const row = document.getElementById(`frow-${i}`);
+        if (row) { row.classList.remove('built', 'active'); }
+        const bar = document.getElementById(`fbar-${i}`);
+        if (bar) { bar.style.width = '0%'; }
+    });
+    animQueue = [...floorMeshGroups];
+    animRunning = true;
+    processAnimQueue();
+}
+
+function processAnimQueue() {
+    if (animQueue.length === 0) {
+        animRunning = false;
+        document.getElementById('replayBtn').style.display = 'flex';
+        return;
+    }
+    const group  = animQueue.shift();
+    const gIndex = floorMeshGroups.indexOf(group);
+
+    // Update UI
+    const row = document.getElementById(`frow-${gIndex}`);
+    if (row) row.classList.add('active');
+    const bar = document.getElementById(`fbar-${gIndex}`);
+
+    // Reveal meshes (fade in over FADE_STEPS frames)
+    group.meshes.forEach(m => {
+        m.visible = true;
+        if (m.material) {
+            const targetOpacity = m.material.opacity || 1;
+            m.material.opacity = 0;
+            m.material.transparent = true;
+            m.userData._fadeTarget = targetOpacity;
+            m.userData._fadeStep   = targetOpacity / FADE_STEPS;
+        }
+    });
+
+    // Animate bar
+    let pct = 0;
+    const barInterval = setInterval(() => {
+        pct = Math.min(100, pct + 100 / FADE_STEPS);
+        if (bar) bar.style.width = pct + '%';
+        if (pct >= 100) clearInterval(barInterval);
+    }, FLOOR_DELAY / FADE_STEPS);
+
+    setTimeout(() => {
+        group.built = true;
+        if (row) { row.classList.remove('active'); row.classList.add('built'); }
+        // Scroll to keep current floor visible
+        if (row) row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        processAnimQueue();
+    }, FLOOR_DELAY);
+}
+
+// Per-frame fade update
+function updateFades() {
+    floorMeshGroups.forEach(g => {
+        if (!g.built) return;
+        g.meshes.forEach(m => {
+            if (m.userData._fadeTarget !== undefined && m.material) {
+                if (m.material.opacity < m.userData._fadeTarget) {
+                    m.material.opacity = Math.min(m.userData._fadeTarget,
+                                                   m.material.opacity + m.userData._fadeStep);
+                    if (m.material.opacity >= m.userData._fadeTarget) {
+                        // Done fading — cleanup transparent flag if fully opaque
+                        if (m.userData._fadeTarget >= 1) m.material.transparent = false;
+                        delete m.userData._fadeTarget;
+                        delete m.userData._fadeStep;
+                    }
+                }
+            }
+        });
+    });
+}
+
+// ════════════════════════════════════════════════════════════════
+//  RAYCASTING — hover tooltip
+// ════════════════════════════════════════════════════════════════
+const raycaster = new THREE.Raycaster();
+const mouse     = new THREE.Vector2(-999, -999);
+const tooltip   = document.getElementById('tooltip');
+let   hoveredMesh = null;
+
+canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x =  ((e.clientX - rect.left)  / rect.width)  * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+    tooltip.style.left = (e.clientX + 14) + 'px';
+    tooltip.style.top  = (e.clientY - 10) + 'px';
+});
+
+canvas.addEventListener('mouseleave', () => {
+    mouse.set(-999, -999);
+    tooltip.style.display = 'none';
+    hoveredMesh = null;
+});
+
+function doRaycast() {
+    raycaster.setFromCamera(mouse, camera);
+    const allMeshes = [];
+    scene.traverse(obj => { if (obj.isMesh && obj.visible && obj.userData.label) allMeshes.push(obj); });
+    const hits = raycaster.intersectObjects(allMeshes);
+
+    if (hits.length > 0) {
+        const hit = hits[0].object;
+        if (hit !== hoveredMesh) {
+            hoveredMesh = hit;
+            const ud = hit.userData;
+            const zone = ud.zone || 'structure';
+            document.getElementById('tt-zone').textContent  = zone.toUpperCase();
+            document.getElementById('tt-zone').className    = `tt-zone ${zone}`;
+            document.getElementById('tt-label').textContent = ud.label    || '—';
+            document.getElementById('tt-cost').textContent  = ud.costHint || '—';
+            tooltip.style.display = 'block';
+        }
+    } else {
+        if (hoveredMesh) {
+            hoveredMesh = null;
+            tooltip.style.display = 'none';
+        }
+    }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  UI POPULATION
+// ════════════════════════════════════════════════════════════════
+function populateUI() {
+    const ptype = MODEL.property_type;
+    const badgeEl = document.getElementById('typeBadge');
+    const labels  = { residential: 'Residential', villa: 'Villa', apartment: 'Apartment' };
+    badgeEl.textContent = labels[ptype] || ptype;
+
+    // Stats — read from MODEL (already JSON-injected) to avoid Jinja None → JS syntax errors
+    const builtSqft = Math.round((MODEL.fp_side * MODEL.fp_side / 0.0929) *
+                                  ((MODEL.floors || []).filter(f => f.index >= 0).length || 1));
+    const plotSqft  = Math.round(MODEL.plot_side * MODEL.plot_side / 0.0929);
+    document.getElementById('stat-area').textContent   = builtSqft.toLocaleString('en-IN');
+    document.getElementById('stat-floors').textContent = (MODEL.floors || []).filter(f => f.index >= 0).length;
+    document.getElementById('stat-plot').textContent   = plotSqft.toLocaleString('en-IN');
+    const budgetMap = { low: 'Budget', medium: 'Standard', high: 'Premium' };
+    document.getElementById('stat-budget').textContent = budgetMap[MODEL.budget] || '—';
+}
+
+// ════════════════════════════════════════════════════════════════
+//  RESIZE
+// ════════════════════════════════════════════════════════════════
+function resize() {
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+
+// ════════════════════════════════════════════════════════════════
+//  RENDER LOOP
+// ════════════════════════════════════════════════════════════════
+function animate() {
+    requestAnimationFrame(animate);
+    updateCamera();
+    updateFades();
+    doRaycast();
+    renderer.render(scene, camera);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════════
+function init() {
+    resize();
+    buildScene();
+    buildFloorProgressUI();
+    populateUI();
+    animate();
+
+    // Hide loading, start build animation after brief delay
+    setTimeout(() => {
+        document.getElementById('loading').classList.add('hidden');
+        setTimeout(() => {
+            animQueue = [...floorMeshGroups];
+            animRunning = true;
+            processAnimQueue();
+        }, 400);
+    }, 800);
+}
+
+init();
+</script>
+    <script type="application/json" id="__model_data__">{{ model_data_json | safe }}</script>
+</body>
+</html>

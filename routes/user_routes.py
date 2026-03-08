@@ -233,6 +233,12 @@ def projects():
     
     return render_template('user/my_projects.html', projects=projects)
 
+# ─────────────────────────────────────────────────────────────────────────────
+#  REPLACE the create_project route in routes/user_routes.py with this block.
+#  The only change is passing request.form to calculate_materials_and_cost so
+#  the new detailed calculator can read all the extra HTML form fields.
+# ─────────────────────────────────────────────────────────────────────────────
+
 @user_bp.route('/create-project', methods=['GET', 'POST'])
 @login_required
 def create_project():
@@ -241,45 +247,81 @@ def create_project():
     if not db:
         flash('Database connection error', 'error')
         return redirect(url_for('user.dashboard'))
-    
+
+    # Pass user profile picture to template (used by navbar)
+    user_profile_picture = None
+    try:
+        user_doc = db.collection('users').document(current_user.id).get()
+        if user_doc.exists:
+            user_profile_picture = user_doc.to_dict().get('profile_picture')
+    except Exception:
+        pass
+
     if request.method == 'POST':
         from services.calculation_service import calculate_materials_and_cost
-        
-        square_feet = float(request.form.get('square_feet'))
-        rooms = int(request.form.get('rooms'))
-        floors = int(request.form.get('floors'))
-        bathrooms = int(request.form.get('bathrooms', 2))
-        budget_range = request.form.get('budget_range')
-        
+
+        # ── Core scalar fields (still kept for backwards-compat + DB storage) ──
+        square_feet  = float(request.form.get('square_feet', 0) or 0)
+        plot_area    = float(request.form.get('plot_area', 0) or 0)
+        prop_type    = request.form.get('property_type', 'residential')
+        budget_range = request.form.get('budget_range', 'medium')
+
+        # Rooms / floors / bathrooms differ by property type
+        if prop_type == 'apartment':
+            rooms     = int(request.form.get('apt_total_units') or 0)
+            floors    = int(request.form.get('apt_total_floors') or 1)
+            bathrooms = max(1, (int(request.form.get('apt_1bhk_count') or 0)
+                              + int(request.form.get('apt_2bhk_count') or 0) * 2
+                              + int(request.form.get('apt_3bhk_count') or 0) * 3)
+                          // max(rooms, 1))
+        else:
+            rooms     = int(request.form.get('rooms') or 1)
+            floors    = int(request.form.get('floors') or 1)
+            bathrooms = int(request.form.get('bathrooms') or 2)
+
+        # ── Full estimation with all form fields ──
         estimation = calculate_materials_and_cost(
-            square_feet, rooms, floors, bathrooms, budget_range
+            square_feet  = square_feet,
+            rooms        = rooms,
+            floors       = floors,
+            bathrooms    = bathrooms,
+            budget_range = budget_range,
+            form         = request.form,          # ← NEW: pass full form
         )
-        
+
         project_data = {
-            'user_id': current_user.id,
-            'title': request.form.get('title'),
-            'square_feet': square_feet,
-            'rooms': rooms,
-            'floors': floors,
-            'bathrooms': bathrooms,
-            'location': request.form.get('location'),
-            'property_type': request.form.get('property_type', 'residential'),
-            'budget_range': budget_range,
-            'description': request.form.get('description'),
-            'status': 'planning',
-            'created_at': datetime.now(),
-            'estimation': estimation
+            'user_id':       current_user.id,
+            'title':         request.form.get('title'),
+            'square_feet':   square_feet,
+            'plot_area':     plot_area,
+            'rooms':         rooms,
+            'floors':        floors,
+            'bathrooms':     bathrooms,
+            'location':      request.form.get('location'),
+            'property_type': prop_type,
+            'budget_range':  budget_range,
+            'estimate_scope':request.form.get('estimate_scope', 'material_only'),
+            'description':   request.form.get('description'),
+            'status':        'planning',
+            'created_at':    datetime.now(),
+            'estimation':    estimation,
         }
-        
-        doc_ref = db.collection('projects').add(project_data)
+
+        doc_ref    = db.collection('projects').add(project_data)
         project_id = doc_ref[1].id
-        
-        return render_template('user/project_created.html', 
-                              project=project_data, 
-                              estimation=estimation,
-                              project_id=project_id)
-    
-    return render_template('user/create_project.html')
+        project_data['id'] = project_id
+
+        return render_template(
+            'user/project_created.html',
+            project    = project_data,
+            estimation = estimation,
+            project_id = project_id,
+        )
+
+    return render_template(
+        'user/create_project.html',
+        user_profile_picture = user_profile_picture,
+    )
 
 @user_bp.route('/project/<project_id>')
 @login_required

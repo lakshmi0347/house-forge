@@ -17,6 +17,7 @@
         .navbar-menu{display:flex;align-items:center;gap:4px;}
         .navbar-menu a{color:var(--text-secondary);text-decoration:none;padding:8px 14px;border-radius:8px;font-size:14px;font-weight:500;transition:all 0.2s;}
         .navbar-menu a:hover{color:var(--accent);background:var(--accent-light);}
+        .badge-notification{position:absolute;top:2px;right:2px;background:#DC2626;color:white;border-radius:50%;width:18px;height:18px;display:none;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:2px solid var(--warm-white);}
         .profile-pic{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--stone);}
         .profile-placeholder{width:36px;height:36px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;border:2px solid var(--stone);}
 
@@ -27,7 +28,7 @@
 
         /* PAGE HEADER */
         .page-header{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:30px 40px;margin-bottom:24px;box-shadow:var(--shadow-md);}
-        .page-header h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--text-primary);margin-bottom:10px;}
+        .page-header h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:10px;}
         .divider{width:40px;height:3px;background:var(--accent);border-radius:2px;margin:10px 0 14px;}
         .project-meta{display:flex;gap:18px;flex-wrap:wrap;align-items:center;}
         .meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);}
@@ -35,6 +36,7 @@
         .status-planning{background:#FEF3C7;color:#92400E;}
         .status-active{background:#DBEAFE;color:#1E40AF;}
         .status-completed{background:#D1FAE5;color:#065F46;}
+        .scope-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;background:var(--accent-light);color:var(--accent);border:1px solid rgba(181,128,79,0.25);}
 
         /* TWO COLUMN */
         .two-column{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
@@ -45,16 +47,23 @@
         .section-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--text-primary);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--sand);}
 
         /* COST SUMMARY */
-        .cost-summary{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:28px 32px;margin-bottom:20px;box-shadow:var(--shadow-md);position:relative;overflow:hidden;}
-        
+        .cost-summary{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:28px 32px;margin-bottom:20px;box-shadow:var(--shadow-md);}
         .cost-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);margin-bottom:6px;}
-        .cost-total{font-family:'Trafalgar', sans-serif;font-size:42px;font-weight:700;color:var(--text-primary);line-height:1;margin-bottom:20px;}
+        .cost-total{font-family:'Playfair Display',serif;font-size:42px;font-weight:700;color:var(--text-primary);line-height:1;margin-bottom:20px;}
         .cost-total span{font-size:22px;color:var(--accent);}
         .cost-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
         @media(max-width:600px){.cost-breakdown{grid-template-columns:1fr;}}
         .breakdown-item{background:var(--sand);border:1px solid var(--stone);border-radius:10px;padding:16px;text-align:center;}
         .breakdown-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
-        .breakdown-value{font-family:'Trafalgar', sans-serif;font-size:19px;font-weight:700;color:var(--text-primary);}
+        .breakdown-value{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--text-primary);}
+        /* Hide labour breakdown item when scope=material_only */
+        .labour-item.hidden{display:none;}
+
+        /* AI RATIONALE BLOCK */
+        .ai-block{background:linear-gradient(90deg,var(--accent-light),#FFF8F0);border:1px solid rgba(181,128,79,0.25);border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;}
+        .ai-block-icon{font-size:22px;flex-shrink:0;}
+        .ai-block-text p{font-size:13px;color:var(--text-secondary);line-height:1.6;}
+        .ai-block-text .conf{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--accent);margin-top:4px;}
 
         /* STAGE ACCORDION */
         .stage-accordion{margin-bottom:10px;border:1.5px solid var(--stone);border-radius:10px;overflow:hidden;transition:border-color 0.2s;}
@@ -72,7 +81,6 @@
         .stage-header.active .stage-cost{color:white;}
         .stage-toggle{font-size:12px;color:var(--text-muted);transition:transform 0.3s;}
         .stage-header.active .stage-toggle{transform:rotate(180deg);color:white;}
-
         .stage-content{max-height:0;overflow:hidden;transition:max-height 0.35s ease;}
         .stage-content.active{max-height:2000px;}
 
@@ -80,25 +88,19 @@
         .materials-wrap{padding:16px 20px;}
         table{width:100%;border-collapse:collapse;}
         th{padding:10px 12px;text-align:left;background:var(--sand);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);}
-        th:first-child{border-radius:6px 0 0 6px;}
-        th:last-child{border-radius:0 6px 6px 0;}
+        th:first-child{border-radius:6px 0 0 6px;}th:last-child{border-radius:0 6px 6px 0;}
         td{padding:10px 12px;font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--sand);}
-        tr:last-child td{border-bottom:none;}
-        tr:hover td{background:var(--cream);}
+        tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cream);}
 
-        /* SIDEBAR CARDS */
+        /* SIDEBAR */
         .info-list{display:flex;flex-direction:column;}
         .info-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--sand);}
         .info-row:last-child{border-bottom:none;}
         .info-label{font-size:13px;color:var(--text-muted);font-weight:500;}
         .info-value{font-size:13px;font-weight:600;color:var(--text-primary);}
-
-        /* TIMELINE */
         .timeline-block{background:linear-gradient(135deg,var(--accent-light),#FEF3C7);border:1px solid rgba(181,128,79,0.2);border-radius:10px;padding:20px;text-align:center;}
         .timeline-num{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:var(--accent);line-height:1;}
         .timeline-sub{font-size:13px;color:var(--text-secondary);margin-top:4px;}
-
-        /* ACTION BUTTONS */
         .action-buttons{display:flex;flex-direction:column;gap:10px;}
         .btn-primary{padding:12px 18px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;text-align:center;transition:all 0.2s;display:block;font-family:'DM Sans',sans-serif;}
         .btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 14px rgba(181,128,79,0.3);}
@@ -109,7 +111,7 @@
         .modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,25,23,0.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
         .modal-overlay.show{display:flex;}
         .modal-box{background:var(--warm-white);border:1px solid var(--stone);border-radius:20px;padding:36px;max-width:480px;width:90%;box-shadow:var(--shadow-lg);animation:fadeUp 0.3s ease;}
-        .modal-box h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:6px;}
+        .modal-box h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:6px;}
         .modal-divider{width:36px;height:3px;background:var(--accent);border-radius:2px;margin:8px 0 20px;}
         .modal-label{display:block;margin-bottom:8px;font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;}
         .star-rating{display:flex;gap:4px;margin-bottom:20px;}
@@ -118,24 +120,30 @@
         .modal-textarea{width:100%;padding:11px 14px;border:1.5px solid var(--stone);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text-primary);resize:vertical;min-height:100px;margin-bottom:20px;transition:border-color 0.2s;}
         .modal-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(181,128,79,0.12);}
         .modal-actions{display:flex;gap:12px;}
-        .btn-ghost{flex:1;padding:11px;background:var(--sand);color:var(--text-secondary);border:1px solid var(--stone);border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+        .btn-ghost{flex:1;padding:11px;background:var(--sand);color:var(--text-secondary);border:1px solid var(--stone);border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;}
         .btn-ghost:hover{background:var(--stone);}
-        .modal-submit{flex:1;padding:11px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+        .modal-submit{flex:1;padding:11px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;}
         .modal-submit:hover{background:var(--accent-dark);}
 
         @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-        .page-header{animation:fadeUp 0.5s ease both;}
-        .two-column{animation:fadeUp 0.5s 0.1s ease both;}
+        .page-header,.two-column{animation:fadeUp 0.5s ease both;}
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
         <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">🏗️ House-Forge</a>
         <div class="navbar-menu">
             <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('user.projects') }}">My Projects</a>
             <a href="{{ url_for('user.my_orders') }}">My Orders</a>
+            <a href="{{ url_for('user.messages') }}" style="position:relative;">
+                Messages
+                <span class="badge-notification" id="messagesBadge"></span>
+            </a>
+            <a href="{{ url_for('user.notifications') }}" style="position:relative;">
+                Notifications
+                <span class="badge-notification" id="notificationsBadge"></span>
+            </a>
             <a href="{{ url_for('user.profile') }}" style="padding:8px 10px;">
                 {% if user_profile_picture %}
                     <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
@@ -158,61 +166,96 @@
                 <div class="meta-item">📍 {{ project.location }}</div>
                 <div class="meta-item">📅 Created: {{ project.created_at.strftime('%d %b %Y') if project.created_at else 'N/A' }}</div>
                 <span class="status-badge status-{{ project.status }}">{{ project.status.upper() }}</span>
+                {# estimate scope badge #}
+                {% set scope = estimation.get('estimate_scope', project.get('estimate_scope', 'material_only')) %}
+                <span class="scope-badge">
+                    {% if scope == 'material_and_labour' %}👷 Material + Labour{% else %}📦 Material Only{% endif %}
+                </span>
+                {# property type #}
+                <span class="scope-badge" style="background:#E0F2FE;color:#0369A1;border-color:#BAE6FD;">
+                    {{ estimation.get('property_type', project.get('property_type','residential')).title() }}
+                </span>
             </div>
         </div>
 
         <div class="two-column">
             <!-- LEFT COLUMN -->
             <div>
-                <!-- Cost Summary -->
+                {# ── COST SUMMARY ── #}
+                {% set budget = project.budget_range | lower %}
+                {% set tc = estimation.costs.get(budget, estimation.costs.get('medium', {})) %}
+                {% set mat_cost  = tc.get('material_cost', 0) %}
+                {% set lab_cost  = tc.get('labor_cost',    0) %}
+                {% set oth_cost  = tc.get('other_costs',   0) %}
+                {% set total_cost= tc.get('total_cost',    0) %}
+                {% set scope     = estimation.get('estimate_scope', 'material_only') %}
+
                 <div class="cost-summary">
-                    <div class="cost-label">Total Estimated Cost · {{ project.budget_range.title() }} Budget</div>
-                    <div class="cost-total"><span>₹</span>{{ "{:,.0f}".format(estimation.costs[project.budget_range].total_cost) }}</div>
+                    <div class="cost-label">
+                        Total Estimated Cost · {{ {'low':'Budget','medium':'Standard','high':'Premium'}.get(budget, budget.title()) }} Budget
+                    </div>
+                    <div class="cost-total"><span>₹</span>{{ "{:,.0f}".format(total_cost) }}</div>
                     <div class="cost-breakdown">
                         <div class="breakdown-item">
                             <div class="breakdown-label">Materials</div>
-                            <div class="breakdown-value">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].material_cost) }}</div>
+                            <div class="breakdown-value">₹{{ "{:,.0f}".format(mat_cost) }}</div>
                         </div>
-                        <div class="breakdown-item">
+                        {# Labour: only shown when scope = material_and_labour #}
+                        <div class="breakdown-item labour-item {% if scope != 'material_and_labour' %}hidden{% endif %}">
                             <div class="breakdown-label">Labour</div>
-                            <div class="breakdown-value">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].labor_cost) }}</div>
+                            <div class="breakdown-value">₹{{ "{:,.0f}".format(lab_cost) }}</div>
                         </div>
                         <div class="breakdown-item">
-                            <div class="breakdown-label">Other</div>
-                            <div class="breakdown-value">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].other_costs) }}</div>
+                            <div class="breakdown-label">Other / Contingency</div>
+                            <div class="breakdown-value">₹{{ "{:,.0f}".format(oth_cost) }}</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Stages & Materials -->
+                {# ── AI RATIONALE ── #}
+                {% if estimation.get('ai_rationale') %}
+                <div class="ai-block">
+                    <span class="ai-block-icon">🤖</span>
+                    <div class="ai-block-text">
+                        <p>{{ estimation.ai_rationale }}</p>
+                        {% if estimation.get('ai_confidence') %}
+                        <div class="conf">AI Confidence: {{ estimation.ai_confidence }}/10</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {# ── STAGES & MATERIALS ── #}
                 <div class="card">
-                    <div class="section-title">🏗️ Construction Stages & Materials</div>
+                    <div class="section-title">🏗️ Construction Stages &amp; Materials</div>
 
                     {% set stages = [
-                        ('foundation','🏗️','Foundation'),
-                        ('walls','🧱','Walls'),
-                        ('flooring','🪟','Flooring & Slab'),
-                        ('roofing','🏠','Roofing'),
-                        ('plumbing','🚰','Plumbing'),
-                        ('electrical','⚡','Electrical'),
-                        ('finishing','🎨','Finishing'),
-                        ('carpentry','🪑','Carpentry'),
-                        ('exterior','🌳','Exterior'),
-                        ('miscellaneous','🔧','Miscellaneous')
+                        ('foundation',   '🏗️', 'Foundation'),
+                        ('walls',        '🧱', 'Walls'),
+                        ('flooring',     '🪟', 'Flooring & Slab'),
+                        ('roofing',      '🏠', 'Roofing'),
+                        ('plumbing',     '🚰', 'Plumbing'),
+                        ('electrical',   '⚡', 'Electrical'),
+                        ('finishing',    '🎨', 'Finishing'),
+                        ('carpentry',    '🪑', 'Carpentry'),
+                        ('exterior',     '🌳', 'Exterior'),
+                        ('miscellaneous','🔧', 'Miscellaneous')
                     ] %}
 
                     {% for stage_key, icon, stage_name in stages %}
+                    {% set stage_cost = tc.get('stage_breakdown', {}).get(stage_key, 0) %}
+                    {% set stage_mats = estimation.materials.get(stage_key, {}) %}
                     <div class="stage-accordion">
                         <div class="stage-header" onclick="toggleStage('{{ stage_key }}')">
                             <div class="stage-info">
                                 <span class="stage-icon">{{ icon }}</span>
                                 <div>
                                     <div class="stage-name">{{ stage_name }}</div>
-                                    <div class="stage-meta-count">{{ estimation.materials[stage_key] | length }} materials</div>
+                                    <div class="stage-meta-count">{{ stage_mats | length }} materials</div>
                                 </div>
                             </div>
                             <div style="display:flex;align-items:center;gap:14px;">
-                                <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown[stage_key]) }}</div>
+                                <div class="stage-cost">₹{{ "{:,.0f}".format(stage_cost) }}</div>
                                 <span class="stage-toggle">▼</span>
                             </div>
                         </div>
@@ -227,20 +270,20 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for material, quantity in estimation.materials[stage_key].items() %}
-                                        {% if quantity > 0 %}
+                                        {% for material, quantity in stage_mats.items() %}
+                                        {% if quantity is number and quantity > 0 %}
                                         <tr>
                                             <td>{{ material.replace('_',' ').title() }}</td>
                                             <td>{{ "{:,.0f}".format(quantity) }}</td>
                                             <td>
                                                 {% if 'bags' in material %}bags
-                                                {% elif 'kg' in material %}kg
+                                                {% elif '_kg' in material or material.endswith('kg') %}kg
                                                 {% elif 'cuft' in material %}cu ft
                                                 {% elif 'sqft' in material %}sq ft
                                                 {% elif 'meters' in material %}meters
                                                 {% elif 'liters' in material %}liters
                                                 {% elif 'sheets' in material %}sheets
-                                                {% else %}units{% endif %}
+                                                {% else %}nos{% endif %}
                                             </td>
                                         </tr>
                                         {% endif %}
@@ -252,6 +295,36 @@
                     </div>
                     {% endfor %}
                 </div>
+
+                {# ── BUDGET COMPARISON ── #}
+                <div class="card">
+                    <div class="section-title">💰 Budget Comparison</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tier</th>
+                                <th>Material</th>
+                                {% if scope == 'material_and_labour' %}<th>Labour</th>{% endif %}
+                                <th>Other</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tier_key, tier_label in [('low','💵 Budget'),('medium','💰 Standard'),('high','💎 Premium')] %}
+                            {% set t = estimation.costs.get(tier_key, {}) %}
+                            <tr {% if tier_key == budget %}style="background:var(--accent-light);font-weight:700;"{% endif %}>
+                                <td>{{ tier_label }}</td>
+                                <td>₹{{ "{:,.0f}".format(t.get('material_cost', 0)) }}</td>
+                                {% if scope == 'material_and_labour' %}
+                                <td>₹{{ "{:,.0f}".format(t.get('labor_cost', 0)) }}</td>
+                                {% endif %}
+                                <td>₹{{ "{:,.0f}".format(t.get('other_costs', 0)) }}</td>
+                                <td>₹{{ "{:,.0f}".format(t.get('total_cost', 0)) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- RIGHT SIDEBAR -->
@@ -261,11 +334,21 @@
                     <div class="section-title">📋 Project Details</div>
                     <div class="info-list">
                         <div class="info-row"><span class="info-label">Area</span><span class="info-value">{{ project.square_feet }} sq ft</span></div>
+                        {% if project.get('plot_area') %}
+                        <div class="info-row"><span class="info-label">Plot Area</span><span class="info-value">{{ project.plot_area }} sq ft</span></div>
+                        {% endif %}
                         <div class="info-row"><span class="info-label">Rooms</span><span class="info-value">{{ project.rooms }}</span></div>
                         <div class="info-row"><span class="info-label">Floors</span><span class="info-value">{{ project.floors }}</span></div>
                         <div class="info-row"><span class="info-label">Bathrooms</span><span class="info-value">{{ project.bathrooms }}</span></div>
                         <div class="info-row"><span class="info-label">Property Type</span><span class="info-value">{{ project.property_type.title() }}</span></div>
-                        <div class="info-row"><span class="info-label">Budget Range</span><span class="info-value">{{ project.budget_range.title() }}</span></div>
+                        <div class="info-row"><span class="info-label">Estimate Scope</span>
+                            <span class="info-value">
+                                {% if project.get('estimate_scope') == 'material_and_labour' %}Material + Labour{% else %}Material Only{% endif %}
+                            </span>
+                        </div>
+                        <div class="info-row"><span class="info-label">Budget Range</span>
+                            <span class="info-value">{{ {'low':'Budget','medium':'Standard','high':'Premium'}.get(project.budget_range|lower, project.budget_range.title()) }}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -273,8 +356,19 @@
                 <div class="card">
                     <div class="section-title">⏱️ Timeline</div>
                     <div class="timeline-block">
-                        <div class="timeline-num">{{ estimation.timeline.total_days }}</div>
-                        <div class="timeline-sub">Days · ≈ {{ (estimation.timeline.total_days / 30) | round(1) }} months</div>
+                        <div class="timeline-num">{{ estimation.timeline.get('total_days', 0) }}</div>
+                        <div class="timeline-sub">Days · ≈ {{ ((estimation.timeline.get('total_days', 0)) / 30) | round(1) }} months</div>
+                    </div>
+                    <div class="info-list" style="margin-top:14px;">
+                        {% for stage_key, stage_name in [('foundation','Foundation'),('walls','Walls'),
+                            ('flooring','Flooring'),('roofing','Roofing'),('plumbing','Plumbing'),
+                            ('electrical','Electrical'),('finishing','Finishing'),
+                            ('carpentry','Carpentry'),('exterior','Exterior')] %}
+                        <div class="info-row">
+                            <span class="info-label">{{ stage_name }}</span>
+                            <span class="info-value">{{ estimation.timeline.get(stage_key, 0) | int }} days</span>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
 
@@ -310,7 +404,7 @@
                 </div>
                 <input type="hidden" name="rating" id="ratingValue" required>
                 <label class="modal-label">Your Review</label>
-                <textarea name="review" class="modal-textarea" placeholder="Share your experience with this contractor…"></textarea>
+                <textarea name="review" class="modal-textarea" placeholder="Share your experience…"></textarea>
                 <div class="modal-actions">
                     <button type="button" class="btn-ghost" onclick="closeRatingModal()">Cancel</button>
                     <button type="submit" class="modal-submit">Submit Review</button>
@@ -323,9 +417,12 @@
     <script>
         function toggleStage(key) {
             const content = document.getElementById('stage-' + key);
-            const header = content.previousElementSibling;
+            const header  = content.previousElementSibling;
             document.querySelectorAll('.stage-content').forEach(el => {
-                if (el.id !== 'stage-' + key) { el.classList.remove('active'); el.previousElementSibling.classList.remove('active'); }
+                if (el.id !== 'stage-' + key) {
+                    el.classList.remove('active');
+                    el.previousElementSibling.classList.remove('active');
+                }
             });
             content.classList.toggle('active');
             header.classList.toggle('active');
@@ -336,15 +433,18 @@
         document.querySelectorAll('.star').forEach(star => {
             star.addEventListener('mouseenter', function() {
                 const r = parseInt(this.dataset.rating);
-                document.querySelectorAll('.star').forEach((s,i) => s.style.color = i < r ? '#F59E0B' : 'var(--stone)');
+                document.querySelectorAll('.star').forEach((s,i) =>
+                    s.style.color = i < r ? '#F59E0B' : 'var(--stone)');
             });
             star.addEventListener('mouseleave', () => {
-                document.querySelectorAll('.star').forEach((s,i) => s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
+                document.querySelectorAll('.star').forEach((s,i) =>
+                    s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
             });
             star.addEventListener('click', function() {
                 selectedRating = parseInt(this.dataset.rating);
                 document.getElementById('ratingValue').value = selectedRating;
-                document.querySelectorAll('.star').forEach((s,i) => s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
+                document.querySelectorAll('.star').forEach((s,i) =>
+                    s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
             });
         });
 
@@ -364,14 +464,35 @@
                 e.preventDefault();
                 if (!selectedRating) { alert('Please select a rating'); return; }
                 const fd = new FormData(this);
-                fetch('/user/project/{{ project.id }}/rate-contractor', { method: 'POST', body: fd })
+                fetch('/user/project/{{ project.id }}/rate-contractor', {method:'POST', body:fd})
                     .then(r => r.json())
-                    .then(d => {
-                        if (d.success) { closeRatingModal(); location.reload(); }
-                        else alert(d.message);
-                    }).catch(() => alert('An error occurred'));
+                    .then(d => { if (d.success) { closeRatingModal(); location.reload(); } else alert(d.message); })
+                    .catch(() => alert('An error occurred'));
             });
         }
+
+        // Navbar badges
+        function updateBadge(url, badgeId) {
+            fetch(url).then(r => {
+                if (!r.ok) return null;
+                const ct = r.headers.get('content-type') || '';
+                return ct.includes('application/json') ? r.json() : null;
+            }).then(data => {
+                if (!data) return;
+                const b = document.getElementById(badgeId);
+                if (!b) return;
+                if (data.count > 0) { b.textContent = data.count; b.style.display = 'flex'; }
+                else { b.style.display = 'none'; }
+            }).catch(() => {});
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            updateBadge('/user/messages/unread-count',      'messagesBadge');
+            updateBadge('/user/notifications/unread-count', 'notificationsBadge');
+        });
+        setInterval(() => {
+            updateBadge('/user/messages/unread-count',      'messagesBadge');
+            updateBadge('/user/notifications/unread-count', 'notificationsBadge');
+        }, 30000);
     </script>
 </body>
 </html>

@@ -376,6 +376,7 @@
                 <div class="card">
                     <div class="section-title">⚡ Actions</div>
                     <div class="action-buttons">
+                        <a href="{{ url_for('viewer.building_3d_view', project_id=project.id) }}" class="btn-primary" target="_blank">🏗️ View 3D Model</a>
                         <a href="{{ url_for('user.download_pdf', project_id=project.id) }}" class="btn-primary">📄 Download PDF</a>
                         <a href="{{ url_for('user.project_bids', project_id=project.id) }}" class="btn-primary">📋 View Bids</a>
                         <a href="{{ url_for('user.find_contractors') }}" class="btn-outline">🔨 Find Contractors</a>

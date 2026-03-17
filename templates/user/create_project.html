@@ -476,10 +476,69 @@
                     </div>
                 </div>
                 <div class="form-grid" style="margin-top:16px;">
-                    <div class="form-group">
-                        <label class="form-label">Location <span class="required">*</span></label>
-                        <input type="text" name="location" required placeholder="City, State" class="form-control">
-                    </div>
+                    <div class="form-group full" style="grid-column: 1 / -1;">
+    <label class="form-label">Project Location <span class="required">*</span></label>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+        <div>
+            <label class="form-label" style="font-size:10px;">State</label>
+            <select name="location_state" id="locationState" class="form-control" onchange="loadDistricts(this.value)" required>
+                <option value="">— Select State —</option>
+                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                <option value="Assam">Assam</option>
+                <option value="Bihar">Bihar</option>
+                <option value="Chhattisgarh">Chhattisgarh</option>
+                <option value="Goa">Goa</option>
+                <option value="Gujarat">Gujarat</option>
+                <option value="Haryana">Haryana</option>
+                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                <option value="Jharkhand">Jharkhand</option>
+                <option value="Karnataka">Karnataka</option>
+                <option value="Kerala">Kerala</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                <option value="Maharashtra">Maharashtra</option>
+                <option value="Manipur">Manipur</option>
+                <option value="Meghalaya">Meghalaya</option>
+                <option value="Mizoram">Mizoram</option>
+                <option value="Nagaland">Nagaland</option>
+                <option value="Odisha">Odisha</option>
+                <option value="Punjab">Punjab</option>
+                <option value="Rajasthan">Rajasthan</option>
+                <option value="Sikkim">Sikkim</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="Telangana">Telangana</option>
+                <option value="Tripura">Tripura</option>
+                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                <option value="Uttarakhand">Uttarakhand</option>
+                <option value="West Bengal">West Bengal</option>
+                <option value="Delhi">Delhi (NCT)</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label" style="font-size:10px;">District</label>
+            <select name="location_district" id="locationDistrict" class="form-control" required disabled>
+                <option value="">— Select State First —</option>
+            </select>
+        </div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+        <div>
+            <label class="form-label" style="font-size:10px;">Town / Place</label>
+            <input type="text" name="location_place" id="locationPlace" class="form-control" placeholder="e.g. Vyttila, Kakkanad, Pattom" required>
+        </div>
+        <div>
+            <label class="form-label" style="font-size:10px;">PIN Code</label>
+            <input type="text" name="location_pin" id="locationPin" class="form-control" placeholder="e.g. 682019" maxlength="6" pattern="[0-9]{6}" required>
+        </div>
+    </div>
+    <div>
+        <label class="form-label" style="font-size:10px;">Exact Site Address</label>
+        <input type="text" name="location_address" id="locationAddress" class="form-control" placeholder="e.g. Survey No. 34/1, NH 66 Bypass Road, Near City Mall" required>
+        <div class="form-hint">Survey/Door/Villa/Flat No., Street, Landmark</div>
+    </div>
+    <!-- Hidden combined field sent to backend -->
+    <input type="hidden" name="location" id="locationCombined">
+</div>
                     <!-- ➕ ADDED: Material+Labour toggle — defines what the estimate actually outputs -->
                     <div class="form-group">
                         <label class="form-label">Estimate Scope <span class="required">*</span></label>
@@ -1314,6 +1373,21 @@
                         </div>
                         <div class="form-grid-3">
                             <div class="form-group">
+                <label class="form-label">Number of Rooms <span class="required">*</span></label>
+                <input type="number" name="villa_rooms" id="villaRooms" min="1" max="30" placeholder="e.g. 8" class="form-control">
+                <div class="form-hint">Bedrooms + living + dining + study — used for switchboard &amp; paint area estimate</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Number of Bathrooms <span class="required">*</span></label>
+                <input type="number" name="villa_bathrooms" id="villaBathrooms" min="1" max="20" placeholder="e.g. 5" class="form-control" oninput="updateVillaTapHint()">
+                <div class="form-hint">Used for sanitary ware sets, bathroom tile quantity &amp; tap point estimate</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Number of Floors <span class="required">*</span></label>
+                <input type="number" name="villa_floors" id="villaFloors" min="1" max="10" placeholder="e.g. 2" class="form-control">
+                <div class="form-hint">Used to calculate total wall area, slab volume &amp; staircase requirement</div>
+            </div>
+                            <div class="form-group">
                                 <label class="form-label">No. of Doors <span class="required">*</span></label>
                                 <input type="number" name="villa_num_doors" id="villaNumDoors" min="0" placeholder="e.g. 12" class="form-control">
                                 <div class="form-hint">Door void 3×7 ft deducted from brickwork. Villa typically 10–18 doors</div>
@@ -1779,734 +1853,776 @@
             <!-- ADDED:   Roof waterproofing                                -->
             <!-- ADDED:   Anti-termite treatment                            -->
             <!-- ══════════════════════════════════════════════════════════ -->
-            <div class="apartment-section" id="apartmentSection">
-                <div class="apt-banner">
-                    <span class="apt-banner-icon">🏢</span>
-                    <div class="apt-banner-text">
-                        <h3>Apartment Building Specifications</h3>
-                        <p>Multi-unit inputs for accurate structural &amp; MEP estimation</p>
-                    </div>
-                    <span class="apt-badge">Apartment Mode</span>
-                </div>
+            <!-- ══════════════════════════════════════════════════════════ -->
+<!-- APARTMENT SECTION — EDITED FOR CONSTRUCTION COST          -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- APARTMENT SECTION                                          -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="apartment-section" id="apartmentSection">
+    <div class="apt-banner">
+        <span class="apt-banner-icon">🏢</span>
+        <div class="apt-banner-text">
+            <h3>Apartment Building Specifications</h3>
+            <p>Multi-unit inputs for accurate structural &amp; MEP estimation</p>
+        </div>
+        <span class="apt-badge">Apartment Mode</span>
+    </div>
 
-                <!-- ─── CARD 1: PROJECT SCALE & UNIT MIX ─── -->
-                <div class="form-card">
-                    <div class="section-title">🏗️ Project Scale &amp; Unit Mix <span class="section-badge">The Core</span></div>
+    <!-- ─── CARD 1: PROJECT SCALE & UNIT MIX ─── -->
+    <div class="form-card">
+        <div class="section-title">🏗️ Project Scale &amp; Unit Mix <span class="section-badge">The Core</span></div>
 
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">📐</span>
-                            <span class="subsection-title">Building Overview</span>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Total Number of Floors <span class="required">*</span></label>
-                                <!-- EDITED: value="99" for 30+ option — prevents ambiguous value="30" being submitted -->
-                                <select name="apt_total_floors" id="aptTotalFloors" class="form-control" onchange="updateSteelIndicator(); autoActivateFireSafety();">
-                                    <option value="2">G+1 — 2 Floors</option>
-                                    <option value="3">G+2 — 3 Floors</option>
-                                    <option value="4">G+3 — 4 Floors</option>
-                                    <option value="5">G+4 — 5 Floors (Mid-rise)</option>
-                                    <option value="7">G+6 — 7 Floors</option>
-                                    <option value="10">G+9 — 10 Floors</option>
-                                    <option value="14">G+13 — 14 Floors (High-rise)</option>
-                                    <option value="20">G+19 — 20 Floors</option>
-                                    <!-- FIXED: was value="30", ambiguous for 30+ buildings — changed to 99 sentinel -->
-                                    <option value="99">30+ Floors (Skyscraper grade) — enter exact count in description</option>
-                                </select>
-                                <div class="steel-indicator" id="steelIndicator">
-                                    Steel ratio: <strong id="steelRatio">—</strong> kg/sqft &nbsp;·&nbsp; Concrete: <strong id="concreteGradeApt">—</strong>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Total Number of Units <span class="required">*</span></label>
-                                <input type="number" name="apt_total_units" id="aptTotalUnits" min="1" max="1000" placeholder="e.g. 48" class="form-control" oninput="updateUnitHints(); updateParkingSlotHint();">
-                                <div class="form-hint" id="aptUnitsHint">Total flats across all floors</div>
-                            </div>
-                            <!-- DELETED: apt_avg_unit_size — contradicts per-BHK sizes below; backend can't use both -->
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Common Area Percentage (%)</label>
-                                <input type="number" name="apt_common_area_pct" id="aptCommonAreaPct" min="10" max="40" value="20" class="form-control" oninput="updateUnitHints()">
-                                <div class="form-hint" id="aptCommonHint">Lobbies, corridors, stairwells — typically 15–25%</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Ceiling Height per Floor (ft) <span class="required">*</span></label>
-                                <!-- ADDED: was entirely missing — drives wall plaster, paint & brick quantities -->
-                                <input type="number" name="apt_ceiling_height" id="aptCeilingHeight" min="9" max="14" value="10" step="0.5" class="form-control">
-                                <div class="form-hint">Standard apartments: 10 ft. Affects wall area across all floors × all units</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">🏠</span>
-                            <span class="subsection-title">Unit Breakdown (BHK Mix)</span>
-                        </div>
-                        <!-- EDITED: clarified bathroom count assumption in hint -->
-                        <div class="form-hint" style="margin-bottom:12px;">Specify how many of each flat type. Used to scale material sets — assumes 1 BHK = 1 bathroom, 2 BHK = 2 bathrooms, 3 BHK = 3 bathrooms. Adjust in description if different.</div>
-                        <div class="unit-mix-grid">
-                            <div class="unit-mix-card">
-                                <div class="unit-mix-header">🛏️ 1 BHK Units</div>
-                                <div class="unit-mix-body">
-                                    <label class="form-label">Number of Units</label>
-                                    <input type="number" name="apt_1bhk_count" id="apt1BHK" min="0" placeholder="e.g. 12" class="form-control" oninput="updateUnitHints()">
-                                    <label class="form-label" style="margin-top:8px;">Avg Size (sqft)</label>
-                                    <input type="number" name="apt_1bhk_size" min="300" max="800" placeholder="e.g. 550" class="form-control">
-                                </div>
-                            </div>
-                            <div class="unit-mix-card">
-                                <div class="unit-mix-header">🛏️🛏️ 2 BHK Units</div>
-                                <div class="unit-mix-body">
-                                    <label class="form-label">Number of Units</label>
-                                    <input type="number" name="apt_2bhk_count" id="apt2BHK" min="0" placeholder="e.g. 24" class="form-control" oninput="updateUnitHints()">
-                                    <label class="form-label" style="margin-top:8px;">Avg Size (sqft)</label>
-                                    <input type="number" name="apt_2bhk_size" min="600" max="1400" placeholder="e.g. 950" class="form-control">
-                                </div>
-                            </div>
-                            <div class="unit-mix-card">
-                                <div class="unit-mix-header">🛏️🛏️🛏️ 3 BHK Units</div>
-                                <div class="unit-mix-body">
-                                    <label class="form-label">Number of Units</label>
-                                    <input type="number" name="apt_3bhk_count" id="apt3BHK" min="0" placeholder="e.g. 12" class="form-control" oninput="updateUnitHints()">
-                                    <label class="form-label" style="margin-top:8px;">Avg Size (sqft)</label>
-                                    <input type="number" name="apt_3bhk_size" min="900" max="2500" placeholder="e.g. 1400" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div id="unitMixSummary" style="display:none; margin-top:14px; padding:12px 16px; background:var(--sand); border-radius:8px; border-left:3px solid #2563EB; font-size:13px; color:var(--text-secondary); line-height:1.8;"></div>
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">📐</span>
+                <span class="subsection-title">Building Overview</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Total Number of Floors <span class="required">*</span></label>
+                    <select name="apt_total_floors" id="aptTotalFloors" class="form-control" onchange="updateSteelIndicator(); autoActivateFireSafety();">
+                        <option value="2">G+1 — 2 Floors</option>
+                        <option value="3">G+2 — 3 Floors</option>
+                        <option value="4">G+3 — 4 Floors</option>
+                        <option value="5">G+4 — 5 Floors (Mid-rise)</option>
+                        <option value="7">G+6 — 7 Floors</option>
+                        <option value="10">G+9 — 10 Floors</option>
+                        <option value="14">G+13 — 14 Floors (High-rise)</option>
+                        <option value="20">G+19 — 20 Floors</option>
+                        <option value="99">30+ Floors (Skyscraper grade) — enter exact count in description</option>
+                    </select>
+                    <div class="steel-indicator" id="steelIndicator">
+                        Steel ratio: <strong id="steelRatio">—</strong> kg/sqft &nbsp;·&nbsp; Concrete: <strong id="concreteGradeApt">—</strong>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="form-label">Total Number of Units <span class="required">*</span></label>
+                    <input type="number" name="apt_total_units" id="aptTotalUnits" min="1" max="1000" placeholder="e.g. 48" class="form-control" oninput="updateUnitHints(); updateParkingSlotHint();">
+                    <div class="form-hint" id="aptUnitsHint">Total flats across all floors</div>
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Common Area Percentage (%)</label>
+                    <input type="number" name="apt_common_area_pct" id="aptCommonAreaPct" min="10" max="40" value="20" class="form-control" oninput="updateUnitHints()">
+                    <div class="form-hint" id="aptCommonHint">Lobbies, corridors, stairwells — typically 15–25%</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ceiling Height per Floor (ft) <span class="required">*</span></label>
+                    <input type="number" name="apt_ceiling_height" id="aptCeilingHeight" min="9" max="14" value="10" step="0.5" class="form-control">
+                    <div class="form-hint">Standard apartments: 10 ft. Affects wall area across all floors × all units</div>
+                </div>
+            </div>
+        </div>
 
-                <!-- ─── CARD 2: STRUCTURAL (was entirely missing) ─── -->
-                <div class="form-card">
-                    <div class="section-title">🦴 Structural Details <span class="section-badge">The Skeleton</span></div>
-
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">⚙️</span>
-                            <span class="subsection-title">Concrete, Steel &amp; Slab</span>
-                        </div>
-                        <div class="form-grid-3">
-                            <div class="form-group">
-                                <label class="form-label">Concrete Mix Grade <span class="required">*</span></label>
-                                <select name="apt_concrete_grade" class="form-control">
-                                    <option value="M25">M25 — Up to G+4 (5 floors)</option>
-                                    <option value="M30" selected>M30 — Mid-rise G+5 to G+9 · Recommended</option>
-                                    <option value="M35">M35 — High-rise G+10 to G+15</option>
-                                    <option value="M40">M40 — High-rise 15+ floors</option>
-                                </select>
-                                <div class="form-hint">Matches steel indicator above — update when floors change</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Steel / TMT Grade <span class="required">*</span></label>
-                                <select name="apt_steel_grade" class="form-control">
-                                    <option value="Fe500D" selected>Fe500D — Earthquake Resistant (Ductile) · Recommended</option>
-                                    <option value="Fe550">Fe550 — High Strength</option>
-                                    <option value="Fe500">Fe500 — Standard</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Slab Thickness <span class="required">*</span></label>
-                                <select name="apt_slab_thickness" class="form-control">
-                                    <option value="5" selected>5 inch — Standard mid-rise</option>
-                                    <option value="5.5">5.5 inch — Heavy live load / large spans</option>
-                                    <option value="6">6 inch — High-rise / commercial grade</option>
-                                    <option value="4.5">4.5 inch — Economy / G+2 only</option>
-                                </select>
-                                <div class="form-hint">Sets concrete volume per floor slab — multiplied by total floors</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">🌍</span>
-                            <span class="subsection-title">Foundation &amp; Protection</span>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Soil Condition <span class="required">*</span></label>
-                                <select name="apt_soil_condition" id="aptSoilCondition" class="form-control" onchange="updateAptFoundationHint()">
-                                    <option value="hard_rock">Hard Rock / Laterite — Shallow foundation</option>
-                                    <option value="firm_soil" selected>Firm Soil / Murram — Standard footings</option>
-                                    <option value="soft_soil">Soft / Sandy Soil — Deeper footings</option>
-                                    <option value="marshy">Marshy / Waterlogged — Pile foundation</option>
-                                    <option value="filled">Filled / Made-up Land — Compaction required</option>
-                                </select>
-                                <div class="form-hint" id="aptSoilHint">Standard isolated footings at 5–6 ft depth</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Foundation Type</label>
-                                <select name="apt_foundation_type" id="aptFoundationType" class="form-control">
-                                    <option value="isolated">Isolated Footings — Low-rise RCC columns</option>
-                                    <option value="raft" selected>Raft / Mat Foundation — Standard multi-storey</option>
-                                    <option value="pile">Pile Foundation — High-rise / soft soil</option>
-                                    <option value="combined">Combined Footing</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Foundation Depth (ft)</label>
-                                <input type="number" name="apt_foundation_depth" id="aptFoundationDepth" min="4" max="40" value="8" step="0.5" class="form-control">
-                                <div class="form-hint" id="aptFoundationDepthHint">Multi-storey default: 8–12 ft. Pile foundations: 30–60 ft</div>
-                            </div>
-                            <!-- ADDED: Roof Waterproofing — missing from apartment despite large terrace/podium area -->
-                            <div class="form-group">
-                                <label class="form-label">Roof / Terrace Waterproofing <span class="required">*</span></label>
-                                <select name="apt_roof_waterproofing" class="form-control">
-                                    <option value="membrane" selected>Membrane Waterproofing (HDPE / APP) — Recommended</option>
-                                    <option value="crystalline">Crystalline / Integral (Xypex) — Highest grade</option>
-                                    <option value="chemical_coat">Chemical Coating (Dr. Fixit / Fosroc)</option>
-                                    <option value="brick_bat_coba">Brick-Bat Coba — Traditional</option>
-                                    <option value="none">None — Bare RCC slab</option>
-                                </select>
-                                <div class="form-hint">Applied to top-floor roof + all intermediate terrace / podium areas</div>
-                            </div>
-                            <!-- ADDED: Anti-termite — present in residential & villa, was absent here -->
-                            <div class="form-group">
-                                <label class="form-label">Anti-Termite Treatment</label>
-                                <select name="apt_anti_termite" class="form-control">
-                                    <option value="pre_construction" selected>Pre-construction Soil Treatment — Recommended</option>
-                                    <option value="post_construction">Post-construction Injection</option>
-                                    <option value="none">None</option>
-                                </select>
-                                <div class="form-hint" id="aptAntiTermiteHint">Cost = ₹8–15 × plot area (sqft). Enter plot area in Basic Info above.</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ADDED: Staircase structural detail — was just a count, no type -->
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">🪜</span>
-                            <span class="subsection-title">Staircases</span>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Number of Staircases</label>
-                                <input type="number" name="apt_staircases" id="aptStaircases" min="1" max="10" value="2" placeholder="e.g. 2" class="form-control">
-                                <div class="form-hint">NBC 2016: 1 staircase per 600 sqm floor area — 2 required for most mid-rise blocks</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Staircase Type <span class="required">*</span></label>
-                                <select name="apt_staircase_type" id="aptStaircaseType" class="form-control" onchange="updateAptStaircaseHint()">
-                                    <option value="rcc_open">RCC Open Staircase — G+2 and below</option>
-                                    <option value="rcc_enclosed" selected>RCC Enclosed Staircase — Standard mid-rise</option>
-                                    <option value="fire_rated">Fire-Rated Pressurised Staircase — Mandatory G+4+</option>
-                                    <option value="smoke_lobby">Smoke Lobby + Fire-Rated — High-rise NBC compliant</option>
-                                </select>
-                                <div class="form-hint" id="aptStaircaseHint">Enclosed staircase — fire door + self-closing mechanism</div>
-                            </div>
-                        </div>
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">🏠</span>
+                <span class="subsection-title">Unit Breakdown (BHK Mix)</span>
+            </div>
+            <div class="form-hint" style="margin-bottom:12px;">Specify how many of each flat type. Used to scale material sets — assumes 1 BHK = 1 bathroom, 2 BHK = 2 bathrooms, 3 BHK = 3 bathrooms. Adjust in description if different.</div>
+            <div class="unit-mix-grid">
+                <div class="unit-mix-card">
+                    <div class="unit-mix-header">🛏️ 1 BHK Units</div>
+                    <div class="unit-mix-body">
+                        <label class="form-label">Number of Units</label>
+                        <input type="number" name="apt_1bhk_count" id="apt1BHK" min="0" placeholder="e.g. 12" class="form-control" oninput="updateUnitHints()">
+                        <label class="form-label" style="margin-top:8px;">Avg Size (sqft)</label>
+                        <input type="number" name="apt_1bhk_size" min="300" max="800" placeholder="e.g. 550" class="form-control">
                     </div>
                 </div>
-
-                <!-- ─── CARD 3: MASONRY & FAÇADE (was entirely missing) ─── -->
-                <div class="form-card">
-                    <div class="section-title">🧱 Masonry &amp; Façade <span class="section-badge">The Walls</span></div>
-
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">🧱</span>
-                            <span class="subsection-title">Wall Construction</span>
-                        </div>
-                        <div class="form-grid-3">
-                            <div class="form-group">
-                                <label class="form-label">External Wall Material <span class="required">*</span></label>
-                                <select name="apt_wall_material" class="form-control">
-                                    <option value="aac_blocks" selected>AAC Blocks — Lightweight, thermal · Recommended for multi-storey</option>
-                                    <option value="fly_ash">Fly Ash Bricks — Eco, durable</option>
-                                    <option value="red_clay">Red Clay Bricks — Traditional</option>
-                                    <option value="hollow_concrete">Hollow Concrete Blocks — Economy</option>
-                                </select>
-                                <div class="form-hint">Outer walls — quantity = perimeter × ceiling height × floors × wall thickness</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">External Wall Thickness</label>
-                                <select name="apt_wall_thickness" class="form-control">
-                                    <option value="9" selected>9-inch — Standard apartment outer wall</option>
-                                    <option value="4.5">4.5-inch — Lightweight framed construction</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Internal Partition Material</label>
-                                <select name="apt_partition_material" class="form-control">
-                                    <option value="aac_blocks" selected>AAC Blocks 4.5-inch — Standard</option>
-                                    <option value="fly_ash_partition">Fly Ash Bricks 4.5-inch</option>
-                                    <option value="drywall">Drywall / Gypsum Board — Premium</option>
-                                </select>
-                                <div class="form-hint">Internal partitions between rooms — multiplied by unit count</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">🪟</span>
-                            <span class="subsection-title">External Façade &amp; Plaster</span>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">External Façade Type <span class="required">*</span></label>
-                                <select name="apt_facade_type" id="aptFacadeType" class="form-control" onchange="updateAptFacadeHint()">
-                                    <option value="plaster_paint" selected>Cement Plaster + Weathershield Paint — Standard</option>
-                                    <option value="texture_paint">Cement Plaster + Texture Paint — Premium finish</option>
-                                    <option value="acp_cladding">ACP / Aluminium Composite Panels — Modern</option>
-                                    <option value="stone_cladding">Natural Stone Cladding — Premium</option>
-                                    <option value="glass_curtain">Glass Curtain Wall (partial / full) — High-end</option>
-                                </select>
-                                <div class="form-hint" id="aptFacadeHint">Applied to total external wall area (perimeter × height × all floors)</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">External Plaster Type</label>
-                                <select name="apt_external_plaster" class="form-control">
-                                    <option value="12mm_cm_15" selected>12mm Cement Plaster (1:5) — Standard external</option>
-                                    <option value="20mm_cm_14">20mm Cement Plaster (1:4) — Rough external</option>
-                                    <option value="textured_coat">Textured Coat (Snowcem / Tyrolean) — Decorative</option>
-                                </select>
-                                <div class="form-hint">Separate quantity from internal plaster — applies to all external faces</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Internal Plaster Type</label>
-                                <select name="apt_internal_plaster" class="form-control">
-                                    <option value="gypsum" selected>Gypsum Plaster — Smooth finish · Common for apartments</option>
-                                    <option value="12mm_cm">12mm Cement Plaster (1:6)</option>
-                                    <option value="skim_coat">Skim Coat on AAC — Economy option</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">External Paint Quality</label>
-                                <select name="apt_external_paint" class="form-control">
-                                    <option value="weathershield" selected>Weathershield / Apex — Standard · ₹22–35/sqft</option>
-                                    <option value="elastomeric">Elastomeric / Damp Proof — Premium · ₹38–55/sqft</option>
-                                    <option value="texture_ext">Exterior Texture Paint — High-end · ₹55–100/sqft</option>
-                                </select>
-                                <div class="form-hint">Applied to total external façade area — largest single paint quantity</div>
-                            </div>
-                        </div>
+                <div class="unit-mix-card">
+                    <div class="unit-mix-header">🛏️🛏️ 2 BHK Units</div>
+                    <div class="unit-mix-body">
+                        <label class="form-label">Number of Units</label>
+                        <input type="number" name="apt_2bhk_count" id="apt2BHK" min="0" placeholder="e.g. 24" class="form-control" oninput="updateUnitHints()">
+                        <label class="form-label" style="margin-top:8px;">Avg Size (sqft)</label>
+                        <input type="number" name="apt_2bhk_size" min="600" max="1400" placeholder="e.g. 950" class="form-control">
                     </div>
                 </div>
-
-                <!-- ─── CARD 4: PER-UNIT INTERIOR FINISHES (was entirely missing) ─── -->
-                <div class="form-card">
-                    <div class="section-title">✨ Per-Unit Interior Finishes <span class="section-badge">Multiplied × Unit Count</span></div>
-                    <div class="form-hint" style="margin-bottom:18px; padding:10px 14px; background:var(--info-bg); border-radius:8px; color:var(--info); font-size:12px;">
-                        ℹ️ All fields below are applied per flat and multiplied by unit count from the BHK mix above. They represent the largest material cost lines after the structure.
-                    </div>
-
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">💎</span>
-                            <span class="subsection-title">Flooring &amp; Paint</span>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Floor Tile Type (Living / Bedrooms) <span class="required">*</span></label>
-                                <select name="apt_flooring_type" class="form-control">
-                                    <option value="vitrified" selected>Vitrified Tiles — ₹60–120/sqft · Standard</option>
-                                    <option value="ceramic">Ceramic Tiles — ₹40–80/sqft · Economy</option>
-                                    <option value="marble">Marble — ₹150–350/sqft · Premium</option>
-                                    <option value="granite">Granite — ₹120–280/sqft · Premium</option>
-                                    <option value="hardwood">Hardwood / Engineered Wood — ₹200–500/sqft · Luxury</option>
-                                </select>
-                                <div class="form-hint">Applied to living + bedroom area per unit × total units</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Bathroom Wall Tile Type <span class="required">*</span></label>
-                                <select name="apt_bathroom_tile" class="form-control">
-                                    <option value="ceramic_standard" selected>Ceramic — Standard · ₹60–100/sqft</option>
-                                    <option value="ceramic_economy">Ceramic — Economy · ₹30–60/sqft</option>
-                                    <option value="vitrified_wall">Vitrified Wall Tiles — ₹80–150/sqft</option>
-                                    <option value="designer_tiles">Designer / Moroccan Tiles — ₹150–350/sqft</option>
-                                </select>
-                                <div class="form-hint">Wall tiles to dado height per bathroom × total bathroom count</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Internal Paint Quality <span class="required">*</span></label>
-                                <select name="apt_internal_paint" class="form-control">
-                                    <option value="emulsion" selected>Plastic Emulsion — Standard · ₹18–28/sqft</option>
-                                    <option value="luxury">Royal / Luxury Emulsion — Premium · ₹30–45/sqft</option>
-                                    <option value="texture">Texture / Designer Paint — High-end · ₹50–90/sqft</option>
-                                </select>
-                                <div class="form-hint">Applied to internal wall area per unit × total units</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">False Ceiling (per unit)</label>
-                                <div class="toggle-group">
-                                    <input type="radio" name="apt_false_ceiling" id="afc-none" value="none" checked>
-                                    <label class="toggle-option" for="afc-none">✗ None</label>
-                                    <input type="radio" name="apt_false_ceiling" id="afc-partial" value="partial">
-                                    <label class="toggle-option" for="afc-partial">◑ Partial (Living only)</label>
-                                    <input type="radio" name="apt_false_ceiling" id="afc-full" value="full">
-                                    <label class="toggle-option" for="afc-full">✓ Full Flat</label>
-                                </div>
-                                <div class="form-hint">Gypsum board — area per unit × total units</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">🚪</span>
-                            <span class="subsection-title">Doors, Windows &amp; Sanitary</span>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Door Material (per flat) <span class="required">*</span></label>
-                                <select name="apt_door_material" class="form-control">
-                                    <option value="flush_hollow">Flush Door (Hollow Core) — Economy · ₹8–15K/door</option>
-                                    <option value="flush_solid" selected>Flush Door (Solid Core) — Standard · ₹15–30K/door</option>
-                                    <option value="upvc_door">uPVC Door — Low maintenance · ₹18–35K/door</option>
-                                    <option value="panel_teak">Panel Door — Teak Wood · ₹30–60K/door</option>
-                                </select>
-                                <div class="form-hint">Multiplied by door count per BHK type from unit mix</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Window Material (per flat) <span class="required">*</span></label>
-                                <select name="apt_window_material" class="form-control">
-                                    <option value="aluminium_sliding" selected>Aluminium Sliding — Standard · ₹8–18K/window</option>
-                                    <option value="upvc_sliding">uPVC Sliding — Popular · ₹12–22K/window</option>
-                                    <option value="upvc_casement">uPVC Casement — Thermal, quiet · ₹15–30K/window</option>
-                                    <option value="ms_grill">MS Grill + Glass — Economy · ₹3–8K/window</option>
-                                </select>
-                                <div class="form-hint">Multiplied by window count per BHK type from unit mix</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Sanitary Ware Grade (per flat) <span class="required">*</span></label>
-                                <select name="apt_sanitary_grade" class="form-control">
-                                    <option value="standard" selected>Standard — Hindware / Parryware (₹8–15K/bath)</option>
-                                    <option value="mid">Mid-range — Cera / Jaquar (₹18–35K/bath)</option>
-                                    <option value="premium">Premium — Kohler / American Standard (₹40–80K/bath)</option>
-                                </select>
-                                <div class="form-hint">Multiplied by bathroom count × total units</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Kitchen Type (per flat)</label>
-                                <div class="toggle-group">
-                                    <input type="radio" name="apt_kitchen_type" id="akt-semi" value="semi_modular" checked>
-                                    <label class="toggle-option" for="akt-semi">Semi-Modular</label>
-                                    <input type="radio" name="apt_kitchen_type" id="akt-modular" value="modular">
-                                    <label class="toggle-option" for="akt-modular">Fully Modular</label>
-                                </div>
-                                <div class="form-hint">Modular adds ~₹1.5–4L per flat to estimate</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ─── CARD 5: MEP SYSTEMS ─── -->
-                <div class="form-card">
-                    <div class="section-title">⚙️ MEP Systems <span class="section-badge">Building Services</span></div>
-
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">🛗</span>
-                            <span class="subsection-title">Vertical Transport — Lifts</span>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Number of Lifts / Elevators</label>
-                                <input type="number" name="apt_lifts" min="0" max="20" placeholder="e.g. 2" class="form-control">
-                                <div class="form-hint">1 lift per ~50 units standard for mid-rise; 1 per 30 units for high-rise</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Lift Capacity</label>
-                                <select name="apt_lift_capacity" class="form-control">
-                                    <option value="6">6-person / 450 kg — Low-rise</option>
-                                    <option value="8" selected>8-person / 630 kg — Standard</option>
-                                    <option value="13">13-person / 1000 kg — High-rise</option>
-                                    <option value="service">Service Lift — Goods &amp; stretcher</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">💧</span>
-                            <span class="subsection-title">Water &amp; Power Management</span>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">DG Backup (Power)</label>
-                                <select name="apt_dg_backup" class="form-control">
-                                    <option value="none">None — Municipal supply only</option>
-                                    <option value="common_only" selected>Common Areas Only — Lifts, lights, pumps</option>
-                                    <option value="partial">Partial — Common + 1 AC point per flat</option>
-                                    <option value="full">Full Backup — 100% power per flat</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Water Storage</label>
-                                <select name="apt_water_storage" class="form-control">
-                                    <option value="sump_overhead" selected>Underground Sump + Overhead — Standard</option>
-                                    <option value="overhead">Overhead Tanks Only</option>
-                                    <option value="borewell">Borewell + Sump + Overhead</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">🛡️</span>
-                            <!-- EDITED: title updated to flag mandatory items -->
-                            <span class="subsection-title">Safety &amp; Utility Systems <span style="color:#DC2626; font-size:10px; font-weight:700; margin-left:6px;">🔥 FIRE = MANDATORY G+3+</span></span>
-                        </div>
-                        <div class="safety-grid">
-                            <!-- EDITED: Fire tile defaults ACTIVE — mandatory above G+3 per NBC 2016 -->
-                            <div class="safety-tile active" id="stile-fire">
-                                <div class="safety-header" onclick="toggleSafety('fire')">
-                                    <div class="safety-checkbox" id="schk-fire">✓</div>
-                                    <span style="font-size:18px;">🔥</span>
-                                    <div>
-                                        <div class="addon-label">Fire Suppression System</div>
-                                        <div class="addon-sub">⚠️ Mandatory above G+3 per NBC 2016</div>
-                                    </div>
-                                </div>
-                                <div class="safety-body">
-                                    <label class="form-label">Specification</label>
-                                    <select name="apt_fire_spec" class="form-control">
-                                        <option value="wet_riser" selected>Wet Riser + Hose Reels — Mandatory for all above G+3</option>
-                                        <option value="sprinkler_full">Full Automatic Sprinkler System — High-rise requirement</option>
-                                        <option value="both">Both — Wet Riser + Full Sprinklers — NBC for 15m+ height</option>
-                                    </select>
-                                    <div class="form-hint" style="margin-top:6px;">Non-compliance blocks Occupancy Certificate — always include</div>
-                                </div>
-                            </div>
-                            <div class="safety-tile" id="stile-stp">
-                                <div class="safety-header" onclick="toggleSafety('stp')">
-                                    <div class="safety-checkbox" id="schk-stp"></div>
-                                    <span style="font-size:18px;">♻️</span>
-                                    <div>
-                                        <div class="addon-label">STP / WTP on-site</div>
-                                        <div class="addon-sub">Sewage &amp; water treatment plant</div>
-                                    </div>
-                                </div>
-                                <div class="safety-body">
-                                    <label class="form-label">Treatment Type</label>
-                                    <select name="apt_stp_type" class="form-control">
-                                        <option value="stp_only">STP Only — Sewage treatment</option>
-                                        <option value="stp_rwh">STP + Rainwater Harvesting</option>
-                                        <option value="stp_wtp_rwh">Full — STP + WTP + RWH</option>
-                                    </select>
-                                    <div class="form-hint" style="margin-top:6px;">Required for 20+ units in most municipalities</div>
-                                </div>
-                            </div>
-                            <div class="safety-tile" id="stile-cctv">
-                                <div class="safety-header" onclick="toggleSafety('cctv')">
-                                    <div class="safety-checkbox" id="schk-cctv"></div>
-                                    <span style="font-size:18px;">📹</span>
-                                    <div>
-                                        <div class="addon-label">CCTV &amp; Security</div>
-                                        <div class="addon-sub">Gated entry, intercom, cameras</div>
-                                    </div>
-                                </div>
-                                <div class="safety-body">
-                                    <label class="form-label">Security Level</label>
-                                    <select name="apt_security_level" class="form-control">
-                                        <option value="basic">Basic — Gated entry + guard room</option>
-                                        <option value="standard">Standard — CCTV + video intercom per flat</option>
-                                        <option value="smart">Smart — ANPR, face recognition, app access</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="safety-tile" id="stile-solar">
-                                <div class="safety-header" onclick="toggleSafety('solar')">
-                                    <div class="safety-checkbox" id="schk-solar"></div>
-                                    <span style="font-size:18px;">☀️</span>
-                                    <div>
-                                        <div class="addon-label">Solar Rooftop System</div>
-                                        <div class="addon-sub">Common area electricity generation</div>
-                                    </div>
-                                </div>
-                                <div class="safety-body">
-                                    <label class="form-label">Capacity (kW)</label>
-                                    <input type="number" name="apt_solar_kw" min="5" max="500" placeholder="e.g. 50" class="form-control">
-                                    <div class="form-hint" style="margin-top:6px;">~10 sqft of roof per kW of solar capacity</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ─── CARD 6: SHARED AMENITIES ─── -->
-                <div class="form-card">
-                    <div class="section-title">🏊 Shared Amenities <span class="section-badge">Common Spaces</span></div>
-
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">🅿️</span>
-                            <span class="subsection-title">Parking Area</span>
-                        </div>
-                        <div class="form-grid" style="margin-bottom:12px;">
-                            <div class="form-group">
-                                <label class="form-label">Parking Type <span class="required">*</span></label>
-                                <select name="apt_parking_type" id="aptParkingType" class="form-control" onchange="toggleBasementInputs(this)">
-                                    <option value="open">Open Surface Parking</option>
-                                    <option value="stilt">Stilt / Podium Parking (Ground level)</option>
-                                    <option value="basement_1">Basement Parking — 1 Level</option>
-                                    <option value="basement_2">Basement Parking — 2 Levels</option>
-                                    <option value="multilevel">Multi-level Mechanical Parking</option>
-                                </select>
-                                <div class="form-hint" id="parkingHint">No additional excavation cost</div>
-                            </div>
-                            <div class="form-group">
-                                <!-- EDITED: hint now cross-references unit count via updateParkingSlotHint() -->
-                                <label class="form-label">Total Parking Slots</label>
-                                <input type="number" name="apt_parking_slots" id="aptParkingSlots" min="0" placeholder="e.g. 60" class="form-control" oninput="calcParkingArea()">
-                                <div class="form-hint" id="parkingSlotHint">Enter total units above to get a suggested slot count</div>
-                            </div>
-                        </div>
-                        <div class="form-grid-3" style="margin-bottom:12px;">
-                            <div class="form-group">
-                                <label class="form-label">Slot Length (ft)</label>
-                                <input type="number" name="apt_slot_length" id="aptSlotLength" min="14" max="22" value="18" step="0.5" class="form-control" oninput="calcParkingArea()">
-                                <div class="form-hint">Standard: 18 ft. Compact: 16 ft</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Slot Width (ft)</label>
-                                <input type="number" name="apt_slot_width" id="aptSlotWidth" min="7" max="12" value="8.5" step="0.5" class="form-control" oninput="calcParkingArea()">
-                                <div class="form-hint">Standard: 8.5 ft. SUV: 10 ft</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Aisle Width (ft)</label>
-                                <input type="number" name="apt_aisle_width" id="aptAisleWidth" min="16" max="26" value="20" step="0.5" class="form-control" oninput="calcParkingArea()">
-                                <div class="form-hint">Two-way aisle: 20–24 ft</div>
-                            </div>
-                        </div>
-                        <div id="parkingAreaSummary" style="display:none; background: linear-gradient(90deg,#EFF6FF,#DBEAFE); border:1px solid #BFDBFE; border-radius:8px; padding:12px 16px; margin-bottom:12px;">
-                            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#1E40AF; margin-bottom:8px;">🅿️ Calculated Parking Area</div>
-                            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
-                                <div style="text-align:center;">
-                                    <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:#1E40AF;" id="parkNetArea">—</div>
-                                    <div style="font-size:10px; color:#3B82F6; font-weight:600;">Net Slot Area (sqft)</div>
-                                </div>
-                                <div style="text-align:center;">
-                                    <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:#1E40AF;" id="parkGrossArea">—</div>
-                                    <div style="font-size:10px; color:#3B82F6; font-weight:600;">Gross incl. Aisles (sqft)</div>
-                                </div>
-                                <div style="text-align:center;">
-                                    <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:#1E40AF;" id="parkSqftPerSlot">—</div>
-                                    <div style="font-size:10px; color:#3B82F6; font-weight:600;">sqft / slot (gross)</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Parking Floor Finish</label>
-                                <!-- EDITED: "Anti-skid Tiles" was misleading (zone finish, not whole floor) — renamed -->
-                                <select name="apt_parking_floor" class="form-control">
-                                    <option value="pcc">PCC / Plain Concrete — Economy</option>
-                                    <option value="epoxy" selected>Epoxy Coating — Durable, easy-clean · Standard for basement</option>
-                                    <option value="interlocking">Interlocking Paver Blocks — Open surface parking</option>
-                                    <option value="polished_concrete">Polished Concrete — Premium basement</option>
-                                    <option value="anti_skid_ramp">Anti-skid Coating (Ramps &amp; Entry Only) — Zone finish</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Parking Bay Marking</label>
-                                <select name="apt_parking_marking" class="form-control">
-                                    <option value="paint" selected>Thermoplastic Paint — Standard</option>
-                                    <option value="reflective">Reflective Paint — Low-light visibility</option>
-                                    <option value="sensor">Smart Sensors — Bay occupancy detection</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div id="basementExtras" style="display:none; margin-top:12px; padding-top:12px; border-top:1px dashed var(--stone);">
-                            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#DC2626; margin-bottom:10px;">⚠️ Basement-Specific Inputs</div>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label class="form-label">Basement Depth (ft)</label>
-                                    <input type="number" name="apt_basement_depth" min="10" max="30" value="14" class="form-control">
-                                    <div class="form-hint">Adds excavation, retaining walls &amp; waterproofing cost</div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Waterproofing System</label>
-                                    <select name="apt_basement_waterproofing" class="form-control">
-                                        <option value="crystalline">Crystalline / Integral — Best for deep basements</option>
-                                        <option value="membrane" selected>Membrane Sheet — Standard</option>
-                                        <option value="injection">Injection Grouting — Retrofit / leaky</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Ramp Type</label>
-                                    <select name="apt_ramp_type" class="form-control">
-                                        <option value="straight">Straight Ramp — Single vehicle width</option>
-                                        <option value="straight_double" selected>Straight Ramp — Double vehicle width</option>
-                                        <option value="spiral">Spiral / Curved Ramp</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Ventilation System</label>
-                                    <select name="apt_basement_ventilation" class="form-control">
-                                        <option value="mechanical" selected>Mechanical — Exhaust fans + CO sensors · Standard</option>
-                                        <option value="natural">Natural — Openings &amp; vents</option>
-                                        <option value="jet_fan">Jet Fan System — Large basement grade</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <div class="subsection-header apt-accent">
-                            <span class="subsection-icon">🏋️</span>
-                            <span class="subsection-title">Clubhouse &amp; Recreational Facilities</span>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Clubhouse / Amenity Block</label>
-                                <select name="apt_clubhouse" class="form-control">
-                                    <option value="none">None</option>
-                                    <option value="basic">Basic — 500–1000 sqft (Multi-purpose hall)</option>
-                                    <option value="standard">Standard — 1000–2500 sqft (Hall + gym + toilet)</option>
-                                    <option value="full">Full — 2500+ sqft (Pool, gym, party hall)</option>
-                                </select>
-                            </div>
-                            <!-- EDITED: apt_pool — added finish type selector (mirrors villa pool) -->
-                            <div class="form-group">
-                                <label class="form-label">Swimming Pool</label>
-                                <select name="apt_pool" id="aptPool" class="form-control" onchange="toggleAptPoolFinish(this)">
-                                    <option value="none">None</option>
-                                    <option value="small">Small — ~600 sqft (20×30 ft)</option>
-                                    <option value="standard">Standard — ~1200 sqft (30×40 ft)</option>
-                                    <option value="lap_pool">Lap Pool — ~1600 sqft (25m lane)</option>
-                                </select>
-                            </div>
-                            <div class="form-group" id="aptPoolFinishGroup" style="display:none;">
-                                <label class="form-label">Pool Finish / Lining</label>
-                                <select name="apt_pool_finish" class="form-control">
-                                    <option value="vitrified_tile" selected>Vitrified Tiles — Standard · ₹150–250/sqft</option>
-                                    <option value="ceramic_tile">Ceramic Tiles — Economy · ₹80–150/sqft</option>
-                                    <option value="glass_mosaic">Glass Mosaic — Premium · ₹350–600/sqft</option>
-                                    <option value="fibreglass">Fibreglass Lining — Low maintenance · ₹400–700/sqft</option>
-                                </select>
-                                <div class="form-hint">Applied to total pool surface area (walls + floor)</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Children's Play Area</label>
-                                <select name="apt_play_area" class="form-control">
-                                    <option value="none">None</option>
-                                    <option value="basic">Basic — Swings &amp; slides (~200 sqft)</option>
-                                    <option value="standard">Standard — Dedicated play zone (~500 sqft)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Landscape &amp; Gardens</label>
-                                <select name="apt_landscape" class="form-control">
-                                    <option value="none">None / Minimal</option>
-                                    <option value="basic">Basic — Lawn + pathways</option>
-                                    <option value="designed">Designed — Theme garden + water features</option>
-                                    <option value="terrace">Terrace Garden / Sky deck</option>
-                                </select>
-                            </div>
-                        </div>
+                <div class="unit-mix-card">
+                    <div class="unit-mix-header">🛏️🛏️🛏️ 3 BHK Units</div>
+                    <div class="unit-mix-body">
+                        <label class="form-label">Number of Units</label>
+                        <input type="number" name="apt_3bhk_count" id="apt3BHK" min="0" placeholder="e.g. 12" class="form-control" oninput="updateUnitHints()">
+                        <label class="form-label" style="margin-top:8px;">Avg Size (sqft)</label>
+                        <input type="number" name="apt_3bhk_size" min="900" max="2500" placeholder="e.g. 1400" class="form-control">
                     </div>
                 </div>
             </div>
+            <div id="unitMixSummary" style="display:none; margin-top:14px; padding:12px 16px; background:var(--sand); border-radius:8px; border-left:3px solid #2563EB; font-size:13px; color:var(--text-secondary); line-height:1.8;"></div>
+        </div>
+    </div>
+
+    <!-- ─── CARD 2: STRUCTURAL ─── -->
+    <div class="form-card">
+        <div class="section-title">🦴 Structural Details <span class="section-badge">The Skeleton</span></div>
+
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">⚙️</span>
+                <span class="subsection-title">Concrete, Steel &amp; Slab</span>
+            </div>
+            <div class="form-grid-3">
+                <div class="form-group">
+                    <label class="form-label">Concrete Mix Grade <span class="required">*</span></label>
+                    <select name="apt_concrete_grade" class="form-control">
+                        <option value="M25">M25 — Up to G+4 (5 floors)</option>
+                        <option value="M30" selected>M30 — Mid-rise G+5 to G+9 · Recommended</option>
+                        <option value="M35">M35 — High-rise G+10 to G+15</option>
+                        <option value="M40">M40 — High-rise 15+ floors</option>
+                    </select>
+                    <div class="form-hint">Matches steel indicator above — update when floors change</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Steel / TMT Grade <span class="required">*</span></label>
+                    <select name="apt_steel_grade" class="form-control">
+                        <option value="Fe500D" selected>Fe500D — Earthquake Resistant (Ductile) · Recommended</option>
+                        <option value="Fe550">Fe550 — High Strength</option>
+                        <option value="Fe500">Fe500 — Standard</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Slab Thickness <span class="required">*</span></label>
+                    <select name="apt_slab_thickness" class="form-control">
+                        <option value="5" selected>5 inch — Standard mid-rise</option>
+                        <option value="5.5">5.5 inch — Heavy live load / large spans</option>
+                        <option value="6">6 inch — High-rise / commercial grade</option>
+                        <option value="4.5">4.5 inch — Economy / G+2 only</option>
+                    </select>
+                    <div class="form-hint">Sets concrete volume per floor slab — multiplied by total floors</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">🌍</span>
+                <span class="subsection-title">Foundation &amp; Protection</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Soil Condition <span class="required">*</span></label>
+                    <select name="apt_soil_condition" id="aptSoilCondition" class="form-control" onchange="updateAptFoundationHint()">
+                        <option value="hard_rock">Hard Rock / Laterite — Shallow foundation</option>
+                        <option value="firm_soil" selected>Firm Soil / Murram — Standard footings</option>
+                        <option value="soft_soil">Soft / Sandy Soil — Deeper footings</option>
+                        <option value="marshy">Marshy / Waterlogged — Pile foundation</option>
+                        <option value="filled">Filled / Made-up Land — Compaction required</option>
+                    </select>
+                    <div class="form-hint" id="aptSoilHint">Raft foundation at 8–10 ft depth — standard multi-storey</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Foundation Type</label>
+                    <select name="apt_foundation_type" id="aptFoundationType" class="form-control">
+                        <option value="isolated">Isolated Footings — Low-rise RCC columns</option>
+                        <option value="raft" selected>Raft / Mat Foundation — Standard multi-storey</option>
+                        <option value="pile">Pile Foundation — High-rise / soft soil</option>
+                        <option value="combined">Combined Footing</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Foundation Depth (ft)</label>
+                    <input type="number" name="apt_foundation_depth" id="aptFoundationDepth" min="4" max="40" value="8" step="0.5" class="form-control">
+                    <div class="form-hint" id="aptFoundationDepthHint">Multi-storey default: 8–12 ft. Pile foundations: 30–60 ft</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Roof / Terrace Waterproofing <span class="required">*</span></label>
+                    <select name="apt_roof_waterproofing" class="form-control">
+                        <option value="membrane" selected>Membrane Waterproofing (HDPE / APP) — Recommended</option>
+                        <option value="crystalline">Crystalline / Integral (Xypex) — Highest grade</option>
+                        <option value="chemical_coat">Chemical Coating (Dr. Fixit / Fosroc)</option>
+                        <option value="brick_bat_coba">Brick-Bat Coba — Traditional</option>
+                        <option value="none">None — Bare RCC slab</option>
+                    </select>
+                    <div class="form-hint">Applied to top-floor roof + all intermediate terrace / podium areas</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Anti-Termite Treatment</label>
+                    <select name="apt_anti_termite" class="form-control">
+                        <option value="pre_construction" selected>Pre-construction Soil Treatment — Recommended</option>
+                        <option value="post_construction">Post-construction Injection</option>
+                        <option value="none">None</option>
+                    </select>
+                    <div class="form-hint" id="aptAntiTermiteHint">Cost = ₹8–15 × plot area (sqft). Enter plot area in Basic Info above.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">🪜</span>
+                <span class="subsection-title">Staircases</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Number of Staircases</label>
+                    <input type="number" name="apt_staircases" id="aptStaircases" min="1" max="10" value="2" placeholder="e.g. 2" class="form-control">
+                    <div class="form-hint">NBC 2016: 1 staircase per 600 sqm floor area — 2 required for most mid-rise blocks</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Staircase Type <span class="required">*</span></label>
+                    <select name="apt_staircase_type" id="aptStaircaseType" class="form-control" onchange="updateAptStaircaseHint()">
+                        <option value="rcc_open">RCC Open Staircase — G+2 and below</option>
+                        <option value="rcc_enclosed" selected>RCC Enclosed Staircase — Standard mid-rise</option>
+                        <option value="fire_rated">Fire-Rated Pressurised Staircase — Mandatory G+4+</option>
+                        <option value="smoke_lobby">Smoke Lobby + Fire-Rated — High-rise NBC compliant</option>
+                    </select>
+                    <div class="form-hint" id="aptStaircaseHint">Enclosed staircase — fire door + self-closing mechanism</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── CARD 3: MASONRY & FAÇADE ─── -->
+    <div class="form-card">
+        <div class="section-title">🧱 Masonry &amp; Façade <span class="section-badge">The Walls</span></div>
+
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">🧱</span>
+                <span class="subsection-title">Wall Construction</span>
+            </div>
+            <div class="form-grid-3">
+                <div class="form-group">
+                    <label class="form-label">External Wall Material <span class="required">*</span></label>
+                    <select name="apt_wall_material" class="form-control">
+                        <option value="aac_blocks" selected>AAC Blocks — Lightweight, thermal · Recommended for multi-storey</option>
+                        <option value="fly_ash">Fly Ash Bricks — Eco, durable</option>
+                        <option value="red_clay">Red Clay Bricks — Traditional</option>
+                        <option value="hollow_concrete">Hollow Concrete Blocks — Economy</option>
+                    </select>
+                    <div class="form-hint">Outer walls — quantity = perimeter × ceiling height × floors × wall thickness</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">External Wall Thickness</label>
+                    <select name="apt_wall_thickness" class="form-control">
+                        <option value="9" selected>9-inch — Standard apartment outer wall</option>
+                        <option value="4.5">4.5-inch — Lightweight framed construction</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Internal Partition Material</label>
+                    <select name="apt_partition_material" class="form-control">
+                        <option value="aac_blocks" selected>AAC Blocks 4.5-inch — Standard</option>
+                        <option value="fly_ash_partition">Fly Ash Bricks 4.5-inch</option>
+                        <option value="drywall">Drywall / Gypsum Board — Premium</option>
+                    </select>
+                    <div class="form-hint">Internal partitions between rooms — multiplied by unit count</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">🪟</span>
+                <span class="subsection-title">External Façade &amp; Plaster</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">External Façade Type <span class="required">*</span></label>
+                    <select name="apt_facade_type" id="aptFacadeType" class="form-control" onchange="updateAptFacadeHint()">
+                        <option value="plaster_paint" selected>Cement Plaster + Weathershield Paint — Standard</option>
+                        <option value="texture_paint">Cement Plaster + Texture Paint — Premium finish</option>
+                        <option value="acp_cladding">ACP / Aluminium Composite Panels — Modern</option>
+                        <option value="stone_cladding">Natural Stone Cladding — Premium</option>
+                        <option value="glass_curtain">Glass Curtain Wall (partial / full) — High-end</option>
+                    </select>
+                    <div class="form-hint" id="aptFacadeHint">Applied to total external wall area (perimeter × height × all floors)</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">External Plaster Type</label>
+                    <select name="apt_external_plaster" class="form-control">
+                        <option value="12mm_cm_15" selected>12mm Cement Plaster (1:5) — Standard external</option>
+                        <option value="20mm_cm_14">20mm Cement Plaster (1:4) — Rough external</option>
+                        <option value="textured_coat">Textured Coat (Snowcem / Tyrolean) — Decorative</option>
+                    </select>
+                    <div class="form-hint">Separate quantity from internal plaster — applies to all external faces</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Internal Plaster Type</label>
+                    <select name="apt_internal_plaster" class="form-control">
+                        <option value="gypsum" selected>Gypsum Plaster — Smooth finish · Common for apartments</option>
+                        <option value="12mm_cm">12mm Cement Plaster (1:6)</option>
+                        <option value="skim_coat">Skim Coat on AAC — Economy option</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">External Paint Quality</label>
+                    <select name="apt_external_paint" class="form-control">
+                        <option value="weathershield" selected>Weathershield / Apex — Standard · ₹22–35/sqft</option>
+                        <option value="elastomeric">Elastomeric / Damp Proof — Premium · ₹38–55/sqft</option>
+                        <option value="texture_ext">Exterior Texture Paint — High-end · ₹55–100/sqft</option>
+                    </select>
+                    <div class="form-hint">Applied to total external façade area — largest single paint quantity</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── CARD 4: PER-UNIT INTERIOR FINISHES ─── -->
+    <div class="form-card">
+        <div class="section-title">✨ Per-Unit Interior Finishes <span class="section-badge">Multiplied × Unit Count</span></div>
+        <div class="form-hint" style="margin-bottom:18px; padding:10px 14px; background:var(--info-bg); border-radius:8px; color:var(--info); font-size:12px;">
+            ℹ️ All fields below are applied per flat and multiplied by unit count from the BHK mix above. They represent the largest material cost lines after the structure.
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">💎</span>
+                <span class="subsection-title">Flooring &amp; Paint</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Floor Tile Type (Living / Bedrooms) <span class="required">*</span></label>
+                    <select name="apt_flooring_type" class="form-control">
+                        <option value="vitrified" selected>Vitrified Tiles — ₹60–120/sqft · Standard</option>
+                        <option value="ceramic">Ceramic Tiles — ₹40–80/sqft · Economy</option>
+                        <option value="marble">Marble — ₹150–350/sqft · Premium</option>
+                        <option value="granite">Granite — ₹120–280/sqft · Premium</option>
+                        <option value="hardwood">Hardwood / Engineered Wood — ₹200–500/sqft · Luxury</option>
+                    </select>
+                    <div class="form-hint">Applied to living + bedroom area per unit × total units</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Bathroom Wall Tile Type <span class="required">*</span></label>
+                    <select name="apt_bathroom_tile" class="form-control">
+                        <option value="ceramic_standard" selected>Ceramic — Standard · ₹60–100/sqft</option>
+                        <option value="ceramic_economy">Ceramic — Economy · ₹30–60/sqft</option>
+                        <option value="vitrified_wall">Vitrified Wall Tiles — ₹80–150/sqft</option>
+                        <option value="designer_tiles">Designer / Moroccan Tiles — ₹150–350/sqft</option>
+                    </select>
+                    <div class="form-hint">Wall tiles to dado height per bathroom × total bathroom count</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Internal Paint Quality <span class="required">*</span></label>
+                    <select name="apt_internal_paint" class="form-control">
+                        <option value="emulsion" selected>Plastic Emulsion — Standard · ₹18–28/sqft</option>
+                        <option value="luxury">Royal / Luxury Emulsion — Premium · ₹30–45/sqft</option>
+                        <option value="texture">Texture / Designer Paint — High-end · ₹50–90/sqft</option>
+                    </select>
+                    <div class="form-hint">Applied to internal wall area per unit × total units</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">False Ceiling (per unit)</label>
+                    <div class="toggle-group">
+                        <input type="radio" name="apt_false_ceiling" id="afc-none" value="none" checked>
+                        <label class="toggle-option" for="afc-none">✗ None</label>
+                        <input type="radio" name="apt_false_ceiling" id="afc-partial" value="partial">
+                        <label class="toggle-option" for="afc-partial">◑ Partial (Living only)</label>
+                        <input type="radio" name="apt_false_ceiling" id="afc-full" value="full">
+                        <label class="toggle-option" for="afc-full">✓ Full Flat</label>
+                    </div>
+                    <div class="form-hint">Gypsum board — area per unit × total units</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">🚪</span>
+                <span class="subsection-title">Doors, Windows &amp; Sanitary</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Door Material (per flat) <span class="required">*</span></label>
+                    <select name="apt_door_material" class="form-control">
+                        <option value="flush_hollow">Flush Door (Hollow Core) — Economy · ₹8–15K/door</option>
+                        <option value="flush_solid" selected>Flush Door (Solid Core) — Standard · ₹15–30K/door</option>
+                        <option value="upvc_door">uPVC Door — Low maintenance · ₹18–35K/door</option>
+                        <option value="panel_teak">Panel Door — Teak Wood · ₹30–60K/door</option>
+                    </select>
+                    <div class="form-hint">Multiplied by door count per BHK type from unit mix</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Window Material (per flat) <span class="required">*</span></label>
+                    <select name="apt_window_material" class="form-control">
+                        <option value="aluminium_sliding" selected>Aluminium Sliding — Standard · ₹8–18K/window</option>
+                        <option value="upvc_sliding">uPVC Sliding — Popular · ₹12–22K/window</option>
+                        <option value="upvc_casement">uPVC Casement — Thermal, quiet · ₹15–30K/window</option>
+                        <option value="ms_grill">MS Grill + Glass — Economy · ₹3–8K/window</option>
+                    </select>
+                    <div class="form-hint">Multiplied by window count per BHK type from unit mix</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sanitary Ware Grade (per flat) <span class="required">*</span></label>
+                    <select name="apt_sanitary_grade" class="form-control">
+                        <option value="standard" selected>Standard — Hindware / Parryware (₹8–15K/bath)</option>
+                        <option value="mid">Mid-range — Cera / Jaquar (₹18–35K/bath)</option>
+                        <option value="premium">Premium — Kohler / American Standard (₹40–80K/bath)</option>
+                    </select>
+                    <div class="form-hint">Multiplied by bathroom count × total units</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Kitchen Type (per flat)</label>
+                    <div class="toggle-group">
+                        <input type="radio" name="apt_kitchen_type" id="akt-semi" value="semi_modular" checked>
+                        <label class="toggle-option" for="akt-semi">Semi-Modular</label>
+                        <input type="radio" name="apt_kitchen_type" id="akt-modular" value="modular">
+                        <label class="toggle-option" for="akt-modular">Fully Modular</label>
+                    </div>
+                    <div class="form-hint">Modular adds ~₹1.5–4L per flat to estimate</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── CARD 5: MEP SYSTEMS ─── -->
+    <div class="form-card">
+        <div class="section-title">⚙️ MEP Systems <span class="section-badge">Building Services</span></div>
+
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">🛗</span>
+                <span class="subsection-title">Vertical Transport — Lifts</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Number of Lifts / Elevators</label>
+                    <input type="number" name="apt_lifts" min="0" max="20" placeholder="e.g. 2" class="form-control">
+                    <div class="form-hint">1 lift per ~50 units (mid-rise) · 1 per 30 units (high-rise)</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Lift Capacity</label>
+                    <select name="apt_lift_capacity" class="form-control">
+                        <option value="6">6-person / 450 kg — Low-rise</option>
+                        <option value="8" selected>8-person / 630 kg — Standard</option>
+                        <option value="13">13-person / 1000 kg — High-rise</option>
+                        <option value="service">Service Lift — Goods &amp; stretcher</option>
+                    </select>
+                    <div class="form-hint">Cost: 6-person ₹8–12L · 8-person ₹12–18L · 13-person ₹22–35L installed</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">💧</span>
+                <span class="subsection-title">Water &amp; Power Management</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">DG Backup (Power)</label>
+                    <select name="apt_dg_backup" class="form-control">
+                        <option value="none">None — Municipal supply only</option>
+                        <option value="common_only" selected>Common Areas Only — Lifts, lights, pumps</option>
+                        <option value="partial">Partial — Common + 1 AC point per flat · +₹40–60/sqft</option>
+                        <option value="full">Full Backup — 100% power per flat · +₹80–150/sqft</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">DG Set Capacity (kVA)</label>
+                    <select name="apt_dg_kva" id="aptDgKva" class="form-control">
+                        <option value="none" selected>None</option>
+                        <option value="62.5">62.5 kVA — Small block up to 20 units · ₹4–6L</option>
+                        <option value="125">125 kVA — Mid-rise 20–50 units · ₹8–12L</option>
+                        <option value="250">250 kVA — Large block 50–100 units · ₹15–22L</option>
+                        <option value="500">500 kVA — Large complex 100+ units · ₹28–40L</option>
+                        <option value="1000">1000 kVA — High-rise / full backup · ₹55–80L</option>
+                    </select>
+                    <div class="form-hint">Auto-suggested based on floors &amp; units — largest single MEP equipment cost</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Water Storage</label>
+                    <select name="apt_water_storage" class="form-control">
+                        <option value="sump_overhead" selected>Underground Sump + Overhead — Standard</option>
+                        <option value="overhead">Overhead Tanks Only</option>
+                        <option value="borewell">Borewell + Sump + Overhead</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">🛡️</span>
+                <span class="subsection-title">Safety &amp; Utility Systems <span style="color:#DC2626; font-size:10px; font-weight:700; margin-left:6px;">🔥 FIRE = MANDATORY G+3+</span></span>
+            </div>
+            <div class="safety-grid">
+                <div class="safety-tile active" id="stile-fire">
+                    <div class="safety-header" onclick="toggleSafety('fire')">
+                        <div class="safety-checkbox" id="schk-fire">✓</div>
+                        <span style="font-size:18px;">🔥</span>
+                        <div>
+                            <div class="addon-label">Fire Suppression System</div>
+                            <div class="addon-sub">⚠️ Mandatory above G+3 per NBC 2016</div>
+                        </div>
+                    </div>
+                    <div class="safety-body">
+                        <label class="form-label">Specification</label>
+                        <select name="apt_fire_spec" class="form-control">
+                            <option value="wet_riser" selected>Wet Riser + Hose Reels — Mandatory for all above G+3</option>
+                            <option value="sprinkler_full">Full Automatic Sprinkler System — High-rise requirement</option>
+                            <option value="both">Both — Wet Riser + Full Sprinklers — NBC for 15m+ height</option>
+                        </select>
+                        <div class="form-hint" style="margin-top:6px;">Non-compliance blocks Occupancy Certificate — always include</div>
+                    </div>
+                </div>
+                <div class="safety-tile" id="stile-stp">
+                    <div class="safety-header" onclick="toggleSafety('stp')">
+                        <div class="safety-checkbox" id="schk-stp"></div>
+                        <span style="font-size:18px;">♻️</span>
+                        <div>
+                            <div class="addon-label">STP / WTP on-site</div>
+                            <div class="addon-sub">Sewage &amp; water treatment plant</div>
+                        </div>
+                    </div>
+                    <div class="safety-body">
+                        <label class="form-label">Treatment Type</label>
+                        <select name="apt_stp_type" class="form-control">
+                            <option value="stp_only">STP Only — Sewage treatment</option>
+                            <option value="stp_rwh">STP + Rainwater Harvesting</option>
+                            <option value="stp_wtp_rwh">Full — STP + WTP + RWH</option>
+                        </select>
+                        <div class="form-hint" style="margin-top:6px;">Required for 20+ units in most municipalities</div>
+                    </div>
+                </div>
+                <div class="safety-tile" id="stile-cctv">
+                    <div class="safety-header" onclick="toggleSafety('cctv')">
+                        <div class="safety-checkbox" id="schk-cctv"></div>
+                        <span style="font-size:18px;">📹</span>
+                        <div>
+                            <div class="addon-label">CCTV &amp; Security</div>
+                            <div class="addon-sub">Gated entry, intercom, cameras</div>
+                        </div>
+                    </div>
+                    <div class="safety-body">
+                        <label class="form-label">Security Level</label>
+                        <select name="apt_security_level" class="form-control">
+                            <option value="basic">Basic — Gated entry + guard room</option>
+                            <option value="standard">Standard — CCTV + video intercom per flat</option>
+                            <option value="smart">Smart — ANPR, face recognition, app access</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="safety-tile" id="stile-solar">
+                    <div class="safety-header" onclick="toggleSafety('solar')">
+                        <div class="safety-checkbox" id="schk-solar"></div>
+                        <span style="font-size:18px;">☀️</span>
+                        <div>
+                            <div class="addon-label">Solar Rooftop System</div>
+                            <div class="addon-sub">Common area electricity generation</div>
+                        </div>
+                    </div>
+                    <div class="safety-body">
+                        <label class="form-label">Capacity (kW)</label>
+                        <input type="number" name="apt_solar_kw" min="5" max="500" placeholder="e.g. 50" class="form-control">
+                        <div class="form-hint" style="margin-top:6px;">~10 sqft of roof per kW of solar capacity</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── CARD 6: SHARED AMENITIES ─── -->
+    <div class="form-card">
+        <div class="section-title">🏊 Shared Amenities <span class="section-badge">Common Spaces</span></div>
+
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">🅿️</span>
+                <span class="subsection-title">Parking Area</span>
+            </div>
+            <div class="form-grid" style="margin-bottom:12px;">
+                <div class="form-group">
+                    <label class="form-label">Parking Type <span class="required">*</span></label>
+                    <select name="apt_parking_type" id="aptParkingType" class="form-control" onchange="toggleBasementInputs(this)">
+                        <option value="open">Open Surface Parking</option>
+                        <option value="stilt">Stilt / Podium Parking (Ground level)</option>
+                        <option value="basement_1">Basement Parking — 1 Level</option>
+                        <option value="basement_2">Basement Parking — 2 Levels</option>
+                        <option value="multilevel">Multi-level Mechanical Parking</option>
+                    </select>
+                    <div class="form-hint" id="parkingHint">No additional excavation cost</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Total Parking Slots</label>
+                    <input type="number" name="apt_parking_slots" id="aptParkingSlots" min="0" placeholder="e.g. 60" class="form-control" oninput="calcParkingArea()">
+                    <div class="form-hint" id="parkingSlotHint">Enter total units above to get a suggested slot count</div>
+                </div>
+            </div>
+            <div class="form-grid-3" style="margin-bottom:12px;">
+                <div class="form-group">
+                    <label class="form-label">Slot Length (ft)</label>
+                    <input type="number" name="apt_slot_length" id="aptSlotLength" min="14" max="22" value="18" step="0.5" class="form-control" oninput="calcParkingArea()">
+                    <div class="form-hint">Standard: 18 ft. Compact: 16 ft</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Slot Width (ft)</label>
+                    <input type="number" name="apt_slot_width" id="aptSlotWidth" min="7" max="12" value="8.5" step="0.5" class="form-control" oninput="calcParkingArea()">
+                    <div class="form-hint">Standard: 8.5 ft. SUV: 10 ft</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Aisle Width (ft)</label>
+                    <input type="number" name="apt_aisle_width" id="aptAisleWidth" min="16" max="26" value="20" step="0.5" class="form-control" oninput="calcParkingArea()">
+                    <div class="form-hint">Two-way aisle: 20–24 ft</div>
+                </div>
+            </div>
+            <div id="parkingAreaSummary" style="display:none; background:linear-gradient(90deg,#EFF6FF,#DBEAFE); border:1px solid #BFDBFE; border-radius:8px; padding:12px 16px; margin-bottom:12px;">
+                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#1E40AF; margin-bottom:8px;">🅿️ Calculated Parking Area</div>
+                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
+                    <div style="text-align:center;">
+                        <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:#1E40AF;" id="parkNetArea">—</div>
+                        <div style="font-size:10px; color:#3B82F6; font-weight:600;">Net Slot Area (sqft)</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:#1E40AF;" id="parkGrossArea">—</div>
+                        <div style="font-size:10px; color:#3B82F6; font-weight:600;">Gross incl. Aisles (sqft)</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:#1E40AF;" id="parkSqftPerSlot">—</div>
+                        <div style="font-size:10px; color:#3B82F6; font-weight:600;">sqft / slot (gross)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Parking Floor Finish</label>
+                    <select name="apt_parking_floor" class="form-control">
+                        <option value="pcc">PCC / Plain Concrete — Economy</option>
+                        <option value="epoxy" selected>Epoxy Coating — Durable, easy-clean · Standard for basement</option>
+                        <option value="interlocking">Interlocking Paver Blocks — Open surface parking</option>
+                        <option value="polished_concrete">Polished Concrete — Premium basement</option>
+                        <option value="anti_skid_ramp">Anti-skid Coating (Ramps &amp; Entry Only) — Zone finish</option>
+                    </select>
+                </div>
+            </div>
+            <div id="basementExtras" style="display:none; margin-top:12px; padding-top:12px; border-top:1px dashed var(--stone);">
+                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#DC2626; margin-bottom:10px;">⚠️ Basement-Specific Inputs</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Basement Depth (ft)</label>
+                        <input type="number" name="apt_basement_depth" min="10" max="30" value="14" class="form-control">
+                        <div class="form-hint">Adds excavation, retaining walls &amp; waterproofing cost</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Waterproofing System</label>
+                        <select name="apt_basement_waterproofing" class="form-control">
+                            <option value="crystalline">Crystalline / Integral — Best for deep basements</option>
+                            <option value="membrane" selected>Membrane Sheet — Standard</option>
+                            <option value="injection">Injection Grouting — Retrofit / leaky</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ramp Type</label>
+                        <select name="apt_ramp_type" class="form-control">
+                            <option value="straight">Straight Ramp — Single vehicle width</option>
+                            <option value="straight_double" selected>Straight Ramp — Double vehicle width</option>
+                            <option value="spiral">Spiral / Curved Ramp</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ventilation System</label>
+                        <select name="apt_basement_ventilation" class="form-control">
+                            <option value="mechanical" selected>Mechanical — Exhaust fans + CO sensors · Standard</option>
+                            <option value="natural">Natural — Openings &amp; vents</option>
+                            <option value="jet_fan">Jet Fan System — Large basement grade</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">🏋️</span>
+                <span class="subsection-title">Clubhouse &amp; Recreational Facilities</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Clubhouse / Amenity Block</label>
+                    <select name="apt_clubhouse" class="form-control">
+                        <option value="none">None</option>
+                        <option value="basic">Basic — 500–1000 sqft (Multi-purpose hall)</option>
+                        <option value="standard">Standard — 1000–2500 sqft (Hall + gym + toilet)</option>
+                        <option value="full">Full — 2500+ sqft (Pool, gym, party hall)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Swimming Pool</label>
+                    <select name="apt_pool" id="aptPool" class="form-control" onchange="toggleAptPoolFinish(this)">
+                        <option value="none">None</option>
+                        <option value="small">Small — ~600 sqft (20×30 ft)</option>
+                        <option value="standard">Standard — ~1200 sqft (30×40 ft)</option>
+                        <option value="lap_pool">Lap Pool — ~1600 sqft (25m lane)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="aptPoolFinishGroup" style="display:none;">
+                    <label class="form-label">Pool Finish / Lining</label>
+                    <select name="apt_pool_finish" class="form-control">
+                        <option value="vitrified_tile" selected>Vitrified Tiles — Standard · ₹150–250/sqft</option>
+                        <option value="ceramic_tile">Ceramic Tiles — Economy · ₹80–150/sqft</option>
+                        <option value="glass_mosaic">Glass Mosaic — Premium · ₹350–600/sqft</option>
+                        <option value="fibreglass">Fibreglass Lining — Low maintenance · ₹400–700/sqft</option>
+                    </select>
+                    <div class="form-hint">Applied to total pool surface area (walls + floor)</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">External Development Area (sqft)</label>
+                    <input type="number" name="apt_external_dev_sqft" min="0" placeholder="e.g. 3000" class="form-control">
+                    <div class="form-hint">Compound wall, gate, approach road, landscaping — typically 20–35% of plot area</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">External Development Grade</label>
+                    <select name="apt_external_dev_grade" class="form-control">
+                        <option value="basic">Basic — Boundary wall + gate + paved path · ₹80–120/sqft</option>
+                        <option value="standard" selected>Standard — Above + landscaping + pathways · ₹120–200/sqft</option>
+                        <option value="premium">Premium — Designed landscape + water features + lighting · ₹200–400/sqft</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-header apt-accent">
+                <span class="subsection-icon">🏛️</span>
+                <span class="subsection-title">Common Area Finishes <span style="font-size:10px; font-weight:400; text-transform:none; letter-spacing:0; color:#3B82F6; margin-left:6px;">Applied to lobbies, corridors &amp; stairwells</span></span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Lobby / Corridor Flooring <span class="required">*</span></label>
+                    <select name="apt_common_flooring" class="form-control">
+                        <option value="vitrified" selected>Vitrified Tiles — Standard · ₹60–120/sqft</option>
+                        <option value="marble">Marble — Premium lobbies · ₹150–350/sqft</option>
+                        <option value="granite">Granite — Durable · ₹120–280/sqft</option>
+                        <option value="ceramic">Ceramic — Economy · ₹40–80/sqft</option>
+                    </select>
+                    <div class="form-hint">Applied to all common corridors + lobbies — common area % × total BUA</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Common Area Internal Paint</label>
+                    <select name="apt_common_paint" class="form-control">
+                        <option value="emulsion" selected>Plastic Emulsion — Standard · ₹18–28/sqft</option>
+                        <option value="luxury">Luxury Emulsion — Premium lobbies · ₹30–45/sqft</option>
+                        <option value="texture">Texture / Designer — High-end · ₹50–90/sqft</option>
+                    </select>
+                    <div class="form-hint">Applied to lobby + corridor walls — separate from unit internal paint</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Common Area Ceiling</label>
+                    <select name="apt_common_ceiling" class="form-control">
+                        <option value="painted" selected>Painted Concrete — Economy</option>
+                        <option value="gypsum_plain">Gypsum Board — Plain · ₹60–80/sqft</option>
+                        <option value="gypsum_designer">Gypsum Board — Designer / Cove · ₹100–160/sqft</option>
+                        <option value="metal_grid">Metal Grid (Armstrong) — Commercial · ₹80–120/sqft</option>
+                    </select>
+                    <div class="form-hint">Lobby + corridor ceiling area — high visibility, affects buyer perception</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Lobby Wall Cladding / Finish</label>
+                    <select name="apt_lobby_wall_finish" class="form-control">
+                        <option value="paint_only" selected>Paint Only — Economy</option>
+                        <option value="ceramic_dado">Ceramic Dado (waist height) — Standard · ₹40–80/sqft</option>
+                        <option value="vitrified_full">Vitrified Tiles Full Height — Premium · ₹80–150/sqft</option>
+                        <option value="stone_cladding">Natural Stone Cladding — High-end · ₹200–400/sqft</option>
+                    </select>
+                    <div class="form-hint">Ground floor lobby wall — major cost line for premium apartments</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
             <!-- END APARTMENT SECTION -->
 
             <!-- BUDGET -->
@@ -2780,33 +2896,27 @@
     //  VILLA TAP HINT — cross-references villa bathroom count
     // ============================================================
     function updateVillaTapHint() {
-        const taps = parseInt(document.getElementById('villaNumTaps')?.value) || 0;
-        const hint = document.getElementById('villaTapHint');
-        if (!hint) return;
+    const taps  = parseInt(document.getElementById('villaNumTaps')?.value)  || 0;
+    const baths = parseInt(document.getElementById('villaBathrooms')?.value) || 0;              
+    const hint  = document.getElementById('villaTapHint');
+    if (!hint) return;
+    if (baths > 0) {
+        const suggestMin = baths * 4 + 5; // 4 per bath + 5 kitchen/utility/outdoor
+        const suggestMax = baths * 6 + 8;
         if (taps > 0) {
-            hint.textContent = taps < 20
-                ? `⚠️ Villas typically need 25–40+ tap points (bathrooms + kitchen + utility + outdoor)`
-                : taps > 50
-                    ? `ℹ️ High count — verify against bathroom count + outdoor points`
-                    : `✓ Reasonable tap count for a villa`;
+            const status = taps < suggestMin
+                ? `⚠️ Low — ${baths} bathrooms typically need ${suggestMin}–${suggestMax} points`
+                : taps > suggestMax
+                    ? `ℹ️ High — verify against bathroom count + outdoor points`
+                    : `✓ Reasonable for ${baths} bathrooms (range: ${suggestMin}–${suggestMax})`;
+            hint.textContent = status;
         } else {
-            hint.textContent = 'Typically 4–6 per bathroom + kitchen + utility + outdoor points';
+            hint.textContent = `${baths} bathrooms → suggested: ${suggestMin}–${suggestMax} tap points (bathrooms + kitchen + utility + outdoor)`;
         }
+    } else {
+        hint.textContent = 'Enter number of bathrooms above to get a suggested tap count';
     }
-
-    // ============================================================
-    //  VILLA ANTI-TERMITE HINT — live update with plot area
-    // ============================================================
-    document.getElementById('plotArea')?.addEventListener('input', function() {
-        const plotSqft = parseFloat(this.value) || 0;
-        // Update villa hint too
-        const villaHint = document.getElementById('villaAntiTermiteHint');
-        if (villaHint && plotSqft > 0) {
-            const low  = Math.round(plotSqft * 8);
-            const high = Math.round(plotSqft * 15);
-            villaHint.textContent = `Pre-construction: ₹${low.toLocaleString('en-IN')}–₹${high.toLocaleString('en-IN')} (₹8–15 × ${plotSqft.toLocaleString('en-IN')} sqft)`;
-        }
-    });
+}
 
     // ============================================================
     //  ADDON TILES (Residential)
@@ -2935,176 +3045,192 @@
         if (plotArea < sf) { e.preventDefault(); alert('Plot area cannot be smaller than built-up area'); return; }
 
         const propType = document.querySelector('input[name="property_type"]:checked')?.value;
-        if (EXPANDED_TYPES.includes(propType)) {
+        if (propType === 'residential') {
             const rooms  = parseInt(document.getElementById('rooms')?.value);
             const floors = parseInt(document.getElementById('floors')?.value);
-            if (propType !== 'apartment') {
-                if (!rooms || rooms < 1)  { e.preventDefault(); alert('At least 1 room is required'); return; }
-                if (!floors || floors < 1) { e.preventDefault(); alert('At least 1 floor is required'); return; }
-            }
+            if (!rooms || rooms < 1)   { e.preventDefault(); alert('At least 1 room is required'); return; }
+            if (!floors || floors < 1) { e.preventDefault(); alert('At least 1 floor is required'); return; }
+        } else if (propType === 'villa') {
+            const villaRooms  = parseInt(document.getElementById('villaRooms')?.value);
+            const villaFloors = parseInt(document.getElementById('villaFloors')?.value);
+            const villaBaths  = parseInt(document.getElementById('villaBathrooms')?.value);
+            if (!villaRooms  || villaRooms < 1)  { e.preventDefault(); alert('Please enter number of rooms for the villa'); return; }
+            if (!villaFloors || villaFloors < 1) { e.preventDefault(); alert('Please enter number of floors for the villa'); return; }
+            if (!villaBaths  || villaBaths < 1)  { e.preventDefault(); alert('Please enter number of bathrooms for the villa'); return; }
         }
+        // ── LOCATION VALIDATION ──
+    const locState    = document.getElementById('locationState')?.value;
+    const locDistrict = document.getElementById('locationDistrict')?.value;
+    const locPlace    = document.getElementById('locationPlace')?.value?.trim();
+    const locAddress  = document.getElementById('locationAddress')?.value?.trim();
+    const locPin      = document.getElementById('locationPin')?.value?.trim();
+    buildLocationString();
+    if (!locState)    { e.preventDefault(); alert('Please select a State'); return; }
+    if (!locDistrict) { e.preventDefault(); alert('Please select a District'); return; }
+    if (!locPlace)    { e.preventDefault(); alert('Please enter Town / Place'); return; }
+    if (!locAddress)  { e.preventDefault(); alert('Please enter the exact site address'); return; }
+    if (!locPin || !/^\d{6}$/.test(locPin)) { e.preventDefault(); alert('Please enter a valid 6-digit PIN code'); return; }
     });
 
     // ============================================================
     //  APARTMENT — STEEL & CONCRETE INDICATOR
     // ============================================================
     function updateSteelIndicator() {
-        const floors  = parseInt(document.getElementById('aptTotalFloors')?.value) || 2;
-        const ind     = document.getElementById('steelIndicator');
-        const ratioEl = document.getElementById('steelRatio');
-        const gradeEl = document.getElementById('concreteGradeApt');
-        if (!ind) return;
-        let steelKg, concreteGrade;
-        // FIXED: value="99" used for 30+ option — treat 99 as 30+ sentinel
-        const f = floors >= 99 ? 30 : floors;
-        if (f <= 3)       { steelKg = '3.5–4.0';  concreteGrade = 'M20'; }
-        else if (f <= 5)  { steelKg = '4.0–4.8';  concreteGrade = 'M25'; }
-        else if (f <= 10) { steelKg = '4.8–5.5';  concreteGrade = 'M25–M30'; }
-        else if (f <= 15) { steelKg = '5.5–6.5';  concreteGrade = 'M30–M35'; }
-        else if (f <= 20) { steelKg = '6.5–8.0';  concreteGrade = 'M35'; }
-        else              { steelKg = '8.0–10.0+'; concreteGrade = 'M40+'; }
-        ratioEl.textContent = steelKg;
-        gradeEl.textContent = concreteGrade;
-        ind.classList.add('show');
-    }
+    const floors  = parseInt(document.getElementById('aptTotalFloors')?.value) || 2;
+    const ind     = document.getElementById('steelIndicator');
+    const ratioEl = document.getElementById('steelRatio');
+    const gradeEl = document.getElementById('concreteGradeApt');
+    if (!ind) return;
+    let steelKg, concreteGrade;
+    const f = floors >= 99 ? 30 : floors;
+    if (f <= 3)       { steelKg = '3.5–4.0';  concreteGrade = 'M20'; }
+    else if (f <= 5)  { steelKg = '4.0–4.8';  concreteGrade = 'M25'; }
+    else if (f <= 10) { steelKg = '4.8–5.5';  concreteGrade = 'M25–M30'; }
+    else if (f <= 15) { steelKg = '5.5–6.5';  concreteGrade = 'M30–M35'; }
+    else if (f <= 20) { steelKg = '6.5–8.0';  concreteGrade = 'M35'; }
+    else              { steelKg = '8.0–10.0+'; concreteGrade = 'M40+'; }
+    ratioEl.textContent = steelKg;
+    gradeEl.textContent = concreteGrade;
+    ind.classList.add('show');
 
-    // ADDED: auto-activate fire safety tile when floors ≥ 4 (mandatory above G+3)
-    function autoActivateFireSafety() {
-        const floors = parseInt(document.getElementById('aptTotalFloors')?.value) || 2;
-        if (floors >= 4 && !safetyStates.fire) {
+    // Auto-suggest DG kVA based on floors + units
+    const dgKva = document.getElementById('aptDgKva');
+    if (dgKva) {
+        const units = parseInt(document.getElementById('aptTotalUnits')?.value) || 0;
+        if (f <= 3)       dgKva.value = units <= 20 ? '62.5' : '125';
+        else if (f <= 7)  dgKva.value = units <= 50 ? '125'  : '250';
+        else if (f <= 14) dgKva.value = '250';
+        else              dgKva.value = '500';
+    }
+}
+
+    // Auto-activate / deactivate fire safety tile based on floor count
+function autoActivateFireSafety() {
+    const floors = parseInt(document.getElementById('aptTotalFloors')?.value) || 2;
+    if (floors >= 4) {
+        if (!safetyStates.fire) {
             safetyStates.fire = true;
             document.getElementById('stile-fire')?.classList.add('active');
             const chk = document.getElementById('schk-fire');
             if (chk) chk.textContent = '✓';
         }
+    } else {
+        safetyStates.fire = false;
+        document.getElementById('stile-fire')?.classList.remove('active');
+        const chk = document.getElementById('schk-fire');
+        if (chk) chk.textContent = '';
     }
+}
 
     // ============================================================
     //  APARTMENT — UNIT MIX SUMMARY
     // ============================================================
     function updateUnitHints() {
-        const total   = parseInt(document.getElementById('aptTotalUnits')?.value)      || 0;
-        const bhk1    = parseInt(document.getElementById('apt1BHK')?.value)            || 0;
-        const bhk2    = parseInt(document.getElementById('apt2BHK')?.value)            || 0;
-        const bhk3    = parseInt(document.getElementById('apt3BHK')?.value)            || 0;
-        const caPct   = parseFloat(document.getElementById('aptCommonAreaPct')?.value) || 20;
-        const sumCard = document.getElementById('unitMixSummary');
-        const caHint  = document.getElementById('aptCommonHint');
-        if (caHint) caHint.textContent = `${caPct}% of total BUA = lobbies, corridors, stairwells, plant rooms`;
-        if (total < 1 || !sumCard) return;
-        // EDITED: bathroom counts clarified — assumes 1/2/3 baths per BHK type
-        const toilets   = (bhk1 * 1) + (bhk2 * 2) + (bhk3 * 3);
-        const doors     = (bhk1 * 3) + (bhk2 * 5) + (bhk3 * 7);
-        const windows   = (bhk1 * 4) + (bhk2 * 6) + (bhk3 * 8);
-        const defined   = bhk1 + bhk2 + bhk3;
-        const remaining = total - defined;
-        let html = `<strong>📊 Quantity Multipliers (from unit mix):</strong><br>`;
-        if (bhk1) html += `&nbsp;· 1BHK ×${bhk1}: ~${bhk1} bathroom sets (1/flat assumed), ~${bhk1*3} doors<br>`;
-        if (bhk2) html += `&nbsp;· 2BHK ×${bhk2}: ~${bhk2*2} bathroom sets (2/flat assumed), ~${bhk2*5} doors<br>`;
-        if (bhk3) html += `&nbsp;· 3BHK ×${bhk3}: ~${bhk3*3} bathroom sets (3/flat assumed), ~${bhk3*7} doors<br>`;
-        if (defined > 0) html += `<strong>Total:</strong> ~${toilets} bathroom sets &nbsp;·&nbsp; ~${doors} doors &nbsp;·&nbsp; ~${windows} windows`;
-        if (remaining > 0 && defined > 0) html += `<br><span style="color:var(--accent);">⚠️ ${remaining} unit(s) not assigned to a BHK type</span>`;
-        sumCard.innerHTML     = html;
-        sumCard.style.display = defined > 0 ? 'block' : 'none';
-    }
+    const total   = parseInt(document.getElementById('aptTotalUnits')?.value)      || 0;
+    const bhk1    = parseInt(document.getElementById('apt1BHK')?.value)            || 0;
+    const bhk2    = parseInt(document.getElementById('apt2BHK')?.value)            || 0;
+    const bhk3    = parseInt(document.getElementById('apt3BHK')?.value)            || 0;
+    const caPct   = parseFloat(document.getElementById('aptCommonAreaPct')?.value) || 20;
+    const sumCard = document.getElementById('unitMixSummary');
+    const caHint  = document.getElementById('aptCommonHint');
+    if (caHint) caHint.textContent = `${caPct}% of total BUA = lobbies, corridors, stairwells, plant rooms`;
+    if (total < 1 || !sumCard) return;
+    const toilets   = (bhk1 * 1) + (bhk2 * 2) + (bhk3 * 3);
+    const doors     = (bhk1 * 3) + (bhk2 * 5) + (bhk3 * 7);
+    const windows   = (bhk1 * 4) + (bhk2 * 6) + (bhk3 * 8);
+    const defined   = bhk1 + bhk2 + bhk3;
+    const remaining = total - defined;
+    let html = `<strong>📊 Quantity Multipliers (from unit mix):</strong><br>`;
+    if (bhk1) html += `&nbsp;· 1BHK ×${bhk1}: ~${bhk1} bathroom sets (1/flat assumed), ~${bhk1*3} doors<br>`;
+    if (bhk2) html += `&nbsp;· 2BHK ×${bhk2}: ~${bhk2*2} bathroom sets (2/flat assumed), ~${bhk2*5} doors<br>`;
+    if (bhk3) html += `&nbsp;· 3BHK ×${bhk3}: ~${bhk3*3} bathroom sets (3/flat assumed), ~${bhk3*7} doors<br>`;
+    if (defined > 0) html += `<strong>Total:</strong> ~${toilets} bathroom sets &nbsp;·&nbsp; ~${doors} doors &nbsp;·&nbsp; ~${windows} windows`;
+    if (remaining > 0 && defined > 0) html += `<br><span style="color:var(--accent);">⚠️ ${remaining} unit(s) not assigned to a BHK type</span>`;
+    sumCard.innerHTML     = html;
+    sumCard.style.display = defined > 0 ? 'block' : 'none';
+}
 
-    // ADDED: parking slots hint cross-references unit count
-    function updateParkingSlotHint() {
-        const units = parseInt(document.getElementById('aptTotalUnits')?.value) || 0;
-        const hint  = document.getElementById('parkingSlotHint');
-        if (!hint) return;
-        if (units > 0) {
-            hint.textContent = `${units} units → standard: ${units} slots (1×) · premium: ${Math.round(units*1.5)} slots (1.5×)`;
-        } else {
-            hint.textContent = 'Enter total units above to get a suggested slot count';
-        }
+function updateParkingSlotHint() {
+    const units = parseInt(document.getElementById('aptTotalUnits')?.value) || 0;
+    const hint  = document.getElementById('parkingSlotHint');
+    if (!hint) return;
+    if (units > 0) {
+        hint.textContent = `${units} units → standard: ${units} slots (1×) · premium: ${Math.round(units*1.5)} slots (1.5×)`;
+    } else {
+        hint.textContent = 'Enter total units above to get a suggested slot count';
     }
+}
 
-    // ADDED: apartment foundation hint (mirrors residential/villa logic)
-    function updateAptFoundationHint() {
-        const soil      = document.getElementById('aptSoilCondition')?.value;
-        const hint      = document.getElementById('aptSoilHint');
-        const depthEl   = document.getElementById('aptFoundationDepth');
-        const depthHint = document.getElementById('aptFoundationDepthHint');
-        const ftEl      = document.getElementById('aptFoundationType');
-        const hints  = {
-            hard_rock: 'Shallow raft/isolated (4–6 ft) — lowest excavation cost',
-            firm_soil: 'Raft foundation at 8–10 ft depth — standard multi-storey',
-            soft_soil: '⚠️ Deeper raft or piles needed (10–20 ft) — increases cost significantly',
-            marshy:    '⚠️ Pile foundation required — specialist contractor, high cost',
-            filled:    '⚠️ Soil compaction + geotechnical report required before foundation'
-        };
-        const depths = { hard_rock: 6, firm_soil: 8, soft_soil: 12, marshy: 30, filled: 10 };
-        const fTypes  = { hard_rock: 'raft', firm_soil: 'raft', soft_soil: 'raft', marshy: 'pile', filled: 'raft' };
-        if (hint)      hint.textContent      = hints[soil] || '';
-        if (depthEl && depths[soil])  depthEl.value = depths[soil];
-        if (depthHint) depthHint.textContent = `Recommended: ${depths[soil] || 8} ft for selected soil`;
-        if (ftEl && fTypes[soil])     ftEl.value    = fTypes[soil];
-    }
+function updateAptFoundationHint() {
+    const soil      = document.getElementById('aptSoilCondition')?.value;
+    const hint      = document.getElementById('aptSoilHint');
+    const depthEl   = document.getElementById('aptFoundationDepth');
+    const depthHint = document.getElementById('aptFoundationDepthHint');
+    const ftEl      = document.getElementById('aptFoundationType');
+    const hints  = {
+        hard_rock: 'Shallow raft/isolated (4–6 ft) — lowest excavation cost',
+        firm_soil: 'Raft foundation at 8–10 ft depth — standard multi-storey',
+        soft_soil: '⚠️ Deeper raft or piles needed (10–20 ft) — increases cost significantly',
+        marshy:    '⚠️ Pile foundation required — specialist contractor, high cost',
+        filled:    '⚠️ Soil compaction + geotechnical report required before foundation'
+    };
+    const depths = { hard_rock: 6, firm_soil: 8, soft_soil: 12, marshy: 30, filled: 10 };
+    const fTypes  = { hard_rock: 'raft', firm_soil: 'raft', soft_soil: 'raft', marshy: 'pile', filled: 'raft' };
+    if (hint)      hint.textContent      = hints[soil] || '';
+    if (depthEl && depths[soil])  depthEl.value = depths[soil];
+    if (depthHint) depthHint.textContent = `Recommended: ${depths[soil] || 8} ft for selected soil`;
+    if (ftEl && fTypes[soil])     ftEl.value    = fTypes[soil];
+}
 
-    // ADDED: apartment staircase type hint
-    function updateAptStaircaseHint() {
-        const val  = document.getElementById('aptStaircaseType')?.value;
-        const hint = document.getElementById('aptStaircaseHint');
+function updateAptStaircaseHint() {
+    const val  = document.getElementById('aptStaircaseType')?.value;
+    const hint = document.getElementById('aptStaircaseHint');
+    const msgs = {
+        rcc_open:      'Open staircase — suitable for G+2 residential only',
+        rcc_enclosed:  'Enclosed staircase — fire door + self-closing mechanism required',
+        fire_rated:    '⚠️ Pressurised fire staircase — mandatory for buildings > 15m height (G+4+)',
+        smoke_lobby:   '⚠️ Smoke lobby + fire-rated staircase — mandatory for high-rise > 30m per NBC 2016'
+    };
+    if (hint) hint.textContent = msgs[val] || '';
+}
+
+function updateAptFacadeHint() {
+    const val  = document.getElementById('aptFacadeType')?.value;
+    const hint = document.getElementById('aptFacadeHint');
+    const msgs = {
+        plaster_paint:  'Cement plaster + weathershield: ₹80–120/sqft external wall area',
+        texture_paint:  'Cement plaster + texture paint: ₹120–180/sqft external wall area',
+        acp_cladding:   'ACP panels: ₹200–450/sqft. Requires aluminium frame substrate — specialist fix',
+        stone_cladding: 'Natural stone: ₹250–600/sqft. Heavy — verify structural load capacity',
+        glass_curtain:  '⚠️ Glass curtain wall: ₹800–2500/sqft. Specialist façade contractor required'
+    };
+    if (hint) hint.textContent = msgs[val] || '';
+}
+
+function toggleAptPoolFinish(select) {
+    const group = document.getElementById('aptPoolFinishGroup');
+    if (group) group.style.display = select.value !== 'none' ? 'block' : 'none';
+}
+
+// ============================================================
+//  APARTMENT — BASEMENT PARKING EXTRAS
+// ============================================================
+function toggleBasementInputs(select) {
+    const extras     = document.getElementById('basementExtras');
+    const hint       = document.getElementById('parkingHint');
+    const isBasement = select.value.startsWith('basement') || select.value === 'multilevel';
+    if (extras) extras.style.display = isBasement ? 'block' : 'none';
+    if (hint) {
         const msgs = {
-            rcc_open:      'Open staircase — suitable for G+2 residential only',
-            rcc_enclosed:  'Enclosed staircase — fire door + self-closing mechanism required',
-            fire_rated:    '⚠️ Pressurised fire staircase — mandatory for buildings > 15m height (G+4+)',
-            smoke_lobby:   '⚠️ Smoke lobby + fire-rated staircase — mandatory for high-rise > 30m per NBC 2016'
+            open:        'No additional excavation cost',
+            stilt:       'Stilt columns add ~8% to structural cost',
+            basement_1:  '⚠️ 1-level basement adds excavation + retaining walls + waterproofing',
+            basement_2:  '⚠️ 2-level basement significantly increases cost — piling may be required',
+            multilevel:  '⚠️ Mechanical parking requires specialist contractor'
         };
-        if (hint) hint.textContent = msgs[val] || '';
+        hint.textContent = msgs[select.value] || '';
     }
-
-    // ADDED: apartment façade hint
-    function updateAptFacadeHint() {
-        const val  = document.getElementById('aptFacadeType')?.value;
-        const hint = document.getElementById('aptFacadeHint');
-        const msgs = {
-            plaster_paint:  'Cement plaster + weathershield: ₹80–120/sqft external wall area',
-            texture_paint:  'Cement plaster + texture paint: ₹120–180/sqft external wall area',
-            acp_cladding:   'ACP panels: ₹200–450/sqft. Requires aluminium frame substrate — specialist fix',
-            stone_cladding: 'Natural stone: ₹250–600/sqft. Heavy — verify structural load capacity',
-            glass_curtain:  '⚠️ Glass curtain wall: ₹800–2500/sqft. Specialist façade contractor required'
-        };
-        if (hint) hint.textContent = msgs[val] || '';
-    }
-
-    // ADDED: apt pool finish show/hide
-    function toggleAptPoolFinish(select) {
-        const group = document.getElementById('aptPoolFinishGroup');
-        if (group) group.style.display = select.value !== 'none' ? 'block' : 'none';
-    }
-
-    // ADDED: apt anti-termite hint — live update with plot area
-    document.getElementById('plotArea')?.addEventListener('input', function() {
-        const plotSqft  = parseFloat(this.value) || 0;
-        const aptHint   = document.getElementById('aptAntiTermiteHint');
-        if (aptHint && plotSqft > 0) {
-            const low  = Math.round(plotSqft * 8);
-            const high = Math.round(plotSqft * 15);
-            aptHint.textContent = `Pre-construction: ₹${low.toLocaleString('en-IN')}–₹${high.toLocaleString('en-IN')} (₹8–15 × ${plotSqft.toLocaleString('en-IN')} sqft)`;
-        }
-    });
-
-    // ============================================================
-    //  APARTMENT — BASEMENT PARKING EXTRAS
-    // ============================================================
-    function toggleBasementInputs(select) {
-        const extras     = document.getElementById('basementExtras');
-        const hint       = document.getElementById('parkingHint');
-        const isBasement = select.value.startsWith('basement') || select.value === 'multilevel';
-        if (extras) extras.style.display = isBasement ? 'block' : 'none';
-        if (hint) {
-            const msgs = {
-                open:        'No additional excavation cost',
-                stilt:       'Stilt columns add ~8% to structural cost',
-                basement_1:  '⚠️ 1-level basement adds excavation + retaining walls + waterproofing',
-                basement_2:  '⚠️ 2-level basement significantly increases cost — piling may be required',
-                multilevel:  '⚠️ Mechanical parking requires specialist contractor'
-            };
-            hint.textContent = msgs[select.value] || '';
-        }
-    }
+}
 
     // ============================================================
     //  APARTMENT — SAFETY TILE TOGGLES
@@ -3112,35 +3238,63 @@
     // ============================================================
     const safetyStates = { fire: true, stp: false, cctv: false, solar: false };
 
-    function toggleSafety(id) {
-        safetyStates[id] = !safetyStates[id];
-        const tile = document.getElementById(`stile-${id}`);
-        const chk  = document.getElementById(`schk-${id}`);
-        if (safetyStates[id]) { tile.classList.add('active'); chk.textContent = '✓'; }
-        else { tile.classList.remove('active'); chk.textContent = ''; }
-    }
+function toggleSafety(id) {
+    safetyStates[id] = !safetyStates[id];
+    const tile = document.getElementById(`stile-${id}`);
+    const chk  = document.getElementById(`schk-${id}`);
+    if (safetyStates[id]) { tile.classList.add('active'); chk.textContent = '✓'; }
+    else { tile.classList.remove('active'); chk.textContent = ''; }
+}
 
     // ============================================================
     //  APARTMENT — PARKING AREA CALCULATOR
     // ============================================================
     function calcParkingArea() {
-        const slots    = parseInt(document.getElementById('aptParkingSlots')?.value)  || 0;
-        const len      = parseFloat(document.getElementById('aptSlotLength')?.value)  || 18;
-        const width    = parseFloat(document.getElementById('aptSlotWidth')?.value)   || 8.5;
-        const aisle    = parseFloat(document.getElementById('aptAisleWidth')?.value)  || 20;
-        const sumDiv   = document.getElementById('parkingAreaSummary');
-        if (!sumDiv) return;
-        if (slots < 1) { sumDiv.style.display = 'none'; return; }
-        const netArea     = Math.round(slots * len * width);
-        // Gross: each slot occupies its footprint + half an aisle on each side
-        // Simplified: gross per slot = len × (width + aisle/2) — reasonable estimate
-        const grossArea   = Math.round(slots * len * (width + aisle / 2));
-        const sqftPerSlot = Math.round(grossArea / slots);
-        document.getElementById('parkNetArea').textContent     = netArea.toLocaleString('en-IN');
-        document.getElementById('parkGrossArea').textContent   = grossArea.toLocaleString('en-IN');
-        document.getElementById('parkSqftPerSlot').textContent = sqftPerSlot;
-        sumDiv.style.display = 'block';
+    const slots  = parseInt(document.getElementById('aptParkingSlots')?.value)  || 0;
+    const len    = parseFloat(document.getElementById('aptSlotLength')?.value)  || 18;
+    const width  = parseFloat(document.getElementById('aptSlotWidth')?.value)   || 8.5;
+    const aisle  = parseFloat(document.getElementById('aptAisleWidth')?.value)  || 20;
+    const sumDiv = document.getElementById('parkingAreaSummary');
+    if (!sumDiv) return;
+    if (slots < 1) { sumDiv.style.display = 'none'; return; }
+    const netArea     = Math.round(slots * len * width);
+    const grossArea   = Math.round(slots * len * (width + aisle / 2));
+    const sqftPerSlot = Math.round(grossArea / slots);
+    document.getElementById('parkNetArea').textContent     = netArea.toLocaleString('en-IN');
+    document.getElementById('parkGrossArea').textContent   = grossArea.toLocaleString('en-IN');
+    document.getElementById('parkSqftPerSlot').textContent = sqftPerSlot;
+    sumDiv.style.display = 'block';
+}
+
+// ============================================================
+//  MERGED plotArea INPUT LISTENER
+//  Updates all three anti-termite hints in one handler
+// ============================================================
+document.getElementById('plotArea')?.addEventListener('input', function() {
+    const plotSqft = parseFloat(this.value) || 0;
+    const low  = plotSqft > 0 ? Math.round(plotSqft * 8)  : 0;
+    const high = plotSqft > 0 ? Math.round(plotSqft * 15) : 0;
+
+    // Residential
+    const resHint = document.getElementById('antiTermiteHint');
+    if (resHint) {
+        resHint.textContent = plotSqft > 0
+            ? `Pre-construction treatment: ₹${low.toLocaleString('en-IN')}–₹${high.toLocaleString('en-IN')} (₹8–15 × ${plotSqft.toLocaleString('en-IN')} sqft plot)`
+            : 'Pre-construction treatment: ₹8–15 × plot area. Enter plot area in Basic Info above.';
     }
+
+    // Villa
+    const villaHint = document.getElementById('villaAntiTermiteHint');
+    if (villaHint && plotSqft > 0) {
+        villaHint.textContent = `Pre-construction: ₹${low.toLocaleString('en-IN')}–₹${high.toLocaleString('en-IN')} (₹8–15 × ${plotSqft.toLocaleString('en-IN')} sqft)`;
+    }
+
+    // Apartment
+    const aptHint = document.getElementById('aptAntiTermiteHint');
+    if (aptHint && plotSqft > 0) {
+        aptHint.textContent = `Pre-construction: ₹${low.toLocaleString('en-IN')}–₹${high.toLocaleString('en-IN')} (₹8–15 × ${plotSqft.toLocaleString('en-IN')} sqft)`;
+    }
+});
 
     // ============================================================
     //  NAVBAR BADGES
@@ -3160,8 +3314,75 @@
     document.addEventListener('DOMContentLoaded', function() {
         updateMessageBadge();
         updateNotificationBadge();
+        updateSteelIndicator();
     });
     setInterval(() => { updateMessageBadge(); updateNotificationBadge(); }, 30000);
+
+    // ============================================================
+//  LOCATION — State → District cascading + combined field
+// ============================================================
+const districtData = {
+    'Kerala': ['Alappuzha','Ernakulam','Idukki','Kannur','Kasaragod','Kollam','Kottayam','Kozhikode','Malappuram','Palakkad','Pathanamthitta','Thiruvananthapuram','Thrissur','Wayanad'],
+    'Tamil Nadu': ['Chennai','Coimbatore','Cuddalore','Dharmapuri','Dindigul','Erode','Kallakurichi','Kancheepuram','Kanyakumari','Karur','Krishnagiri','Madurai','Nagapattinam','Namakkal','Nilgiris','Perambalur','Pudukkottai','Ramanathapuram','Ranipet','Salem','Sivaganga','Tenkasi','Thanjavur','Theni','Thoothukudi','Tiruchirappalli','Tirunelveli','Tirupathur','Tiruppur','Tiruvallur','Tiruvannamalai','Tiruvarur','Vellore','Viluppuram','Virudhunagar'],
+    'Karnataka': ['Bagalkot','Ballari','Belagavi','Bengaluru Rural','Bengaluru Urban','Bidar','Chamarajanagar','Chikballapur','Chikkamagaluru','Chitradurga','Dakshina Kannada','Davanagere','Dharwad','Gadag','Hassan','Haveri','Kalaburagi','Kodagu','Kolar','Koppal','Mandya','Mysuru','Raichur','Ramanagara','Shivamogga','Tumakuru','Udupi','Uttara Kannada','Vijayapura','Yadgir'],
+    'Maharashtra': ['Ahmednagar','Akola','Amravati','Aurangabad','Beed','Bhandara','Buldhana','Chandrapur','Dhule','Gadchiroli','Gondia','Hingoli','Jalgaon','Jalna','Kolhapur','Latur','Mumbai City','Mumbai Suburban','Nagpur','Nanded','Nandurbar','Nashik','Osmanabad','Palghar','Parbhani','Pune','Raigad','Ratnagiri','Sangli','Satara','Sindhudurg','Solapur','Thane','Wardha','Washim','Yavatmal'],
+    'Andhra Pradesh': ['Alluri Sitharama Raju','Anakapalli','Anantapur','Annamayya','Bapatla','Chittoor','East Godavari','Eluru','Guntur','Kadapa','Kakinada','Konaseema','Krishna','Kurnool','Nandyal','Nellore','NTR','Palnadu','Parvathipuram Manyam','Prakasam','Sri Potti Sriramulu Nellore','Sri Sathya Sai','Srikakulam','Tirupati','Visakhapatnam','Vizianagaram','West Godavari'],
+    'Telangana': ['Adilabad','Bhadradri Kothagudem','Hanumakonda','Hyderabad','Jagtial','Jangaon','Jayashankar Bhupalpally','Jogulamba Gadwal','Kamareddy','Karimnagar','Khammam','Komaram Bheem','Mahabubabad','Mahabubnagar','Mancherial','Medak','Medchal Malkajgiri','Mulugu','Nagarkurnool','Nalgonda','Narayanpet','Nirmal','Nizamabad','Peddapalli','Rajanna Sircilla','Rangareddy','Sangareddy','Siddipet','Suryapet','Vikarabad','Wanaparthy','Warangal','Yadadri Bhuvanagiri'],
+    'Gujarat': ['Ahmedabad','Amreli','Anand','Aravalli','Banaskantha','Bharuch','Bhavnagar','Botad','Chhota Udaipur','Dahod','Dang','Devbhoomi Dwarka','Gandhinagar','Gir Somnath','Jamnagar','Junagadh','Kheda','Kutch','Mahisagar','Mehsana','Morbi','Narmada','Navsari','Panchmahal','Patan','Porbandar','Rajkot','Sabarkantha','Surat','Surendranagar','Tapi','Vadodara','Valsad'],
+    'Rajasthan': ['Ajmer','Alwar','Banswara','Baran','Barmer','Bharatpur','Bhilwara','Bikaner','Bundi','Chittorgarh','Churu','Dausa','Dholpur','Dungarpur','Hanumangarh','Jaipur','Jaisalmer','Jalore','Jhalawar','Jhunjhunu','Jodhpur','Karauli','Kota','Nagaur','Pali','Pratapgarh','Rajsamand','Sawai Madhopur','Sikar','Sirohi','Sri Ganganagar','Tonk','Udaipur'],
+    'Uttar Pradesh': ['Agra','Aligarh','Ambedkar Nagar','Amethi','Amroha','Auraiya','Ayodhya','Azamgarh','Baghpat','Bahraich','Ballia','Balrampur','Banda','Barabanki','Bareilly','Basti','Bhadohi','Bijnor','Budaun','Bulandshahr','Chandauli','Chitrakoot','Deoria','Etah','Etawah','Farrukhabad','Fatehpur','Firozabad','Gautam Buddha Nagar','Ghaziabad','Ghazipur','Gonda','Gorakhpur','Hamirpur','Hapur','Hardoi','Hathras','Jalaun','Jaunpur','Jhansi','Kannauj','Kanpur Dehat','Kanpur Nagar','Kasganj','Kaushambi','Kheri','Kushinagar','Lalitpur','Lucknow','Maharajganj','Mahoba','Mainpuri','Mathura','Mau','Meerut','Mirzapur','Moradabad','Muzaffarnagar','Pilibhit','Pratapgarh','Prayagraj','Raebareli','Rampur','Saharanpur','Sambhal','Sant Kabir Nagar','Shahjahanpur','Shamli','Shrawasti','Siddharthnagar','Sitapur','Sonbhadra','Sultanpur','Unnao','Varanasi'],
+    'West Bengal': ['Alipurduar','Bankura','Birbhum','Cooch Behar','Dakshin Dinajpur','Darjeeling','Hooghly','Howrah','Jalpaiguri','Jhargram','Kalimpong','Kolkata','Malda','Murshidabad','Nadia','North 24 Parganas','Paschim Bardhaman','Paschim Medinipur','Purba Bardhaman','Purba Medinipur','Purulia','South 24 Parganas','Uttar Dinajpur'],
+    'Punjab': ['Amritsar','Barnala','Bathinda','Faridkot','Fatehgarh Sahib','Fazilka','Ferozepur','Gurdaspur','Hoshiarpur','Jalandhar','Kapurthala','Ludhiana','Mansa','Moga','Mohali','Muktsar','Pathankot','Patiala','Rupnagar','Sangrur','Shaheed Bhagat Singh Nagar','Tarn Taran'],
+    'Haryana': ['Ambala','Bhiwani','Charkhi Dadri','Faridabad','Fatehabad','Gurugram','Hisar','Jhajjar','Jind','Kaithal','Karnal','Kurukshetra','Mahendragarh','Nuh','Palwal','Panchkula','Panipat','Rewari','Rohtak','Sirsa','Sonipat','Yamunanagar'],
+    'Delhi': ['Central Delhi','East Delhi','New Delhi','North Delhi','North East Delhi','North West Delhi','Shahdara','South Delhi','South East Delhi','South West Delhi','West Delhi'],
+    'Madhya Pradesh': ['Agar Malwa','Alirajpur','Anuppur','Ashoknagar','Balaghat','Barwani','Betul','Bhind','Bhopal','Burhanpur','Chhatarpur','Chhindwara','Damoh','Datia','Dewas','Dhar','Dindori','Guna','Gwalior','Harda','Hoshangabad','Indore','Jabalpur','Jhabua','Katni','Khandwa','Khargone','Mandla','Mandsaur','Morena','Narsinghpur','Neemuch','Niwari','Panna','Raisen','Rajgarh','Ratlam','Rewa','Sagar','Satna','Sehore','Seoni','Shahdol','Shajapur','Sheopur','Shivpuri','Sidhi','Singrauli','Tikamgarh','Ujjain','Umaria','Vidisha'],
+    'Bihar': ['Araria','Arwal','Aurangabad','Banka','Begusarai','Bhagalpur','Bhojpur','Buxar','Darbhanga','East Champaran','Gaya','Gopalganj','Jamui','Jehanabad','Kaimur','Katihar','Khagaria','Kishanganj','Lakhisarai','Madhepura','Madhubani','Munger','Muzaffarpur','Nalanda','Nawada','Patna','Purnia','Rohtas','Saharsa','Samastipur','Saran','Sheikhpura','Sheohar','Sitamarhi','Siwan','Supaul','Vaishali','West Champaran'],
+    'Odisha': ['Angul','Balangir','Balasore','Bargarh','Bhadrak','Boudh','Cuttack','Deogarh','Dhenkanal','Gajapati','Ganjam','Jagatsinghpur','Jajpur','Jharsuguda','Kalahandi','Kandhamal','Kendrapara','Kendujhar','Khordha','Koraput','Malkangiri','Mayurbhanj','Nabarangpur','Nayagarh','Nuapada','Puri','Rayagada','Sambalpur','Subarnapur','Sundargarh'],
+    'Assam': ['Bajali','Baksa','Barpeta','Biswanath','Bongaigaon','Cachar','Charaideo','Chirang','Darrang','Dhemaji','Dhubri','Dibrugarh','Dima Hasao','Goalpara','Golaghat','Hailakandi','Hojai','Jorhat','Kamrup','Kamrup Metropolitan','Karbi Anglong','Karimganj','Kokrajhar','Lakhimpur','Majuli','Morigaon','Nagaon','Nalbari','Sivasagar','Sonitpur','South Salmara-Mankachar','Tinsukia','Udalguri','West Karbi Anglong'],
+    'Himachal Pradesh': ['Bilaspur','Chamba','Hamirpur','Kangra','Kinnaur','Kullu','Lahaul and Spiti','Mandi','Shimla','Sirmaur','Solan','Una'],
+    'Uttarakhand': ['Almora','Bageshwar','Chamoli','Champawat','Dehradun','Haridwar','Nainital','Pauri Garhwal','Pithoragarh','Rudraprayag','Tehri Garhwal','Udham Singh Nagar','Uttarkashi'],
+    'Jharkhand': ['Bokaro','Chatra','Deoghar','Dhanbad','Dumka','East Singhbhum','Garhwa','Giridih','Godda','Gumla','Hazaribagh','Jamtara','Khunti','Koderma','Latehar','Lohardaga','Pakur','Palamu','Ramgarh','Ranchi','Sahebganj','Seraikela Kharsawan','Simdega','West Singhbhum'],
+    'Chhattisgarh': ['Balod','Baloda Bazar','Balrampur','Bastar','Bemetara','Bijapur','Bilaspur','Dantewada','Dhamtari','Durg','Gariaband','Gaurela Pendra Marwahi','Janjgir Champa','Jashpur','Kabirdham','Kanker','Khairagarh','Kondagaon','Korba','Korea','Mahasamund','Manendragarh','Mohla Manpur','Mungeli','Narayanpur','Raigarh','Raipur','Rajnandgaon','Sakti','Sarangarh Bilaigarh','Sukma','Surajpur','Surguja'],
+    'Goa': ['North Goa','South Goa'],
+    'Manipur': ['Bishnupur','Chandel','Churachandpur','Imphal East','Imphal West','Jiribam','Kakching','Kamjong','Kangpokpi','Noney','Pherzawl','Senapati','Tamenglong','Tengnoupal','Thoubal','Ukhrul'],
+    'Meghalaya': ['East Garo Hills','East Jaintia Hills','East Khasi Hills','Eastern West Khasi Hills','North Garo Hills','Ri Bhoi','South Garo Hills','South West Garo Hills','South West Khasi Hills','West Garo Hills','West Jaintia Hills','West Khasi Hills'],
+    'Arunachal Pradesh': ['Anjaw','Changlang','Dibang Valley','East Kameng','East Siang','Kamle','Kra Daadi','Kurung Kumey','Lepa Rada','Lohit','Longding','Lower Dibang Valley','Lower Siang','Lower Subansiri','Namsai','Pakke Kessang','Papum Pare','Shi Yomi','Siang','Tawang','Tirap','Upper Dibang Valley','Upper Siang','Upper Subansiri','West Kameng','West Siang'],
+    'Mizoram': ['Aizawl','Champhai','Hnahthial','Khawzawl','Kolasib','Lawngtlai','Lunglei','Mamit','Saiha','Saitual','Serchhip'],
+    'Nagaland': ['Chumoukedima','Dimapur','Kiphire','Kohima','Longleng','Mokokchung','Mon','Niuland','Noklak','Peren','Phek','Shamator','Tseminyu','Tuensang','Wokha','Zunheboto'],
+    'Tripura': ['Dhalai','Gomati','Khowai','North Tripura','Sepahijala','South Tripura','Sipahijala','Unakoti','West Tripura'],
+    'Sikkim': ['East Sikkim','North Sikkim','Pakyong','Soreng','South Sikkim','West Sikkim']
+};
+
+function loadDistricts(state) {
+    const districtSelect = document.getElementById('locationDistrict');
+    districtSelect.innerHTML = '<option value="">— Select District —</option>';
+    if (!state || !districtData[state]) {
+        districtSelect.disabled = true;
+        return;
+    }
+    districtData[state].forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        districtSelect.appendChild(opt);
+    });
+    districtSelect.disabled = false;
+}
+
+function buildLocationString() {
+    const state   = document.getElementById('locationState')?.value    || '';
+    const district= document.getElementById('locationDistrict')?.value || '';
+    const place   = document.getElementById('locationPlace')?.value     || '';
+    const pin     = document.getElementById('locationPin')?.value       || '';
+    const address = document.getElementById('locationAddress')?.value  || '';
+    const parts   = [address, place, district, state, pin].filter(Boolean);
+    document.getElementById('locationCombined').value = parts.join(', ');
+}
+
+['locationState','locationDistrict','locationPlace','locationPin','locationAddress'].forEach(id => {
+    document.getElementById(id)?.addEventListener('change', buildLocationString);
+    document.getElementById(id)?.addEventListener('input',  buildLocationString);
+});
     </script>
 </body>
 </html>

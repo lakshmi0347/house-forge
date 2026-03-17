@@ -56,7 +56,6 @@
         .breakdown-item{background:var(--sand);border:1px solid var(--stone);border-radius:10px;padding:16px;text-align:center;}
         .breakdown-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
         .breakdown-value{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--text-primary);}
-        /* Hide labour breakdown item when scope=material_only */
         .labour-item.hidden{display:none;}
 
         /* AI RATIONALE BLOCK */
@@ -94,10 +93,18 @@
 
         /* SIDEBAR */
         .info-list{display:flex;flex-direction:column;}
-        .info-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--sand);}
+        .info-row{display:flex;justify-content:space-between;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--sand);}
         .info-row:last-child{border-bottom:none;}
-        .info-label{font-size:13px;color:var(--text-muted);font-weight:500;}
-        .info-value{font-size:13px;font-weight:600;color:var(--text-primary);}
+        .info-label{font-size:13px;color:var(--text-muted);font-weight:500;flex-shrink:0;margin-right:8px;}
+        .info-value{font-size:13px;font-weight:600;color:var(--text-primary);text-align:right;}
+        .info-value.address{font-size:12px;max-width:180px;line-height:1.4;}
+
+        /* LOCATION SECTION IN SIDEBAR */
+        .location-block{background:var(--sand);border:1px solid var(--stone);border-radius:8px;padding:12px 14px;margin-bottom:2px;}
+        .location-block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:8px;}
+        .location-line{font-size:13px;color:var(--text-secondary);line-height:1.6;}
+        .location-line strong{color:var(--text-primary);font-weight:600;}
+
         .timeline-block{background:linear-gradient(135deg,var(--accent-light),#FEF3C7);border:1px solid rgba(181,128,79,0.2);border-radius:10px;padding:20px;text-align:center;}
         .timeline-num{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:var(--accent);line-height:1;}
         .timeline-sub{font-size:13px;color:var(--text-secondary);margin-top:4px;}
@@ -163,17 +170,18 @@
             <h1>{{ project.title }}</h1>
             <div class="divider"></div>
             <div class="project-meta">
-                <div class="meta-item">📍 {{ project.location }}</div>
+                {# Full location: show combined string in header #}
+                <div class="meta-item">📍 {{ project.location or 'Location not set' }}</div>
                 <div class="meta-item">📅 Created: {{ project.created_at.strftime('%d %b %Y') if project.created_at else 'N/A' }}</div>
                 <span class="status-badge status-{{ project.status }}">{{ project.status.upper() }}</span>
-                {# estimate scope badge #}
-                {% set scope = estimation.get('estimate_scope', project.get('estimate_scope', 'material_only')) %}
+                {# FIXED: direct attribute access instead of .get() #}
+                {% set scope = project.estimate_scope or 'material_only' %}
                 <span class="scope-badge">
                     {% if scope == 'material_and_labour' %}👷 Material + Labour{% else %}📦 Material Only{% endif %}
                 </span>
-                {# property type #}
+                {% set prop_type = project.property_type or 'residential' %}
                 <span class="scope-badge" style="background:#E0F2FE;color:#0369A1;border-color:#BAE6FD;">
-                    {{ estimation.get('property_type', project.get('property_type','residential')).title() }}
+                    {{ prop_type.title() }}
                 </span>
             </div>
         </div>
@@ -182,13 +190,14 @@
             <!-- LEFT COLUMN -->
             <div>
                 {# ── COST SUMMARY ── #}
-                {% set budget = project.budget_range | lower %}
+                {# FIXED: direct attribute access for budget_range #}
+                {% set budget = (project.budget_range or 'medium') | lower %}
                 {% set tc = estimation.costs.get(budget, estimation.costs.get('medium', {})) %}
-                {% set mat_cost  = tc.get('material_cost', 0) %}
-                {% set lab_cost  = tc.get('labor_cost',    0) %}
-                {% set oth_cost  = tc.get('other_costs',   0) %}
-                {% set total_cost= tc.get('total_cost',    0) %}
-                {% set scope     = estimation.get('estimate_scope', 'material_only') %}
+                {% set mat_cost   = tc.get('material_cost', 0) %}
+                {% set lab_cost   = tc.get('labor_cost',    0) %}
+                {% set oth_cost   = tc.get('other_costs',   0) %}
+                {% set total_cost = tc.get('total_cost',    0) %}
+                {% set scope      = project.estimate_scope or 'material_only' %}
 
                 <div class="cost-summary">
                     <div class="cost-label">
@@ -200,7 +209,7 @@
                             <div class="breakdown-label">Materials</div>
                             <div class="breakdown-value">₹{{ "{:,.0f}".format(mat_cost) }}</div>
                         </div>
-                        {# Labour: only shown when scope = material_and_labour #}
+                        {# Labour only shown when scope = material_and_labour #}
                         <div class="breakdown-item labour-item {% if scope != 'material_and_labour' %}hidden{% endif %}">
                             <div class="breakdown-label">Labour</div>
                             <div class="breakdown-value">₹{{ "{:,.0f}".format(lab_cost) }}</div>
@@ -243,6 +252,7 @@
                     ] %}
 
                     {% for stage_key, icon, stage_name in stages %}
+                    {# FIXED: safe .get() with fallbacks #}
                     {% set stage_cost = tc.get('stage_breakdown', {}).get(stage_key, 0) %}
                     {% set stage_mats = estimation.materials.get(stage_key, {}) %}
                     <div class="stage-accordion">
@@ -251,7 +261,7 @@
                                 <span class="stage-icon">{{ icon }}</span>
                                 <div>
                                     <div class="stage-name">{{ stage_name }}</div>
-                                    <div class="stage-meta-count">{{ stage_mats | length }} materials</div>
+                                    <div class="stage-meta-count">{{ stage_mats | length }} material{{ 's' if stage_mats | length != 1 else '' }}</div>
                                 </div>
                             </div>
                             <div style="display:flex;align-items:center;gap:14px;">
@@ -261,6 +271,7 @@
                         </div>
                         <div class="stage-content" id="stage-{{ stage_key }}">
                             <div class="materials-wrap">
+                                {% if stage_mats %}
                                 <table>
                                     <thead>
                                         <tr>
@@ -290,6 +301,9 @@
                                         {% endfor %}
                                     </tbody>
                                 </table>
+                                {% else %}
+                                <p style="font-size:13px;color:var(--text-muted);padding:8px 0;">No materials calculated for this stage.</p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -333,21 +347,69 @@
                 <div class="card">
                     <div class="section-title">📋 Project Details</div>
                     <div class="info-list">
-                        <div class="info-row"><span class="info-label">Area</span><span class="info-value">{{ project.square_feet }} sq ft</span></div>
-                        {% if project.get('plot_area') %}
-                        <div class="info-row"><span class="info-label">Plot Area</span><span class="info-value">{{ project.plot_area }} sq ft</span></div>
+                        <div class="info-row">
+                            <span class="info-label">Area</span>
+                            <span class="info-value">{{ project.square_feet }} sq ft</span>
+                        </div>
+                        {% if project.plot_area %}
+                        <div class="info-row">
+                            <span class="info-label">Plot Area</span>
+                            <span class="info-value">{{ project.plot_area }} sq ft</span>
+                        </div>
                         {% endif %}
-                        <div class="info-row"><span class="info-label">Rooms</span><span class="info-value">{{ project.rooms }}</span></div>
-                        <div class="info-row"><span class="info-label">Floors</span><span class="info-value">{{ project.floors }}</span></div>
-                        <div class="info-row"><span class="info-label">Bathrooms</span><span class="info-value">{{ project.bathrooms }}</span></div>
-                        <div class="info-row"><span class="info-label">Property Type</span><span class="info-value">{{ project.property_type.title() }}</span></div>
-                        <div class="info-row"><span class="info-label">Estimate Scope</span>
+                        {# FIXED: villa fallback for rooms/floors/bathrooms #}
+                        <div class="info-row">
+                            <span class="info-label">Rooms</span>
+                            <span class="info-value">{{ project.rooms or project.villa_rooms or '—' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Floors</span>
+                            <span class="info-value">{{ project.floors or project.villa_floors or '—' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Bathrooms</span>
+                            <span class="info-value">{{ project.bathrooms or project.villa_bathrooms or '—' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Property Type</span>
+                            <span class="info-value">{{ (project.property_type or 'Residential').title() }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Estimate Scope</span>
                             <span class="info-value">
-                                {% if project.get('estimate_scope') == 'material_and_labour' %}Material + Labour{% else %}Material Only{% endif %}
+                                {% if (project.estimate_scope or '') == 'material_and_labour' %}Material + Labour{% else %}Material Only{% endif %}
                             </span>
                         </div>
-                        <div class="info-row"><span class="info-label">Budget Range</span>
-                            <span class="info-value">{{ {'low':'Budget','medium':'Standard','high':'Premium'}.get(project.budget_range|lower, project.budget_range.title()) }}</span>
+                        <div class="info-row">
+                            <span class="info-label">Budget Range</span>
+                            <span class="info-value">{{ {'low':'Budget','medium':'Standard','high':'Premium'}.get((project.budget_range or 'medium')|lower, (project.budget_range or 'Medium').title()) }}</span>
+                        </div>
+                    </div>
+
+                    {# ── FULL LOCATION BLOCK ── #}
+                    {# Shows all 5 location fields submitted from the form #}
+                    <div style="margin-top:16px;">
+                        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:10px;">📍 Location</div>
+                        <div class="location-block">
+                            <div class="location-line">
+                                {% if project.location_address %}
+                                    <strong>{{ project.location_address }}</strong><br>
+                                {% endif %}
+                                {% if project.location_place %}
+                                    {{ project.location_place }}{% if project.location_district %}, {{ project.location_district }}{% endif %}<br>
+                                {% elif project.location_district %}
+                                    {{ project.location_district }}<br>
+                                {% endif %}
+                                {% if project.location_state %}
+                                    {{ project.location_state }}
+                                    {% if project.location_pin %} — {{ project.location_pin }}{% endif %}
+                                {% elif project.location_pin %}
+                                    PIN: {{ project.location_pin }}
+                                {% endif %}
+                                {% if not project.location_address and not project.location_place and not project.location_state %}
+                                    {{ project.location or 'Location not available' }}
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -360,14 +422,19 @@
                         <div class="timeline-sub">Days · ≈ {{ ((estimation.timeline.get('total_days', 0)) / 30) | round(1) }} months</div>
                     </div>
                     <div class="info-list" style="margin-top:14px;">
-                        {% for stage_key, stage_name in [('foundation','Foundation'),('walls','Walls'),
-                            ('flooring','Flooring'),('roofing','Roofing'),('plumbing','Plumbing'),
-                            ('electrical','Electrical'),('finishing','Finishing'),
-                            ('carpentry','Carpentry'),('exterior','Exterior')] %}
+                        {% for stage_key, stage_name in [
+                            ('foundation','Foundation'),('walls','Walls'),
+                            ('flooring','Flooring'),('roofing','Roofing'),
+                            ('plumbing','Plumbing'),('electrical','Electrical'),
+                            ('finishing','Finishing'),('carpentry','Carpentry'),
+                            ('exterior','Exterior')] %}
+                        {% set days = estimation.timeline.get(stage_key, 0) | int %}
+                        {% if days > 0 %}
                         <div class="info-row">
                             <span class="info-label">{{ stage_name }}</span>
-                            <span class="info-value">{{ estimation.timeline.get(stage_key, 0) | int }} days</span>
+                            <span class="info-value">{{ days }} days</span>
                         </div>
+                        {% endif %}
                         {% endfor %}
                     </div>
                 </div>
@@ -388,8 +455,9 @@
         </div>
     </div>
 
-    <!-- Rating Modal -->
-    {% if project.status == 'completed' and not project.get('reviewed', False) and project.get('contractor_id') %}
+    {# ── RATING MODAL ── #}
+    {# FIXED: direct attribute access instead of .get() for SQLAlchemy model #}
+    {% if project.status == 'completed' and not project.reviewed and project.contractor_id %}
     <div id="ratingModal" class="modal-overlay">
         <div class="modal-box">
             <h2>⭐ Rate Your Contractor</h2>

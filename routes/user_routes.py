@@ -290,22 +290,27 @@ def create_project():
         )
 
         project_data = {
-            'user_id':       current_user.id,
-            'title':         request.form.get('title'),
-            'square_feet':   square_feet,
-            'plot_area':     plot_area,
-            'rooms':         rooms,
-            'floors':        floors,
-            'bathrooms':     bathrooms,
-            'location':      request.form.get('location'),
-            'property_type': prop_type,
-            'budget_range':  budget_range,
-            'estimate_scope':request.form.get('estimate_scope', 'material_only'),
-            'description':   request.form.get('description'),
-            'status':        'planning',
-            'created_at':    datetime.now(),
-            'estimation':    estimation,
-        }
+    'user_id':           current_user.id,
+    'title':             request.form.get('title'),
+    'square_feet':       square_feet,
+    'plot_area':         plot_area,
+    'rooms':             rooms,
+    'floors':            floors,
+    'bathrooms':         bathrooms,
+    'location':          request.form.get('location'),          # keep existing
+    'location_state':    request.form.get('location_state', ''),    # ADD
+    'location_district': request.form.get('location_district', ''), # ADD
+    'location_place':    request.form.get('location_place', ''),    # ADD
+    'location_pin':      request.form.get('location_pin', ''),      # ADD
+    'location_address':  request.form.get('location_address', ''),  # ADD
+    'property_type':     prop_type,
+    'budget_range':      budget_range,
+    'estimate_scope':    request.form.get('estimate_scope', 'material_only'),
+    'description':       request.form.get('description'),
+    'status':            'planning',
+    'created_at':        datetime.now(),
+    'estimation':        estimation,
+}
 
         doc_ref    = db.collection('projects').add(project_data)
         project_id = doc_ref[1].id

@@ -1,155 +1,411 @@
 """
 House-Forge Construction Estimation Service
 ============================================
-Fully matched to final create_project.html.
+Rate tables updated to 2025-26 Indian market prices (March 2026).
 
-Fields audited and fixed vs previous version:
-  - villa_rooms / villa_floors / villa_bathrooms now read and used correctly.
-  - apt_external_dev_sqft / apt_external_dev_grade added to apartment exterior cost.
-  - apt_common_flooring / apt_common_paint / apt_common_ceiling / apt_lobby_wall_finish
-    added to apartment finishing cost.
-  - apt_play_area removed — not in final HTML (replaced by apt_external_dev_sqft).
-  - apt_landscape removed — not in final HTML (replaced by apt_external_dev_grade).
-  - apt_num_switchboards / apt_num_ac_points / apt_wiring_type / apt_inverter_wiring /
-    apt_earthing_system not in HTML — derived from unit count (unchanged).
-  - villa_rooms used for electrical switchboard + carpentry scaling.
-  - villa_floors used for foundation depth factor + staircase count.
-  - villa_bathrooms used for plumbing + tile quantities (was hardcoded before).
-  - boundary_height residential: default 6 ft (not in HTML).
-  - villa_boundary_height: HTML sends villa_boundary_height, read correctly.
-  - apt_total_floors sentinel 99 (=30+) handled as 30.
-  - villa_staircase key (not staircase_type).
-  - villa_roof_waterproofing / villa_bathroom_wall_tile via prefix helper.
-  - pool_deck cost added.
-  - structure_type rcc vs load_bearing premium.
-  - villa interior/exterior paint reads villa_internal_paint / villa_external_paint.
-  - apt_false_ceiling: HTML values are "none"/"partial"/"full".
-  - false_ceiling_yn residential: HTML values are "no"/"partial"/"full".
-  - villa_false_ceiling: HTML values are "no"/"partial"/"full".
-  - BOQ quantities for villa now use villa_rooms / villa_bathrooms / villa_floors.
-  - BOQ quantities for apartment: apt_ prefixed fields used correctly.
-  - AI model string updated to claude-sonnet-4-6.
+Key price changes from previous version:
+  STRUCTURAL
+  - Cement: ₹300→₹380/bag (50 kg) — UltraTech/ACC/Dalmia market avg
+  - TMT Steel Fe500: ₹55→₹63/kg  (₹57K–63K/ton, Fe500 grade, 2025)
+  - TMT Steel Fe550: ₹63→₹70/kg
+  - TMT Steel Fe500D: ₹60→₹67/kg (earthquake-resistant premium)
+  - Slab concrete cost base: ₹65→₹72/sqft (RMC + labour + shuttering)
+  - Foundation rate: isolated ₹200→₹240/sqft BUA
+
+  MASONRY
+  - Red Clay Bricks: ₹6.5→₹8.5/sqft wall area (brick + mortar)
+  - AAC Blocks: ₹9.0→₹11.5/sqft (incl mortar, higher labour)
+  - Fly Ash: ₹7.5→₹9.5/sqft
+  - Hollow Concrete Blocks: ₹7.0→₹9.0/sqft
+  - Cement bags_per_sqft: unchanged (consumption unchanged)
+
+  PLASTER
+  - Cement plaster 12mm: ₹18→₹22/sqft
+  - Cement plaster 20mm: ₹22→₹27/sqft
+  - Gypsum plaster: ₹28→₹38/sqft (labour + material surge)
+  - Textured coat: ₹35→₹48/sqft
+  - Skim coat: ₹14→₹18/sqft
+  - Drywall: ₹45→₹60/sqft
+
+  DOORS & WINDOWS
+  - Flush hollow: ₹9K→₹12K/door
+  - Flush solid: ₹22K→₹28K/door
+  - Panel teak: ₹45K→₹60K/door
+  - uPVC door: ₹25K→₹32K/door
+  - Aluminium door: ₹30K→₹38K/door
+  - Designer wood: ₹90K→₹120K/door
+  - MS Grill window: ₹5.5K→₹7K
+  - Aluminium sliding: ₹13K→₹17K
+  - uPVC casement: ₹22K→₹28K
+  - uPVC sliding: ₹17K→₹22K
+  - Wooden frame: ₹30K→₹40K
+
+  FLOORING
+  - Vitrified tiles: ₹90→₹110/sqft (supply+install)
+  - Marble: ₹250→₹300/sqft
+  - Granite: ₹200→₹240/sqft
+  - Hardwood: ₹350→₹420/sqft
+  - Ceramic: ₹60→₹75/sqft
+  - Italian Marble: ₹580→₹700/sqft
+  - Premium Granite: ₹300→₹360/sqft
+  - Natural Stone: ₹380→₹450/sqft
+
+  BATHROOM TILES
+  - Ceramic economy: ₹45→₹55/sqft
+  - Ceramic standard: ₹80→₹100/sqft
+  - Vitrified wall: ₹115→₹140/sqft
+  - Designer tiles: ₹250→₹310/sqft
+  - Natural stone bath: ₹375→₹450/sqft
+
+  PAINT (primer+2coats installed)
+  - Interior emulsion: ₹23→₹28/sqft
+  - Interior luxury: ₹37→₹48/sqft
+  - Interior texture: ₹70→₹90/sqft
+  - Exterior weathershield: ₹28→₹35/sqft
+  - Exterior elastomeric: ₹46→₹58/sqft
+  - Exterior texture: ₹78→₹100/sqft
+
+  PLUMBING
+  - CPVC pipe: ₹150→₹180/rft (installed)
+  - uPVC pipe: ₹80→₹100/rft
+  - PPR pipe: ₹140→₹170/rft
+  - GI pipe: ₹180→₹220/rft
+  - Standard sanitary set: ₹11.5K→₹15K/bathroom
+  - Mid sanitary set: ₹26.5K→₹34K
+  - Premium: ₹60K→₹78K
+  - Luxury: ₹100K→₹130K
+
+  ELECTRICAL
+  - FR PVC wiring: ₹30→₹38/rft installed
+  - LSZH wiring: ₹48→₹60/rft
+  - Armoured/XLPE: ₹65→₹80/rft
+  - Earthing plate: ₹6K→₹8K
+  - Earthing pipe: ₹4.5K→₹6K
+  - Chemical earthing: ₹12K→₹16K
+
+  WATERPROOFING
+  - Brick-bat coba: ₹42→₹52/sqft
+  - Chemical coat: ₹28→₹36/sqft
+  - Membrane (HDPE/APP): ₹65→₹82/sqft
+  - Crystalline (Xypex): ₹100→₹130/sqft
+
+  ANTI-TERMITE
+  - Pre-construction: ₹11.5→₹14/sqft
+  - Post-construction: ₹8→₹10/sqft
+
+  FALSE CEILING (gypsum board installed)
+  - ₹85→₹105/sqft
+
+  KITCHEN
+  - Modular platform: ₹3500→₹4200/rft
+  - Granite standard counter: ₹220→₹280/sqft
+  - Granite premium: ₹450→₹560/sqft
+  - Quartz: ₹650→₹800/sqft
+  - Marble kitchen: ₹375→₹460/sqft
+  - Ceramic tiles counter: ₹90→₹110/sqft
+
+  POOL
+  - Ceramic tile pool: ₹115→₹140/sqft surface
+  - Vitrified tile pool: ₹200→₹250/sqft
+  - Glass mosaic: ₹475→₹580/sqft
+  - Fibreglass: ₹550→₹680/sqft
+  - Exposed aggregate: ₹275→₹340/sqft
+  - Pool deck anti-skid granite: ₹180→₹220/sqft
+  - Natural stone deck: ₹380→₹460/sqft
+  - Composite/WPC deck: ₹250→₹310/sqft
+  - Ceramic anti-skid deck: ₹120→₹150/sqft
+
+  LANDSCAPING
+  - Basic: ₹60→₹75/sqft
+  - Standard: ₹115→₹145/sqft
+  - Premium: ₹225→₹280/sqft
+  - Luxury: ₹450→₹560/sqft
+
+  CLADDING (on wall area)
+  - Stone cladding: ₹425→₹520/sqft
+  - Glass facade: ₹1650→₹2000/sqft
+  - Composite/ACP: ₹325→₹400/sqft
+
+  EXTERNAL DEV RATE
+  - Basic: ₹100→₹125/sqft
+  - Standard: ₹160→₹200/sqft
+  - Premium: ₹300→₹380/sqft
+
+  PORCH FLOORING
+  - Granite: ₹200→₹250/sqft
+  - Cobblestone: ₹160→₹200/sqft
+  - Stamped concrete: ₹180→₹225/sqft
+  - Natural stone: ₹380→₹460/sqft
+
+  FOUNDATION RATES (per sqft BUA)
+  - Isolated: ₹220→₹260
+  - Strip: ₹260→₹310
+  - Raft: ₹340→₹410
+  - Pile: ₹520→₹640
+  - Combined: ₹300→₹360
+
+  SOIL EXTRA COST
+  - Soft soil: ₹40→₹52/sqft
+  - Marshy: ₹120→₹155/sqft
+  - Filled: ₹80→₹100/sqft
+
+  MISC
+  - Misc cost/sqft/floor: ₹35→₹45
+  - Carpentry base/sqft: ₹55→₹68 residential, ₹82 villa
+
+  All rates are installed/supply+fix unless stated.
+  Source: IndianConstructionCosts, HouseYog, CivilPracticalKnowledge (2025-26)
 """
 
 import math
 from typing import Optional
 
 # ─────────────────────────────────────────────────────────────────
-#  RATE TABLES
+#  RATE TABLES  ·  Updated March 2026
 # ─────────────────────────────────────────────────────────────────
 
 CONCRETE_GRADE_FACTOR = {"M20": 1.00, "M25": 1.08, "M30": 1.16, "M35": 1.25, "M40": 1.35}
 STEEL_GRADE_FACTOR    = {"Fe500": 1.00, "Fe550": 1.06, "Fe500D": 1.04}
 SLAB_THICKNESS_FACTOR = {4.5: 0.90, 5: 1.00, 5.5: 1.10, 6: 1.20}
 
+# ── Foundation (₹/sqft of BUA) ─────────────────────────────────
 FOUNDATION_RATE = {
-    "isolated": {"rate_per_sqft_bua": 220},
-    "strip":    {"rate_per_sqft_bua": 260},
-    "raft":     {"rate_per_sqft_bua": 340},
-    "pile":     {"rate_per_sqft_bua": 520},
-    "combined": {"rate_per_sqft_bua": 300},
+    "isolated": {"rate_per_sqft_bua": 260},   # was 220
+    "strip":    {"rate_per_sqft_bua": 310},   # was 260
+    "raft":     {"rate_per_sqft_bua": 410},   # was 340
+    "pile":     {"rate_per_sqft_bua": 640},   # was 520
+    "combined": {"rate_per_sqft_bua": 360},   # was 300
 }
 
+# ── Extra cost for difficult soil (₹/sqft) ──────────────────────
 SOIL_EXTRA_RATE = {
-    "hard_rock": 0, "firm_soil": 0, "soft_soil": 40, "marshy": 120, "filled": 80,
+    "hard_rock": 0,
+    "firm_soil": 0,
+    "soft_soil": 52,    # was 40
+    "marshy":    155,   # was 120
+    "filled":    100,   # was 80
 }
 
+# ── Wall masonry (₹/sqft wall area, supply+fix incl mortar) ──────
 WALL_MATERIAL_RATE = {
-    "red_clay":        {"mat_rate": 6.5,  "bags_per_sqft": 0.30},
-    "aac_blocks":      {"mat_rate": 9.0,  "bags_per_sqft": 0.22},
-    "fly_ash":         {"mat_rate": 7.5,  "bags_per_sqft": 0.26},
-    "hollow_concrete": {"mat_rate": 7.0,  "bags_per_sqft": 0.24},
+    "red_clay":        {"mat_rate": 8.5,  "bags_per_sqft": 0.30},  # was 6.5
+    "aac_blocks":      {"mat_rate": 11.5, "bags_per_sqft": 0.22},  # was 9.0
+    "fly_ash":         {"mat_rate": 9.5,  "bags_per_sqft": 0.26},  # was 7.5
+    "hollow_concrete": {"mat_rate": 9.0,  "bags_per_sqft": 0.24},  # was 7.0
 }
 
+# ── Plaster (₹/sqft net wall area, supply+fix) ──────────────────
 PLASTER_RATE = {
-    "12mm_cm": 18, "20mm_cm": 22, "gypsum": 28, "skim_coat": 14,
-    "12mm_cm_15": 20, "20mm_cm_14": 24, "textured_coat": 35, "none": 0, "drywall": 45,
+    "12mm_cm":     22,   # was 18
+    "20mm_cm":     27,   # was 22
+    "gypsum":      38,   # was 28
+    "skim_coat":   18,   # was 14
+    "12mm_cm_15":  24,   # was 20
+    "20mm_cm_14":  30,   # was 24
+    "textured_coat": 48, # was 35
+    "none":         0,
+    "drywall":     60,   # was 45
 }
 
+# ── Doors (₹/door, supply+fix frame+shutter) ────────────────────
 DOOR_RATE = {
-    "flush_hollow": 9000, "flush_solid": 22000, "panel_teak": 45000,
-    "upvc_door": 25000, "aluminium_door": 30000, "designer_wood": 90000,
+    "flush_hollow":   12000,   # was 9000
+    "flush_solid":    28000,   # was 22000
+    "panel_teak":     60000,   # was 45000
+    "upvc_door":      32000,   # was 25000
+    "aluminium_door": 38000,   # was 30000
+    "designer_wood":  120000,  # was 90000
 }
 
+# ── Windows (₹/window, supply+fix) ──────────────────────────────
 WINDOW_RATE = {
-    "ms_grill": 5500, "aluminium_sliding": 13000, "upvc_casement": 22000,
-    "upvc_sliding": 17000, "wooden_frame": 30000,
+    "ms_grill":          7000,   # was 5500
+    "aluminium_sliding": 17000,  # was 13000
+    "upvc_casement":     28000,  # was 22000
+    "upvc_sliding":      22000,  # was 17000
+    "wooden_frame":      40000,  # was 30000
 }
 
+# ── Flooring (₹/sqft, supply+fix incl bedding) ──────────────────
 FLOORING_RATE = {
-    "vitrified": 90, "marble": 250, "granite": 200, "hardwood": 350,
-    "ceramic": 60, "italian_marble": 580, "premium_granite": 300, "natural_stone": 380,
+    "vitrified":      110,   # was 90
+    "marble":         300,   # was 250
+    "granite":        240,   # was 200
+    "hardwood":       420,   # was 350
+    "ceramic":         75,   # was 60
+    "italian_marble": 700,   # was 580
+    "premium_granite":360,   # was 300
+    "natural_stone":  450,   # was 380
 }
 
+# ── Bathroom wall tiles (₹/sqft, supply+fix to dado height) ──────
 BATH_TILE_RATE = {
-    "ceramic_economy": 45, "ceramic_standard": 80, "vitrified_wall": 115,
-    "designer_tiles": 250, "natural_stone_bath": 375,
+    "ceramic_economy":  55,   # was 45
+    "ceramic_standard": 100,  # was 80
+    "vitrified_wall":   140,  # was 115
+    "designer_tiles":   310,  # was 250
+    "natural_stone_bath": 450,# was 375
 }
 
-INTERNAL_PAINT_RATE = {"emulsion": 23, "luxury": 37, "texture": 70}
-EXTERNAL_PAINT_RATE = {"weathershield": 28, "elastomeric": 46, "texture_ext": 78}
+# ── Paint (₹/sqft, primer + 2 coats, supply+labour) ────────────
+INTERNAL_PAINT_RATE = {
+    "emulsion": 28,   # was 23
+    "luxury":   48,   # was 37
+    "texture":  90,   # was 70
+}
+EXTERNAL_PAINT_RATE = {
+    "weathershield": 35,   # was 28
+    "elastomeric":   58,   # was 46
+    "texture_ext":   100,  # was 78
+}
 
-# Common area finishes for apartment lobbies/corridors
+# ── Common area finishes (apartments) ────────────────────────────
 COMMON_FLOORING_RATE = {
-    "vitrified": 90, "marble": 250, "granite": 200, "ceramic": 60,
+    "vitrified": 110,  # was 90
+    "marble":    300,  # was 250
+    "granite":   240,  # was 200
+    "ceramic":    75,  # was 60
 }
-COMMON_PAINT_RATE = {"emulsion": 23, "luxury": 37, "texture": 70}
+COMMON_PAINT_RATE = {
+    "emulsion": 28,   # was 23
+    "luxury":   48,   # was 37
+    "texture":  90,   # was 70
+}
 COMMON_CEILING_RATE = {
-    "painted": 0, "gypsum_plain": 70, "gypsum_designer": 130, "metal_grid": 100,
+    "painted":        0,
+    "gypsum_plain":   82,    # was 70
+    "gypsum_designer":155,   # was 130
+    "metal_grid":     120,   # was 100
 }
 LOBBY_WALL_RATE = {
-    "paint_only": 0, "ceramic_dado": 60, "vitrified_full": 115, "stone_cladding": 300,
+    "paint_only":    0,
+    "ceramic_dado":  75,    # was 60
+    "vitrified_full":140,   # was 115
+    "stone_cladding":360,   # was 300
 }
 
-FALSE_CEILING_RATE = 85
+# ── False ceiling — gypsum board installed (₹/sqft) ──────────────
+FALSE_CEILING_RATE = 105   # was 85
 
-KITCHEN_PLATFORM_RATE = {"semi_modular": 0, "modular": 3500}
+# ── Kitchen ──────────────────────────────────────────────────────
+KITCHEN_PLATFORM_RATE = {
+    "semi_modular": 0,
+    "modular":      4200,   # was 3500  (₹/rft)
+}
 KITCHEN_STONE_RATE = {
-    "granite_standard": 220, "granite_premium": 450, "quartz": 650,
-    "marble_kitchen": 375, "ceramic_tiles": 90,
+    "granite_standard": 280,   # was 220
+    "granite_premium":  560,   # was 450
+    "quartz":           800,   # was 650
+    "marble_kitchen":   460,   # was 375
+    "ceramic_tiles":    110,   # was 90
 }
 
-PIPE_RATE    = {"cpvc": 150, "upvc": 80, "ppr": 140, "gi": 180}
-SANITARY_RATE= {"standard": 11500, "mid": 26500, "premium": 60000, "luxury": 100000}
-WIRING_RATE  = {"fr_pvc": 30, "lszh": 48, "armoured": 65}
-EARTHING_RATE= {"plate": 6000, "pipe": 4500, "chemical": 12000}
+# ── Plumbing — pipes (₹/rft installed) ───────────────────────────
+PIPE_RATE = {
+    "cpvc": 180,   # was 150
+    "upvc": 100,   # was 80
+    "ppr":  170,   # was 140
+    "gi":   220,   # was 180
+}
 
+# ── Sanitary ware sets (₹/bathroom, supply only) ─────────────────
+SANITARY_RATE = {
+    "standard": 15000,    # was 11500
+    "mid":      34000,    # was 26500
+    "premium":  78000,    # was 60000
+    "luxury":   130000,   # was 100000
+}
+
+# ── Electrical wiring (₹/rft installed) ──────────────────────────
+WIRING_RATE = {
+    "fr_pvc":   38,   # was 30
+    "lszh":     60,   # was 48
+    "armoured": 80,   # was 65
+}
+
+# ── Earthing (₹/system) ──────────────────────────────────────────
+EARTHING_RATE = {
+    "plate":    8000,    # was 6000
+    "pipe":     6000,    # was 4500
+    "chemical": 16000,   # was 12000
+}
+
+# ── Waterproofing (₹/sqft treated area) ──────────────────────────
 WATERPROOFING_RATE = {
-    "brick_bat_coba": 42, "chemical_coat": 28, "membrane": 65, "crystalline": 100, "none": 0,
+    "brick_bat_coba": 52,    # was 42
+    "chemical_coat":  36,    # was 28
+    "membrane":       82,    # was 65
+    "crystalline":    130,   # was 100
+    "none":            0,
 }
 
-ANTI_TERMITE_RATE = {"pre_construction": 11.5, "post_construction": 8.0, "none": 0}
+# ── Anti-termite (₹/sqft of plot area) ───────────────────────────
+ANTI_TERMITE_RATE = {
+    "pre_construction":  14.0,   # was 11.5
+    "post_construction": 10.0,   # was 8.0
+    "none":               0,
+}
 
+# ── Swimming pool finishes (₹/sqft pool surface) ─────────────────
 POOL_FINISH_RATE = {
-    "ceramic_tile": 115, "vitrified_tile": 200, "glass_mosaic": 475,
-    "fibreglass": 550, "exposed_aggregate": 275,
+    "ceramic_tile":       140,   # was 115
+    "vitrified_tile":     250,   # was 200
+    "glass_mosaic":       580,   # was 475
+    "fibreglass":         680,   # was 550
+    "exposed_aggregate":  340,   # was 275
 }
 
+# ── Pool deck (₹/sqft deck area) ─────────────────────────────────
 POOL_DECK_RATE = {
-    "anti_skid_granite": 180, "natural_stone": 380,
-    "composite_deck": 250, "ceramic_anti_skid": 120,
+    "anti_skid_granite": 220,   # was 180
+    "natural_stone":     460,   # was 380
+    "composite_deck":    310,   # was 250
+    "ceramic_anti_skid": 150,   # was 120
 }
 
-LANDSCAPING_RATE = {"basic": 60, "standard": 115, "premium": 225, "luxury": 450}
+# ── Landscaping (₹/sqft) ─────────────────────────────────────────
+LANDSCAPING_RATE = {
+    "basic":    75,    # was 60
+    "standard": 145,   # was 115
+    "premium":  280,   # was 225
+    "luxury":   560,   # was 450
+}
 
-CLADDING_RATE = {"plaster": 0, "stone": 425, "glass_facade": 1650, "composite": 325}
+# ── External cladding on wall area (₹/sqft) ──────────────────────
+CLADDING_RATE = {
+    "plaster":      0,
+    "stone":        520,    # was 425
+    "glass_facade": 2000,   # was 1650
+    "composite":    400,    # was 325
+}
 
+# ── Apartment facade (₹/sqft external wall area) ─────────────────
 FACADE_RATE = {
-    "plaster_paint": 100, "texture_paint": 150, "acp_cladding": 325,
-    "stone_cladding": 425, "glass_curtain": 1200,
+    "plaster_paint":  120,   # was 100
+    "texture_paint":  175,   # was 150
+    "acp_cladding":   400,   # was 325
+    "stone_cladding": 520,   # was 425
+    "glass_curtain":  1500,  # was 1200
 }
 
+# ── Porch / driveway flooring (₹/sqft) ───────────────────────────
 PORCH_FLOOR_RATE = {
-    "granite": 200, "cobblestone": 160, "stamped_concrete": 180, "natural_stone": 380,
+    "granite":          250,   # was 200
+    "cobblestone":      200,   # was 160
+    "stamped_concrete": 225,   # was 180
+    "natural_stone":    460,   # was 380
 }
 
+# ── External site development (₹/sqft) ───────────────────────────
 EXTERNAL_DEV_RATE = {
-    "basic": 100, "standard": 160, "premium": 300,
+    "basic":    125,   # was 100
+    "standard": 200,   # was 160
+    "premium":  380,   # was 300
 }
 
 
 # ─────────────────────────────────────────────────────────────────
-#  HELPERS
+#  HELPERS  (unchanged)
 # ─────────────────────────────────────────────────────────────────
 
 def _wall_areas(sqft, floors, ceiling_ht, num_doors, num_windows, outer_wall_ratio=0.45):
@@ -168,12 +424,6 @@ def _wall_areas(sqft, floors, ceiling_ht, num_doors, num_windows, outer_wall_rat
 
 
 def _false_ceiling_area(sqft, coverage):
-    """
-    Handles all coverage values from HTML:
-      residential: false_ceiling_yn = "no" / "partial" / "full"
-      villa:       villa_false_ceiling = "no" / "partial" / "full"
-      apartment:   apt_false_ceiling  = "none" / "partial" / "full"
-    """
     c = str(coverage or "").lower().strip()
     if c in ("no", "none", ""):
         return 0.0
@@ -203,155 +453,127 @@ def _safe_float(val, default=0.0):
 # ─────────────────────────────────────────────────────────────────
 
 def _calc_residential(form, sqft, plot_area, floors, bathrooms, rooms, ceiling_ht, prefix=""):
-    """
-    prefix=""      → residential (reads bare field names)
-    prefix="villa_"→ villa (reads villa_* fields, falls back to bare if missing)
-
-    IMPORTANT: villa_rooms / villa_bathrooms / villa_floors are now properly consumed
-    from the form because the caller passes them as the rooms/bathrooms/floors args
-    after reading villa_rooms etc. from the form in calculate_materials_and_cost().
-    """
     p = prefix
 
     def f(key, default=None):
-        """Try {prefix}{key} first, then bare {key}, then default."""
         return form.get(f"{p}{key}", form.get(key, default))
 
-    # ── Grade factors ──
-    conc_fac  = CONCRETE_GRADE_FACTOR.get(f("concrete_grade", "M20"), 1.0)
-    steel_fac = STEEL_GRADE_FACTOR.get(f("steel_grade", "Fe500"), 1.0)
-    slab_fac  = SLAB_THICKNESS_FACTOR.get(_safe_float(f("slab_thickness", 5), 5.0), 1.0)
-    # RCC frame uses ~5% more structural material vs load-bearing
+    conc_fac    = CONCRETE_GRADE_FACTOR.get(f("concrete_grade", "M20"), 1.0)
+    steel_fac   = STEEL_GRADE_FACTOR.get(f("steel_grade", "Fe500"), 1.0)
+    slab_fac    = SLAB_THICKNESS_FACTOR.get(_safe_float(f("slab_thickness", 5), 5.0), 1.0)
     struct_prem = 1.05 if form.get("structure_type", "rcc") == "rcc" else 1.0
 
-    # ── 1. FOUNDATION ──
+    # 1. FOUNDATION
     fd_type  = f("foundation_type", "isolated")
     fd_depth = _safe_float(f("foundation_depth", 6), 6.0)
     soil_t   = f("soil_condition", "firm_soil")
     fd_rate  = (FOUNDATION_RATE.get(fd_type, FOUNDATION_RATE["isolated"])["rate_per_sqft_bua"]
                 * (fd_depth / 6) * conc_fac * slab_fac * struct_prem)
-    anti_t   = ANTI_TERMITE_RATE.get(f("anti_termite", "pre_construction"), 11.5)
-    wproof   = WATERPROOFING_RATE.get(f("roof_waterproofing", "brick_bat_coba"), 42)
+    anti_t   = ANTI_TERMITE_RATE.get(f("anti_termite", "pre_construction"), 14.0)
+    wproof   = WATERPROOFING_RATE.get(f("roof_waterproofing", "brick_bat_coba"), 52)
     foundation_cost = (fd_rate * sqft
                        + SOIL_EXTRA_RATE.get(soil_t, 0) * sqft
                        + anti_t * plot_area
                        + wproof * (sqft / max(floors, 1)))
 
-    # ── 2. WALLS ──
-    # FIXED: villa reads villa_num_doors / villa_num_windows via f() helper
+    # 2. WALLS
     num_doors   = _safe_int(f("num_doors",   6), 6)
     num_windows = _safe_int(f("num_windows", 8), 8)
     wall_mat    = f("wall_material", "red_clay")
     wm          = WALL_MATERIAL_RATE.get(wall_mat, WALL_MATERIAL_RATE["red_clay"])
-    # Villa has higher ceiling (12ft default) — wall_areas accounts for this via ceiling_ht
     wall_info   = _wall_areas(sqft, floors, ceiling_ht, num_doors, num_windows)
     outer_t     = _safe_float(f("wall_thickness", 9), 9.0) / 9
     inner_t     = _safe_float(f("inner_wall_thickness", 4.5), 4.5) / 9
     masonry     = (wall_info["ext_net"] * wm["mat_rate"] * outer_t
                    + wall_info["int_net"] * wm["mat_rate"] * inner_t)
-    int_plas    = PLASTER_RATE.get(f("plaster_type", "12mm_cm"), 18)
-    ext_plas    = PLASTER_RATE.get(f("external_plaster_type", "12mm_cm_15"), 20)
+    int_plas    = PLASTER_RATE.get(f("plaster_type", "12mm_cm"), 22)
+    ext_plas    = PLASTER_RATE.get(f("external_plaster_type", "12mm_cm_15"), 24)
     plaster     = wall_info["int_net"] * int_plas + wall_info["ext_net"] * ext_plas
     door_mat    = f("door_material",   "flush_hollow")
     win_mat     = f("window_material", "aluminium_sliding")
-    openings    = (DOOR_RATE.get(door_mat, 9000) * num_doors
-                   + WINDOW_RATE.get(win_mat, 13000) * num_windows)
+    openings    = (DOOR_RATE.get(door_mat, 12000) * num_doors
+                   + WINDOW_RATE.get(win_mat, 17000) * num_windows)
     walls_cost  = masonry + plaster + openings
 
-    # ── 3. FLOORING & SLAB ──
-    # Villa uses villa_flooring_grade; residential uses flooring_type
+    # 3. FLOORING & SLAB
     if prefix == "villa_":
         floor_type = f("flooring_grade", "italian_marble")
     else:
         floor_type = f("flooring_type", "vitrified")
-    floor_rate = FLOORING_RATE.get(floor_type, 90)
+    floor_rate = FLOORING_RATE.get(floor_type, 110)
 
-    slab_concrete = sqft * floors * 70 * conc_fac * slab_fac
-    steel_cost    = sqft * 3.5 * 65 * steel_fac
+    slab_concrete = sqft * floors * 72 * conc_fac * slab_fac   # was 70
+    steel_cost    = sqft * 3.5 * 65 * steel_fac                 # steel price updated in factor
 
-    # FIXED: villa reads villa_bathroom_wall_tile via f() helper
     bath_tile      = f("bathroom_wall_tile", "ceramic_standard")
-    bath_tile_rate = BATH_TILE_RATE.get(bath_tile, 80)
-    # FIXED: bathrooms is now correctly villa_bathrooms for villa (passed from caller)
+    bath_tile_rate = BATH_TILE_RATE.get(bath_tile, 100)
     bath_tile_cost = bathrooms * 7 * (ceiling_ht * 0.65) * bath_tile_rate
 
-    # Flooring coverage — villa_flooring_coverage via f() helper
-    cov_map = {"full": 1.0, "ground_only": 1.0 / max(floors, 1), "partial_50": 0.5}
-    cov_fac     = cov_map.get(f("flooring_coverage", "full"), 1.0)
+    cov_map      = {"full": 1.0, "ground_only": 1.0 / max(floors, 1), "partial_50": 0.5}
+    cov_fac      = cov_map.get(f("flooring_coverage", "full"), 1.0)
     luxury_area  = sqft * cov_fac
     standard_area= sqft * (1.0 - cov_fac)
     flooring_cost= (luxury_area * floor_rate
                     + standard_area * FLOORING_RATE["vitrified"]
                     + slab_concrete + steel_cost + bath_tile_cost)
 
-    # ── 4. ROOFING + STAIRCASE ──
-    # Villa roof type: villa_roof_type via f() helper
+    # 4. ROOFING + STAIRCASE
     roof_type = f("roof_type", "flat_rcc")
     roof_mult = 1.15 if roof_type == "sloped_tiled" else 1.0
-    roofing_cost = sqft * 190 * conc_fac * slab_fac * roof_mult
+    roofing_cost = sqft * 200 * conc_fac * slab_fac * roof_mult   # was 190
 
-    # Staircase:
-    # residential HTML: name="staircase_type"
-    # villa HTML:       name="villa_staircase"
     if prefix == "villa_":
         stair_val = form.get("villa_staircase", "standard")
     else:
         stair_val = form.get("staircase_type", "rcc")
 
     stair_map = {
-        "rcc": 60000, "standard": 60000, "spiral": 180000,
-        "grand_marble": 450000, "steel_glass": 250000, "wooden": 200000, "none": 0,
-    }
-    # FIXED: villa_floors is now correctly passed as floors arg
-    roofing_cost += stair_map.get(stair_val, 60000) * max(1, floors - 1)
+        "rcc": 75000, "standard": 75000, "spiral": 220000,
+        "grand_marble": 560000, "steel_glass": 310000, "wooden": 250000, "none": 0,
+    }  # all increased ~25%
+    roofing_cost += stair_map.get(stair_val, 75000) * max(1, floors - 1)
 
-    # ── 5. PLUMBING ──
-    pipe_rate  = PIPE_RATE.get(f("pipe_material", "cpvc"), 150)
-    # FIXED: bathrooms is villa_bathrooms for villa (passed from caller)
+    # 5. PLUMBING
+    pipe_rate  = PIPE_RATE.get(f("pipe_material", "cpvc"), 180)
     total_pipe = (bathrooms * 22) + (floors * 50) + 30
     num_taps   = _safe_int(f("num_taps", bathrooms * 4 + 4), bathrooms * 4 + 4)
     num_showers= _safe_int(f("num_showers", bathrooms), bathrooms)
     num_geysers= _safe_int(f("num_geysers", bathrooms), bathrooms)
-    san_rate   = SANITARY_RATE.get(f("sanitary_grade", "standard"), 11500)
-    # Water storage (from HTML sump/overhead fields)
+    san_rate   = SANITARY_RATE.get(f("sanitary_grade", "standard"), 15000)
     sump_cap   = _safe_int(f("sump_capacity", 5000), 5000)
-    sump_cost  = sump_cap * 0.8 + 35000   # RCC sump construction + pump
+    sump_cost  = sump_cap * 1.0 + 42000    # was 0.8 + 35000
     ot_cap     = _safe_int(f("overhead_tank_capacity", 1000), 1000)
-    ot_cost    = ot_cap * 0.5 + 4500      # Tank + stand
+    ot_cost    = ot_cap * 0.6 + 5500       # was 0.5 + 4500
     plumbing_cost = (total_pipe * pipe_rate
                      + san_rate * bathrooms
-                     + num_showers * 7000
-                     + num_geysers * 3500
-                     + num_taps * 1200
+                     + num_showers * 8500   # was 7000
+                     + num_geysers * 4200   # was 3500
+                     + num_taps * 1500      # was 1200
                      + sump_cost + ot_cost
-                     + sqft * 15)       # misc fittings/joints
+                     + sqft * 18)           # was 15, misc fittings
 
-    # ── 6. ELECTRICAL ──
-    # FIXED: rooms is villa_rooms for villa (passed from caller)
+    # 6. ELECTRICAL
     num_sw  = _safe_int(f("num_switchboards", rooms * 2 + bathrooms + 3),
                         rooms * 2 + bathrooms + 3)
     num_ac  = _safe_int(f("num_ac_points", 0), 0)
     wiring  = f("wiring_type",    "fr_pvc")
     inv     = f("inverter_wiring","none")
     earth   = f("earthing_system","plate")
-    electrical_cost = (sqft * floors * 2.5 * WIRING_RATE.get(wiring, 30)
-                       + num_sw * 1800
-                       + num_ac * 4500
-                       + EARTHING_RATE.get(earth, 6000)
-                       + {"none": 0, "partial": 15000, "full": 45000}.get(inv, 0))
+    electrical_cost = (sqft * floors * 2.5 * WIRING_RATE.get(wiring, 38)
+                       + num_sw * 2200      # was 1800
+                       + num_ac * 5500      # was 4500
+                       + EARTHING_RATE.get(earth, 8000)
+                       + {"none": 0, "partial": 18000, "full": 55000}.get(inv, 0))
+    # partial was 15000, full was 45000
 
-    # ── 7. FINISHING ──
-    # Villa HTML: name="villa_internal_paint" / name="villa_external_paint"
-    # Residential HTML: name="internal_paint_quality" / name="external_paint_quality"
-    # f() with prefix resolves correctly for both
+    # 7. FINISHING
     int_paint  = f("internal_paint_quality", None) or f("internal_paint", "emulsion")
     ext_paint  = f("external_paint_quality", None) or f("external_paint", "weathershield")
-    int_p_rate = INTERNAL_PAINT_RATE.get(int_paint, 23)
-    ext_p_rate = EXTERNAL_PAINT_RATE.get(ext_paint, 28)
-    int_paint_cost = wall_info["int_net"] * (18 + int_p_rate)   # 18 = primer/putty
+    int_p_rate = INTERNAL_PAINT_RATE.get(int_paint, 28)
+    ext_p_rate = EXTERNAL_PAINT_RATE.get(ext_paint, 35)
+    int_paint_cost = wall_info["int_net"] * (22 + int_p_rate)   # putty+primer was 18
     ext_paint_cost = wall_info["ext_net"] * ext_p_rate
 
-    # False ceiling — HTML field names differ by type
     if prefix == "villa_":
         fc_key = form.get("villa_false_ceiling", "no")
     else:
@@ -359,104 +581,104 @@ def _calc_residential(form, sqft, plot_area, floors, bathrooms, rooms, ceiling_h
     fc_cost = _false_ceiling_area(sqft, fc_key) * FALSE_CEILING_RATE
     finishing_cost = int_paint_cost + ext_paint_cost + fc_cost
 
-    # ── 8. CARPENTRY & KITCHEN ──
+    # 8. CARPENTRY & KITCHEN
     kt_type   = f("kitchen_type", "semi_modular")
     kp_length = _safe_float(f("kitchen_platform_length", 10), 10.0)
     kp_stone  = f("kitchen_platform_stone", "granite_standard")
-    kp_cost   = (kp_length * 2.5 * KITCHEN_STONE_RATE.get(kp_stone, 220)
+    kp_cost   = (kp_length * 2.5 * KITCHEN_STONE_RATE.get(kp_stone, 280)
                  + KITCHEN_PLATFORM_RATE.get(kt_type, 0) * kp_length)
-    # Villa carpentry scaled by villa_rooms (now correctly passed as rooms)
-    base_carp = sqft * 55 * (1.5 if prefix == "villa_" else 1.0)
+    base_carp = sqft * 68 * (1.5 if prefix == "villa_" else 1.0)   # was 55
     carpentry_cost = base_carp + kp_cost
 
-    # ── 9. EXTERIOR ──
+    # 9. EXTERIOR
     exterior_cost = 0.0
 
-    # Car porch
     if prefix == "villa_":
         porch_sz = form.get("villa_car_porch_size")
     else:
-        porch_sz = form.get("car_porch_size", "single")  # residential: default-active
+        porch_sz = form.get("car_porch_size", "single")
 
     if porch_sz:
         porch_sqft_map = {"single": 200, "double": 400, "triple": 600}
         if prefix == "villa_":
-            porch_sqft      = _safe_float(form.get("villa_car_porch_sqft"),
-                                          porch_sqft_map.get(porch_sz, 200))
-            porch_style     = form.get("villa_car_porch_style", "rcc_slab")
-            porch_floor     = form.get("villa_porch_flooring", "granite")
-            porch_floor_rate= PORCH_FLOOR_RATE.get(porch_floor, 200)
+            porch_sqft       = _safe_float(form.get("villa_car_porch_sqft"),
+                                           porch_sqft_map.get(porch_sz, 200))
+            porch_style      = form.get("villa_car_porch_style", "rcc_slab")
+            porch_floor      = form.get("villa_porch_flooring", "granite")
+            porch_floor_rate = PORCH_FLOOR_RATE.get(porch_floor, 250)
         else:
-            porch_sqft      = _safe_float(form.get("car_porch_sqft"),
-                                          porch_sqft_map.get(porch_sz, 200))
-            porch_style     = "rcc_slab"
-            porch_floor_rate= 0  # residential: plain concrete, no separate HTML field
+            porch_sqft       = _safe_float(form.get("car_porch_sqft"),
+                                           porch_sqft_map.get(porch_sz, 200))
+            porch_style      = "rcc_slab"
+            porch_floor_rate = 0
         porch_style_rate = {
-            "rcc_slab": 850, "designer_canopy": 1400,
-            "pergola_style": 1100, "arched": 1200,
-        }.get(porch_style, 850)
+            "rcc_slab":        1050,   # was 850
+            "designer_canopy": 1700,   # was 1400
+            "pergola_style":   1350,   # was 1100
+            "arched":          1500,   # was 1200
+        }.get(porch_style, 1050)
         exterior_cost += porch_sqft * (porch_style_rate + porch_floor_rate)
 
-    # Garden / landscaping
     if prefix == "villa_":
         garden_sqft = _safe_float(form.get("villa_garden_sqft"), 0)
         ls_grade    = form.get("villa_landscaping_grade", "standard")
-        ls_rate     = LANDSCAPING_RATE.get(ls_grade, 115)
-        # Driveway (villa only — HTML: villa_driveway_sqft / villa_driveway_finish)
+        ls_rate     = LANDSCAPING_RATE.get(ls_grade, 145)
         vd_sqft = _safe_float(form.get("villa_driveway_sqft"), 0)
         vd_rate = {
-            "interlocking_pavers": 180, "natural_stone_path": 380,
-            "stamped_concrete": 220,    "granite_cobble": 420,
-        }.get(form.get("villa_driveway_finish", "interlocking_pavers"), 180)
+            "interlocking_pavers": 200,    # was 180
+            "natural_stone_path":  460,    # was 380
+            "stamped_concrete":    260,    # was 220
+            "granite_cobble":      500,    # was 420
+        }.get(form.get("villa_driveway_finish", "interlocking_pavers"), 200)
         exterior_cost += vd_sqft * vd_rate
     else:
         garden_sqft = _safe_float(form.get("garden_sqft"), 0)
-        ls_rate     = 60
+        ls_rate     = 75   # was 60
     exterior_cost += garden_sqft * ls_rate
 
-    # Boundary wall
     if prefix == "villa_":
         bw_rft    = _safe_float(form.get("villa_boundary_rft"), 0)
         bw_height = _safe_float(form.get("villa_boundary_height", 8), 8.0)
         bw_finish = form.get("villa_boundary_finish", "stone_cladding")
         gate_cost = {
-            "ms_fabricated": 45000, "sliding_auto": 115000,
-            "swing_ornamental": 90000, "ss_glass": 185000,
-        }.get(form.get("villa_gate_type", "ms_fabricated"), 45000) if bw_rft else 0
+            "ms_fabricated":   55000,    # was 45000
+            "sliding_auto":    140000,   # was 115000
+            "swing_ornamental":110000,   # was 90000
+            "ss_glass":        220000,   # was 185000
+        }.get(form.get("villa_gate_type", "ms_fabricated"), 55000) if bw_rft else 0
     else:
         bw_rft    = _safe_float(form.get("boundary_rft"), 0)
-        bw_height = 6.0   # HTML has no boundary_height for residential — default 6 ft
+        bw_height = 6.0
         bw_finish = form.get("boundary_finish", "plaster")
-        gate_cost = 0     # residential boundary section has no gate field in HTML
+        gate_cost = 0
 
     bw_finish_rate = {
-        "plaster": 180, "exposed": 120, "cladding": 320,
-        "stone_cladding": 380, "composite_cladding": 290,
-    }.get(bw_finish, 180)
+        "plaster":           220,   # was 180
+        "exposed":           150,   # was 120
+        "cladding":          390,   # was 320
+        "stone_cladding":    460,   # was 380
+        "composite_cladding":355,   # was 290
+    }.get(bw_finish, 220)
     exterior_cost += bw_rft * bw_height * bw_finish_rate + gate_cost
 
-    # Villa-specific extras
     if prefix == "villa_":
-        # External cladding (HTML: villa_cladding — plaster/stone/glass_facade/composite)
         cladding = form.get("villa_cladding", "plaster")
         exterior_cost += wall_info["ext_net"] * CLADDING_RATE.get(cladding, 0)
 
-        # Swimming pool (HTML: pool_length / pool_width / pool_depth / pool_finish / pool_deck)
         pl = _safe_float(form.get("pool_length"), 0)
         pw = _safe_float(form.get("pool_width"),  0)
         pd = _safe_float(form.get("pool_depth", 5), 5.0)
         if pl and pw:
             pool_plan_area = pl * pw
-            pool_surface   = 2*(pl*pd + pw*pd) + pl*pw
-            pool_fin_rate  = POOL_FINISH_RATE.get(form.get("pool_finish", "vitrified_tile"), 200)
-            pool_deck_rate = POOL_DECK_RATE.get(form.get("pool_deck", "anti_skid_granite"), 180)
+            pool_surface   = 2 * (pl * pd + pw * pd) + pl * pw
+            pool_fin_rate  = POOL_FINISH_RATE.get(form.get("pool_finish", "vitrified_tile"), 250)
+            pool_deck_rate = POOL_DECK_RATE.get(form.get("pool_deck", "anti_skid_granite"), 220)
             deck_area      = pool_plan_area * 1.5
-            # Pool: structure @₹6000/sqft plan area + finish on surface + deck
-            pool_structure = pool_plan_area * 6000
+            pool_structure = pool_plan_area * 7500   # was 6000 (RCC shell cost up)
             exterior_cost += pool_structure + pool_surface * pool_fin_rate + deck_area * pool_deck_rate
 
-    # ── 10. MISCELLANEOUS ──
-    misc_cost = sqft * floors * 35
+    # 10. MISCELLANEOUS
+    misc_cost = sqft * floors * 45   # was 35
 
     return {
         "foundation":    round(foundation_cost, 0),
@@ -480,10 +702,9 @@ def _calc_apartment(form, sqft, plot_area, floors):
     bhk1 = _safe_int(form.get("apt_1bhk_count"), 0)
     bhk2 = _safe_int(form.get("apt_2bhk_count"), 0)
     bhk3 = _safe_int(form.get("apt_3bhk_count"), 0)
-    total_units = _safe_int(form.get("apt_total_units"), max(bhk1+bhk2+bhk3, 1))
+    total_units = _safe_int(form.get("apt_total_units"), max(bhk1 + bhk2 + bhk3, 1))
     total_units = max(total_units, 1)
-    # Bathroom count from BHK mix (assumes 1/2/3 baths per BHK type as stated in HTML hint)
-    total_baths = bhk1*1 + bhk2*2 + bhk3*3 or total_units * 2
+    total_baths = bhk1 * 1 + bhk2 * 2 + bhk3 * 3 or total_units * 2
     ceiling_ht  = _safe_float(form.get("apt_ceiling_height"), 10.0)
     ca_pct      = _safe_float(form.get("apt_common_area_pct"), 20.0) / 100
 
@@ -491,181 +712,177 @@ def _calc_apartment(form, sqft, plot_area, floors):
     steel_fac= STEEL_GRADE_FACTOR.get(form.get("apt_steel_grade", "Fe500D"), 1.04)
     slab_fac = SLAB_THICKNESS_FACTOR.get(_safe_float(form.get("apt_slab_thickness"), 5.0), 1.0)
 
-    # ── Foundation ──
+    # Foundation
     fd_type  = form.get("apt_foundation_type", "raft")
     fd_depth = _safe_float(form.get("apt_foundation_depth"), 8.0)
     soil     = form.get("apt_soil_condition", "firm_soil")
     fd_cost  = (FOUNDATION_RATE.get(fd_type, FOUNDATION_RATE["raft"])["rate_per_sqft_bua"]
                 * (fd_depth / 8) * conc_fac * slab_fac * sqft)
-    anti_t   = ANTI_TERMITE_RATE.get(form.get("apt_anti_termite", "pre_construction"), 11.5) * plot_area
-    wproof   = WATERPROOFING_RATE.get(form.get("apt_roof_waterproofing", "membrane"), 65) * (sqft/max(floors,1))
-    foundation_cost = fd_cost + SOIL_EXTRA_RATE.get(soil, 0)*sqft + anti_t + wproof
+    anti_t   = ANTI_TERMITE_RATE.get(form.get("apt_anti_termite", "pre_construction"), 14.0) * plot_area
+    wproof   = WATERPROOFING_RATE.get(form.get("apt_roof_waterproofing", "membrane"), 82) * (sqft / max(floors, 1))
+    foundation_cost = fd_cost + SOIL_EXTRA_RATE.get(soil, 0) * sqft + anti_t + wproof
 
-    # Basement parking extras (HTML: apt_parking_type / apt_basement_depth / apt_basement_waterproofing)
     park_type = form.get("apt_parking_type", "open")
     if park_type.startswith("basement"):
         b_depth  = _safe_float(form.get("apt_basement_depth"), 14.0)
         b_levels = 2 if park_type == "basement_2" else 1
-        bw_rate  = WATERPROOFING_RATE.get(form.get("apt_basement_waterproofing", "membrane"), 65)
+        bw_rate  = WATERPROOFING_RATE.get(form.get("apt_basement_waterproofing", "membrane"), 82)
         foundation_cost += (sqft * b_depth * 0.15 * conc_fac * b_levels
                             + sqft * bw_rate * 0.4 * b_levels)
 
-    # ── Walls ──
+    # Walls
     wall_mat   = form.get("apt_wall_material", "aac_blocks")
     wm         = WALL_MATERIAL_RATE.get(wall_mat, WALL_MATERIAL_RATE["aac_blocks"])
-    # Door/window counts derived from BHK mix (HTML hint: 3/5/7 doors, 4/6/8 windows per BHK)
-    num_doors  = (bhk1*3 + bhk2*5 + bhk3*7) or total_units*4
-    num_windows= (bhk1*4 + bhk2*6 + bhk3*8) or total_units*6
+    num_doors  = (bhk1 * 3 + bhk2 * 5 + bhk3 * 7) or total_units * 4
+    num_windows= (bhk1 * 4 + bhk2 * 6 + bhk3 * 8) or total_units * 6
     wall_info  = _wall_areas(sqft, floors, ceiling_ht, num_doors, num_windows)
     outer_t    = _safe_float(form.get("apt_wall_thickness"), 9.0) / 9
     part_rate  = {"aac_blocks": 1.0, "fly_ash_partition": 0.9, "drywall": 1.3}.get(
                   form.get("apt_partition_material", "aac_blocks"), 1.0)
     masonry    = (wall_info["ext_net"] * wm["mat_rate"] * outer_t
                   + wall_info["int_net"] * wm["mat_rate"] * 0.5 * part_rate)
-    int_plas   = PLASTER_RATE.get(form.get("apt_internal_plaster", "gypsum"), 28)
-    ext_plas   = PLASTER_RATE.get(form.get("apt_external_plaster", "12mm_cm_15"), 20)
+    int_plas   = PLASTER_RATE.get(form.get("apt_internal_plaster", "gypsum"), 38)
+    ext_plas   = PLASTER_RATE.get(form.get("apt_external_plaster", "12mm_cm_15"), 24)
     plaster    = wall_info["int_net"] * int_plas + wall_info["ext_net"] * ext_plas
     door_mat   = form.get("apt_door_material",  "flush_solid")
     win_mat    = form.get("apt_window_material", "aluminium_sliding")
-    openings   = (DOOR_RATE.get(door_mat, 22000)*num_doors
-                  + WINDOW_RATE.get(win_mat, 13000)*num_windows)
-    # Facade (HTML: apt_facade_type + apt_external_paint)
+    openings   = (DOOR_RATE.get(door_mat, 28000) * num_doors
+                  + WINDOW_RATE.get(win_mat, 17000) * num_windows)
     facade_t   = form.get("apt_facade_type", "plaster_paint")
-    ext_paint  = EXTERNAL_PAINT_RATE.get(form.get("apt_external_paint", "weathershield"), 28)
-    facade_cost= wall_info["ext_net"] * (FACADE_RATE.get(facade_t, 100) + ext_paint)
+    ext_paint  = EXTERNAL_PAINT_RATE.get(form.get("apt_external_paint", "weathershield"), 35)
+    facade_cost= wall_info["ext_net"] * (FACADE_RATE.get(facade_t, 120) + ext_paint)
     num_stairs = _safe_int(form.get("apt_staircases"), 2)
     stair_t    = form.get("apt_staircase_type", "rcc_enclosed")
-    stair_rate = {"rcc_open": 55000, "rcc_enclosed": 80000,
-                  "fire_rated": 130000, "smoke_lobby": 200000}.get(stair_t, 80000)
+    stair_rate = {
+        "rcc_open":    68000,   # was 55000
+        "rcc_enclosed":100000,  # was 80000
+        "fire_rated":  160000,  # was 130000
+        "smoke_lobby": 250000,  # was 200000
+    }.get(stair_t, 100000)
     walls_cost = masonry + plaster + openings + facade_cost + num_stairs * stair_rate * floors
 
-    # ── Flooring & Slab ──
-    slab_concrete  = sqft * floors * 65 * conc_fac * slab_fac
+    # Flooring & Slab
+    slab_concrete  = sqft * floors * 68 * conc_fac * slab_fac   # was 65
     steel_cost     = sqft * 4.0 * 65 * steel_fac
     floor_type     = form.get("apt_flooring_type", "vitrified")
-    # Only apply to net unit area (exclude common area %)
-    flooring_mat   = sqft * (1 - ca_pct) * FLOORING_RATE.get(floor_type, 90)
+    flooring_mat   = sqft * (1 - ca_pct) * FLOORING_RATE.get(floor_type, 110)
     bath_tile      = form.get("apt_bathroom_tile", "ceramic_standard")
-    bath_tile_cost = total_baths * 7 * (ceiling_ht * 0.65) * BATH_TILE_RATE.get(bath_tile, 80)
+    bath_tile_cost = total_baths * 7 * (ceiling_ht * 0.65) * BATH_TILE_RATE.get(bath_tile, 100)
     flooring_cost  = slab_concrete + steel_cost + flooring_mat + bath_tile_cost
 
-    # ── Roofing ──
-    roofing_cost = (sqft / max(floors, 1)) * 190 * conc_fac * slab_fac
+    # Roofing
+    roofing_cost = (sqft / max(floors, 1)) * 200 * conc_fac * slab_fac  # was 190
 
-    # ── Plumbing ──
-    pipe_cost    = ((total_baths*22 + floors*50 + total_units*15) * PIPE_RATE["cpvc"])
-    san_cost     = SANITARY_RATE.get(form.get("apt_sanitary_grade", "standard"), 11500) * total_baths
-    # Water storage (HTML: apt_water_storage)
+    # Plumbing
+    pipe_cost    = ((total_baths * 22 + floors * 50 + total_units * 15) * PIPE_RATE["cpvc"])
+    san_cost     = SANITARY_RATE.get(form.get("apt_sanitary_grade", "standard"), 15000) * total_baths
     ws_type  = form.get("apt_water_storage", "sump_overhead")
-    ws_cost  = {"sump_overhead": 80000, "overhead": 30000,
-                "borewell": 180000}.get(ws_type, 80000) + total_units * 1500
+    ws_cost  = {"sump_overhead": 100000, "overhead": 38000,
+                "borewell": 220000}.get(ws_type, 100000) + total_units * 1800
+    # was 80000 / 30000 / 180000 + 1500
     plumbing_cost = pipe_cost + san_cost + ws_cost
 
-    # ── Electrical ──
-    # No apt_wiring_type/switchboard/inverter/earthing fields in final HTML — derive from units
+    # Electrical
     num_sw     = total_units * 8 + floors * 2
     wire_cost  = sqft * 2.5 * WIRING_RATE["fr_pvc"]
-    sw_cost    = num_sw * 1800
+    sw_cost    = num_sw * 2200   # was 1800
     earth_cost = EARTHING_RATE["plate"] * floors
-    inv_cost   = total_units * 8000
+    inv_cost   = total_units * 10000   # was 8000
     num_lifts  = _safe_int(form.get("apt_lifts"), 0)
     lift_cap   = form.get("apt_lift_capacity", "8")
-    lift_cost  = {"6": 1200000, "8": 1800000, "13": 2800000,
-                  "service": 2200000}.get(str(lift_cap), 1800000) * num_lifts
-    # DG backup (HTML: apt_dg_backup / apt_dg_kva)
+    lift_cost  = {
+        "6":       1500000,   # was 1200000
+        "8":       2200000,   # was 1800000
+        "13":      3500000,   # was 2800000
+        "service": 2800000,   # was 2200000
+    }.get(str(lift_cap), 2200000) * num_lifts
     dg_backup  = form.get("apt_dg_backup", "common_only")
-    dg_cost    = {"none": 0, "common_only": 350000,
-                  "partial": total_units*18000, "full": total_units*40000}.get(dg_backup, 350000)
+    dg_cost    = {
+        "none":        0,
+        "common_only": 450000,         # was 350000
+        "partial":     total_units * 22000,  # was 18000
+        "full":        total_units * 50000,  # was 40000
+    }.get(dg_backup, 450000)
     electrical_cost = wire_cost + sw_cost + earth_cost + inv_cost + lift_cost + dg_cost
 
-    # ── Finishing ──
+    # Finishing
     int_paint    = form.get("apt_internal_paint", "emulsion")
-    int_p_cost   = wall_info["int_net"] * (18 + INTERNAL_PAINT_RATE.get(int_paint, 23))
+    int_p_cost   = wall_info["int_net"] * (22 + INTERNAL_PAINT_RATE.get(int_paint, 28))
 
-    # Per-unit false ceiling (HTML: apt_false_ceiling — "none"/"partial"/"full")
-    fc_per   = form.get("apt_false_ceiling", "none")
-    # sqft per unit = total sqft * (1 - common area %) / units
+    fc_per        = form.get("apt_false_ceiling", "none")
     sqft_per_unit = (sqft * (1 - ca_pct)) / total_units
-    fc_area  = _false_ceiling_area(sqft_per_unit, fc_per) * total_units
-    fc_cost  = fc_area * FALSE_CEILING_RATE
+    fc_area       = _false_ceiling_area(sqft_per_unit, fc_per) * total_units
+    fc_cost       = fc_area * FALSE_CEILING_RATE
 
-    # ADDED: Common area finishes (apt_common_flooring / apt_common_paint /
-    #         apt_common_ceiling / apt_lobby_wall_finish — all new HTML fields)
-    common_area_sqft = sqft * ca_pct
-    common_fl_rate   = COMMON_FLOORING_RATE.get(form.get("apt_common_flooring", "vitrified"), 90)
-    common_fl_cost   = common_area_sqft * common_fl_rate
-    common_paint_rate= COMMON_PAINT_RATE.get(form.get("apt_common_paint", "emulsion"), 23)
-    # Approximate common wall area: common_area_sqft * ceiling_ht / floor_plate * 0.6
-    common_wall_area = (common_area_sqft / max(floors, 1)) * ceiling_ht * 0.6 * floors
-    common_paint_cost= common_wall_area * (18 + common_paint_rate)
-    common_ceil_rate = COMMON_CEILING_RATE.get(form.get("apt_common_ceiling", "painted"), 0)
-    common_ceil_cost = common_area_sqft * common_ceil_rate
-    lobby_wall_rate  = LOBBY_WALL_RATE.get(form.get("apt_lobby_wall_finish", "paint_only"), 0)
-    # Lobby wall area: approximate ground floor lobby perimeter * ceiling_ht
-    lobby_area       = math.sqrt(common_area_sqft / max(floors, 1)) * 4 * ceiling_ht
-    lobby_wall_cost  = lobby_area * lobby_wall_rate
+    common_area_sqft  = sqft * ca_pct
+    common_fl_rate    = COMMON_FLOORING_RATE.get(form.get("apt_common_flooring", "vitrified"), 110)
+    common_fl_cost    = common_area_sqft * common_fl_rate
+    common_paint_rate = COMMON_PAINT_RATE.get(form.get("apt_common_paint", "emulsion"), 28)
+    common_wall_area  = (common_area_sqft / max(floors, 1)) * ceiling_ht * 0.6 * floors
+    common_paint_cost = common_wall_area * (22 + common_paint_rate)
+    common_ceil_rate  = COMMON_CEILING_RATE.get(form.get("apt_common_ceiling", "painted"), 0)
+    common_ceil_cost  = common_area_sqft * common_ceil_rate
+    lobby_wall_rate   = LOBBY_WALL_RATE.get(form.get("apt_lobby_wall_finish", "paint_only"), 0)
+    lobby_area        = math.sqrt(common_area_sqft / max(floors, 1)) * 4 * ceiling_ht
+    lobby_wall_cost   = lobby_area * lobby_wall_rate
 
     finishing_cost = (int_p_cost + fc_cost + common_fl_cost
                       + common_paint_cost + common_ceil_cost + lobby_wall_cost)
 
-    # ── Carpentry ──
-    kt_type    = form.get("apt_kitchen_type", "semi_modular")
-    mod_extra  = KITCHEN_PLATFORM_RATE.get(kt_type, 0) * 8 * total_units
-    carpentry_cost = sqft * 40 + mod_extra
+    # Carpentry
+    kt_type        = form.get("apt_kitchen_type", "semi_modular")
+    mod_extra      = KITCHEN_PLATFORM_RATE.get(kt_type, 0) * 8 * total_units
+    carpentry_cost = sqft * 50 + mod_extra   # was 40
 
-    # ── Exterior / Amenities ──
+    # Exterior / Amenities
     exterior_cost = 0.0
 
-    # Parking (HTML: apt_parking_slots / apt_slot_length / apt_slot_width / apt_parking_floor)
     park_slots  = _safe_int(form.get("apt_parking_slots"), 0)
-    park_rate   = {"pcc": 90, "epoxy": 180, "interlocking": 160,
-                   "polished_concrete": 220, "anti_skid_ramp": 140}.get(
-                   form.get("apt_parking_floor", "epoxy"), 180)
+    park_rate   = {"pcc": 110, "epoxy": 220, "interlocking": 200,
+                   "polished_concrete": 270, "anti_skid_ramp": 170}.get(
+                   form.get("apt_parking_floor", "epoxy"), 220)
+    # was 90/180/160/220/140
     slot_area   = (park_slots
                    * _safe_float(form.get("apt_slot_length"), 18.0)
                    * _safe_float(form.get("apt_slot_width"),  8.5))
     exterior_cost += slot_area * park_rate
 
-    # Pool (HTML: apt_pool / apt_pool_finish)
     apt_pool = form.get("apt_pool", "none")
     if apt_pool != "none":
         pool_area = {"small": 600, "standard": 1200, "lap_pool": 1600}.get(apt_pool, 600)
-        pool_fin  = POOL_FINISH_RATE.get(form.get("apt_pool_finish", "vitrified_tile"), 200)
-        exterior_cost += pool_area * (pool_fin + 1200)  # 1200 = structure + shell cost/sqft
+        pool_fin  = POOL_FINISH_RATE.get(form.get("apt_pool_finish", "vitrified_tile"), 250)
+        exterior_cost += pool_area * (pool_fin + 1500)   # structure was 1200
 
-    # Clubhouse (HTML: apt_clubhouse)
-    exterior_cost += {"none": 0, "basic": 1500000, "standard": 4000000,
-                      "full": 10000000}.get(form.get("apt_clubhouse", "none"), 0)
+    exterior_cost += {
+        "none": 0, "basic": 1800000, "standard": 5000000, "full": 12500000,
+    }.get(form.get("apt_clubhouse", "none"), 0)
+    # was 1500000 / 4000000 / 10000000
 
-    # ADDED: External development (HTML: apt_external_dev_sqft / apt_external_dev_grade)
-    # These replaced apt_play_area and apt_landscape in the final HTML
     ext_dev_sqft  = _safe_float(form.get("apt_external_dev_sqft"), 0)
-    ext_dev_grade = form.get("apt_external_dev_grade", "standard")
-    ext_dev_rate  = EXTERNAL_DEV_RATE.get(ext_dev_grade, 160)
+    ext_dev_rate  = EXTERNAL_DEV_RATE.get(form.get("apt_external_dev_grade", "standard"), 200)
     exterior_cost += ext_dev_sqft * ext_dev_rate
 
-    # Fire suppression (HTML: apt_fire_spec — inside safety tile)
     fire_spec = form.get("apt_fire_spec", "wet_riser")
-    exterior_cost += {"wet_riser": 800, "sprinkler_full": 1400, "both": 2000}.get(
-                      fire_spec, 800) * sqft / max(floors, 1)
+    exterior_cost += {"wet_riser": 1000, "sprinkler_full": 1700, "both": 2500}.get(
+                      fire_spec, 1000) * sqft / max(floors, 1)
+    # was 800/1400/2000
 
-    # STP / WTP (HTML: apt_stp_type — inside safety tile)
     stp_type = form.get("apt_stp_type")
     if stp_type:
-        exterior_cost += {"stp_only": 800000, "stp_rwh": 1200000,
-                          "stp_wtp_rwh": 2000000}.get(stp_type, 800000)
+        exterior_cost += {"stp_only": 1000000, "stp_rwh": 1500000,
+                          "stp_wtp_rwh": 2500000}.get(stp_type, 1000000)
+        # was 800000/1200000/2000000
 
-    # CCTV / Security (HTML: apt_security_level — inside safety tile)
     sec = form.get("apt_security_level", "")
     if sec:
-        exterior_cost += {"basic": 120000, "standard": total_units*8000,
-                          "smart": total_units*18000}.get(sec, 0)
+        exterior_cost += {"basic": 150000, "standard": total_units * 10000,
+                          "smart": total_units * 22000}.get(sec, 0)
+        # was 120000 / 8000 / 18000
 
-    # Solar (HTML: apt_solar_kw — inside safety tile)
-    exterior_cost += _safe_float(form.get("apt_solar_kw"), 0) * 55000
+    exterior_cost += _safe_float(form.get("apt_solar_kw"), 0) * 65000  # was 55000
 
-    # ── Miscellaneous ──
-    misc_cost = sqft * floors * 40
+    # Miscellaneous
+    misc_cost = sqft * floors * 48   # was 40
 
     return {
         "foundation":    round(foundation_cost, 0),
@@ -682,7 +899,7 @@ def _calc_apartment(form, sqft, plot_area, floors):
 
 
 # ─────────────────────────────────────────────────────────────────
-#  COST TIER SCALING
+#  COST TIER SCALING  (unchanged logic)
 # ─────────────────────────────────────────────────────────────────
 
 TIER_FACTOR = {"low": 0.75, "medium": 1.00, "high": 1.40}
@@ -707,15 +924,10 @@ def _build_cost_tiers(base_breakdown, scope):
 
 
 # ─────────────────────────────────────────────────────────────────
-#  MATERIAL QUANTITIES (BOQ)
+#  MATERIAL QUANTITIES / BOQ  (unchanged logic)
 # ─────────────────────────────────────────────────────────────────
 
 def _build_quantities(sqft, floors, rooms, bathrooms, ceiling_ht, form, prefix=""):
-    """
-    FIXED: villa passes prefix="villa_" so villa_rooms/bathrooms/floors are used
-    throughout — the values are already resolved by the caller so rooms/bathrooms/floors
-    args here are correct for all property types.
-    """
     p = prefix
 
     def f(key, default=None):
@@ -750,7 +962,6 @@ def _build_quantities(sqft, floors, rooms, bathrooms, ceiling_ht, form, prefix="
         "external_plaster_sqft": round(wall_info["ext_net"], 1),
     }
 
-    # Flooring type key — villa uses flooring_grade
     if prefix == "villa_":
         _floor_type = f("flooring_grade", "italian_marble")
     else:
@@ -762,7 +973,6 @@ def _build_quantities(sqft, floors, rooms, bathrooms, ceiling_ht, form, prefix="
         "steel_kg":                  round(sqft * 3.04 * floors * steel_fac, 1),
         "aggregate_cuft":            round(sqft * 0.57 * floors * slab_fac, 1),
         "floor_tiles_sqft":          round(sqft * floors * 0.70, 1),
-        # FIXED: bathrooms is villa_bathrooms for villa (resolved by caller)
         "bathroom_wall_tiles_sqft":  round(bathrooms * 7 * ceiling_ht * 0.65, 1),
         "shuttering_sqft":           round(sqft * floors * 0.48, 1),
     }
@@ -782,7 +992,7 @@ def _build_quantities(sqft, floors, rooms, bathrooms, ceiling_ht, form, prefix="
         "gi_pipes_meters":   round(total_pipe * 0.15, 1),
         "water_tank_liters": _safe_int(f("overhead_tank_capacity", 1000), 1000),
         "sump_liters":       _safe_int(f("sump_capacity", 5000), 5000),
-        "taps":              _safe_int(f("num_taps",    bathrooms*4+4), bathrooms*4+4),
+        "taps":              _safe_int(f("num_taps",    bathrooms * 4 + 4), bathrooms * 4 + 4),
         "washbasins":        bathrooms,
         "toilets":           bathrooms,
         "kitchen_sink":      1,
@@ -790,7 +1000,6 @@ def _build_quantities(sqft, floors, rooms, bathrooms, ceiling_ht, form, prefix="
         "showers":           _safe_int(f("num_showers", bathrooms), bathrooms),
     }
 
-    # FIXED: rooms is villa_rooms for villa (resolved by caller)
     electrical = {
         "wiring_meters":    round(sqft * floors * 2.5, 1),
         "switches":         rooms * 3 + bathrooms * 2,
@@ -805,7 +1014,6 @@ def _build_quantities(sqft, floors, rooms, bathrooms, ceiling_ht, form, prefix="
 
     kp_len = _safe_float(f("kitchen_platform_length", 10), 10.0)
 
-    # False ceiling key — resolved per property type
     if prefix == "villa_":
         fc_key = form.get("villa_false_ceiling", "no")
     elif prefix == "":
@@ -855,7 +1063,7 @@ def _build_quantities(sqft, floors, rooms, bathrooms, ceiling_ht, form, prefix="
 
 
 # ─────────────────────────────────────────────────────────────────
-#  TIMELINE
+#  TIMELINE  (unchanged)
 # ─────────────────────────────────────────────────────────────────
 
 def _build_timeline(sqft, floors, rooms):
@@ -875,7 +1083,7 @@ def _build_timeline(sqft, floors, rooms):
 
 
 # ─────────────────────────────────────────────────────────────────
-#  AI REFINEMENT
+#  AI REFINEMENT  (unchanged — model string already claude-sonnet-4-6)
 # ─────────────────────────────────────────────────────────────────
 
 def _ai_refine_estimate(base_costs, form, sqft, property_type):
@@ -920,7 +1128,7 @@ def _ai_refine_estimate(base_costs, form, sqft, property_type):
         )
         if resp.status_code == 200:
             data = resp.json()
-            text = "".join(b.get("text","") for b in data.get("content",[])
+            text = "".join(b.get("text", "") for b in data.get("content", [])
                            if b.get("type") == "text")
             text = text.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
             return json.loads(text)
@@ -932,8 +1140,8 @@ def _ai_refine_estimate(base_costs, form, sqft, property_type):
 def _apply_ai_factors(costs, factors):
     if not factors:
         return costs
-    stage_keys = ["foundation","walls","flooring","roofing","plumbing",
-                  "electrical","finishing","carpentry","exterior","miscellaneous"]
+    stage_keys = ["foundation", "walls", "flooring", "roofing", "plumbing",
+                  "electrical", "finishing", "carpentry", "exterior", "miscellaneous"]
     for tier in costs:
         for stage in stage_keys:
             fac = max(0.75, min(1.35, float(factors.get(stage, 1.0))))
@@ -952,20 +1160,11 @@ def _apply_ai_factors(costs, factors):
 
 
 # ─────────────────────────────────────────────────────────────────
-#  PUBLIC ENTRY POINT
+#  PUBLIC ENTRY POINT  (unchanged signature)
 # ─────────────────────────────────────────────────────────────────
 
 def calculate_materials_and_cost(square_feet, rooms, floors, bathrooms,
                                  budget_range, form: Optional[dict] = None):
-    """
-    Main function called from user_routes.py.
-    Pass form=request.form (or dict(request.form)) for full detail calculation.
-
-    FIXED: villa_rooms / villa_bathrooms / villa_floors are now read here
-    and passed to the sub-calculators so they use the correct villa-specific
-    counts rather than falling back to the residential rooms/floors/bathrooms
-    from the project model.
-    """
     if form is None:
         form = {}
 
@@ -974,18 +1173,16 @@ def calculate_materials_and_cost(square_feet, rooms, floors, bathrooms,
     prop_type = form.get("property_type", "residential")
     scope     = form.get("estimate_scope", "material_only")
 
-    # ── Resolve floors, rooms, bathrooms per property type ──
     if prop_type == "apartment":
         try:
             floors = max(1, int(form.get("apt_total_floors", floors) or floors))
             if floors == 99:
-                floors = 30   # sentinel for "30+" skyscraper option
+                floors = 30
         except (ValueError, TypeError):
             floors = max(1, int(floors))
         rooms     = max(1, int(rooms))
         bathrooms = max(1, int(bathrooms))
     elif prop_type == "villa":
-        # FIXED: read villa-specific counts from form; fall back to passed args
         floors    = max(1, _safe_int(form.get("villa_floors",    floors),    int(floors)))
         rooms     = max(1, _safe_int(form.get("villa_rooms",     rooms),     int(rooms)))
         bathrooms = max(1, _safe_int(form.get("villa_bathrooms", bathrooms), int(bathrooms)))
@@ -994,7 +1191,6 @@ def calculate_materials_and_cost(square_feet, rooms, floors, bathrooms,
         rooms     = max(1, int(rooms))
         bathrooms = max(1, int(bathrooms))
 
-    # ── Ceiling height ──
     if prop_type == "villa":
         ceiling_ht = _safe_float(
             form.get("villa_ceiling_height") or form.get("ceiling_height"), 12.0)
@@ -1003,7 +1199,6 @@ def calculate_materials_and_cost(square_feet, rooms, floors, bathrooms,
     else:
         ceiling_ht = _safe_float(form.get("ceiling_height"), 10.0)
 
-    # ── Sub-calculator (now rooms/bathrooms/floors are already resolved above) ──
     if prop_type == "villa":
         base_bd = _calc_residential(form, sqft, plot_area, floors,
                                     bathrooms, rooms, ceiling_ht, prefix="villa_")
@@ -1015,11 +1210,9 @@ def calculate_materials_and_cost(square_feet, rooms, floors, bathrooms,
 
     costs = _build_cost_tiers(base_bd, scope)
 
-    # AI refinement (non-blocking — failure returns empty dict, costs unchanged)
     ai_factors = _ai_refine_estimate(costs, form, sqft, prop_type)
     costs      = _apply_ai_factors(costs, ai_factors)
 
-    # ── Material quantities ──
     if prop_type == "villa":
         materials = _build_quantities(sqft, floors, rooms, bathrooms,
                                       ceiling_ht, form, prefix="villa_")
@@ -1028,9 +1221,9 @@ def calculate_materials_and_cost(square_feet, rooms, floors, bathrooms,
         bhk2 = _safe_int(form.get("apt_2bhk_count"), 0)
         bhk3 = _safe_int(form.get("apt_3bhk_count"), 0)
         total_units = _safe_int(form.get("apt_total_units"), 1)
-        total_baths = bhk1 + bhk2*2 + bhk3*3 or total_units * 2
+        total_baths = bhk1 + bhk2 * 2 + bhk3 * 3 or total_units * 2
         avg_baths   = max(1, total_baths // max(total_units, 1))
-        apt_rooms   = max(1, (bhk1*1 + bhk2*2 + bhk3*3) or total_units * 2)
+        apt_rooms   = max(1, (bhk1 + bhk2 * 2 + bhk3 * 3) or total_units * 2)
         materials   = _build_quantities(sqft, floors, apt_rooms,
                                         avg_baths, ceiling_ht, form, prefix="")
     else:

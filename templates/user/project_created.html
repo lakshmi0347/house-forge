@@ -3,167 +3,634 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Created - House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>{{ project.title }} — Estimate Ready · House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root{--cream:#FAF8F5;--warm-white:#FFFFFF;--sand:#F0EBE3;--stone:#E2D9CE;--accent:#B5804F;--accent-dark:#8C5E35;--accent-light:#F7EDE2;--text-primary:#1C1917;--text-secondary:#6B5E52;--text-muted:#9C8E84;--shadow-sm:0 1px 3px rgba(28,25,23,0.06);--shadow-md:0 4px 16px rgba(28,25,23,0.08);--shadow-lg:0 12px 40px rgba(28,25,23,0.10);}
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;color:var(--text-primary);position:relative;}
-        body::before{content:'';position:fixed;inset:0;background:url('/static/images/house.jpg') no-repeat center/cover;opacity:0.08;z-index:0;pointer-events:none;}
+        :root {
+            --cream: #FAF8F5;
+            --warm-white: #FFFFFF;
+            --sand: #F0EBE3;
+            --stone: #E2D9CE;
+            --accent: #B5804F;
+            --accent-dark: #8C5E35;
+            --accent-light: #F7EDE2;
+            --text-primary: #1C1917;
+            --text-secondary: #6B5E52;
+            --text-muted: #9C8E84;
+            --shadow-sm: 0 1px 3px rgba(28,25,23,0.06);
+            --shadow-md: 0 4px 16px rgba(28,25,23,0.08);
+            --shadow-lg: 0 12px 40px rgba(28,25,23,0.12);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; color: var(--text-primary); }
 
-        .container{max-width:960px;margin:40px auto;padding:0 24px;position:relative;z-index:1;}
+        /* ─── HERO ─── */
+        .hero {
+            background: linear-gradient(135deg, #1C1917 0%, #3D2B1F 45%, #1C1917 100%);
+            padding: 48px 40px 56px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -80px; left: 50%;
+            transform: translateX(-50%);
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(181,128,79,0.18) 0%, transparent 65%);
+            pointer-events: none;
+        }
+        .hero-icon { font-size: 64px; display: block; margin-bottom: 16px; animation: bounceIn 0.8s cubic-bezier(.36,.07,.19,.97); }
+        @keyframes bounceIn { 0%{transform:scale(0.3);opacity:0} 50%{transform:scale(1.1)} 70%{transform:scale(0.92)} 100%{transform:scale(1);opacity:1} }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 800; color: #F7EDE2; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .hero-sub { color: rgba(247,237,226,0.6); font-size: 14px; }
+        .hero-divider { width: 48px; height: 3px; background: var(--accent); border-radius: 2px; margin: 14px auto; }
+        .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+        .hero-badge { background: rgba(247,237,226,0.1); border: 1px solid rgba(247,237,226,0.2); color: rgba(247,237,226,0.8); padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .hero-badge.accent { background: var(--accent); border-color: var(--accent); color: white; }
 
-        /* SUCCESS BANNER */
-        .success-banner{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:36px 40px;margin-bottom:24px;box-shadow:var(--shadow-md);text-align:center;position:relative;overflow:hidden;}
-        .success-banner::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,var(--accent-light),transparent 70%);pointer-events:none;}
-        .success-icon{font-size:64px;display:block;margin-bottom:14px;animation:bounceIn 0.8s cubic-bezier(.36,.07,.19,.97);}
-        @keyframes bounceIn{0%{transform:scale(0.3);opacity:0}50%{transform:scale(1.1)}70%{transform:scale(0.9)}100%{transform:scale(1);opacity:1}}
-        .success-banner h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--text-primary);margin-bottom:8px;}
-        .success-banner p{color:var(--text-secondary);font-size:14px;}
-        .divider{width:40px;height:3px;background:var(--accent);border-radius:2px;margin:12px auto;}
+        /* ─── COST TIER STRIP ─── */
+        .cost-strip { background: var(--warm-white); border-bottom: 1px solid var(--stone); }
+        .cost-strip-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 1fr; }
+        .ctb { padding: 24px 28px; text-align: center; border-right: 1px solid var(--stone); transition: background 0.2s; }
+        .ctb:last-child { border-right: none; }
+        .ctb.active { background: var(--accent); color: white; }
+        .ctb-icon { font-size: 26px; display: block; margin-bottom: 8px; }
+        .ctb-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 6px; }
+        .ctb.active .ctb-lbl { color: rgba(255,255,255,0.7); }
+        .ctb-tot { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; color: var(--text-primary); line-height: 1; margin-bottom: 8px; }
+        .ctb.active .ctb-tot { color: white; }
+        .ctb-det { font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+        .ctb.active .ctb-det { color: rgba(255,255,255,0.65); }
+        .ctb-sqft { margin-top: 8px; font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-light); padding: 3px 10px; border-radius: 20px; display: inline-block; }
+        .ctb.active .ctb-sqft { background: rgba(255,255,255,0.2); color: white; }
 
-        /* CARDS */
-        .card{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:28px 32px;margin-bottom:20px;box-shadow:var(--shadow-sm);}
-        .section-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--text-primary);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--sand);}
+        /* ─── LAYOUT ─── */
+        .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 24px 56px; display: grid; grid-template-columns: 1fr 308px; gap: 24px; align-items: start; }
+        @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } .cost-strip-inner { grid-template-columns: 1fr; } .ctb { border-right: none; border-bottom: 1px solid var(--stone); } .ctb:last-child { border-bottom: none; } }
 
-        /* PROJECT INFO */
-        .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-        @media(max-width:600px){.info-grid{grid-template-columns:repeat(2,1fr);}}
-        .info-chip{display:flex;align-items:center;gap:8px;background:var(--sand);border:1px solid var(--stone);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text-secondary);font-weight:500;}
+        /* ─── CARD ─── */
+        .card { background: var(--warm-white); border: 1px solid var(--stone); border-radius: 16px; padding: 26px 30px; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+        .sec-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--sand); display: flex; align-items: center; justify-content: space-between; }
+        .sec-badge { font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; background: var(--accent-light); color: var(--accent); padding: 3px 8px; border-radius: 20px; }
 
-        /* COST CARDS */
-        .cost-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-        @media(max-width:600px){.cost-grid{grid-template-columns:1fr;}}
-        .cost-card{padding:24px 20px;border:1.5px solid var(--stone);background:var(--sand);border-radius:12px;text-align:center;transition:all 0.25s;}
-        .cost-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);}
-        .cost-card.selected{border-color:var(--accent);background:var(--accent);color:white;transform:scale(1.03);box-shadow:0 8px 24px rgba(181,128,79,0.3);}
-        .cost-icon{font-size:32px;margin-bottom:8px;display:block;}
-        .cost-tier{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;opacity:0.8;margin-bottom:6px;}
-        .cost-amount{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:8px;}
-        .cost-details{font-size:12px;opacity:0.75;line-height:1.6;}
+        /* ─── METRICS ─── */
+        .metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+        @media (max-width:600px) { .metrics { grid-template-columns: 1fr 1fr; } }
+        .metric { background: var(--warm-white); border: 1px solid var(--stone); border-radius: 12px; padding: 16px 14px; text-align: center; box-shadow: var(--shadow-sm); }
+        .m-icon { font-size: 22px; display: block; margin-bottom: 6px; }
+        .m-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+        .m-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 4px; }
 
-        /* TIMELINE */
-        .timeline-card{background:linear-gradient(135deg,var(--accent-light),#FEF3C7);border:1px solid rgba(181,128,79,0.2);border-radius:14px;padding:24px 28px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
-        .timeline-left{flex:1;}
-        .timeline-label{font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px;}
-        .timeline-days{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--accent);line-height:1;}
-        .timeline-months{font-size:14px;color:var(--text-secondary);margin-top:4px;}
-        .timeline-icon{font-size:48px;opacity:0.5;}
+        /* ─── HIGHLIGHTS GRID ─── */
+        .hgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+        @media (max-width:600px) { .hgrid { grid-template-columns: 1fr 1fr; } }
+        .hchip { background: var(--sand); border: 1px solid var(--stone); border-radius: 10px; padding: 11px 13px; display: flex; align-items: center; gap: 9px; }
+        .hc-ico { font-size: 20px; flex-shrink: 0; }
+        .hc-qty { font-size: 14px; font-weight: 700; color: var(--text-primary); line-height: 1.1; }
+        .hc-lbl { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
 
-        /* STAGES GRID */
-        .stages-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
-        @media(max-width:600px){.stages-grid{grid-template-columns:1fr;}}
-        .stage-card{padding:18px 20px;border:1px solid var(--stone);background:var(--cream);border-radius:10px;transition:all 0.2s;}
-        .stage-card:hover{border-color:var(--accent);background:var(--accent-light);}
-        .stage-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-        .stage-name{font-size:14px;font-weight:600;color:var(--text-primary);}
-        .stage-cost{font-size:14px;font-weight:700;color:var(--accent);}
-        .stage-count{font-size:12px;color:var(--text-muted);}
+        /* ─── STAGE ACCORDION ─── */
+        .sacc { border: 1.5px solid var(--stone); border-radius: 12px; overflow: hidden; margin-bottom: 10px; transition: border-color 0.2s; }
+        .sacc:hover { border-color: rgba(181,128,79,0.35); }
+        .sh { padding: 14px 18px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; background: var(--cream); transition: background 0.2s; user-select: none; }
+        .sh:hover { background: var(--sand); }
+        .sh.open  { background: var(--accent); }
+        .sh-l { display: flex; align-items: center; gap: 11px; }
+        .sh-ico { font-size: 22px; }
+        .sh-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .sh.open .sh-name { color: white; }
+        .sh-sub  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .sh.open .sh-sub  { color: rgba(255,255,255,0.65); }
+        .sh-r { display: flex; align-items: center; gap: 12px; }
+        .sh-bar-w { width: 72px; height: 4px; background: rgba(0,0,0,0.08); border-radius: 2px; overflow: hidden; }
+        .sh-bar   { height: 100%; border-radius: 2px; background: var(--accent); }
+        .sh.open .sh-bar { background: rgba(255,255,255,0.45); }
+        .sh-cost  { font-size: 14px; font-weight: 700; color: var(--accent); min-width: 64px; text-align: right; }
+        .sh.open .sh-cost { color: white; }
+        .sh-arr   { font-size: 11px; color: var(--text-muted); transition: transform 0.3s; }
+        .sh.open .sh-arr  { transform: rotate(180deg); color: white; }
+        .sb { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+        .sb.open { max-height: 1400px; }
+        .mat-wrap { padding: 14px 18px 18px; }
+        .mat-tbl { width: 100%; border-collapse: collapse; }
+        .mat-tbl th { padding: 8px 11px; text-align: left; background: var(--sand); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); }
+        .mat-tbl th:first-child { border-radius: 6px 0 0 6px; } .mat-tbl th:last-child { border-radius: 0 6px 6px 0; }
+        .mat-tbl td { padding: 8px 11px; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--sand); }
+        .mat-tbl tr:last-child td { border-bottom: none; }
+        .mat-tbl tr:hover td { background: var(--cream); }
+        .mat-qty  { font-weight: 700; color: var(--text-primary); }
+        .mat-unit { font-size: 11px; color: var(--text-muted); }
 
-        /* ACTIONS */
-        .actions{display:flex;gap:14px;margin-top:4px;}
-        .btn-primary{flex:1;padding:14px 24px;background:var(--accent);color:white;border:none;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;transition:all 0.2s;text-decoration:none;text-align:center;font-family:'DM Sans',sans-serif;}
-        .btn-primary:hover{background:var(--accent-dark);transform:translateY(-2px);box-shadow:0 6px 20px rgba(181,128,79,0.3);}
-        .btn-secondary{flex:1;padding:14px 24px;background:var(--sand);color:var(--text-secondary);border:1.5px solid var(--stone);border-radius:10px;font-weight:600;font-size:15px;text-decoration:none;text-align:center;transition:all 0.2s;}
-        .btn-secondary:hover{background:var(--stone);}
+        /* ─── TIMELINE ─── */
+        .tl-card { background: linear-gradient(135deg, var(--accent-light), #FEF3C7); border: 1px solid rgba(181,128,79,0.2); border-radius: 14px; padding: 22px 24px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 20px; }
+        .tl-big { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: var(--accent); line-height: 1; }
+        .tl-sub { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+        .tl-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 6px; }
+        .tl-stages { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 3px 14px; }
+        .tl-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); padding: 3px 0; }
+        .tl-row-d { font-weight: 700; color: var(--text-primary); }
 
-        @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-        .success-banner{animation:fadeUp 0.5s ease both;}
-        .card{animation:fadeUp 0.5s 0.1s ease both;}
+        /* ─── AI BLOCK ─── */
+        .ai-blk { background: linear-gradient(90deg,#EFF6FF,#DBEAFE); border: 1px solid #BFDBFE; border-radius: 12px; padding: 16px 18px; margin-bottom: 20px; display: flex; gap: 13px; }
+        .ai-ico  { font-size: 22px; flex-shrink: 0; }
+        .ai-ttl  { font-size: 11px; font-weight: 700; color: #1E40AF; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ai-txt  { font-size: 13px; color: #1D4ED8; line-height: 1.6; }
+        .conf-row{ display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+        .conf-lbl{ font-size: 11px; font-weight: 600; color: #1E40AF; }
+        .cdots   { display: flex; gap: 3px; }
+        .cdot    { width: 9px; height: 9px; border-radius: 50%; background: #BFDBFE; }
+        .cdot.on { background: #2563EB; }
+
+        /* ─── BUDGET COMPARISON ─── */
+        .bcomp { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .bcomp th { padding: 9px 13px; text-align: left; background: var(--sand); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); }
+        .bcomp th:first-child { border-radius: 6px 0 0 6px; } .bcomp th:last-child { border-radius: 0 6px 6px 0; }
+        .bcomp td { padding: 9px 13px; color: var(--text-secondary); border-bottom: 1px solid var(--sand); }
+        .bcomp tr:last-child td { border-bottom: none; }
+        .bcomp tr.sel td { background: var(--accent-light); font-weight: 700; color: var(--text-primary); }
+        .bcomp td.amt { font-weight: 700; color: var(--text-primary); }
+
+        /* ─── PROP BANNER ─── */
+        .prop-ban { border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; }
+        .prop-ban.residential { background: var(--sand); border: 1px solid var(--stone); }
+        .prop-ban.villa       { background: linear-gradient(90deg,#FEF3C7,#FFF8F0); border: 1px solid #FDE68A; }
+        .prop-ban.apartment   { background: linear-gradient(90deg,#EFF6FF,#F0F9FF); border: 1px solid #BFDBFE; }
+        .pb-ico { font-size: 30px; }
+        .pb-h   { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+        .pb-sub { font-size: 11px; color: var(--text-muted); }
+
+        /* ─── SIDEBAR ─── */
+        .scard { background: var(--warm-white); border: 1px solid var(--stone); border-radius: 16px; padding: 22px 24px; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+        .stitle { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--sand); }
+        .irow { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--sand); }
+        .irow:last-child { border-bottom: none; }
+        .ilbl { font-size: 12px; color: var(--text-muted); font-weight: 500; flex-shrink: 0; margin-right: 8px; }
+        .ival { font-size: 12px; font-weight: 700; color: var(--text-primary); text-align: right; }
+        .loc-b { background: var(--sand); border: 1px solid var(--stone); border-radius: 8px; padding: 11px 13px; margin-top: 13px; }
+        .loc-bl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 7px; }
+        .loc-ln { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+        .loc-ln strong { color: var(--text-primary); font-weight: 700; }
+
+        /* Stage mini in sidebar */
+        .sml { display: flex; flex-direction: column; }
+        .smr { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--sand); }
+        .smr:last-child { border-bottom: none; }
+        .sm-ico { font-size: 13px; width: 18px; text-align: center; flex-shrink: 0; }
+        .sm-lbl { font-size: 11px; color: var(--text-secondary); flex: 0 0 70px; font-weight: 500; }
+        .sm-bw  { flex: 1; height: 4px; background: var(--sand); border-radius: 2px; overflow: hidden; }
+        .sm-bar { height: 100%; border-radius: 2px; background: var(--accent); }
+        .sm-amt { font-size: 11px; font-weight: 700; color: var(--text-primary); width: 52px; text-align: right; flex-shrink: 0; }
+
+        /* Scope pills */
+        .sco { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+        .sco-mat  { background: var(--accent-light); color: var(--accent); }
+        .sco-full { background: #DCFCE7; color: #166534; }
+        .sco-vil  { background: #FEF3C7; color: #92400E; }
+        .sco-apt  { background: #DBEAFE; color: #1E40AF; }
+        .sco-res  { background: var(--sand); color: var(--text-secondary); }
+
+        /* Action buttons */
+        .agrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-p { padding: 12px 16px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer; text-decoration: none; text-align: center; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; font-family: 'DM Sans', sans-serif; }
+        .btn-p:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 5px 16px rgba(181,128,79,0.3); }
+        .btn-p.full { grid-column: 1/-1; }
+        .btn-o { padding: 11px 14px; background: transparent; color: var(--accent); border: 1.5px solid rgba(181,128,79,0.45); border-radius: 10px; font-weight: 600; font-size: 13px; text-decoration: none; text-align: center; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-o:hover { background: var(--accent-light); border-color: var(--accent); }
+        .btn-o.full { grid-column: 1/-1; }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+        .hero      { animation: fadeUp 0.4s ease both; }
+        .cost-strip{ animation: fadeUp 0.4s 0.08s ease both; }
+        .wrap      { animation: fadeUp 0.4s 0.15s ease both; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Success Banner -->
-        <div class="success-banner">
-            <span class="success-icon">✅</span>
-            <h1>Project Created Successfully!</h1>
-            <div class="divider"></div>
-            <p>Complete construction estimation with {{ estimation.total_materials_count }}+ materials calculated</p>
+
+<!-- HERO -->
+<div class="hero">
+    <span class="hero-icon">✅</span>
+    <h1>Estimation Complete!</h1>
+    <div class="hero-divider"></div>
+    <p class="hero-sub">
+        {{ project.title }}
+        &nbsp;·&nbsp; {{ project.square_feet | int }} sq ft
+        &nbsp;·&nbsp; {{ (project.property_type or 'residential') | title }}
+    </p>
+    <div class="hero-badges">
+        <span class="hero-badge accent">
+            {% if (project.estimate_scope or '') == 'material_and_labour' %}👷 Material + Labour{% else %}📦 Material Only{% endif %}
+        </span>
+        <span class="hero-badge">{{ estimation.total_materials_count }}+ materials</span>
+        {% if estimation.get('ai_rationale') %}<span class="hero-badge">🤖 AI-refined</span>{% endif %}
+        {% if estimation.get('ai_confidence') %}<span class="hero-badge">Confidence {{ estimation.ai_confidence }}/10</span>{% endif %}
+    </div>
+</div>
+
+<!-- COST TIER STRIP -->
+{% set budget = (project.budget_range or 'medium') | lower %}
+{% set scope  = project.estimate_scope or 'material_only' %}
+{% set sqf    = project.square_feet | float or 1 %}
+
+<div class="cost-strip">
+    <div class="cost-strip-inner">
+        {% for tk, ti, tl in [('low','💵','Budget'),('medium','💰','Standard'),('high','💎','Premium')] %}
+        {% set tc = estimation.costs.get(tk, {}) %}
+        {% set tv = tc.get('total_cost', 0) %}
+        <div class="ctb {% if tk == budget %}active{% endif %}">
+            <span class="ctb-icon">{{ ti }}</span>
+            <div class="ctb-lbl">{{ tl }}</div>
+            <div class="ctb-tot">
+                {% if tv >= 10000000 %}₹{{ "%.2f"|format(tv/10000000) }} Cr
+                {% elif tv >= 100000  %}₹{{ "%.1f"|format(tv/100000)  }} L
+                {% else %}₹{{ "{:,.0f}".format(tv) }}{% endif %}
+            </div>
+            <div class="ctb-det">
+                Materials: ₹{{ "{:,.0f}".format(tc.get('material_cost',0)) }}<br>
+                {% if scope == 'material_and_labour' %}Labour: ₹{{ "{:,.0f}".format(tc.get('labor_cost',0)) }}<br>{% endif %}
+                Other: ₹{{ "{:,.0f}".format(tc.get('other_costs',0)) }}
+            </div>
+            <span class="ctb-sqft">₹{{ "{:,.0f}".format((tv / sqf) | round) }}/sqft</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- BODY -->
+{% set stage_defs = [
+    ('foundation',    '🏗️', 'Foundation',    'Footings, anti-termite, waterproofing, concrete'),
+    ('walls',         '🧱', 'Masonry & Walls','Bricks/blocks, plaster, doors, windows'),
+    ('flooring',      '🪵', 'Flooring & Slab','Slab, steel, floor tiles, bathroom tiles'),
+    ('roofing',       '🏠', 'Roofing',        'Roof slab, staircase, waterproofing'),
+    ('plumbing',      '🚰', 'Plumbing',        'Pipes, sanitary ware, water storage'),
+    ('electrical',    '⚡', 'Electrical',      'Wiring, switchboards, AC points, earthing'),
+    ('finishing',     '🎨', 'Finishing',       'Paint, primer, false ceiling, putty'),
+    ('carpentry',     '🪑', 'Carpentry & Kitchen','Kitchen platform, wardrobes, furniture'),
+    ('exterior',      '🌿', 'Exterior',        'Car porch, garden, boundary wall, pool'),
+    ('miscellaneous', '🔧', 'Miscellaneous',   'Safety equipment, binding wire, contingency'),
+] %}
+<div class="wrap">
+
+    <!-- LEFT COLUMN -->
+    <div>
+
+        <!-- Property banner -->
+        {% set prop_type = project.property_type or 'residential' %}
+        <div class="prop-ban {{ prop_type }}">
+            {% if prop_type == 'villa' %}
+                <span class="pb-ico">🏰</span>
+                <div><div class="pb-h">Villa Construction Estimate</div>
+                <div class="pb-sub">{{ project.floors or 2 }} floors · {{ project.rooms or 5 }} rooms · {{ project.bathrooms or 3 }} bathrooms · Luxury specs</div></div>
+            {% elif prop_type == 'apartment' %}
+                <span class="pb-ico">🏢</span>
+                <div><div class="pb-h">Apartment Building Estimate</div>
+                <div class="pb-sub">{{ project.floors or 5 }} floors · {{ project.rooms or 20 }} units · Multi-unit residential</div></div>
+            {% else %}
+                <span class="pb-ico">🏠</span>
+                <div><div class="pb-h">Residential Construction Estimate</div>
+                <div class="pb-sub">{{ project.floors or 2 }} floors · {{ project.rooms or 3 }} rooms · {{ project.bathrooms or 2 }} bathrooms</div></div>
+            {% endif %}
         </div>
 
-        <!-- Project Info -->
-        <div class="card">
-            <div class="section-title">🏗️ {{ project.title }}</div>
-            <div class="info-grid">
-                <div class="info-chip"><span>📏</span>{{ project.square_feet }} sq ft</div>
-                <div class="info-chip"><span>📍</span>{{ project.location }}</div>
-                <div class="info-chip"><span>🚪</span>{{ project.rooms }} Rooms</div>
-                <div class="info-chip"><span>🏢</span>{{ project.floors }} Floors</div>
-                <div class="info-chip"><span>🚿</span>{{ project.bathrooms }} Bathrooms</div>
-                <div class="info-chip"><span>🏘️</span>{{ project.property_type.title() }}</div>
+        <!-- Key metrics -->
+        {% set sel = estimation.costs.get(budget, estimation.costs.get('medium', {})) %}
+        {% set tot = sel.get('total_cost', 0) %}
+        <div class="metrics">
+            <div class="metric">
+                <span class="m-icon">💰</span>
+                <div class="m-val">
+                    {% if tot >= 10000000 %}₹{{ "%.2f"|format(tot/10000000) }}Cr
+                    {% elif tot >= 100000  %}₹{{ "%.1f"|format(tot/100000)  }}L
+                    {% else %}₹{{ "{:,.0f}".format(tot) }}{% endif %}
+                </div>
+                <div class="m-lbl">Total ({{ budget | title }})</div>
+            </div>
+            <div class="metric">
+                <span class="m-icon">📐</span>
+                <div class="m-val">₹{{ "{:,.0f}".format((tot / sqf) | round) }}</div>
+                <div class="m-lbl">Per Sq Ft</div>
+            </div>
+            <div class="metric">
+                <span class="m-icon">⏱️</span>
+                <div class="m-val">{{ estimation.timeline.get('total_days', 0) | int }}</div>
+                <div class="m-lbl">Days to Build</div>
+            </div>
+            <div class="metric">
+                <span class="m-icon">📦</span>
+                <div class="m-val">{{ estimation.total_materials_count }}+</div>
+                <div class="m-lbl">Material Items</div>
             </div>
         </div>
 
-        <!-- Cost Estimates -->
+        <!-- AI rationale -->
+        {% if estimation.get('ai_rationale') %}
+        <div class="ai-blk">
+            <span class="ai-ico">🤖</span>
+            <div>
+                <div class="ai-ttl">AI Cost Refinement Applied</div>
+                <div class="ai-txt">{{ estimation.ai_rationale }}</div>
+                {% if estimation.get('ai_confidence') %}
+                <div class="conf-row">
+                    <span class="conf-lbl">Confidence</span>
+                    <div class="cdots">
+                        {% for i in range(1,11) %}<div class="cdot {% if i <= estimation.ai_confidence | int %}on{% endif %}"></div>{% endfor %}
+                    </div>
+                    <span style="font-size:11px;color:#1E40AF;font-weight:700;">{{ estimation.ai_confidence }}/10</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Key material highlights -->
+        {% set fm = estimation.materials %}
+        {% set cement_total = (
+            (fm.get('foundation',{}).get('cement_bags',0) or 0) +
+            (fm.get('walls',     {}).get('cement_bags',0) or 0) +
+            (fm.get('flooring',  {}).get('cement_bags',0) or 0) +
+            (fm.get('roofing',   {}).get('cement_bags',0) or 0)
+        ) | round | int %}
+        {% set steel_total = (
+            (fm.get('foundation',{}).get('steel_kg',0) or 0) +
+            (fm.get('flooring',  {}).get('steel_kg',0) or 0) +
+            (fm.get('roofing',   {}).get('steel_kg',0) or 0)
+        ) | round | int %}
+
         <div class="card">
-            <div class="section-title">💰 Total Cost Estimation</div>
-            <div class="cost-grid">
-                <div class="cost-card {% if project.budget_range == 'low' %}selected{% endif %}">
-                    <span class="cost-icon">💵</span>
-                    <div class="cost-tier">Budget</div>
-                    <div class="cost-amount">₹{{ "{:,.0f}".format(estimation.costs.low.total_cost) }}</div>
-                    <div class="cost-details">Materials: ₹{{ "{:,.0f}".format(estimation.costs.low.material_cost) }}<br>Labour: ₹{{ "{:,.0f}".format(estimation.costs.low.labor_cost) }}</div>
+            <div class="sec-title">🧮 Key Material Quantities <span class="sec-badge">Quick Reference</span></div>
+            <div class="hgrid">
+                {% if cement_total > 0 %}
+                <div class="hchip"><span class="hc-ico">🏗️</span><div><div class="hc-qty">{{ "{:,}".format(cement_total) }}</div><div class="hc-lbl">Cement Bags (50 kg)</div></div></div>
+                {% endif %}
+                {% if steel_total > 0 %}
+                <div class="hchip"><span class="hc-ico">🔩</span><div><div class="hc-qty">{{ "{:,}".format(steel_total) }} kg</div><div class="hc-lbl">TMT Steel</div></div></div>
+                {% endif %}
+                {% if fm.get('walls',{}).get('bricks_or_blocks',0) %}
+                <div class="hchip"><span class="hc-ico">🧱</span><div><div class="hc-qty">{{ "{:,}".format(fm.get('walls',{}).get('bricks_or_blocks',0) | int) }}</div><div class="hc-lbl">Bricks / Blocks</div></div></div>
+                {% endif %}
+                {% if fm.get('flooring',{}).get('floor_tiles_sqft',0) %}
+                <div class="hchip"><span class="hc-ico">🏠</span><div><div class="hc-qty">{{ "{:,}".format(fm.get('flooring',{}).get('floor_tiles_sqft',0) | round | int) }} sqft</div><div class="hc-lbl">Floor Tiles</div></div></div>
+                {% endif %}
+                {% if fm.get('flooring',{}).get('bathroom_wall_tiles_sqft',0) %}
+                <div class="hchip"><span class="hc-ico">🚿</span><div><div class="hc-qty">{{ "{:,}".format(fm.get('flooring',{}).get('bathroom_wall_tiles_sqft',0) | round | int) }} sqft</div><div class="hc-lbl">Bathroom Tiles</div></div></div>
+                {% endif %}
+                {% if fm.get('finishing',{}).get('interior_paint_liters',0) %}
+                <div class="hchip"><span class="hc-ico">🎨</span><div><div class="hc-qty">{{ "{:,}".format(fm.get('finishing',{}).get('interior_paint_liters',0) | round | int) }} L</div><div class="hc-lbl">Interior Paint</div></div></div>
+                {% endif %}
+                {% if fm.get('finishing',{}).get('exterior_paint_liters',0) %}
+                <div class="hchip"><span class="hc-ico">🖌️</span><div><div class="hc-qty">{{ "{:,}".format(fm.get('finishing',{}).get('exterior_paint_liters',0) | round | int) }} L</div><div class="hc-lbl">Exterior Paint</div></div></div>
+                {% endif %}
+                {% if fm.get('plumbing',{}).get('cpvc_pipes_meters',0) %}
+                <div class="hchip"><span class="hc-ico">🔧</span><div><div class="hc-qty">{{ "{:,}".format(fm.get('plumbing',{}).get('cpvc_pipes_meters',0) | round | int) }} m</div><div class="hc-lbl">CPVC Pipes</div></div></div>
+                {% endif %}
+                {% if fm.get('electrical',{}).get('wiring_meters',0) %}
+                <div class="hchip"><span class="hc-ico">⚡</span><div><div class="hc-qty">{{ "{:,}".format(fm.get('electrical',{}).get('wiring_meters',0) | round | int) }} m</div><div class="hc-lbl">Electrical Wiring</div></div></div>
+                {% endif %}
+                {% if fm.get('finishing',{}).get('false_ceiling_sqft',0) %}
+                <div class="hchip"><span class="hc-ico">🪟</span><div><div class="hc-qty">{{ "{:,}".format(fm.get('finishing',{}).get('false_ceiling_sqft',0) | round | int) }} sqft</div><div class="hc-lbl">False Ceiling</div></div></div>
+                {% endif %}
+                {% if fm.get('plumbing',{}).get('toilets',0) %}
+                <div class="hchip"><span class="hc-ico">🚽</span><div><div class="hc-qty">{{ fm.get('plumbing',{}).get('toilets',0) }} sets</div><div class="hc-lbl">Sanitary Sets</div></div></div>
+                {% endif %}
+                {% if fm.get('carpentry',{}).get('wardrobes',0) %}
+                <div class="hchip"><span class="hc-ico">🪑</span><div><div class="hc-qty">{{ fm.get('carpentry',{}).get('wardrobes',0) }}</div><div class="hc-lbl">Wardrobes</div></div></div>
+                {% endif %}
+                {% if fm.get('electrical',{}).get('fans',0) %}
+                <div class="hchip"><span class="hc-ico">🌀</span><div><div class="hc-qty">{{ fm.get('electrical',{}).get('fans',0) }}</div><div class="hc-lbl">Fan Points</div></div></div>
+                {% endif %}
+                {% if fm.get('electrical',{}).get('lights',0) %}
+                <div class="hchip"><span class="hc-ico">💡</span><div><div class="hc-qty">{{ fm.get('electrical',{}).get('lights',0) }}</div><div class="hc-lbl">Light Points</div></div></div>
+                {% endif %}
+                {% if fm.get('plumbing',{}).get('sump_liters',0) %}
+                <div class="hchip"><span class="hc-ico">💧</span><div><div class="hc-qty">{{ "{:,}".format(fm.get('plumbing',{}).get('sump_liters',0) | int) }} L</div><div class="hc-lbl">Sump Capacity</div></div></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Stages accordion -->
+        <div class="card">
+            <div class="sec-title">🏗️ Stages &amp; Bill of Quantities <span class="sec-badge">{{ budget | title }} Budget</span></div>
+
+            {% set stg = sel.get('stage_breakdown', {}) %}
+            {% set max_c = stg.values() | list | max if stg else 1 %}
+
+            {% for sk, sico, sname, sdesc in stage_defs %}
+            {% set sc = stg.get(sk, 0) %}
+            {% set sm = estimation.materials.get(sk, {}) %}
+            {% set bp = ((sc / max_c) * 100) | round | int if max_c > 0 else 0 %}
+            <div class="sacc">
+                <div class="sh" id="sh-{{ sk }}" onclick="tog('{{ sk }}')">
+                    <div class="sh-l">
+                        <span class="sh-ico">{{ sico }}</span>
+                        <div>
+                            <div class="sh-name">{{ sname }}</div>
+                            <div class="sh-sub">{{ sdesc }} · {{ sm | length }} items</div>
+                        </div>
+                    </div>
+                    <div class="sh-r">
+                        <div class="sh-bar-w"><div class="sh-bar" style="width:{{ bp }}%;"></div></div>
+                        <div class="sh-cost">
+                            {% if sc >= 100000 %}₹{{ "%.1f"|format(sc/100000) }}L
+                            {% else %}₹{{ "{:,.0f}".format(sc) }}{% endif %}
+                        </div>
+                        <span class="sh-arr">▼</span>
+                    </div>
                 </div>
-                <div class="cost-card {% if project.budget_range == 'medium' %}selected{% endif %}">
-                    <span class="cost-icon">💰</span>
-                    <div class="cost-tier">Standard</div>
-                    <div class="cost-amount">₹{{ "{:,.0f}".format(estimation.costs.medium.total_cost) }}</div>
-                    <div class="cost-details">Materials: ₹{{ "{:,.0f}".format(estimation.costs.medium.material_cost) }}<br>Labour: ₹{{ "{:,.0f}".format(estimation.costs.medium.labor_cost) }}</div>
-                </div>
-                <div class="cost-card {% if project.budget_range == 'high' %}selected{% endif %}">
-                    <span class="cost-icon">💎</span>
-                    <div class="cost-tier">Premium</div>
-                    <div class="cost-amount">₹{{ "{:,.0f}".format(estimation.costs.high.total_cost) }}</div>
-                    <div class="cost-details">Materials: ₹{{ "{:,.0f}".format(estimation.costs.high.material_cost) }}<br>Labour: ₹{{ "{:,.0f}".format(estimation.costs.high.labor_cost) }}</div>
+                <div class="sb" id="sb-{{ sk }}">
+                    <div class="mat-wrap">
+                        {% if sm %}
+                        <table class="mat-tbl">
+                            <thead><tr><th>Material</th><th>Quantity</th><th>Unit</th></tr></thead>
+                            <tbody>
+                                {% for mn, qty in sm.items() %}
+                                {% if qty is number and qty > 0 %}
+                                <tr>
+                                    <td>{{ mn.replace('_',' ').title() }}</td>
+                                    <td><span class="mat-qty">{{ "{:,.0f}".format(qty) }}</span></td>
+                                    <td><span class="mat-unit">
+                                        {% if 'bags' in mn %}bags (50 kg)
+                                        {% elif mn.endswith('_kg') or '_kg' in mn %}kg
+                                        {% elif 'cuft' in mn %}cu ft
+                                        {% elif 'sqft' in mn %}sq ft
+                                        {% elif 'meters' in mn %}m
+                                        {% elif 'liters' in mn %}litres
+                                        {% elif 'sheets' in mn %}sheets
+                                        {% elif 'blocks' in mn or 'bricks' in mn %}nos
+                                        {% else %}nos{% endif %}
+                                    </span></td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p style="font-size:13px;color:var(--text-muted);padding:4px 0;">No materials for this stage.</p>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
+            {% endfor %}
+        </div>
+
+        <!-- Budget comparison -->
+        <div class="card">
+            <div class="sec-title">💰 All Budget Tiers Compared</div>
+            <table class="bcomp">
+                <thead>
+                    <tr>
+                        <th>Tier</th><th>Materials</th>
+                        {% if scope == 'material_and_labour' %}<th>Labour</th>{% endif %}
+                        <th>Other</th><th>Total</th><th>₹/sqft</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tk, tl in [('low','💵 Budget'),('medium','💰 Standard'),('high','💎 Premium')] %}
+                    {% set t = estimation.costs.get(tk, {}) %}
+                    {% set tv = t.get('total_cost', 0) %}
+                    <tr {% if tk == budget %}class="sel"{% endif %}>
+                        <td>{{ tl }}</td>
+                        <td class="amt">₹{{ "{:,.0f}".format(t.get('material_cost',0)) }}</td>
+                        {% if scope == 'material_and_labour' %}<td class="amt">₹{{ "{:,.0f}".format(t.get('labor_cost',0)) }}</td>{% endif %}
+                        <td>₹{{ "{:,.0f}".format(t.get('other_costs',0)) }}</td>
+                        <td class="amt">
+                            {% if tv >= 10000000 %}₹{{ "%.2f"|format(tv/10000000) }} Cr
+                            {% elif tv >= 100000  %}₹{{ "%.1f"|format(tv/100000)  }} L
+                            {% else %}₹{{ "{:,.0f}".format(tv) }}{% endif %}
+                        </td>
+                        <td>₹{{ "{:,.0f}".format((tv / sqf) | round) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
         <!-- Timeline -->
-        <div class="timeline-card">
-            <div class="timeline-left">
-                <div class="timeline-label">⏱️ Estimated Timeline</div>
-                <div class="timeline-days">{{ estimation.timeline.total_days }} <span style="font-size:20px;color:var(--text-secondary);">days</span></div>
-                <div class="timeline-months">Approximately {{ (estimation.timeline.total_days / 30) | round(1) }} months to complete</div>
+        <div class="card">
+            <div class="sec-title">⏱️ Construction Timeline</div>
+            <div class="tl-card">
+                <div>
+                    <div class="tl-lbl">Total Duration</div>
+                    <div class="tl-big">{{ estimation.timeline.get('total_days',0) | int }}</div>
+                    <div class="tl-sub">≈ {{ ((estimation.timeline.get('total_days',0)) / 30) | round(1) }} months</div>
+                </div>
+                <div class="tl-stages">
+                    {% for sk, sn in [('foundation','Foundation'),('walls','Walls'),('flooring','Flooring'),('roofing','Roofing'),('plumbing','Plumbing'),('electrical','Electrical'),('finishing','Finishing'),('carpentry','Carpentry'),('exterior','Exterior')] %}
+                    {% set d = estimation.timeline.get(sk, 0) | int %}
+                    {% if d > 0 %}<div class="tl-row"><span>{{ sn }}</span><span class="tl-row-d">{{ d }}d</span></div>{% endif %}
+                    {% endfor %}
+                </div>
+                <span style="font-size:42px;opacity:0.35;">🏗️</span>
             </div>
-            <div class="timeline-icon">🏗️</div>
         </div>
 
-        <!-- Construction Stages -->
-        <div class="card">
-            <div class="section-title">🏗️ Construction Stages Breakdown</div>
-            <div class="stages-grid">
-                {% set stages = [
-                    ('🏗️','Foundation','foundation'),
-                    ('🧱','Walls','walls'),
-                    ('🪟','Flooring','flooring'),
-                    ('🏠','Roofing','roofing'),
-                    ('🚰','Plumbing','plumbing'),
-                    ('⚡','Electrical','electrical'),
-                    ('🎨','Finishing','finishing'),
-                    ('🪑','Carpentry','carpentry'),
-                    ('🌳','Exterior','exterior'),
-                    ('🔧','Miscellaneous','miscellaneous')
-                ] %}
-                {% for icon, name, key in stages %}
-                <div class="stage-card">
-                    <div class="stage-header">
-                        <div class="stage-name">{{ icon }} {{ name }}</div>
-                        <div class="stage-cost">₹{{ "{:,.0f}".format(estimation.costs[project.budget_range].stage_breakdown[key]) }}</div>
-                    </div>
-                    <div class="stage-count">{{ estimation.materials[key] | length }} materials</div>
+    </div><!-- end left -->
+
+    <!-- SIDEBAR -->
+    <div>
+        <!-- Actions -->
+        <div class="scard">
+            <div class="stitle">⚡ Next Steps</div>
+            <div class="agrid">
+                <a href="{{ url_for('viewer.building_3d_view', project_id=project_id) }}" class="btn-p full" target="_blank">🏗️ View 3D Model</a>
+                <a href="{{ url_for('user.download_pdf', project_id=project_id) }}" class="btn-p">📄 PDF Report</a>
+                <a href="{{ url_for('user.view_project', project_id=project_id) }}" class="btn-p">🔍 Full Detail</a>
+                <a href="{{ url_for('user.find_contractors') }}" class="btn-o full">🔨 Find Contractors</a>
+                <a href="{{ url_for('user.order_materials', project_id=project_id) }}" class="btn-o full">📦 Order Materials</a>
+                <a href="{{ url_for('user.create_project') }}" class="btn-o">＋ New Project</a>
+                <a href="{{ url_for('user.projects') }}" class="btn-o">📋 My Projects</a>
+            </div>
+        </div>
+
+        <!-- Project info -->
+        <div class="scard">
+            <div class="stitle">📋 Project Details</div>
+            <div class="irow"><span class="ilbl">Type</span><span class="ival"><span class="sco sco-{{ prop_type }}">{{ prop_type | title }}</span></span></div>
+            <div class="irow"><span class="ilbl">Scope</span><span class="ival">
+                <span class="sco {% if scope == 'material_and_labour' %}sco-full{% else %}sco-mat{% endif %}">
+                    {% if scope == 'material_and_labour' %}Mat + Labour{% else %}Mat Only{% endif %}
+                </span>
+            </span></div>
+            <div class="irow"><span class="ilbl">Area</span><span class="ival">{{ project.square_feet | int }} sqft</span></div>
+            {% if project.plot_area %}<div class="irow"><span class="ilbl">Plot</span><span class="ival">{{ project.plot_area | int }} sqft</span></div>{% endif %}
+            <div class="irow"><span class="ilbl">Rooms</span><span class="ival">{{ project.rooms }}</span></div>
+            <div class="irow"><span class="ilbl">Floors</span><span class="ival">{{ project.floors }}</span></div>
+            <div class="irow"><span class="ilbl">Bathrooms</span><span class="ival">{{ project.bathrooms }}</span></div>
+            <div class="irow"><span class="ilbl">Budget</span><span class="ival">{{ {'low':'Budget','medium':'Standard','high':'Premium'}.get(budget, budget | title) }}</span></div>
+            <div class="loc-b">
+                <div class="loc-bl">📍 Location</div>
+                <div class="loc-ln">
+                    {% if project.location_address %}<strong>{{ project.location_address }}</strong><br>{% endif %}
+                    {% if project.location_place %}{{ project.location_place }}{% if project.location_district %}, {{ project.location_district }}{% endif %}<br>{% elif project.location_district %}{{ project.location_district }}<br>{% endif %}
+                    {% if project.location_state %}{{ project.location_state }}{% if project.location_pin %} — {{ project.location_pin }}{% endif %}{% endif %}
+                    {% if not project.location_address and not project.location_place and not project.location_state %}{{ project.location or 'Not set' }}{% endif %}
                 </div>
+            </div>
+        </div>
+
+        <!-- Stage cost mini chart -->
+        <div class="scard">
+            <div class="stitle">📊 Cost by Stage</div>
+            {% set stg = sel.get('stage_breakdown', {}) %}
+            {% set mx  = stg.values() | list | max if stg else 1 %}
+            <div class="sml">
+                {% for sk, sico, sname, _ in stage_defs %}
+                {% set c = stg.get(sk, 0) %}
+                {% if c > 0 %}
+                <div class="smr">
+                    <span class="sm-ico">{{ sico }}</span>
+                    <span class="sm-lbl">{{ sname.split('&')[0].strip() }}</span>
+                    <div class="sm-bw"><div class="sm-bar" style="width:{{ ((c/mx)*100)|round|int }}%;"></div></div>
+                    <span class="sm-amt">{% if c >= 100000 %}₹{{ "%.1f"|format(c/100000) }}L{% else %}₹{{ "{:,.0f}".format(c) }}{% endif %}</span>
+                </div>
+                {% endif %}
                 {% endfor %}
             </div>
         </div>
 
-        <!-- Actions -->
-        <div class="actions">
-            <a href="{{ url_for('viewer.building_3d_view', project_id=project_id) }}" class="btn-primary" target="_blank">🏗️ View 3D Model</a>
-            <a href="{{ url_for('user.projects') }}" class="btn-primary">View My Projects</a>
-            <a href="{{ url_for('user.dashboard') }}" class="btn-secondary">Go to Dashboard</a>
+        {% if project.description %}
+        <div class="scard">
+            <div class="stitle">📝 Notes</div>
+            <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">{{ project.description }}</p>
         </div>
-    </div>
+        {% endif %}
+
+    </div><!-- end sidebar -->
+</div><!-- end wrap -->
+
+<script>
+    function tog(key) {
+        const b = document.getElementById('sb-' + key);
+        const h = document.getElementById('sh-' + key);
+        // Guard: elements may not exist if estimation data is empty for that stage
+        if (!b || !h) return;
+        const wasOpen = b.classList.contains('open');
+        // Close all first
+        document.querySelectorAll('.sb').forEach(function(el) { el.classList.remove('open'); });
+        document.querySelectorAll('.sh').forEach(function(el) { el.classList.remove('open'); });
+        // Toggle the clicked one
+        if (!wasOpen) {
+            b.classList.add('open');
+            h.classList.add('open');
+            // Smooth scroll only when not already in view
+            setTimeout(function() {
+                var rect = b.getBoundingClientRect();
+                if (rect.top < 0 || rect.bottom > window.innerHeight) {
+                    b.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 60);
+        }
+    }
+
+    // Auto-open foundation stage on load, safely
+    document.addEventListener('DOMContentLoaded', function() {
+        // Try foundation first, fall back to first available stage
+        var firstStage = ['foundation','walls','flooring','roofing','plumbing','electrical','finishing','carpentry','exterior','miscellaneous'];
+        for (var i = 0; i < firstStage.length; i++) {
+            var el = document.getElementById('sb-' + firstStage[i]);
+            if (el) { tog(firstStage[i]); break; }
+        }
+    });
+</script>
 </body>
 </html>

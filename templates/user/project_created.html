@@ -20,6 +20,9 @@
             --shadow-sm: 0 1px 3px rgba(28,25,23,0.06);
             --shadow-md: 0 4px 16px rgba(28,25,23,0.08);
             --shadow-lg: 0 12px 40px rgba(28,25,23,0.12);
+            --warn-bg: #FFFBEB;
+            --warn-border: #FDE68A;
+            --warn-text: #92400E;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; color: var(--text-primary); }
@@ -49,6 +52,22 @@
         .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
         .hero-badge { background: rgba(247,237,226,0.1); border: 1px solid rgba(247,237,226,0.2); color: rgba(247,237,226,0.8); padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         .hero-badge.accent { background: var(--accent); border-color: var(--accent); color: white; }
+        .hero-badge.warn   { background: rgba(245,158,11,0.25); border-color: rgba(245,158,11,0.4); color: #FDE68A; }
+
+        /* ─── PRICE DISCLAIMER BANNER ─── */
+        .price-disclaimer {
+            background: var(--warn-bg);
+            border-bottom: 1px solid var(--warn-border);
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--warn-text);
+            font-weight: 500;
+        }
+        .price-disclaimer strong { font-weight: 700; }
 
         /* ─── COST TIER STRIP ─── */
         .cost-strip { background: var(--warm-white); border-bottom: 1px solid var(--stone); }
@@ -132,7 +151,7 @@
         .tl-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); padding: 3px 0; }
         .tl-row-d { font-weight: 700; color: var(--text-primary); }
 
-        /* ─── AI BLOCK ─── */
+        /* ─── AI BLOCK — success ─── */
         .ai-blk { background: linear-gradient(90deg,#EFF6FF,#DBEAFE); border: 1px solid #BFDBFE; border-radius: 12px; padding: 16px 18px; margin-bottom: 20px; display: flex; gap: 13px; }
         .ai-ico  { font-size: 22px; flex-shrink: 0; }
         .ai-ttl  { font-size: 11px; font-weight: 700; color: #1E40AF; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -142,6 +161,21 @@
         .cdots   { display: flex; gap: 3px; }
         .cdot    { width: 9px; height: 9px; border-radius: 50%; background: #BFDBFE; }
         .cdot.on { background: #2563EB; }
+
+        /* ─── AI BLOCK — fallback (rates only, no AI) ─── */
+        .ai-blk-warn {
+            background: var(--warn-bg);
+            border: 1px solid var(--warn-border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .ai-blk-warn .ai-ico { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+        .ai-blk-warn .ai-ttl { font-size: 11px; font-weight: 700; color: var(--warn-text); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ai-blk-warn .ai-txt { font-size: 13px; color: #78350F; line-height: 1.6; }
 
         /* ─── BUDGET COMPARISON ─── */
         .bcomp { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -196,9 +230,22 @@
         .btn-p { padding: 12px 16px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer; text-decoration: none; text-align: center; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; font-family: 'DM Sans', sans-serif; }
         .btn-p:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 5px 16px rgba(181,128,79,0.3); }
         .btn-p.full { grid-column: 1/-1; }
+        .btn-p.disabled { background: var(--stone); color: var(--text-muted); cursor: not-allowed; pointer-events: none; transform: none; box-shadow: none; }
         .btn-o { padding: 11px 14px; background: transparent; color: var(--accent); border: 1.5px solid rgba(181,128,79,0.45); border-radius: 10px; font-weight: 600; font-size: 13px; text-decoration: none; text-align: center; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-o:hover { background: var(--accent-light); border-color: var(--accent); }
         .btn-o.full { grid-column: 1/-1; }
+
+        /* Rates info note */
+        .rates-note {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 8px 12px;
+            background: var(--sand);
+            border-radius: 6px;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
 
         @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
         .hero      { animation: fadeUp 0.4s ease both; }
@@ -223,9 +270,27 @@
             {% if (project.estimate_scope or '') == 'material_and_labour' %}👷 Material + Labour{% else %}📦 Material Only{% endif %}
         </span>
         <span class="hero-badge">{{ estimation.total_materials_count }}+ materials</span>
-        {% if estimation.get('ai_rationale') %}<span class="hero-badge">🤖 AI-refined</span>{% endif %}
-        {% if estimation.get('ai_confidence') %}<span class="hero-badge">Confidence {{ estimation.ai_confidence }}/10</span>{% endif %}
+
+        {# FIX: show correct badge depending on whether AI refinement actually ran #}
+        {% if estimation.get('ai_success') %}
+            <span class="hero-badge">🤖 AI-refined</span>
+            {% if estimation.get('ai_confidence') %}
+                <span class="hero-badge">Confidence {{ estimation.ai_confidence }}/10</span>
+            {% endif %}
+        {% else %}
+            <span class="hero-badge warn">⚠️ Base rates only</span>
+        {% endif %}
     </div>
+</div>
+
+<!-- PRICE DISCLAIMER BANNER — always visible so users understand the estimate basis -->
+<div class="price-disclaimer">
+    ℹ️ &nbsp;
+    {% if estimation.get('ai_success') %}
+        <strong>AI-refined estimate</strong> — base rates are March 2026 market averages, adjusted by AI for your location &amp; spec. Actual quotes from contractors may vary ±10–20%.
+    {% else %}
+        <strong>Base rate estimate</strong> — prices are March 2026 Indian market averages (hardcoded). AI refinement was unavailable. Actual quotes may vary ±15–20%. Always verify with local suppliers.
+    {% endif %}
 </div>
 
 <!-- COST TIER STRIP -->
@@ -323,14 +388,14 @@
             </div>
         </div>
 
-        <!-- AI rationale -->
-        {% if estimation.get('ai_rationale') %}
+        <!-- AI rationale block — FIX: two separate blocks for success vs fallback -->
+        {% if estimation.get('ai_success') %}
         <div class="ai-blk">
             <span class="ai-ico">🤖</span>
             <div>
                 <div class="ai-ttl">AI Cost Refinement Applied</div>
                 <div class="ai-txt">{{ estimation.ai_rationale }}</div>
-                {% if estimation.get('ai_confidence') %}
+                {% if estimation.get('ai_confidence') and estimation.ai_confidence > 0 %}
                 <div class="conf-row">
                     <span class="conf-lbl">Confidence</span>
                     <div class="cdots">
@@ -339,6 +404,15 @@
                     <span style="font-size:11px;color:#1E40AF;font-weight:700;">{{ estimation.ai_confidence }}/10</span>
                 </div>
                 {% endif %}
+            </div>
+        </div>
+        {% else %}
+        {# FIX: show visible warning instead of nothing when AI refinement failed #}
+        <div class="ai-blk-warn">
+            <span class="ai-ico">⚠️</span>
+            <div>
+                <div class="ai-ttl">Using Base Rate Tables</div>
+                <div class="ai-txt">{{ estimation.ai_rationale }}</div>
             </div>
         </div>
         {% endif %}
@@ -429,7 +503,7 @@
                         </div>
                     </div>
                     <div class="sh-r">
-                        <div class="sh-bar-w"><div class="sh-bar" style="width:{{ bp }}%;"></div></div>
+                        <div class="sh-bar-w"><div class="sh-bar" data-w="{{ bp }}"></div></div>
                         <div class="sh-cost">
                             {% if sc >= 100000 %}₹{{ "%.1f"|format(sc/100000) }}L
                             {% else %}₹{{ "{:,.0f}".format(sc) }}{% endif %}
@@ -533,12 +607,18 @@
             <div class="stitle">⚡ Next Steps</div>
             <div class="agrid">
                 <a href="{{ url_for('viewer.building_3d_view', project_id=project_id) }}" class="btn-p full" target="_blank">🏗️ View 3D Model</a>
+
                 <a href="{{ url_for('user.download_pdf', project_id=project_id) }}" class="btn-p">📄 PDF Report</a>
                 <a href="{{ url_for('user.view_project', project_id=project_id) }}" class="btn-p">🔍 Full Detail</a>
                 <a href="{{ url_for('user.find_contractors') }}" class="btn-o full">🔨 Find Contractors</a>
                 <a href="{{ url_for('user.order_materials', project_id=project_id) }}" class="btn-o full">📦 Order Materials</a>
                 <a href="{{ url_for('user.create_project') }}" class="btn-o">＋ New Project</a>
                 <a href="{{ url_for('user.projects') }}" class="btn-o">📋 My Projects</a>
+            </div>
+            <!-- Rates note shown in sidebar for context -->
+            <div class="rates-note">
+                📅 Rates reference: March 2026 · Indian market averages<br>
+                Actual costs vary by location, contractor &amp; season.
             </div>
         </div>
 
@@ -580,7 +660,7 @@
                 <div class="smr">
                     <span class="sm-ico">{{ sico }}</span>
                     <span class="sm-lbl">{{ sname.split('&')[0].strip() }}</span>
-                    <div class="sm-bw"><div class="sm-bar" style="width:{{ ((c/mx)*100)|round|int }}%;"></div></div>
+                    <div class="sm-bw"><div class="sm-bar" data-w="{{ ((c/mx)*100)|round|int }}"></div></div>
                     <span class="sm-amt">{% if c >= 100000 %}₹{{ "%.1f"|format(c/100000) }}L{% else %}₹{{ "{:,.0f}".format(c) }}{% endif %}</span>
                 </div>
                 {% endif %}
@@ -602,17 +682,13 @@
     function tog(key) {
         const b = document.getElementById('sb-' + key);
         const h = document.getElementById('sh-' + key);
-        // Guard: elements may not exist if estimation data is empty for that stage
         if (!b || !h) return;
         const wasOpen = b.classList.contains('open');
-        // Close all first
         document.querySelectorAll('.sb').forEach(function(el) { el.classList.remove('open'); });
         document.querySelectorAll('.sh').forEach(function(el) { el.classList.remove('open'); });
-        // Toggle the clicked one
         if (!wasOpen) {
             b.classList.add('open');
             h.classList.add('open');
-            // Smooth scroll only when not already in view
             setTimeout(function() {
                 var rect = b.getBoundingClientRect();
                 if (rect.top < 0 || rect.bottom > window.innerHeight) {
@@ -622,9 +698,11 @@
         }
     }
 
-    // Auto-open foundation stage on load, safely
     document.addEventListener('DOMContentLoaded', function() {
-        // Try foundation first, fall back to first available stage
+    // Apply data-w widths to progress bars (avoids Jinja2 inline-style CSS linter errors)
+    document.querySelectorAll('[data-w]').forEach(function(el) {
+        el.style.width = el.getAttribute('data-w') + '%';
+    });
         var firstStage = ['foundation','walls','flooring','roofing','plumbing','electrical','finishing','carpentry','exterior','miscellaneous'];
         for (var i = 0; i < firstStage.length; i++) {
             var el = document.getElementById('sb-' + firstStage[i]);

@@ -85,7 +85,7 @@ app.register_blueprint(user_bp, url_prefix='/user')
 app.register_blueprint(contractor_bp, url_prefix='/contractor')
 app.register_blueprint(supplier_bp, url_prefix='/supplier')
 app.register_blueprint(admin_bp, url_prefix='/admin')
-app.register_blueprint(viewer_bp, url_prefix='/user')
+app.register_blueprint(viewer_bp, url_prefix='/viewer')
 
 # Home route
 @app.route('/')

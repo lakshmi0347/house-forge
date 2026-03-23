@@ -3,406 +3,559 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - House-Forge</title>
+    <title>Register — House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --obsidian: #0A0A0A;
+            --charcoal: #1A1A1A;
+            --graphite: #222222;
+            --smoke: #242424;
+            --gold: #C9A84C;
+            --gold-light: #E8C97A;
+            --gold-dim: rgba(201, 168, 76, 0.12);
+            --ivory: #F5F0E8;
+            --ivory-dim: rgba(245, 240, 232, 0.85);
+            --ivory-ghost: rgba(245, 240, 232, 0.12);
+            --border: rgba(245, 240, 232, 0.2);
         }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: url('/static/images/house.jpg') no-repeat center center fixed;
-            background-size: cover;
+            font-family: 'Outfit', sans-serif;
+            background: var(--obsidian);
+            color: var(--ivory);
             min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+        }
+
+        /* ─── LEFT SIDEBAR ─── */
+        .sidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            background: var(--charcoal);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 48px 40px;
+            border-right: 1px solid rgba(201, 168, 76, 0.2);
+            overflow: hidden;
+        }
+
+        .sidebar::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: -80px;
+            width: 300px; height: 300px;
+            border-radius: 50%;
+            border: 1px solid var(--ivory-ghost);
+            pointer-events: none;
+        }
+
+        .sidebar-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--ivory);
+            text-decoration: none;
+        }
+
+        .sidebar-brand em { color: var(--gold); font-style: normal; }
+
+        .sidebar-middle { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+        .sidebar-heading {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 42px;
+            font-weight: 400;
+            line-height: 1.15;
+            color: #F5F0E8;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-heading em { font-style: italic; color: var(--gold); }
+
+        .sidebar-desc {
+            font-size: 13px;
+            color: rgba(245, 240, 232, 0.85);
+            line-height: 1.8;
+            font-weight: 400;
+            max-width: 280px;
+        }
+
+        .sidebar-steps {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .step-num {
+            width: 28px; height: 28px;
+            border: 1px solid var(--gold);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            position: relative;
-        }
-        
-        /* Purple gradient overlay - same as home page */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.85) 100%);
-            z-index: 0;
-        }
-        
-        .register-container {
-            position: relative;
-            z-index: 1;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            max-width: 550px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-        
-        .logo {
-            text-align: center;
-            font-size: 64px;
-            margin-bottom: 10px;
-        }
-        
-        h2 {
-            text-align: center;
-            color: white;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-        
-        .subtitle {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: white;
+            font-size: 11px;
             font-weight: 600;
-            font-size: 14px;
+            color: var(--gold);
+            flex-shrink: 0;
         }
-        
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            font-size: 15px;
-            transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
+
+        .step span {
+            font-size: 13px;
+            color: rgba(245, 240, 232, 0.85);
+            font-weight: 400;
         }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: white;
-            background: white;
+
+        .sidebar-footer a {
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(245, 240, 232, 0.8);
+            text-decoration: none;
+            transition: color 0.2s;
         }
-        
-        input::placeholder {
-            color: #999;
+
+        .sidebar-footer a:hover { color: var(--gold); }
+
+        /* ─── MAIN FORM AREA ─── */
+        .form-area {
+            background: var(--graphite);
+            padding: 60px 72px;
+            overflow-y: auto;
+            max-height: 100vh;
         }
-        
-        .role-selector {
+
+        .form-area::-webkit-scrollbar { width: 4px; }
+        .form-area::-webkit-scrollbar-track { background: transparent; }
+        .form-area::-webkit-scrollbar-thumb { background: var(--smoke); }
+
+        /* ─── ROLE SELECTOR ─── */
+        .role-section {
+            margin-bottom: 44px;
+            animation: fadeUp 0.5s ease both;
+        }
+
+        .section-label {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #E8C97A;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-label .line { width: 24px; height: 1px; background: var(--gold); }
+
+        .role-cards {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            margin-bottom: 20px;
         }
-        
-        .role-option {
-            text-align: center;
-            padding: 15px 10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
+
+        .role-card {
+            padding: 22px 16px;
+            border: 1px solid var(--border);
+            background: transparent;
             cursor: pointer;
             transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .role-option:hover {
-            border-color: white;
-            background: rgba(255, 255, 255, 0.2);
+
+        .role-card input[type="radio"] { display: none; }
+
+        .role-card:hover {
+            border-color: rgba(201, 168, 76, 0.4);
         }
-        
-        .role-option.active {
-            border-color: white;
-            background: white;
-            color: #667eea;
+
+        .role-card.active {
+            border-color: var(--gold);
+            background: var(--gold-dim);
         }
-        
-        .role-option input[type="radio"] {
-            display: none;
+
+        .role-card.active::before {
+            content: '✓';
+            position: absolute;
+            top: 8px; right: 10px;
+            font-size: 11px;
+            color: var(--gold);
         }
-        
-        .role-icon {
-            font-size: 32px;
-            margin-bottom: 5px;
-        }
-        
-        .role-label {
+
+        .role-emoji { font-size: 26px; display: block; margin-bottom: 8px; }
+
+        .role-name {
             font-size: 13px;
             font-weight: 600;
+            color: #F5F0E8;
+            letter-spacing: 0.5px;
         }
-        
-        .additional-fields {
-            display: none;
+
+        .role-sub { font-size: 11px; color: rgba(245, 240, 232, 0.75); margin-top: 3px; }
+
+        /* ─── FORM FIELDS ─── */
+        .fields-section {
+            animation: fadeUp 0.5s 0.1s ease both;
         }
-        
-        .additional-fields.show {
+
+        .fields-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 32px;
+        }
+
+        .field { margin-bottom: 28px; }
+
+        .field.full { grid-column: 1 / -1; }
+
+        .field label {
             display: block;
+            font-size: 11px;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: rgba(245, 240, 232, 0.9);
+            margin-bottom: 10px;
+            font-weight: 500;
         }
-        
-        .btn-register {
+
+        .field input,
+        .field select {
             width: 100%;
-            padding: 16px;
-            background: white;
-            color: #667eea;
+            padding: 13px 0;
+            background: transparent;
             border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+            font-family: 'Outfit', sans-serif;
+            color: #F5F0E8;
+            outline: none;
+            transition: border-color 0.3s;
+            -webkit-appearance: none;
+            appearance: none;
         }
-        
-        .btn-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.4);
+
+        .field select option { background: var(--graphite); color: var(--ivory); }
+
+        .field input::placeholder { color: rgba(245, 240, 232, 0.38); }
+        .field input:focus,
+        .field select:focus { border-bottom-color: var(--gold); }
+
+        /* ─── EXTRA FIELDS ─── */
+        .extra-fields {
+            display: none;
+            animation: fadeUp 0.4s ease both;
         }
-        
-        .login-link {
-            text-align: center;
-            margin-top: 20px;
-            color: white;
-            font-size: 14px;
+
+        .extra-fields.show { display: grid; }
+
+        .extra-divider {
+            grid-column: 1 / -1;
+            margin: 8px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
-        
-        .login-link a {
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            border-bottom: 2px solid white;
+
+        .extra-divider span {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(245, 240, 232, 0.75);
+            white-space: nowrap;
         }
-        
-        .login-link a:hover {
-            opacity: 0.8;
+
+        .extra-divider::before,
+        .extra-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
         }
-        
-        .back-home {
-            text-align: center;
-            margin-top: 15px;
-        }
-        
-        .back-home a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
+
+        /* ─── ALERTS ─── */
+        .alert {
+            padding: 13px 16px;
+            border-radius: 2px;
+            margin-bottom: 24px;
             font-size: 13px;
         }
-        
-        .back-home a:hover {
-            color: white;
+
+        .alert-error { background: rgba(180, 40, 40, 0.2); color: #F87171; border-left: 3px solid #EF4444; }
+        .alert-success { background: rgba(40, 140, 80, 0.2); color: #6EE7B7; border-left: 3px solid #10B981; }
+
+        /* ─── SUBMIT ─── */
+        .form-submit-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 12px;
+            padding-top: 28px;
+            border-top: 1px solid var(--border);
+            animation: fadeUp 0.5s 0.2s ease both;
         }
-        
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
+
+        .btn-submit {
+            padding: 16px 52px;
+            background: var(--gold);
+            color: var(--obsidian);
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .alert-error {
-            background: rgba(255, 100, 100, 0.9);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gold-light);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
         }
-        
-        .alert-success {
-            background: rgba(100, 255, 100, 0.9);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+
+        .btn-submit:hover::before { transform: translateX(0); }
+        .btn-submit span { position: relative; z-index: 1; }
+
+        .login-prompt {
+            font-size: 13px;
+            color: rgba(245, 240, 232, 0.8);
+        }
+
+        .login-prompt a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .login-prompt a:hover { opacity: 0.7; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 900px) {
+            body { grid-template-columns: 1fr; }
+            .sidebar { position: relative; height: auto; }
+            .form-area { padding: 48px 32px; max-height: none; }
+            .fields-grid { grid-template-columns: 1fr; }
+            .form-submit-row { flex-direction: column; gap: 20px; align-items: flex-start; }
+        }
+
+        @media (max-width: 560px) {
+            .role-cards { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="register-container">
-        <div class="logo">🏗️</div>
-        <h2>Create Account</h2>
-        <p class="subtitle">Join House-Forge Today</p>
-        
-        <!-- Flash Messages -->
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ url_for('index') }}" class="sidebar-brand">HOUSE<em>-FORGE</em></a>
+
+        <div class="sidebar-middle">
+            <h2 class="sidebar-heading">Start<br>Building<br><em>Today</em></h2>
+            <p class="sidebar-desc">Join thousands of homeowners, contractors, and suppliers already building smarter on House-Forge.</p>
+
+            <div class="sidebar-steps">
+                <div class="step"><div class="step-num">1</div><span>Choose your role</span></div>
+                <div class="step"><div class="step-num">2</div><span>Fill your details</span></div>
+                <div class="step"><div class="step-num">3</div><span>Access your dashboard</span></div>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.login') }}">← Already have an account</a>
+        </div>
+    </aside>
+
+    <!-- Form Area -->
+    <main class="form-area">
+
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
+            {% if messages %}{% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}{% endif %}
         {% endwith %}
-        
+
         <form method="POST" action="{{ url_for('auth.register') }}" id="registerForm">
+
             <!-- Role Selection -->
-            <label>I want to register as:</label>
-            <div class="role-selector">
-                <label class="role-option active" for="role-user">
-                    <input type="radio" name="role" id="role-user" value="user" checked>
-                    <div class="role-icon">👤</div>
-                    <div class="role-label">User</div>
-                </label>
-                
-                <label class="role-option" for="role-contractor">
-                    <input type="radio" name="role" id="role-contractor" value="contractor">
-                    <div class="role-icon">🔨</div>
-                    <div class="role-label">Contractor</div>
-                </label>
-                
-                <label class="role-option" for="role-supplier">
-                    <input type="radio" name="role" id="role-supplier" value="supplier">
-                    <div class="role-icon">📦</div>
-                    <div class="role-label">Supplier</div>
-                </label>
-            </div>
-            
-            <!-- Basic Fields -->
-            <div class="form-group">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" name="name" required placeholder="Enter your name">
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required placeholder="Enter your email">
-            </div>
-            
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" name="phone" required placeholder="10 digit number" pattern="[6-9][0-9]{9}">
-            </div>
-            
-            <!-- Contractor Additional Fields -->
-            <div id="contractor-fields" class="additional-fields">
-                <div class="form-group">
-                    <label for="contractor_company_name">Company Name</label>
-                    <input type="text" id="contractor_company_name" name="company_name" placeholder="Your company name">
-                </div>
-                
-                <div class="form-group">
-                    <label for="experience">Years of Experience</label>
-                    <input type="number" id="experience" name="experience" min="0" placeholder="Years">
-                </div>
-                
-                <div class="form-group">
-                    <label for="license_number">License Number (Optional)</label>
-                    <input type="text" id="license_number" name="license_number" placeholder="Professional license">
+            <div class="role-section">
+                <div class="section-label"><span class="line"></span><span>I am registering as</span></div>
+                <div class="role-cards">
+                    <label class="role-card active" for="role-user">
+                        <input type="radio" name="role" id="role-user" value="user" checked>
+                        <span class="role-emoji">👤</span>
+                        <div class="role-name">Homeowner</div>
+                        <div class="role-sub">Plan & manage projects</div>
+                    </label>
+                    <label class="role-card" for="role-contractor">
+                        <input type="radio" name="role" id="role-contractor" value="contractor">
+                        <span class="role-emoji">🔨</span>
+                        <div class="role-name">Contractor</div>
+                        <div class="role-sub">Bid & build projects</div>
+                    </label>
+                    <label class="role-card" for="role-supplier">
+                        <input type="radio" name="role" id="role-supplier" value="supplier">
+                        <span class="role-emoji">📦</span>
+                        <div class="role-name">Supplier</div>
+                        <div class="role-sub">Supply materials</div>
+                    </label>
                 </div>
             </div>
-            
-            <!-- Supplier Additional Fields -->
-            <div id="supplier-fields" class="additional-fields">
-                <div class="form-group">
-                    <label for="supplier_company_name">Company Name</label>
-                    <input type="text" id="company_name" name="company_name" placeholder="Your company name">
-                </div>
-                
-                <div class="form-group">
-                    <label for="business_type">Business Type</label>
-                    <select id="business_type" name="business_type">
-                        <option value="">Select type</option>
-                        <option value="retailer">Retailer</option>
-                        <option value="wholesaler">Wholesaler</option>
-                        <option value="manufacturer">Manufacturer</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="gst_number">GST Number (Optional)</label>
-                    <input type="text" id="gst_number" name="gst_number" placeholder="GST registration">
+
+            <!-- Base Fields -->
+            <div class="fields-section">
+                <div class="section-label" style="margin-bottom: 24px;"><span class="line"></span><span>Your Information</span></div>
+
+                <div class="fields-grid">
+                    <div class="field">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                    </div>
+                    <div class="field">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required placeholder="10-digit number" pattern="[6-9][0-9]{9}">
+                    </div>
+                    <div class="field full">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required placeholder="you@example.com">
+                    </div>
+
+                    <!-- Contractor Extra Fields -->
+                    <div class="extra-fields fields-grid" id="contractor-fields" style="grid-column: 1/-1;">
+                        <div class="extra-divider" style="grid-column:1/-1;"><span>Contractor Details</span></div>
+                        <div class="field">
+                            <label>Company Name</label>
+                            <input type="text" name="company_name" placeholder="Your company">
+                        </div>
+                        <div class="field">
+                            <label>Years of Experience</label>
+                            <input type="number" name="experience" min="0" placeholder="e.g. 5">
+                        </div>
+                        <div class="field full">
+                            <label>License Number (Optional)</label>
+                            <input type="text" name="license_number" placeholder="Professional license">
+                        </div>
+                    </div>
+
+                    <!-- Supplier Extra Fields -->
+                    <div class="extra-fields fields-grid" id="supplier-fields" style="grid-column: 1/-1;">
+                        <div class="extra-divider" style="grid-column:1/-1;"><span>Supplier Details</span></div>
+                        <div class="field">
+                            <label>Company Name</label>
+                            <input type="text" name="company_name" placeholder="Your company">
+                        </div>
+                        <div class="field">
+                            <label>Business Type</label>
+                            <select name="business_type">
+                                <option value="">Select type</option>
+                                <option value="retailer">Retailer</option>
+                                <option value="wholesaler">Wholesaler</option>
+                                <option value="manufacturer">Manufacturer</option>
+                            </select>
+                        </div>
+                        <div class="field full">
+                            <label>GST Number (Optional)</label>
+                            <input type="text" name="gst_number" placeholder="GST registration">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required placeholder="Min. 6 characters" minlength="6">
+                    </div>
+                    <div class="field">
+                        <label for="confirm_password">Confirm Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" required placeholder="Re-enter password">
+                    </div>
                 </div>
             </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="At least 6 characters" minlength="6">
+
+            <!-- Submit -->
+            <div class="form-submit-row">
+                <button type="submit" class="btn-submit"><span>Create Account →</span></button>
+                <span class="login-prompt">Already registered? <a href="{{ url_for('auth.login') }}">Sign in</a></span>
             </div>
-            
-            <div class="form-group">
-                <label for="confirm_password">Confirm Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" required placeholder="Re-enter password">
-            </div>
-            
-            <button type="submit" class="btn-register">Create Account</button>
+
         </form>
-        
-        <div class="login-link">
-            Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
-        </div>
-        
-        <div class="back-home">
-            <a href="{{ url_for('index') }}">← Back to Home</a>
-        </div>
-    </div>
-    
+    </main>
+
     <script>
-        // Role selection handling
-        const roleOptions = document.querySelectorAll('.role-option');
+        const roleCards = document.querySelectorAll('.role-card');
         const contractorFields = document.getElementById('contractor-fields');
         const supplierFields = document.getElementById('supplier-fields');
-        
-        roleOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                // Remove active class from all
-                roleOptions.forEach(opt => opt.classList.remove('active'));
-                
-                // Add active class to clicked
+
+        function disableFields(container) {
+            container.querySelectorAll('input, select').forEach(el => el.disabled = true);
+        }
+
+        function enableFields(container) {
+            container.querySelectorAll('input, select').forEach(el => el.disabled = false);
+        }
+
+        // Disable extra fields on load
+        document.addEventListener('DOMContentLoaded', () => {
+            disableFields(contractorFields);
+            disableFields(supplierFields);
+        });
+
+        roleCards.forEach(card => {
+            card.addEventListener('click', function () {
+                roleCards.forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
-                
-                // Get selected role
-                const selectedRole = this.querySelector('input[type="radio"]').value;
-                
-                // Show/hide additional fields
+
+                const role = this.querySelector('input[type="radio"]').value;
+
                 contractorFields.classList.remove('show');
                 supplierFields.classList.remove('show');
-                
-                // Disable inputs in hidden fields to prevent form submission
-                const contractorInputs = contractorFields.querySelectorAll('input, select');
-                const supplierInputs = supplierFields.querySelectorAll('input, select');
-                
-                contractorInputs.forEach(input => input.disabled = true);
-                supplierInputs.forEach(input => input.disabled = true);
-                
-                if (selectedRole === 'contractor') {
+                disableFields(contractorFields);
+                disableFields(supplierFields);
+
+                if (role === 'contractor') {
                     contractorFields.classList.add('show');
-                    contractorInputs.forEach(input => input.disabled = false);
-                } else if (selectedRole === 'supplier') {
+                    enableFields(contractorFields);
+                } else if (role === 'supplier') {
                     supplierFields.classList.add('show');
-                    supplierInputs.forEach(input => input.disabled = false);
+                    enableFields(supplierFields);
                 }
             });
         });
-        
-        // Initialize - disable contractor and supplier fields on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const contractorInputs = contractorFields.querySelectorAll('input, select');
-            const supplierInputs = supplierFields.querySelectorAll('input, select');
-            
-            contractorInputs.forEach(input => input.disabled = true);
-            supplierInputs.forEach(input => input.disabled = true);
-        });
-        
-        // Password validation
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm_password').value;
-            
-            if (password !== confirmPassword) {
+
+        document.getElementById('registerForm').addEventListener('submit', function (e) {
+            const pw = document.getElementById('password').value;
+            const cpw = document.getElementById('confirm_password').value;
+            if (pw !== cpw) {
                 e.preventDefault();
                 alert('Passwords do not match!');
             }
         });
     </script>
+
 </body>
 </html>

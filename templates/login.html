@@ -3,214 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - House-Forge</title>
+    <title>Login — House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --obsidian: #0A0A0A;
+            --charcoal: #141414;
+            --graphite: #1C1C1C;
+            --smoke: #242424;
+            --gold: #C9A84C;
+            --gold-light: #E8C97A;
+            --gold-dim: rgba(201, 168, 76, 0.12);
+            --ivory: #F5F0E8;
+            --ivory-dim: rgba(245, 240, 232, 0.55);
+            --ivory-ghost: rgba(245, 240, 232, 0.07);
+            --border: rgba(245, 240, 232, 0.1);
+            --border-gold: rgba(201, 168, 76, 0.35);
         }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: url('/static/images/house.jpg') no-repeat center center fixed;
-            background-size: cover;
+            font-family: 'Outfit', sans-serif;
+            background: var(--obsidian);
+            color: var(--ivory);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
         }
-        
-        /* Purple gradient overlay - same as home page */
-        body::before {
+
+        /* ─── LEFT PANEL ─── */
+        .left-panel {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.4) saturate(0.6);
+        }
+
+        .left-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, transparent 40%, var(--obsidian) 100%);
+        }
+
+        .left-content {
+            position: absolute;
+            bottom: 60px;
+            left: 52px;
+            right: 0;
+        }
+
+        .left-content .quote {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--ivory);
+            line-height: 1.4;
+            max-width: 320px;
+            margin-bottom: 16px;
+        }
+
+        .left-content .quote-attr {
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        /* Vertical gold line */
+        .left-panel::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.85) 100%);
-            z-index: 0;
+            top: 0; right: 0;
+            width: 1px; height: 100%;
+            background: linear-gradient(to bottom, transparent 5%, var(--gold) 40%, var(--gold) 60%, transparent 95%);
+            opacity: 0.5;
         }
-        
-        .login-container {
+
+        /* ─── RIGHT PANEL ─── */
+        .right-panel {
+            background: var(--charcoal);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 80px 64px;
             position: relative;
-            z-index: 1;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            max-width: 450px;
-            width: 100%;
+            overflow: hidden;
         }
-        
-        .logo {
-            text-align: center;
-            font-size: 64px;
-            margin-bottom: 10px;
+
+        /* Decorative circle */
+        .right-panel::before {
+            content: '';
+            position: absolute;
+            top: -100px; right: -100px;
+            width: 400px; height: 400px;
+            border-radius: 50%;
+            border: 1px solid var(--ivory-ghost);
+            pointer-events: none;
         }
-        
-        h2 {
-            text-align: center;
-            color: white;
-            margin-bottom: 10px;
-            font-size: 28px;
+
+        /* Top nav */
+        .panel-nav {
+            position: absolute;
+            top: 40px; left: 64px; right: 64px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        
-        .subtitle {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: white;
-            background: white;
-        }
-        
-        input::placeholder {
-            color: #999;
-        }
-        
-        .btn-login {
-            width: 100%;
-            padding: 16px;
-            background: white;
-            color: #667eea;
-            border: none;
-            border-radius: 10px;
+
+        .brand {
+            font-family: 'Cormorant Garamond', serif;
             font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--ivory);
+            text-decoration: none;
         }
-        
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.4);
+
+        .brand em { color: var(--gold); font-style: normal; }
+
+        .back-link {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--ivory-dim);
+            text-decoration: none;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        
-        .register-link {
-            text-align: center;
-            margin-top: 25px;
-            color: white;
+
+        .back-link:hover { color: var(--gold); }
+
+        /* Form heading */
+        .form-eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            animation: fadeUp 0.6s ease both;
+        }
+
+        .form-eyebrow .line { width: 28px; height: 1px; background: var(--gold); }
+
+        .form-eyebrow span {
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        .form-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 52px;
+            font-weight: 300;
+            line-height: 1.05;
+            color: var(--ivory);
+            margin-bottom: 8px;
+            animation: fadeUp 0.6s 0.05s ease both;
+        }
+
+        .form-subtitle {
             font-size: 14px;
+            color: var(--ivory-dim);
+            margin-bottom: 44px;
+            font-weight: 300;
+            animation: fadeUp 0.6s 0.1s ease both;
         }
-        
-        .register-link a {
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            border-bottom: 2px solid white;
-        }
-        
-        .register-link a:hover {
-            opacity: 0.8;
-        }
-        
-        .back-home {
-            text-align: center;
-            margin-top: 15px;
-        }
-        
-        .back-home a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-size: 13px;
-        }
-        
-        .back-home a:hover {
-            color: white;
-        }
-        
+
+        /* Alerts */
         .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
+            width: 100%;
+            padding: 13px 16px;
+            border-radius: 2px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            animation: fadeUp 0.4s ease both;
         }
-        
-        .alert-error {
-            background: rgba(255, 100, 100, 0.9);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+
+        .alert-error { background: rgba(180, 40, 40, 0.2); color: #F87171; border-left: 3px solid #EF4444; }
+        .alert-success { background: rgba(40, 140, 80, 0.2); color: #6EE7B7; border-left: 3px solid #10B981; }
+
+        /* Form */
+        form { width: 100%; max-width: 380px; animation: fadeUp 0.6s 0.15s ease both; }
+
+        .field {
+            margin-bottom: 24px;
         }
-        
-        .alert-success {
-            background: rgba(100, 255, 100, 0.9);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+
+        .field label {
+            display: block;
+            font-size: 11px;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--ivory-dim);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 14px 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            font-size: 16px;
+            font-family: 'Outfit', sans-serif;
+            color: var(--ivory);
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .field input::placeholder { color: rgba(245, 240, 232, 0.2); }
+
+        .field input:focus { border-bottom-color: var(--gold); }
+
+        .btn-submit {
+            width: 100%;
+            padding: 17px;
+            background: var(--gold);
+            color: var(--obsidian);
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gold-light);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .btn-submit:hover::before { transform: translateX(0); }
+        .btn-submit span { position: relative; z-index: 1; }
+
+        .form-footer {
+            margin-top: 36px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-footer a {
+            font-size: 13px;
+            color: var(--ivory-dim);
+            text-decoration: none;
+            transition: color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-footer a:hover { color: var(--gold); }
+
+        .form-footer a .underline-link {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            body { grid-template-columns: 1fr; }
+            .left-panel { display: none; }
+            .right-panel { padding: 100px 32px 60px; }
+            .panel-nav { left: 32px; right: 32px; }
+            form { max-width: 100%; }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo">🏗️</div>
-        <h2>Welcome Back</h2>
-        <p class="subtitle">Login to House-Forge</p>
-        
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
-        <form method="POST" action="{{ url_for('auth.login') }}">
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required placeholder="Enter your email">
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Enter your password">
-            </div>
-            
-            <button type="submit" class="btn-login">Login</button>
-        </form>
-        
-        <div class="register-link">
-            Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a>
-        </div>
-        
-        <div class="back-home">
-            <a href="{{ url_for('index') }}">← Back to Home</a>
+
+    <!-- Left Photo Panel -->
+    <div class="left-panel">
+        <img src="/static/images/house.jpg" alt="House-Forge">
+        <div class="left-overlay"></div>
+        <div class="left-content">
+            <p class="quote">"Every great structure begins with a single, precise plan."</p>
+            <span class="quote-attr">House-Forge · Build with Intent</span>
         </div>
     </div>
+
+    <!-- Right Form Panel -->
+    <div class="right-panel">
+
+        <nav class="panel-nav">
+            <a href="{{ url_for('index') }}" class="brand">HOUSE<em>-FORGE</em></a>
+            <a href="{{ url_for('index') }}" class="back-link">← Home</a>
+        </nav>
+
+        <div class="form-eyebrow">
+            <span class="line"></span>
+            <span>Welcome Back</span>
+        </div>
+
+        <h1 class="form-title">Sign<br>In</h1>
+        <p class="form-subtitle">Access your construction dashboard</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}{% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <div class="field">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="you@example.com" autocomplete="email">
+            </div>
+
+            <div class="field">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••" autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn-submit"><span>Sign In →</span></button>
+
+            <div class="form-footer">
+                <span style="font-size:13px; color: var(--ivory-dim);">
+                    New to House-Forge?
+                    <a href="{{ url_for('auth.register') }}"><span class="underline-link">Create an account</span></a>
+                </span>
+            </div>
+        </form>
+
+    </div>
+
 </body>
 </html>

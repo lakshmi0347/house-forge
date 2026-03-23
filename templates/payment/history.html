@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment History — House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg:#F2EDE4;--card:#FAF7F2;--card2:#F5F0E8;--sand:#EDE6DB;--stone:#D9CFC2;--accent:#C9A84C;--accent-d:#a8893a;--accent-l:#FBF3E0;--text:#1C1917;--text2:#5C4F43;--muted:#8C7E72;}
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);}
+        body::before{content:'';position:fixed;inset:0;background:url('/static/images/house.jpg') no-repeat center/cover;opacity:.04;z-index:0;pointer-events:none;}
+        .navbar{background:rgba(250,247,242,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--stone);padding:0 40px;height:68px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(28,25,23,.07);}
+        .navbar-brand{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px;}
+        .brand-icon{width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#0A0A0A;}
+        .navbar-menu{display:flex;align-items:center;gap:4px;}
+        .navbar-menu a{color:var(--text2);text-decoration:none;padding:8px 13px;border-radius:8px;font-size:14px;font-weight:500;transition:all .2s;}
+        .navbar-menu a:hover,.navbar-menu a.active{color:var(--accent);background:var(--accent-l);}
+        .profile-pic{width:33px;height:33px;border-radius:50%;object-fit:cover;border:2px solid var(--stone);}
+        .profile-ph{width:33px;height:33px;border-radius:50%;background:var(--accent-l);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;border:2px solid var(--stone);}
+        .nav-div{width:1px;height:20px;background:var(--stone);margin:0 6px;}
+        .logout-link{color:var(--muted);text-decoration:none;padding:8px 13px;border-radius:8px;font-size:13px;font-weight:500;transition:all .2s;}
+        .logout-link:hover{color:#DC2626;background:#FEF2F2;}
+
+        .page{max-width:1000px;margin:36px auto;padding:0 24px;position:relative;z-index:1;}
+
+        .page-header{
+            background:var(--card);border:1px solid var(--stone);border-radius:20px;
+            padding:30px 36px;margin-bottom:20px;
+            box-shadow:0 4px 18px rgba(28,25,23,.08);
+            animation:fadeUp .4s ease both;
+        }
+        .page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--text);margin-bottom:4px;}
+        .divider{width:36px;height:3px;background:var(--accent);border-radius:2px;margin:10px 0 20px;}
+
+        .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+        .stat-box{background:var(--card2);border:1px solid var(--stone);border-radius:12px;padding:18px;text-align:center;transition:all .2s;}
+        .stat-box:hover{border-color:var(--accent);background:var(--accent-l);}
+        .stat-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--accent-d);margin-bottom:4px;}
+        .stat-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);}
+
+        .payment-card{
+            background:var(--card);border:1px solid var(--stone);border-radius:16px;
+            padding:22px 28px;margin-bottom:14px;
+            box-shadow:0 1px 3px rgba(28,25,23,.06);
+            transition:all .25s;
+            display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;
+            animation:fadeUp .4s ease both;
+        }
+        .payment-card:hover{transform:translateY(-2px);box-shadow:0 4px 18px rgba(28,25,23,.09);border-color:rgba(201,168,76,.35);}
+
+        .payment-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .payment-icon.material{background:#EDE9FE;color:#6D28D9;}
+        .payment-icon.contractor{background:var(--accent-l);color:var(--accent-d);}
+        .payment-icon svg{width:22px;height:22px;}
+
+        .payment-info h3{font-size:15px;font-weight:600;color:var(--text);margin-bottom:3px;}
+        .payment-meta{display:flex;gap:16px;flex-wrap:wrap;}
+        .payment-meta span{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px;}
+
+        .payment-right{text-align:right;flex-shrink:0;}
+        .payment-amount{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;}
+
+        /* FIX: was .status-cod_confirmed — underscore after hyphen caused CSS parse error */
+        .payment-status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
+        .status-cod-confirmed{background:var(--accent-l);color:var(--accent-d);}
+        .status-paid{background:#D1FAE5;color:#065F46;}
+
+        .receipt-link{display:inline-flex;align-items:center;gap:5px;margin-top:6px;color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;transition:gap .15s;}
+        .receipt-link:hover{gap:8px;}
+
+        .empty{background:var(--card);border:1px solid var(--stone);border-radius:16px;padding:60px 20px;text-align:center;}
+        .empty-icon{width:60px;height:60px;background:var(--sand);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--muted);}
+        .empty h2{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:8px;}
+        .empty p{font-size:14px;color:var(--text2);margin-bottom:22px;}
+        .btn-primary{padding:12px 24px;background:var(--accent);color:#0A0A0A;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s;}
+        .btn-primary:hover{background:var(--accent-d);transform:translateY(-1px);}
+
+        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        @media(max-width:700px){
+            .navbar{padding:0 16px;}
+            .page-header{padding:22px 20px;}
+            .payment-card{grid-template-columns:auto 1fr;gap:14px;padding:18px 18px;}
+            .payment-right{grid-column:2;text-align:left;}
+            .stats-row{grid-template-columns:1fr 1fr;}
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">
+        <div class="brand-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        House-Forge
+    </a>
+    <div class="navbar-menu">
+        <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('user.my_orders') }}">My Orders</a>
+        <a href="{{ url_for('user.projects') }}">My Projects</a>
+        <a href="{{ url_for('payment.payment_history') }}" class="active">Payments</a>
+        <div class="nav-div"></div>
+        <a href="{{ url_for('user.profile') }}" style="padding:8px 9px;">
+            {% if user_profile_picture %}<img src="/static/uploads/profiles/{{ user_profile_picture }}" class="profile-pic" alt="Profile">
+            {% else %}<div class="profile-ph">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>{% endif %}
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="logout-link">Logout</a>
+    </div>
+</nav>
+
+<div class="page">
+
+    <div class="page-header">
+        <h1>💳 Payment History</h1>
+        <div class="divider"></div>
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-num">{{ payments|length }}</div>
+                <div class="stat-lbl">Total Payments</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num">{{ payments|selectattr('type','equalto','material_order')|list|length }}</div>
+                <div class="stat-lbl">Material Orders</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num">₹{{ "{:,.0f}".format(total_spent) }}</div>
+                <div class="stat-lbl">Total Confirmed</div>
+            </div>
+        </div>
+    </div>
+
+    {% if payments %}
+        {% for payment in payments %}
+        <div class="payment-card">
+
+            <div class="payment-icon {{ 'material' if payment.type == 'material_order' else 'contractor' }}">
+                {% if payment.type == 'material_order' %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                {% else %}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                {% endif %}
+            </div>
+
+            <div class="payment-info">
+                <h3>
+                    {% if payment.type == 'material_order' %}
+                        Material Order — {{ payment.supplier_name or 'Supplier' }}
+                    {% else %}
+                        Contractor Payment — {{ payment.contractor_name or 'Contractor' }}
+                    {% endif %}
+                </h3>
+                <div class="payment-meta">
+                    <span>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        {{ payment.created_at.strftime('%d %b %Y, %I:%M %p') if payment.created_at else 'N/A' }}
+                    </span>
+                    {% if payment.project_title %}
+                    <span>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                        {{ payment.project_title }}
+                    </span>
+                    {% endif %}
+                    <span>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                        Cash on Delivery
+                    </span>
+                    <span style="font-family:monospace;font-size:11px;">{{ payment.receipt_number or '—' }}</span>
+                </div>
+            </div>
+
+            <div class="payment-right">
+                <div class="payment-amount">₹{{ "{:,.0f}".format(payment.amount or 0) }}</div>
+                <div>
+                    {# FIX: use status-cod-confirmed (hyphen) not status-cod_confirmed (underscore) #}
+                    <span class="payment-status {% if payment.status == 'cod_confirmed' %}status-cod-confirmed{% elif payment.status == 'paid' %}status-paid{% endif %}">
+                        {% if payment.status == 'paid' %}✓ Paid
+                        {% elif payment.status == 'cod_confirmed' %}⏳ COD Confirmed
+                        {% else %}{{ payment.status }}{% endif %}
+                    </span>
+                </div>
+                {% if payment.type == 'material_order' and payment.order_id %}
+                    <a href="{{ url_for('payment.order_receipt', order_id=payment.order_id) }}" class="receipt-link">
+                        Receipt
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </a>
+                {% elif payment.type == 'contractor_payment' and payment.project_id %}
+                    <a href="{{ url_for('payment.contractor_receipt', project_id=payment.project_id) }}" class="receipt-link">
+                        Receipt
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </a>
+                {% endif %}
+            </div>
+
+        </div>
+        {% endfor %}
+
+    {% else %}
+        <div class="empty">
+            <div class="empty-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            </div>
+            <h2>No Payments Yet</h2>
+            <p>Your payment history will appear here once you confirm a COD payment.</p>
+            <a href="{{ url_for('user.my_orders') }}" class="btn-primary">View My Orders</a>
+        </div>
+    {% endif %}
+
+</div>
+</body>
+</html>

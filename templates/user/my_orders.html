@@ -19,13 +19,12 @@
         .profile-placeholder{width:36px;height:36px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;border:2px solid var(--stone);}
         .container{max-width:1050px;margin:36px auto;padding:0 24px;position:relative;z-index:1;}
         .page-header{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:30px 40px;margin-bottom:24px;box-shadow:var(--shadow-md);}
-
         .page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--text-primary);margin-bottom:4px;}
         .divider{width:40px;height:3px;background:var(--accent);border-radius:2px;margin:10px 0 20px;}
         .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;}
         .stat-card{background:var(--sand);border:1px solid var(--stone);border-radius:12px;padding:18px;text-align:center;transition:all .2s;}
         .stat-card:hover{border-color:var(--accent);background:var(--accent-light);}
-        .stat-number{font-family:'Trafalgar', sans-serif;font-size:26px;font-weight:700;color:var(--accent);margin-bottom:4px;}
+        .stat-number{font-size:26px;font-weight:700;color:var(--accent);margin-bottom:4px;}
         .stat-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);}
         .form-card{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:28px 32px;margin-bottom:20px;box-shadow:var(--shadow-sm);transition:all .25s;}
         .form-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:rgba(181,128,79,.25);}
@@ -52,11 +51,20 @@
         .item-total{font-weight:700;color:var(--accent);font-size:14px;white-space:nowrap;}
         .order-total{background:var(--accent);color:white;padding:13px 18px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;margin:14px 0;}
         .total-label{font-size:13px;opacity:.9;}
-        .total-value{font-family:'Trafalgar', sans-serif;font-size:20px;font-weight:700;}
+        .total-value{font-size:20px;font-weight:700;}
         .status-info{font-size:13px;padding:9px 13px;border-radius:8px;margin-top:4px;}
         .status-info.pending{background:#FEF3C7;color:#92400E;}
         .status-info.processing{background:#DBEAFE;color:#1E40AF;}
         .status-info.completed{background:#D1FAE5;color:#065F46;}
+
+        /* Payment action row */
+        .payment-action-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+        .btn-pay{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;background:var(--accent);color:white;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;transition:all .2s;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
+        .btn-pay:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 14px rgba(181,128,79,0.35);}
+        .btn-receipt{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;background:#D1FAE5;color:#065F46;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;transition:all .2s;border:1px solid #A7F3D0;}
+        .btn-receipt:hover{background:#A7F3D0;}
+        .payment-confirmed-note{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#92400E;background:#FBF3E0;padding:8px 14px;border-radius:8px;border:1px solid #F0D9A0;}
+
         .empty-state{text-align:center;padding:60px 20px;background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;}
         .empty-icon{font-size:56px;margin-bottom:14px;opacity:.6;}
         .empty-state h2{font-family:'Playfair Display',serif;font-size:20px;color:var(--text-primary);margin-bottom:8px;}
@@ -65,8 +73,7 @@
         .btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);}
         @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
         .page-header{animation:fadeUp .45s ease both;}
-        .form-card:nth-child(1){animation:fadeUp .45s .05s ease both;}
-        .form-card:nth-child(2){animation:fadeUp .45s .1s ease both;}
+        @media(max-width:600px){.payment-action-row{flex-direction:column;}}
     </style>
 </head>
 <body>
@@ -76,6 +83,7 @@
             <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('user.projects') }}">My Projects</a>
             <a href="{{ url_for('user.my_orders') }}">My Orders</a>
+            <a href="{{ url_for('payment.payment_history') }}">Payments</a>
             <a href="{{ url_for('user.messages') }}">Messages</a>
             <a href="{{ url_for('user.profile') }}" style="padding:8px 10px;">
                 {% if user_profile_picture %}<img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
@@ -84,6 +92,7 @@
             <a href="{{ url_for('auth.logout') }}" style="color:var(--text-muted);font-size:13px;">Logout</a>
         </div>
     </nav>
+
     <div class="container">
         <div class="page-header">
             <h1>📦 My Material Orders</h1>
@@ -96,6 +105,7 @@
                 <div class="stat-card"><div class="stat-number">₹{{ "{:,.0f}".format(stats.total_spent) }}</div><div class="stat-label">Total Spent</div></div>
             </div>
         </div>
+
         {% if orders %}
             {% for order in orders %}
             <div class="form-card">
@@ -111,25 +121,66 @@
                         {% elif order.status=='cancelled' %}❌ Cancelled{% endif %}
                     </span>
                 </div>
+
                 {% if order.project_title %}
-                <div class="order-project"><div class="project-label">For Project</div><div class="project-name">🏗️ {{ order.project_title }}</div></div>
+                <div class="order-project">
+                    <div class="project-label">For Project</div>
+                    <div class="project-name">🏗️ {{ order.project_title }}</div>
+                </div>
                 {% endif %}
+
                 <div class="order-supplier">
                     <div class="supplier-avatar">📦</div>
-                    <div class="supplier-info"><h4>{{ order.supplier_name or 'Supplier' }}</h4><p>Material Supplier</p></div>
+                    <div class="supplier-info">
+                        <h4>{{ order.supplier_name or 'Supplier' }}</h4>
+                        <p>Material Supplier</p>
+                    </div>
                 </div>
+
                 <div class="order-items">
                     {% for item in order.order_items %}
                     <div class="item-row">
-                        <div><div class="item-name">{{ item.material_name }}</div><div class="item-details">{{ item.quantity }} {{ item.unit }} × ₹{{ "{:,.0f}".format(item.price_per_unit) }}</div></div>
+                        <div>
+                            <div class="item-name">{{ item.material_name }}</div>
+                            <div class="item-details">{{ item.quantity }} {{ item.unit }} × ₹{{ "{:,.0f}".format(item.price_per_unit) }}</div>
+                        </div>
                         <div class="item-total">₹{{ "{:,.0f}".format(item.total) }}</div>
                     </div>
                     {% endfor %}
                 </div>
-                <div class="order-total"><span class="total-label">Total Amount</span><span class="total-value">₹{{ "{:,.0f}".format(order.total) }}</span></div>
-                {% if order.status=='pending' %}<div class="status-info pending">⏳ Waiting for supplier to accept your order</div>
-                {% elif order.status=='processing' %}<div class="status-info processing">🔄 Your order is being prepared by the supplier</div>
-                {% elif order.status=='completed' %}<div class="status-info completed">✅ Order completed on {{ order.completed_at.strftime('%d %b %Y') if order.completed_at else 'N/A' }}</div>{% endif %}
+
+                <div class="order-total">
+                    <span class="total-label">Total Amount</span>
+                    <span class="total-value">₹{{ "{:,.0f}".format(order.total) }}</span>
+                </div>
+
+                {# ── STATUS INFO ── #}
+                {% if order.status=='pending' %}
+                    <div class="status-info pending">⏳ Waiting for supplier to accept your order</div>
+                {% elif order.status=='processing' %}
+                    <div class="status-info processing">🔄 Your order is being prepared by the supplier</div>
+                {% elif order.status=='completed' %}
+                    <div class="status-info completed">✅ Order completed on {{ order.completed_at.strftime('%d %b %Y') if order.completed_at else 'N/A' }}</div>
+                {% endif %}
+
+                {# ── PAYMENT ACTIONS ── #}
+                {% if order.status == 'processing' %}
+                    <div class="payment-action-row">
+                        {% if order.payment_status == 'paid' %}
+                            <span class="btn-receipt">✅ Payment Complete</span>
+                            <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">🧾 View Receipt</a>
+                        {% elif order.payment_status == 'cod_confirmed' %}
+                            <span class="payment-confirmed-note">💵 COD Confirmed · Awaiting cash collection by supplier</span>
+                            <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">🧾 View Receipt</a>
+                        {% else %}
+                            <a href="{{ url_for('payment.pay_order', order_id=order.id) }}" class="btn-pay">💳 Pay Now (COD)</a>
+                        {% endif %}
+                    </div>
+                {% elif order.status == 'completed' and order.payment_status in ('paid', 'cod_confirmed') %}
+                    <div class="payment-action-row">
+                        <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">🧾 View Receipt</a>
+                    </div>
+                {% endif %}
             </div>
             {% endfor %}
         {% else %}

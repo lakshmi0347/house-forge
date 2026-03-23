@@ -97,7 +97,6 @@
         .info-row:last-child{border-bottom:none;}
         .info-label{font-size:13px;color:var(--text-muted);font-weight:500;flex-shrink:0;margin-right:8px;}
         .info-value{font-size:13px;font-weight:600;color:var(--text-primary);text-align:right;}
-        .info-value.address{font-size:12px;max-width:180px;line-height:1.4;}
 
         /* LOCATION SECTION IN SIDEBAR */
         .location-block{background:var(--sand);border:1px solid var(--stone);border-radius:8px;padding:12px 14px;margin-bottom:2px;}
@@ -108,11 +107,26 @@
         .timeline-block{background:linear-gradient(135deg,var(--accent-light),#FEF3C7);border:1px solid rgba(181,128,79,0.2);border-radius:10px;padding:20px;text-align:center;}
         .timeline-num{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:var(--accent);line-height:1;}
         .timeline-sub{font-size:13px;color:var(--text-secondary);margin-top:4px;}
+
+        /* ACTION BUTTONS */
         .action-buttons{display:flex;flex-direction:column;gap:10px;}
         .btn-primary{padding:12px 18px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;text-align:center;transition:all 0.2s;display:block;font-family:'DM Sans',sans-serif;}
         .btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 14px rgba(181,128,79,0.3);}
         .btn-outline{padding:12px 18px;background:transparent;color:var(--accent);border:1.5px solid rgba(181,128,79,0.5);border-radius:8px;font-weight:600;font-size:14px;text-decoration:none;text-align:center;transition:all 0.2s;display:block;}
         .btn-outline:hover{background:var(--accent-light);border-color:var(--accent);}
+
+        /* Pay contractor button — gold fill */
+        .btn-pay-contractor{padding:12px 18px;background:#C9A84C;color:#0A0A0A;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;text-align:center;transition:all 0.2s;display:block;font-family:'DM Sans',sans-serif;}
+        .btn-pay-contractor:hover{background:#a8893a;transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,168,76,0.4);}
+
+        /* Contractor payment note */
+        .contractor-paid-note{display:block;padding:11px 16px;background:#D1FAE5;color:#065F46;border-radius:8px;font-weight:600;font-size:13px;text-align:center;border:1px solid #A7F3D0;}
+
+        /* Contractor info strip */
+        .contractor-strip{background:var(--sand);border:1px solid var(--stone);border-radius:10px;padding:14px 16px;margin-bottom:4px;}
+        .contractor-strip-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:6px;}
+        .contractor-strip-name{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:2px;}
+        .contractor-strip-sub{font-size:12px;color:var(--text-muted);}
 
         /* RATING MODAL */
         .modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,25,23,0.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
@@ -143,6 +157,7 @@
             <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('user.projects') }}">My Projects</a>
             <a href="{{ url_for('user.my_orders') }}">My Orders</a>
+            <a href="{{ url_for('payment.payment_history') }}">Payments</a>
             <a href="{{ url_for('user.messages') }}" style="position:relative;">
                 Messages
                 <span class="badge-notification" id="messagesBadge"></span>
@@ -170,11 +185,9 @@
             <h1>{{ project.title }}</h1>
             <div class="divider"></div>
             <div class="project-meta">
-                {# Full location: show combined string in header #}
                 <div class="meta-item">📍 {{ project.location or 'Location not set' }}</div>
                 <div class="meta-item">📅 Created: {{ project.created_at.strftime('%d %b %Y') if project.created_at else 'N/A' }}</div>
                 <span class="status-badge status-{{ project.status }}">{{ project.status.upper() }}</span>
-                {# FIXED: direct attribute access instead of .get() #}
                 {% set scope = project.estimate_scope or 'material_only' %}
                 <span class="scope-badge">
                     {% if scope == 'material_and_labour' %}👷 Material + Labour{% else %}📦 Material Only{% endif %}
@@ -189,8 +202,6 @@
         <div class="two-column">
             <!-- LEFT COLUMN -->
             <div>
-                {# ── COST SUMMARY ── #}
-                {# FIXED: direct attribute access for budget_range #}
                 {% set budget = (project.budget_range or 'medium') | lower %}
                 {% set tc = estimation.costs.get(budget, estimation.costs.get('medium', {})) %}
                 {% set mat_cost   = tc.get('material_cost', 0) %}
@@ -209,7 +220,6 @@
                             <div class="breakdown-label">Materials</div>
                             <div class="breakdown-value">₹{{ "{:,.0f}".format(mat_cost) }}</div>
                         </div>
-                        {# Labour only shown when scope = material_and_labour #}
                         <div class="breakdown-item labour-item {% if scope != 'material_and_labour' %}hidden{% endif %}">
                             <div class="breakdown-label">Labour</div>
                             <div class="breakdown-value">₹{{ "{:,.0f}".format(lab_cost) }}</div>
@@ -221,7 +231,6 @@
                     </div>
                 </div>
 
-                {# ── AI RATIONALE ── #}
                 {% if estimation.get('ai_rationale') %}
                 <div class="ai-block">
                     <span class="ai-block-icon">🤖</span>
@@ -234,7 +243,6 @@
                 </div>
                 {% endif %}
 
-                {# ── STAGES & MATERIALS ── #}
                 <div class="card">
                     <div class="section-title">🏗️ Construction Stages &amp; Materials</div>
 
@@ -252,7 +260,6 @@
                     ] %}
 
                     {% for stage_key, icon, stage_name in stages %}
-                    {# FIXED: safe .get() with fallbacks #}
                     {% set stage_cost = tc.get('stage_breakdown', {}).get(stage_key, 0) %}
                     {% set stage_mats = estimation.materials.get(stage_key, {}) %}
                     <div class="stage-accordion">
@@ -274,11 +281,7 @@
                                 {% if stage_mats %}
                                 <table>
                                     <thead>
-                                        <tr>
-                                            <th>Material</th>
-                                            <th>Quantity</th>
-                                            <th>Unit</th>
-                                        </tr>
+                                        <tr><th>Material</th><th>Quantity</th><th>Unit</th></tr>
                                     </thead>
                                     <tbody>
                                         {% for material, quantity in stage_mats.items() %}
@@ -310,7 +313,6 @@
                     {% endfor %}
                 </div>
 
-                {# ── BUDGET COMPARISON ── #}
                 <div class="card">
                     <div class="section-title">💰 Budget Comparison</div>
                     <table>
@@ -357,7 +359,6 @@
                             <span class="info-value">{{ project.plot_area }} sq ft</span>
                         </div>
                         {% endif %}
-                        {# FIXED: villa fallback for rooms/floors/bathrooms #}
                         <div class="info-row">
                             <span class="info-label">Rooms</span>
                             <span class="info-value">{{ project.rooms or project.villa_rooms or '—' }}</span>
@@ -386,33 +387,48 @@
                         </div>
                     </div>
 
-                    {# ── FULL LOCATION BLOCK ── #}
-                    {# Shows all 5 location fields submitted from the form #}
                     <div style="margin-top:16px;">
                         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:10px;">📍 Location</div>
                         <div class="location-block">
                             <div class="location-line">
-                                {% if project.location_address %}
-                                    <strong>{{ project.location_address }}</strong><br>
-                                {% endif %}
-                                {% if project.location_place %}
-                                    {{ project.location_place }}{% if project.location_district %}, {{ project.location_district }}{% endif %}<br>
-                                {% elif project.location_district %}
-                                    {{ project.location_district }}<br>
-                                {% endif %}
-                                {% if project.location_state %}
-                                    {{ project.location_state }}
-                                    {% if project.location_pin %} — {{ project.location_pin }}{% endif %}
-                                {% elif project.location_pin %}
-                                    PIN: {{ project.location_pin }}
-                                {% endif %}
-                                {% if not project.location_address and not project.location_place and not project.location_state %}
-                                    {{ project.location or 'Location not available' }}
-                                {% endif %}
+                                {% if project.location_address %}<strong>{{ project.location_address }}</strong><br>{% endif %}
+                                {% if project.location_place %}{{ project.location_place }}{% if project.location_district %}, {{ project.location_district }}{% endif %}<br>
+                                {% elif project.location_district %}{{ project.location_district }}<br>{% endif %}
+                                {% if project.location_state %}{{ project.location_state }}{% if project.location_pin %} — {{ project.location_pin }}{% endif %}
+                                {% elif project.location_pin %}PIN: {{ project.location_pin }}{% endif %}
+                                {% if not project.location_address and not project.location_place and not project.location_state %}{{ project.location or 'Location not available' }}{% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Contractor Info (when assigned) -->
+                {% if project.contractor_id %}
+                <div class="card">
+                    <div class="section-title">🔨 Assigned Contractor</div>
+                    <div class="contractor-strip">
+                        <div class="contractor-strip-label">Contractor</div>
+                        <div class="contractor-strip-name">{{ project.contractor_name or '—' }}</div>
+                        {% if project.contractor_company %}
+                        <div class="contractor-strip-sub">{{ project.contractor_company }}</div>
+                        {% endif %}
+                    </div>
+                    {% if project.agreed_cost %}
+                    <div class="info-list" style="margin-top:12px;">
+                        <div class="info-row">
+                            <span class="info-label">Agreed Cost</span>
+                            <span class="info-value">₹{{ "{:,.0f}".format(project.agreed_cost) }}</span>
+                        </div>
+                        {% if project.agreed_duration %}
+                        <div class="info-row">
+                            <span class="info-label">Duration</span>
+                            <span class="info-value">{{ project.agreed_duration }} days</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
 
                 <!-- Timeline -->
                 <div class="card">
@@ -449,6 +465,19 @@
                         <a href="{{ url_for('user.find_contractors') }}" class="btn-outline">🔨 Find Contractors</a>
                         <a href="{{ url_for('user.order_materials', project_id=project.id) }}" class="btn-outline">📦 Order Materials</a>
                         <a href="{{ url_for('user.edit_project', project_id=project.id) }}" class="btn-outline">✏️ Edit Project</a>
+
+                        {# ── PAY CONTRACTOR (COD) ── show only when contractor is assigned #}
+                        {% if project.contractor_id %}
+                            {% if project.contractor_payment_status == 'paid' %}
+                                <span class="contractor-paid-note">✅ Contractor Paid</span>
+                                <a href="{{ url_for('payment.contractor_receipt', project_id=project.id) }}" class="btn-outline" style="text-align:center;">🧾 Payment Receipt</a>
+                            {% elif project.contractor_payment_status == 'cod_confirmed' %}
+                                <span class="contractor-paid-note" style="background:#FBF3E0;color:#856404;border-color:#F0D9A0;">💵 COD Confirmed · Pending cash handover</span>
+                                <a href="{{ url_for('payment.contractor_receipt', project_id=project.id) }}" class="btn-outline" style="text-align:center;">🧾 Payment Receipt</a>
+                            {% else %}
+                                <a href="{{ url_for('payment.pay_contractor', project_id=project.id) }}" class="btn-pay-contractor">💳 Pay Contractor (COD)</a>
+                            {% endif %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -456,7 +485,6 @@
     </div>
 
     {# ── RATING MODAL ── #}
-    {# FIXED: direct attribute access instead of .get() for SQLAlchemy model #}
     {% if project.status == 'completed' and not project.reviewed and project.contractor_id %}
     <div id="ratingModal" class="modal-overlay">
         <div class="modal-box">
@@ -488,10 +516,7 @@
             const content = document.getElementById('stage-' + key);
             const header  = content.previousElementSibling;
             document.querySelectorAll('.stage-content').forEach(el => {
-                if (el.id !== 'stage-' + key) {
-                    el.classList.remove('active');
-                    el.previousElementSibling.classList.remove('active');
-                }
+                if (el.id !== 'stage-' + key) { el.classList.remove('active'); el.previousElementSibling.classList.remove('active'); }
             });
             content.classList.toggle('active');
             header.classList.toggle('active');
@@ -502,30 +527,20 @@
         document.querySelectorAll('.star').forEach(star => {
             star.addEventListener('mouseenter', function() {
                 const r = parseInt(this.dataset.rating);
-                document.querySelectorAll('.star').forEach((s,i) =>
-                    s.style.color = i < r ? '#F59E0B' : 'var(--stone)');
+                document.querySelectorAll('.star').forEach((s,i) => s.style.color = i < r ? '#F59E0B' : 'var(--stone)');
             });
             star.addEventListener('mouseleave', () => {
-                document.querySelectorAll('.star').forEach((s,i) =>
-                    s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
+                document.querySelectorAll('.star').forEach((s,i) => s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
             });
             star.addEventListener('click', function() {
                 selectedRating = parseInt(this.dataset.rating);
                 document.getElementById('ratingValue').value = selectedRating;
-                document.querySelectorAll('.star').forEach((s,i) =>
-                    s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
+                document.querySelectorAll('.star').forEach((s,i) => s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
             });
         });
 
-        window.addEventListener('load', () => {
-            const modal = document.getElementById('ratingModal');
-            if (modal) modal.classList.add('show');
-        });
-
-        function closeRatingModal() {
-            const modal = document.getElementById('ratingModal');
-            if (modal) modal.classList.remove('show');
-        }
+        window.addEventListener('load', () => { const m = document.getElementById('ratingModal'); if (m) m.classList.add('show'); });
+        function closeRatingModal() { const m = document.getElementById('ratingModal'); if (m) m.classList.remove('show'); }
 
         const ratingForm = document.getElementById('ratingForm');
         if (ratingForm) {

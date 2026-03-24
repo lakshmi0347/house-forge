@@ -27,7 +27,6 @@ def get_db():
         return None
 
 
-# ─── helper: fetch profile picture for navbar ───────────────────────────────
 def _get_profile_picture(db):
     """Return the current user's profile_picture filename or None."""
     try:
@@ -69,10 +68,10 @@ def dashboard():
         orders.append(order_data)
 
     stats = {
-        'total_projects': len(projects),
+        'total_projects':  len(projects),
         'active_projects': len([p for p in projects if p.get('status') == 'active']),
         'total_estimates': len(estimates),
-        'total_orders': len(orders)
+        'total_orders':    len(orders)
     }
 
     user_profile_picture = _get_profile_picture(db)
@@ -102,7 +101,7 @@ def profile():
 
     user_data = user_doc.to_dict()
 
-    projects_ref = db.collection('projects').where('user_id', '==', current_user.id).stream()
+    projects_ref  = db.collection('projects').where('user_id', '==', current_user.id).stream()
     project_count = len(list(projects_ref))
 
     return render_template('user/profile.html',
@@ -119,17 +118,15 @@ def update_profile():
         return jsonify({'success': False, 'message': 'Database connection error'}), 500
 
     try:
-        name = request.form.get('name')
-        email = request.form.get('email')
-        phone = request.form.get('phone', '')
+        name     = request.form.get('name')
+        email    = request.form.get('email')
+        phone    = request.form.get('phone', '')
         location = request.form.get('location', '')
 
         user_ref = db.collection('users').document(current_user.id)
         user_ref.update({
-            'name': name,
-            'email': email,
-            'phone': phone,
-            'location': location,
+            'name': name, 'email': email,
+            'phone': phone, 'location': location,
             'updated_at': datetime.now().isoformat()
         })
 
@@ -152,26 +149,20 @@ def upload_profile_picture():
             return jsonify({'success': False, 'message': 'No file uploaded'}), 400
 
         file = request.files['profile_picture']
-
         if file.filename == '':
             return jsonify({'success': False, 'message': 'No file selected'}), 400
 
         allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
         file_ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
-
         if file_ext not in allowed_extensions:
             return jsonify({'success': False, 'message': 'Invalid file type. Only PNG, JPG, JPEG, and GIF allowed'}), 400
 
         filename = secure_filename(f"{current_user.id}_{int(datetime.now().timestamp())}.{file_ext}")
-
         upload_folder = os.path.join('static', 'uploads', 'profiles')
         os.makedirs(upload_folder, exist_ok=True)
+        file.save(os.path.join(upload_folder, filename))
 
-        filepath = os.path.join(upload_folder, filename)
-        file.save(filepath)
-
-        user_ref = db.collection('users').document(current_user.id)
-        user_ref.update({
+        db.collection('users').document(current_user.id).update({
             'profile_picture': filename,
             'updated_at': datetime.now().isoformat()
         })
@@ -192,22 +183,19 @@ def change_password():
 
     try:
         current_password = request.form.get('currentPassword')
-        new_password = request.form.get('newPassword')
+        new_password     = request.form.get('newPassword')
 
         user_ref = db.collection('users').document(current_user.id)
         user_doc = user_ref.get()
-
         if not user_doc.exists:
             return jsonify({'success': False, 'message': 'User not found'}), 404
 
         user_data = user_doc.to_dict()
-
         if not check_password_hash(user_data.get('password', ''), current_password):
             return jsonify({'success': False, 'message': 'Current password is incorrect'}), 400
 
-        hashed_password = generate_password_hash(new_password)
         user_ref.update({
-            'password': hashed_password,
+            'password': generate_password_hash(new_password),
             'updated_at': datetime.now().isoformat()
         })
 
@@ -277,12 +265,8 @@ def create_project():
             bathrooms = int(request.form.get('bathrooms') or 2)
 
         estimation = calculate_materials_and_cost(
-            square_feet  = square_feet,
-            rooms        = rooms,
-            floors       = floors,
-            bathrooms    = bathrooms,
-            budget_range = budget_range,
-            form         = request.form,
+            square_feet=square_feet, rooms=rooms, floors=floors,
+            bathrooms=bathrooms, budget_range=budget_range, form=request.form,
         )
 
         project_data = {
@@ -312,17 +296,10 @@ def create_project():
         project_id = doc_ref[1].id
         project_data['id'] = project_id
 
-        return render_template(
-            'user/project_created.html',
-            project    = project_data,
-            estimation = estimation,
-            project_id = project_id,
-        )
+        return render_template('user/project_created.html',
+                               project=project_data, estimation=estimation, project_id=project_id)
 
-    return render_template(
-        'user/create_project.html',
-        user_profile_picture = user_profile_picture,
-    )
+    return render_template('user/create_project.html', user_profile_picture=user_profile_picture)
 
 
 @user_bp.route('/project/<project_id>')
@@ -337,33 +314,26 @@ def view_project(project_id):
         debug_user_info(f"VIEW PROJECT: {project_id}")
 
         project_doc = db.collection('projects').document(project_id).get()
-
         if not project_doc.exists:
             flash('Project not found', 'error')
             return redirect(url_for('user.projects'))
 
         project_data = project_doc.to_dict()
-
         if project_data.get('user_id') != current_user.id:
             flash('Access denied', 'error')
             return redirect(url_for('user.projects'))
 
         project_data['id'] = project_id
         estimation = project_data.get('estimation', {})
-
         user_profile_picture = _get_profile_picture(db)
 
-        return render_template(
-            'user/project_detail.html',
-            project=project_data,
-            estimation=estimation,
-            user_profile_picture=user_profile_picture
-        )
+        return render_template('user/project_detail.html',
+                               project=project_data, estimation=estimation,
+                               user_profile_picture=user_profile_picture)
 
     except Exception as e:
         print(f"❌ Error loading project: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
         flash(f'Error loading project: {str(e)}', 'error')
         return redirect(url_for('user.projects'))
 
@@ -381,28 +351,20 @@ def download_pdf(project_id):
 
     try:
         project_doc = db.collection('projects').document(project_id).get()
-
         if not project_doc.exists:
             flash('Project not found', 'error')
             return redirect(url_for('user.projects'))
 
         project_data = project_doc.to_dict()
-
         if project_data.get('user_id') != current_user.id:
             flash('Access denied', 'error')
             return redirect(url_for('user.projects'))
 
         estimation = project_data.get('estimation', {})
         pdf_buffer = generate_project_pdf(project_data, estimation)
+        filename   = f"{project_data.get('title', 'project').replace(' ', '_')}_estimation.pdf"
 
-        filename = f"{project_data.get('title', 'project').replace(' ', '_')}_estimation.pdf"
-
-        return send_file(
-            pdf_buffer,
-            mimetype='application/pdf',
-            as_attachment=True,
-            download_name=filename
-        )
+        return send_file(pdf_buffer, mimetype='application/pdf', as_attachment=True, download_name=filename)
 
     except Exception as e:
         flash(f'Error generating PDF: {str(e)}', 'error')
@@ -420,19 +382,16 @@ def find_contractors():
     try:
         contractors_ref = db.collection('contractors').where('verified', '==', True).where('active', '==', True).stream()
         contractors = []
-
         for doc in contractors_ref:
             contractor_data = doc.to_dict()
             contractor_data['id'] = doc.id
             contractors.append(contractor_data)
 
         contractors.sort(key=lambda x: x.get('rating', 0), reverse=True)
-
         user_profile_picture = _get_profile_picture(db)
 
         return render_template('user/find_contractors.html',
-                               contractors=contractors,
-                               user_profile_picture=user_profile_picture)
+                               contractors=contractors, user_profile_picture=user_profile_picture)
 
     except Exception as e:
         flash(f'Error loading contractors: {str(e)}', 'error')
@@ -449,19 +408,16 @@ def view_contractor(contractor_id):
 
     try:
         contractor_doc = db.collection('contractors').document(contractor_id).get()
-
         if not contractor_doc.exists:
             flash('Contractor not found', 'error')
             return redirect(url_for('user.find_contractors'))
 
         contractor_data = contractor_doc.to_dict()
         contractor_data['id'] = contractor_id
-
-        user_profile_picture = _get_profile_picture(db)
+        user_profile_picture  = _get_profile_picture(db)
 
         return render_template('user/contractor_profile.html',
-                               contractor=contractor_data,
-                               user_profile_picture=user_profile_picture)
+                               contractor=contractor_data, user_profile_picture=user_profile_picture)
 
     except Exception as e:
         flash(f'Error loading contractor: {str(e)}', 'error')
@@ -478,13 +434,11 @@ def project_bids(project_id):
 
     try:
         project_doc = db.collection('projects').document(project_id).get()
-
         if not project_doc.exists:
             flash('Project not found', 'error')
             return redirect(url_for('user.projects'))
 
         project_data = project_doc.to_dict()
-
         if project_data.get('user_id') != current_user.id:
             flash('Access denied', 'error')
             return redirect(url_for('user.projects'))
@@ -493,7 +447,6 @@ def project_bids(project_id):
 
         bids_ref = db.collection('bids').where('project_id', '==', project_id).stream()
         bids = []
-
         for doc in bids_ref:
             bid_data = doc.to_dict()
             bid_data['id'] = doc.id
@@ -511,9 +464,7 @@ def project_bids(project_id):
         user_profile_picture = _get_profile_picture(db)
 
         return render_template('user/project_bids.html',
-                               project=project_data,
-                               bids=bids,
-                               stats=stats,
+                               project=project_data, bids=bids, stats=stats,
                                user_profile_picture=user_profile_picture)
 
     except Exception as e:
@@ -531,14 +482,12 @@ def accept_bid(bid_id):
 
     try:
         bid_doc = db.collection('bids').document(bid_id).get()
-
         if not bid_doc.exists:
             flash('Bid not found', 'error')
             return redirect(url_for('user.projects'))
 
-        bid_data = bid_doc.to_dict()
-
-        project_doc = db.collection('projects').document(bid_data.get('project_id')).get()
+        bid_data     = bid_doc.to_dict()
+        project_doc  = db.collection('projects').document(bid_data.get('project_id')).get()
         project_data = project_doc.to_dict()
 
         if project_data.get('user_id') != current_user.id:
@@ -546,18 +495,14 @@ def accept_bid(bid_id):
             return redirect(url_for('user.projects'))
 
         db.collection('bids').document(bid_id).update({
-            'status':      'accepted',
-            'accepted_at': datetime.now(),
-            'updated_at':  datetime.now()
+            'status': 'accepted', 'accepted_at': datetime.now(), 'updated_at': datetime.now()
         })
 
         other_bids = db.collection('bids').where('project_id', '==', bid_data.get('project_id')).stream()
         for other_bid in other_bids:
             if other_bid.id != bid_id and other_bid.to_dict().get('status') == 'pending':
                 db.collection('bids').document(other_bid.id).update({
-                    'status':      'rejected',
-                    'rejected_at': datetime.now(),
-                    'updated_at':  datetime.now()
+                    'status': 'rejected', 'rejected_at': datetime.now(), 'updated_at': datetime.now()
                 })
 
         db.collection('projects').document(bid_data.get('project_id')).update({
@@ -589,14 +534,12 @@ def reject_bid(bid_id):
 
     try:
         bid_doc = db.collection('bids').document(bid_id).get()
-
         if not bid_doc.exists:
             flash('Bid not found', 'error')
             return redirect(url_for('user.projects'))
 
-        bid_data = bid_doc.to_dict()
-
-        project_doc = db.collection('projects').document(bid_data.get('project_id')).get()
+        bid_data     = bid_doc.to_dict()
+        project_doc  = db.collection('projects').document(bid_data.get('project_id')).get()
         project_data = project_doc.to_dict()
 
         if project_data.get('user_id') != current_user.id:
@@ -608,9 +551,7 @@ def reject_bid(bid_id):
             return redirect(url_for('user.project_bids', project_id=bid_data.get('project_id')))
 
         db.collection('bids').document(bid_id).update({
-            'status':      'rejected',
-            'rejected_at': datetime.now(),
-            'updated_at':  datetime.now()
+            'status': 'rejected', 'rejected_at': datetime.now(), 'updated_at': datetime.now()
         })
 
         flash('Bid rejected successfully', 'success')
@@ -636,19 +577,15 @@ def find_suppliers():
         for doc in suppliers_ref:
             supplier_data = doc.to_dict()
             supplier_data['id'] = doc.id
-
             materials_ref = db.collection('materials').where('supplier_id', '==', doc.id).stream()
             supplier_data['materials_count'] = len(list(materials_ref))
-
             suppliers.append(supplier_data)
 
         suppliers.sort(key=lambda x: x.get('rating', 0), reverse=True)
-
         user_profile_picture = _get_profile_picture(db)
 
         return render_template('user/find_suppliers.html',
-                               suppliers=suppliers,
-                               user_profile_picture=user_profile_picture)
+                               suppliers=suppliers, user_profile_picture=user_profile_picture)
 
     except Exception as e:
         flash(f'Error loading suppliers: {str(e)}', 'error')
@@ -665,7 +602,6 @@ def view_supplier(supplier_id):
 
     try:
         supplier_doc = db.collection('suppliers').document(supplier_id).get()
-
         if not supplier_doc.exists:
             flash('Supplier not found', 'error')
             return redirect(url_for('user.find_suppliers'))
@@ -675,7 +611,6 @@ def view_supplier(supplier_id):
 
         materials_ref = db.collection('materials').where('supplier_id', '==', supplier_id).stream()
         materials = []
-
         for doc in materials_ref:
             material_data = doc.to_dict()
             material_data['id'] = doc.id
@@ -684,8 +619,7 @@ def view_supplier(supplier_id):
         user_profile_picture = _get_profile_picture(db)
 
         return render_template('user/supplier_profile.html',
-                               supplier=supplier_data,
-                               materials=materials,
+                               supplier=supplier_data, materials=materials,
                                user_profile_picture=user_profile_picture)
 
     except Exception as e:
@@ -703,13 +637,11 @@ def edit_project(project_id):
 
     try:
         project_doc = db.collection('projects').document(project_id).get()
-
         if not project_doc.exists:
             flash('Project not found', 'error')
             return redirect(url_for('user.projects'))
 
         project_data = project_doc.to_dict()
-
         if project_data.get('user_id') != current_user.id:
             flash('Access denied', 'error')
             return redirect(url_for('user.projects'))
@@ -723,18 +655,12 @@ def edit_project(project_id):
             bathrooms    = int(request.form.get('bathrooms', 2))
             budget_range = request.form.get('budget_range')
 
-            # FIX: pass form so the detailed calculator receives all fields,
-            # consistent with create_project.
             estimation = calculate_materials_and_cost(
-                square_feet  = square_feet,
-                rooms        = rooms,
-                floors       = floors,
-                bathrooms    = bathrooms,
-                budget_range = budget_range,
-                form         = request.form,
+                square_feet=square_feet, rooms=rooms, floors=floors,
+                bathrooms=bathrooms, budget_range=budget_range, form=request.form,
             )
 
-            updated_data = {
+            db.collection('projects').document(project_id).update({
                 'title':         request.form.get('title'),
                 'square_feet':   square_feet,
                 'rooms':         rooms,
@@ -746,9 +672,7 @@ def edit_project(project_id):
                 'description':   request.form.get('description'),
                 'estimation':    estimation,
                 'updated_at':    datetime.now()
-            }
-
-            db.collection('projects').document(project_id).update(updated_data)
+            })
             flash('Project updated successfully!', 'success')
             return redirect(url_for('user.view_project', project_id=project_id))
 
@@ -756,8 +680,7 @@ def edit_project(project_id):
         user_profile_picture = _get_profile_picture(db)
 
         return render_template('user/edit_project.html',
-                               project=project_data,
-                               user_profile_picture=user_profile_picture)
+                               project=project_data, user_profile_picture=user_profile_picture)
 
     except Exception as e:
         flash(f'Error: {str(e)}', 'error')
@@ -779,7 +702,6 @@ def browse_materials():
         for doc in materials_ref:
             material_data = doc.to_dict()
             material_data['id'] = doc.id
-
             supplier_id = material_data.get('supplier_id')
             if supplier_id:
                 supplier_doc = db.collection('suppliers').document(supplier_id).get()
@@ -787,14 +709,12 @@ def browse_materials():
                     supplier_data = supplier_doc.to_dict()
                     material_data['supplier_name']   = supplier_data.get('company_name') or supplier_data.get('name')
                     material_data['supplier_rating'] = supplier_data.get('rating', 0.0)
-
             materials.append(material_data)
 
         user_profile_picture = _get_profile_picture(db)
 
         return render_template('user/browse_materials.html',
-                               materials=materials,
-                               user_profile_picture=user_profile_picture)
+                               materials=materials, user_profile_picture=user_profile_picture)
 
     except Exception as e:
         flash(f'Error loading materials: {str(e)}', 'error')
@@ -811,14 +731,11 @@ def order_materials(project_id):
 
     try:
         project_doc = db.collection('projects').document(project_id).get()
-
         if not project_doc.exists:
             flash('Project not found', 'error')
             return redirect(url_for('user.projects'))
 
         project_data = project_doc.to_dict()
-
-        # FIX (Bug 6 partial): verify project ownership here too
         if project_data.get('user_id') != current_user.id:
             flash('Access denied', 'error')
             return redirect(url_for('user.projects'))
@@ -827,23 +744,19 @@ def order_materials(project_id):
 
         materials_ref = db.collection('materials').stream()
         materials = []
-
         for doc in materials_ref:
             material_data = doc.to_dict()
             material_data['id'] = doc.id
-
             supplier_id = material_data.get('supplier_id')
             if supplier_id:
                 supplier_doc = db.collection('suppliers').document(supplier_id).get()
                 if supplier_doc.exists:
                     supplier_data = supplier_doc.to_dict()
                     material_data['supplier_name'] = supplier_data.get('company_name') or supplier_data.get('name')
-
             materials.append(material_data)
 
-        estimation           = project_data.get('estimation', {})
-        estimated_materials  = estimation.get('materials', {})
-
+        estimation          = project_data.get('estimation', {})
+        estimated_materials = estimation.get('materials', {})
         user_profile_picture = _get_profile_picture(db)
 
         return render_template('user/order_materials.html',
@@ -858,9 +771,9 @@ def order_materials(project_id):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  FIX: create_order — addresses Bug 1 (no stock check), Bug 2 (None supplier
-#       silently skipped with no user feedback), Bug 3 (quantity ≤ 0 allowed),
-#       Bug 6 (project ownership not verified).
+#  create_order  ← ONE definition only.
+#  Stores delivery_address and delivery_note typed/confirmed by the user
+#  on the order_materials page. Falls back to project location if not sent.
 # ─────────────────────────────────────────────────────────────────────────────
 @user_bp.route('/order/create', methods=['POST'])
 @login_required
@@ -874,26 +787,45 @@ def create_order():
         material_ids = request.form.getlist('material_ids[]')
         quantities   = request.form.getlist('quantities[]')
 
-        print("=" * 50)
-        print("ORDER CREATION DEBUG")
-        print(f"Project ID: {project_id}")
-        print(f"Material IDs: {material_ids}")
-        print(f"Quantities: {quantities}")
-        print("=" * 50)
+        # Delivery address fields sent by the order_materials page.
+        # The page pre-fills from the project but the user can edit freely.
+        delivery_address  = request.form.get('delivery_address', '').strip()
+        delivery_district = request.form.get('delivery_district', '').strip()
+        delivery_pin      = request.form.get('delivery_pin', '').strip()
+        delivery_state    = request.form.get('delivery_state', '').strip()
+        delivery_landmark = request.form.get('delivery_landmark', '').strip()
 
         if not material_ids or not quantities:
             return jsonify({'success': False, 'message': 'No materials selected'}), 400
 
-        # ── FIX Bug 6: verify the project belongs to the current user ──────
+        # ── Verify project ownership ───────────────────────────────────────
         project_doc = db.collection('projects').document(project_id).get()
         if not project_doc.exists:
             return jsonify({'success': False, 'message': 'Project not found'}), 404
 
         project_data = project_doc.to_dict()
         if project_data.get('user_id') != current_user.id:
-            return jsonify({'success': False, 'message': 'Access denied: project does not belong to you'}), 403
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
 
-        # ── FIX Bug 3: validate quantities server-side ─────────────────────
+        # ── Build delivery_info — fall back to project address if not provided
+        delivery_info = {
+            'address':  delivery_address  or project_data.get('location_address', project_data.get('location', '')),
+            'district': delivery_district or project_data.get('location_district', ''),
+            'state':    delivery_state    or project_data.get('location_state', ''),
+            'pin':      delivery_pin      or project_data.get('location_pin', ''),
+            'landmark': delivery_landmark,
+        }
+
+        # Build a human-readable single string for the supplier's order card
+        addr_parts = [p for p in [
+            delivery_info['address'], delivery_info['district'],
+            delivery_info['state'], delivery_info['pin']
+        ] if p]
+        if delivery_info['landmark']:
+            addr_parts.append(f"Near: {delivery_info['landmark']}")
+        delivery_display = ', '.join(addr_parts) if addr_parts else ''
+
+        # ── Validate quantities ────────────────────────────────────────────
         validated_quantities = []
         for raw_qty in quantities:
             try:
@@ -901,14 +833,13 @@ def create_order():
             except (ValueError, TypeError):
                 return jsonify({'success': False, 'message': 'Invalid quantity value'}), 400
             if qty < 1:
-                return jsonify({'success': False, 'message': 'Quantity must be at least 1 for every item'}), 400
+                return jsonify({'success': False, 'message': 'Quantity must be at least 1'}), 400
             validated_quantities.append(qty)
 
-        # ── FIX Bug 1 & Bug 2: check stock and catch missing supplier_id ──
-        # Collect material documents first so we can validate before writing.
-        resolved_items   = []   # list of dicts ready for the order
-        orphan_materials = []   # materials with no supplier_id
-        stock_errors     = []   # materials with insufficient stock
+        # ── Check stock & supplier ─────────────────────────────────────────
+        resolved_items   = []
+        orphan_materials = []
+        stock_errors     = []
 
         for i, material_id in enumerate(material_ids):
             quantity     = validated_quantities[i]
@@ -920,12 +851,10 @@ def create_order():
             material_data = material_doc.to_dict()
             supplier_id   = material_data.get('supplier_id')
 
-            # Bug 2: catch orphaned materials and surface the error
             if not supplier_id:
                 orphan_materials.append(material_data.get('name', material_id))
                 continue
 
-            # Bug 1: enforce stock availability
             available_qty = material_data.get('quantity', 0)
             if quantity > available_qty:
                 stock_errors.append(
@@ -944,71 +873,61 @@ def create_order():
                 'supplier_id':    supplier_id,
             })
 
-        # Surface all validation errors before writing anything
         if stock_errors:
-            return jsonify({
-                'success': False,
-                'message': 'Insufficient stock for: ' + '; '.join(stock_errors)
-            }), 400
-
+            return jsonify({'success': False,
+                            'message': 'Insufficient stock for: ' + '; '.join(stock_errors)}), 400
         if orphan_materials:
-            return jsonify({
-                'success': False,
-                'message': (
-                    'The following materials have no supplier assigned and cannot be ordered: '
-                    + ', '.join(orphan_materials)
-                )
-            }), 400
-
+            return jsonify({'success': False,
+                            'message': 'No supplier assigned for: ' + ', '.join(orphan_materials)}), 400
         if not resolved_items:
             return jsonify({'success': False, 'message': 'No valid materials to order'}), 400
 
-        # ── Group by supplier and create one order document each ──────────
+        # ── Group by supplier, one order per supplier ──────────────────────
         groups = {}
         for item in resolved_items:
-            sid = item['supplier_id']
-            groups.setdefault(sid, []).append(item)
+            groups.setdefault(item['supplier_id'], []).append(item)
 
         created_orders = []
 
         for supplier_id, items in groups.items():
             supplier_total = sum(item['total'] for item in items)
+            supplier_doc   = db.collection('suppliers').document(supplier_id).get()
+            supplier_data  = supplier_doc.to_dict() if supplier_doc.exists else {}
 
-            supplier_doc  = db.collection('suppliers').document(supplier_id).get()
-            supplier_data = supplier_doc.to_dict() if supplier_doc.exists else {}
+            order_doc = {
+                'user_id':          current_user.id,
+                'user_name':        current_user.name,
+                'user_email':       current_user.email if hasattr(current_user, 'email') else '',
+                'user_phone':       current_user.phone if hasattr(current_user, 'phone') else '',
+                'project_id':       project_id,
+                'project_title':    project_data.get('title', 'Untitled Project'),
 
-            supplier_order = {
-                'user_id':        current_user.id,
-                'user_name':      current_user.name,
-                'user_email':     current_user.email if hasattr(current_user, 'email') else '',
-                'project_id':     project_id,
-                'project_title':  project_data.get('title', 'Untitled Project'),
-                'supplier_id':    supplier_id,
-                'supplier_name':  supplier_data.get('company_name') or supplier_data.get('name', 'Supplier'),
-                'items':          items,
-                'total':          supplier_total,
-                'status':         'pending',
-                'created_at':     datetime.now(),
-                'updated_at':     datetime.now()
+                # Delivery — structured dict + flat display string for the supplier view
+                'delivery_address': delivery_display,
+                'delivery_info':    delivery_info,
+
+                'supplier_id':      supplier_id,
+                'supplier_name':    supplier_data.get('company_name') or supplier_data.get('name', 'Supplier'),
+                'items':            items,
+                'total':            supplier_total,
+                'status':           'pending',
+                'payment_status':   None,
+                'created_at':       datetime.now(),
+                'updated_at':       datetime.now(),
             }
 
-            order_ref = db.collection('orders').add(supplier_order)
+            order_ref = db.collection('orders').add(order_doc)
             created_orders.append(order_ref[1].id)
-            print(f"✅ Order created for supplier {supplier_id}: ₹{supplier_total}")
-
-        print(f"✅ Total {len(created_orders)} order(s) created.")
-        print("=" * 50)
+            print(f"✅ Order for supplier {supplier_id}: ₹{supplier_total} → {delivery_display}")
 
         return jsonify({
             'success':   True,
-            'message':   f'Order placed successfully! {len(created_orders)} order(s) created.',
-            'order_ids': created_orders
+            'message':   f'{len(created_orders)} order{"s" if len(created_orders) > 1 else ""} placed successfully!',
+            'order_ids': created_orders,
         })
 
     except Exception as e:
-        print(f"❌ Error creating order: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
@@ -1027,10 +946,8 @@ def my_orders():
         for doc in orders_ref:
             order_data = doc.to_dict()
             order_data['id'] = doc.id
-
             if 'items' in order_data:
                 order_data['order_items'] = order_data['items']
-
             orders.append(order_data)
 
         orders.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
@@ -1044,12 +961,10 @@ def my_orders():
             'total_spent': sum(o.get('total', 0) for o in orders if o.get('status') == 'completed')
         }
 
-        # FIX (Bug 5): pass user_profile_picture so the navbar renders correctly
         user_profile_picture = _get_profile_picture(db)
 
         return render_template('user/my_orders.html',
-                               orders=orders,
-                               stats=stats,
+                               orders=orders, stats=stats,
                                user_profile_picture=user_profile_picture)
 
     except Exception as e:
@@ -1067,19 +982,16 @@ def contact_supplier(supplier_id):
 
     try:
         supplier_doc = db.collection('suppliers').document(supplier_id).get()
-
         if not supplier_doc.exists:
             flash('Supplier not found', 'error')
             return redirect(url_for('user.find_suppliers'))
 
         supplier_data = supplier_doc.to_dict()
         supplier_data['id'] = supplier_id
-
         user_profile_picture = _get_profile_picture(db)
 
         return render_template('user/supplier_contact.html',
-                               supplier=supplier_data,
-                               user_profile_picture=user_profile_picture)
+                               supplier=supplier_data, user_profile_picture=user_profile_picture)
 
     except Exception as e:
         flash(f'Error loading supplier contact: {str(e)}', 'error')
@@ -1100,38 +1012,27 @@ def send_message_to_supplier(supplier_id):
         if not subject or not message_content:
             return jsonify({'success': False, 'message': 'Please fill in all required fields'}), 400
 
-        supplier_ref = db.collection('suppliers').document(supplier_id)
-        supplier_doc = supplier_ref.get()
-
+        supplier_doc = db.collection('suppliers').document(supplier_id).get()
         if not supplier_doc.exists:
             return jsonify({'success': False, 'message': 'Supplier not found'}), 404
 
         supplier_data = supplier_doc.to_dict()
         supplier_name = supplier_data.get('company_name') or supplier_data.get('name', 'Unknown Supplier')
 
-        message_data = {
-            'supplier_id':   supplier_id,
-            'supplier_name': supplier_name,
-            'user_id':       current_user.id,
-            'sender_name':   current_user.name,
-            'sender_email':  current_user.email if hasattr(current_user, 'email') else '',
-            'sender_phone':  current_user.phone if hasattr(current_user, 'phone') else '',
-            'subject':       subject,
-            'message':       message_content,
-            'type':          'inquiry',
-            'read':          False,
-            'created_at':    datetime.now()
-        }
-
-        doc_ref    = db.collection('messages').add(message_data)
-        message_id = doc_ref[1].id
+        db.collection('messages').add({
+            'supplier_id': supplier_id, 'supplier_name': supplier_name,
+            'user_id': current_user.id, 'sender_name': current_user.name,
+            'sender_email': current_user.email if hasattr(current_user, 'email') else '',
+            'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
+            'subject': subject, 'message': message_content,
+            'type': 'inquiry', 'read': False, 'created_at': datetime.now()
+        })
 
         return jsonify({'success': True, 'message': 'Message sent successfully! The supplier will respond soon.'})
 
     except Exception as e:
         print(f"❌ ERROR sending message: {e}")
-        import traceback
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
@@ -1152,43 +1053,29 @@ def request_quote_from_supplier(supplier_id):
         if not all([project_type, material_type, quantity, unit, project_details]):
             return jsonify({'success': False, 'message': 'Please fill in all required fields'}), 400
 
-        supplier_ref = db.collection('suppliers').document(supplier_id)
-        supplier_doc = supplier_ref.get()
-
+        supplier_doc = db.collection('suppliers').document(supplier_id).get()
         if not supplier_doc.exists:
             return jsonify({'success': False, 'message': 'Supplier not found'}), 404
 
         supplier_data = supplier_doc.to_dict()
         supplier_name = supplier_data.get('company_name') or supplier_data.get('name', 'Unknown Supplier')
 
-        quote_data = {
-            'supplier_id':    supplier_id,
-            'supplier_name':  supplier_name,
-            'user_id':        current_user.id,
-            'sender_name':    current_user.name,
-            'sender_email':   current_user.email if hasattr(current_user, 'email') else '',
-            'sender_phone':   current_user.phone if hasattr(current_user, 'phone') else '',
-            'subject':        f'Quote Request: {material_type}',
-            'message':        project_details,
-            'type':           'quote_request',
-            'project_type':   project_type,
-            'material_type':  material_type,
-            'quantity':       quantity,
-            'unit':           unit,
-            'project_details': project_details,
-            'read':           False,
-            'created_at':     datetime.now()
-        }
+        db.collection('messages').add({
+            'supplier_id': supplier_id, 'supplier_name': supplier_name,
+            'user_id': current_user.id, 'sender_name': current_user.name,
+            'sender_email': current_user.email if hasattr(current_user, 'email') else '',
+            'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
+            'subject': f'Quote Request: {material_type}', 'message': project_details,
+            'type': 'quote_request', 'project_type': project_type,
+            'material_type': material_type, 'quantity': quantity, 'unit': unit,
+            'project_details': project_details, 'read': False, 'created_at': datetime.now()
+        })
 
-        doc_ref  = db.collection('messages').add(quote_data)
-        quote_id = doc_ref[1].id
-
-        return jsonify({'success': True, 'message': 'Quote request sent successfully! The supplier will review it and contact you.'})
+        return jsonify({'success': True, 'message': 'Quote request sent successfully!'})
 
     except Exception as e:
         print(f"❌ ERROR sending quote request: {e}")
-        import traceback
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
@@ -1202,19 +1089,16 @@ def contact_contractor(contractor_id):
 
     try:
         contractor_doc = db.collection('contractors').document(contractor_id).get()
-
         if not contractor_doc.exists:
             flash('Contractor not found', 'error')
             return redirect(url_for('user.find_contractors'))
 
         contractor_data = contractor_doc.to_dict()
         contractor_data['id'] = contractor_id
-
-        user_profile_picture = _get_profile_picture(db)
+        user_profile_picture  = _get_profile_picture(db)
 
         return render_template('user/contractor_contact.html',
-                               contractor=contractor_data,
-                               user_profile_picture=user_profile_picture)
+                               contractor=contractor_data, user_profile_picture=user_profile_picture)
 
     except Exception as e:
         flash(f'Error loading contractor contact: {str(e)}', 'error')
@@ -1235,38 +1119,27 @@ def send_message_to_contractor(contractor_id):
         if not subject or not message_content:
             return jsonify({'success': False, 'message': 'Please fill in all required fields'}), 400
 
-        contractor_ref = db.collection('contractors').document(contractor_id)
-        contractor_doc = contractor_ref.get()
-
+        contractor_doc = db.collection('contractors').document(contractor_id).get()
         if not contractor_doc.exists:
             return jsonify({'success': False, 'message': 'Contractor not found'}), 404
 
         contractor_data = contractor_doc.to_dict()
         contractor_name = contractor_data.get('company_name') or contractor_data.get('name', 'Unknown Contractor')
 
-        message_data = {
-            'contractor_id':   contractor_id,
-            'contractor_name': contractor_name,
-            'user_id':         current_user.id,
-            'sender_name':     current_user.name,
-            'sender_email':    current_user.email if hasattr(current_user, 'email') else '',
-            'sender_phone':    current_user.phone if hasattr(current_user, 'phone') else '',
-            'subject':         subject,
-            'message':         message_content,
-            'type':            'inquiry',
-            'read':            False,
-            'created_at':      datetime.now()
-        }
-
-        doc_ref    = db.collection('messages').add(message_data)
-        message_id = doc_ref[1].id
+        db.collection('messages').add({
+            'contractor_id': contractor_id, 'contractor_name': contractor_name,
+            'user_id': current_user.id, 'sender_name': current_user.name,
+            'sender_email': current_user.email if hasattr(current_user, 'email') else '',
+            'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
+            'subject': subject, 'message': message_content,
+            'type': 'inquiry', 'read': False, 'created_at': datetime.now()
+        })
 
         return jsonify({'success': True, 'message': 'Message sent successfully! The contractor will respond soon.'})
 
     except Exception as e:
         print(f"❌ ERROR sending message: {e}")
-        import traceback
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
@@ -1291,43 +1164,29 @@ def request_quote_from_contractor(contractor_id):
                     project_details, name, phone, email]):
             return jsonify({'success': False, 'message': 'Please fill in all required fields'}), 400
 
-        contractor_ref = db.collection('contractors').document(contractor_id)
-        contractor_doc = contractor_ref.get()
-
+        contractor_doc = db.collection('contractors').document(contractor_id).get()
         if not contractor_doc.exists:
             return jsonify({'success': False, 'message': 'Contractor not found'}), 404
 
         contractor_data = contractor_doc.to_dict()
         contractor_name = contractor_data.get('company_name') or contractor_data.get('name', 'Unknown Contractor')
 
-        quote_data = {
-            'contractor_id':    contractor_id,
-            'contractor_name':  contractor_name,
-            'user_id':          current_user.id,
-            'sender_name':      name,
-            'sender_email':     email,
-            'sender_phone':     phone,
-            'subject':          f'Quote Request: {project_type}',
-            'message':          project_details,
-            'type':             'quote_request',
-            'project_type':     project_type,
-            'project_area':     project_area,
-            'project_location': project_location,
-            'project_budget':   project_budget,
-            'project_details':  project_details,
-            'read':             False,
-            'created_at':       datetime.now()
-        }
+        db.collection('messages').add({
+            'contractor_id': contractor_id, 'contractor_name': contractor_name,
+            'user_id': current_user.id, 'sender_name': name,
+            'sender_email': email, 'sender_phone': phone,
+            'subject': f'Quote Request: {project_type}', 'message': project_details,
+            'type': 'quote_request', 'project_type': project_type,
+            'project_area': project_area, 'project_location': project_location,
+            'project_budget': project_budget, 'project_details': project_details,
+            'read': False, 'created_at': datetime.now()
+        })
 
-        doc_ref  = db.collection('messages').add(quote_data)
-        quote_id = doc_ref[1].id
-
-        return jsonify({'success': True, 'message': 'Quote request sent successfully! The contractor will review it and contact you.'})
+        return jsonify({'success': True, 'message': 'Quote request sent successfully!'})
 
     except Exception as e:
         print(f"❌ ERROR sending quote request: {e}")
-        import traceback
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
@@ -1342,18 +1201,16 @@ def delete_project(project_id):
         debug_user_info(f"DELETE PROJECT: {project_id}")
 
         project_doc = db.collection('projects').document(project_id).get()
-
         if not project_doc.exists:
             return jsonify({'success': False, 'message': 'Project not found'}), 404
 
         project_data = project_doc.to_dict()
-
         if project_data.get('user_id') != current_user.id:
             return jsonify({'success': False, 'message': 'Access denied - You do not own this project'}), 403
 
         try:
-            bids_ref      = db.collection('bids').where('project_id', '==', project_id).stream()
-            deleted_bids  = 0
+            bids_ref = db.collection('bids').where('project_id', '==', project_id).stream()
+            deleted_bids = 0
             for bid in bids_ref:
                 db.collection('bids').document(bid.id).delete()
                 deleted_bids += 1
@@ -1362,8 +1219,8 @@ def delete_project(project_id):
             print(f"⚠️ Error deleting bids: {e}")
 
         try:
-            orders_ref      = db.collection('orders').where('project_id', '==', project_id).stream()
-            deleted_orders  = 0
+            orders_ref = db.collection('orders').where('project_id', '==', project_id).stream()
+            deleted_orders = 0
             for order in orders_ref:
                 db.collection('orders').document(order.id).delete()
                 deleted_orders += 1
@@ -1373,14 +1230,12 @@ def delete_project(project_id):
 
         db.collection('projects').document(project_id).delete()
         print(f"✅ Project '{project_data.get('title')}' deleted successfully!")
-        print("=" * 80)
 
         return jsonify({'success': True, 'message': 'Project deleted successfully!'})
 
     except Exception as e:
         print(f"❌ ERROR deleting project: {e}")
-        import traceback
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
@@ -1401,11 +1256,10 @@ def messages_conversations():
 
     try:
         conversations = {}
-
-        all_messages = db.collection('messages').stream()
+        all_messages  = db.collection('messages').stream()
 
         for doc in all_messages:
-            msg         = doc.to_dict()
+            msg           = doc.to_dict()
             contractor_id = msg.get('contractor_id')
             supplier_id   = msg.get('supplier_id')
             msg_user_id   = msg.get('user_id')
@@ -1417,52 +1271,42 @@ def messages_conversations():
 
             if contractor_id:
                 conv_key = f"contractor_{contractor_id}"
-
                 if conv_key not in conversations:
                     conversations[conv_key] = {
-                        'id':               contractor_id,
-                        'sender_id':        contractor_id,
-                        'sender_type':      'contractor',
-                        'sender_name':      msg.get('contractor_name', 'Contractor'),
-                        'sender_email':     msg.get('contractor_email', ''),
-                        'sender_phone':     msg.get('contractor_phone', ''),
-                        'last_message':     msg.get('message', ''),
+                        'id': contractor_id, 'sender_id': contractor_id,
+                        'sender_type': 'contractor',
+                        'sender_name': msg.get('contractor_name', 'Contractor'),
+                        'sender_email': msg.get('contractor_email', ''),
+                        'sender_phone': msg.get('contractor_phone', ''),
+                        'last_message': msg.get('message', ''),
                         'last_message_time': msg.get('created_at', datetime.min),
-                        'unread_count':     0
+                        'unread_count': 0
                     }
-
                 msg_time = msg.get('created_at', datetime.min)
                 if msg_time > conversations[conv_key]['last_message_time']:
                     conversations[conv_key]['last_message']      = msg.get('message', '')
                     conversations[conv_key]['last_message_time'] = msg_time
-
-                is_from_contractor = sender_type == 'contractor' and sender_id == contractor_id
-                if is_from_contractor and not msg.get('read', False):
+                if sender_type == 'contractor' and sender_id == contractor_id and not msg.get('read', False):
                     conversations[conv_key]['unread_count'] += 1
 
             if supplier_id:
                 conv_key = f"supplier_{supplier_id}"
-
                 if conv_key not in conversations:
                     conversations[conv_key] = {
-                        'id':               supplier_id,
-                        'sender_id':        supplier_id,
-                        'sender_type':      'supplier',
-                        'sender_name':      msg.get('supplier_name', 'Supplier'),
-                        'sender_email':     msg.get('supplier_email', ''),
-                        'sender_phone':     msg.get('supplier_phone', ''),
-                        'last_message':     msg.get('message', ''),
+                        'id': supplier_id, 'sender_id': supplier_id,
+                        'sender_type': 'supplier',
+                        'sender_name': msg.get('supplier_name', 'Supplier'),
+                        'sender_email': msg.get('supplier_email', ''),
+                        'sender_phone': msg.get('supplier_phone', ''),
+                        'last_message': msg.get('message', ''),
                         'last_message_time': msg.get('created_at', datetime.min),
-                        'unread_count':     0
+                        'unread_count': 0
                     }
-
                 msg_time = msg.get('created_at', datetime.min)
                 if msg_time > conversations[conv_key]['last_message_time']:
                     conversations[conv_key]['last_message']      = msg.get('message', '')
                     conversations[conv_key]['last_message_time'] = msg_time
-
-                is_from_supplier = sender_type == 'supplier' and sender_id == supplier_id
-                if is_from_supplier and not msg.get('read', False):
+                if sender_type == 'supplier' and sender_id == supplier_id and not msg.get('read', False):
                     conversations[conv_key]['unread_count'] += 1
 
         conversations_list = list(conversations.values())
@@ -1472,8 +1316,7 @@ def messages_conversations():
 
     except Exception as e:
         print(f"❌ Error loading conversations: {e}")
-        import traceback
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
         return jsonify({'conversations': []})
 
 
@@ -1488,70 +1331,39 @@ def messages_conversation(recipient_id):
 
     try:
         all_messages = []
+        field        = 'contractor_id' if recipient_type == 'contractor' else 'supplier_id'
 
-        if recipient_type == 'contractor':
-            messages_query = db.collection('messages') \
-                .where('contractor_id', '==', recipient_id) \
-                .stream()
+        messages_query = db.collection('messages').where(field, '==', recipient_id).stream()
+        for doc in messages_query:
+            msg = doc.to_dict()
+            if msg.get('user_id') == current_user.id or msg.get('sender_id') == current_user.id:
+                msg['id']        = doc.id
+                is_user_message  = (msg.get('sender_id') == current_user.id and msg.get('sender_type') == 'user')
+                msg['direction'] = 'outgoing' if is_user_message else 'incoming'
+                all_messages.append(msg)
 
-            for doc in messages_query:
-                msg = doc.to_dict()
-                if msg.get('user_id') == current_user.id or msg.get('sender_id') == current_user.id:
-                    msg['id'] = doc.id
-                    is_user_message  = (msg.get('sender_id') == current_user.id and msg.get('sender_type') == 'user')
-                    msg['direction'] = 'outgoing' if is_user_message else 'incoming'
-                    all_messages.append(msg)
-
-            contractor_doc = db.collection('contractors').document(recipient_id).get()
-            if contractor_doc.exists:
-                d = contractor_doc.to_dict()
-                contact_info = {
-                    'name':  d.get('company_name') or d.get('name', 'Contractor'),
-                    'email': d.get('email', ''),
-                    'phone': d.get('phone', '')
-                }
-            else:
-                contact_info = {'name': 'Contractor', 'email': '', 'phone': ''}
-
+        collection  = 'contractors' if recipient_type == 'contractor' else 'suppliers'
+        entity_doc  = db.collection(collection).document(recipient_id).get()
+        if entity_doc.exists:
+            d = entity_doc.to_dict()
+            contact_info = {'name': d.get('company_name') or d.get('name', recipient_type.title()),
+                            'email': d.get('email', ''), 'phone': d.get('phone', '')}
         else:
-            messages_query = db.collection('messages') \
-                .where('supplier_id', '==', recipient_id) \
-                .stream()
-
-            for doc in messages_query:
-                msg = doc.to_dict()
-                if msg.get('user_id') == current_user.id or msg.get('sender_id') == current_user.id:
-                    msg['id'] = doc.id
-                    is_user_message  = (msg.get('sender_id') == current_user.id and msg.get('sender_type') == 'user')
-                    msg['direction'] = 'outgoing' if is_user_message else 'incoming'
-                    all_messages.append(msg)
-
-            supplier_doc = db.collection('suppliers').document(recipient_id).get()
-            if supplier_doc.exists:
-                d = supplier_doc.to_dict()
-                contact_info = {
-                    'name':  d.get('company_name') or d.get('name', 'Supplier'),
-                    'email': d.get('email', ''),
-                    'phone': d.get('phone', '')
-                }
-            else:
-                contact_info = {'name': 'Supplier', 'email': '', 'phone': ''}
+            contact_info = {'name': recipient_type.title(), 'email': '', 'phone': ''}
 
         all_messages.sort(key=lambda x: x.get('created_at', datetime.min))
 
         for msg in all_messages:
             if msg['direction'] == 'incoming' and not msg.get('read', False):
-                db.collection('messages').document(msg['id']).update({
-                    'read':    True,
-                    'read_at': datetime.now()
-                })
+                db.collection('messages').document(msg['id']).update(
+                    {'read': True, 'read_at': datetime.now()}
+                )
 
         return jsonify({'messages': all_messages, 'contact_info': contact_info})
 
     except Exception as e:
         print(f"❌ Error loading conversation: {e}")
-        import traceback
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
         return jsonify({'messages': [], 'contact_info': {}})
 
 
@@ -1566,67 +1378,47 @@ def send_message_to_recipient(recipient_id):
 
     try:
         message_text = request.form.get('message', '').strip()
-
         if not message_text:
             return jsonify({'success': False, 'message': 'Message cannot be empty'}), 400
 
+        collection  = 'contractors' if recipient_type == 'contractor' else 'suppliers'
+        entity_doc  = db.collection(collection).document(recipient_id).get()
+        if not entity_doc.exists:
+            return jsonify({'success': False, 'message': f'{recipient_type.title()} not found'}), 404
+
+        entity_data = entity_doc.to_dict()
+        entity_name = entity_data.get('company_name') or entity_data.get('name', '')
+
         if recipient_type == 'contractor':
-            contractor_doc = db.collection('contractors').document(recipient_id).get()
-            if not contractor_doc.exists:
-                return jsonify({'success': False, 'message': 'Contractor not found'}), 404
-
-            contractor_data = contractor_doc.to_dict()
-
             message_data = {
-                'user_id':          current_user.id,
-                'contractor_id':    recipient_id,
-                'sender_id':        current_user.id,
-                'sender_type':      'user',
-                'sender_name':      current_user.name,
-                'sender_email':     current_user.email if hasattr(current_user, 'email') else '',
-                'sender_phone':     current_user.phone if hasattr(current_user, 'phone') else '',
-                'contractor_name':  contractor_data.get('company_name') or contractor_data.get('name'),
-                'message':          message_text,
-                'type':             'chat',
-                'read':             False,
-                'created_at':       datetime.now()
+                'user_id': current_user.id, 'contractor_id': recipient_id,
+                'contractor_name': entity_name,
+                'sender_id': current_user.id, 'sender_type': 'user',
+                'sender_name': current_user.name,
+                'sender_email': current_user.email if hasattr(current_user, 'email') else '',
+                'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
+                'message': message_text, 'type': 'chat', 'read': False, 'created_at': datetime.now()
             }
-
         else:
-            supplier_doc = db.collection('suppliers').document(recipient_id).get()
-            if not supplier_doc.exists:
-                return jsonify({'success': False, 'message': 'Supplier not found'}), 404
-
-            supplier_data = supplier_doc.to_dict()
-
             message_data = {
-                'user_id':       current_user.id,
-                'supplier_id':   recipient_id,
-                'sender_id':     current_user.id,
-                'sender_type':   'user',
-                'sender_name':   current_user.name,
-                'sender_email':  current_user.email if hasattr(current_user, 'email') else '',
-                'sender_phone':  current_user.phone if hasattr(current_user, 'phone') else '',
-                'supplier_name': supplier_data.get('company_name') or supplier_data.get('name'),
-                'message':       message_text,
-                'type':          'chat',
-                'read':          False,
-                'created_at':    datetime.now()
+                'user_id': current_user.id, 'supplier_id': recipient_id,
+                'supplier_name': entity_name,
+                'sender_id': current_user.id, 'sender_type': 'user',
+                'sender_name': current_user.name,
+                'sender_email': current_user.email if hasattr(current_user, 'email') else '',
+                'sender_phone': current_user.phone if hasattr(current_user, 'phone') else '',
+                'message': message_text, 'type': 'chat', 'read': False, 'created_at': datetime.now()
             }
 
         doc_ref    = db.collection('messages').add(message_data)
         message_id = doc_ref[1].id
 
-        return jsonify({
-            'success':    True,
-            'message_id': message_id,
-            'timestamp':  datetime.now().strftime('%I:%M %p')
-        })
+        return jsonify({'success': True, 'message_id': message_id,
+                        'timestamp': datetime.now().strftime('%I:%M %p')})
 
     except Exception as e:
         print(f"❌ Error sending message: {e}")
-        import traceback
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
@@ -1636,22 +1428,16 @@ def messages_unread_count():
     db = get_db()
     if not db:
         return jsonify({'count': 0})
-
     try:
         messages_ref = db.collection('messages').where('user_id', '==', current_user.id).stream()
-
         unread_count = 0
         for doc in messages_ref:
-            message_data = doc.to_dict()
-
-            if message_data.get('sender_id') == current_user.id and message_data.get('sender_type') == 'user':
+            md = doc.to_dict()
+            if md.get('sender_id') == current_user.id and md.get('sender_type') == 'user':
                 continue
-
-            if not message_data.get('read', False):
+            if not md.get('read', False):
                 unread_count += 1
-
         return jsonify({'count': unread_count})
-
     except Exception as e:
         print(f"Error getting unread count: {e}")
         return jsonify({'count': 0})
@@ -1667,21 +1453,14 @@ def complete_project(project_id):
     try:
         project_ref = db.collection('projects').document(project_id)
         project_doc = project_ref.get()
-
         if not project_doc.exists:
             return jsonify({'success': False, 'message': 'Project not found'}), 404
 
         project_data = project_doc.to_dict()
-
         if project_data.get('user_id') != current_user.id:
             return jsonify({'success': False, 'message': 'Access denied'}), 403
 
-        project_ref.update({
-            'status':       'completed',
-            'completed_at': datetime.now(),
-            'updated_at':   datetime.now()
-        })
-
+        project_ref.update({'status': 'completed', 'completed_at': datetime.now(), 'updated_at': datetime.now()})
         return jsonify({'success': True, 'message': 'Project marked as completed!'})
 
     except Exception as e:
@@ -1698,15 +1477,12 @@ def rate_contractor(project_id):
 
     try:
         project_doc = db.collection('projects').document(project_id).get()
-
         if not project_doc.exists:
             return jsonify({'success': False, 'message': 'Project not found'}), 404
 
         project_data = project_doc.to_dict()
-
         if project_data.get('user_id') != current_user.id:
             return jsonify({'success': False, 'message': 'Access denied'}), 403
-
         if project_data.get('status') != 'completed':
             return jsonify({'success': False, 'message': 'Can only rate completed projects'}), 400
 
@@ -1717,45 +1493,28 @@ def rate_contractor(project_id):
         if not contractor_id:
             return jsonify({'success': False, 'message': 'No contractor assigned to this project'}), 400
 
-        review_data = {
-            'project_id':    project_id,
-            'contractor_id': contractor_id,
-            'user_id':       current_user.id,
-            'user_name':     current_user.name,
-            'rating':        rating,
-            'review':        review,
-            'created_at':    datetime.now()
-        }
-        db.collection('reviews').add(review_data)
+        db.collection('reviews').add({
+            'project_id': project_id, 'contractor_id': contractor_id,
+            'user_id': current_user.id, 'user_name': current_user.name,
+            'rating': rating, 'review': review, 'created_at': datetime.now()
+        })
 
         reviews    = list(db.collection('reviews').where('contractor_id', '==', contractor_id).stream())
         avg_rating = sum(r.to_dict().get('rating', 0) for r in reviews) / len(reviews) if reviews else 0
 
         db.collection('contractors').document(contractor_id).update({
-            'rating':        round(avg_rating, 1),
-            'total_reviews': len(reviews),
-            'updated_at':    datetime.now()
+            'rating': round(avg_rating, 1), 'total_reviews': len(reviews), 'updated_at': datetime.now()
         })
+        db.collection('projects').document(project_id).update({'reviewed': True, 'reviewed_at': datetime.now()})
 
-        db.collection('projects').document(project_id).update({
-            'reviewed':    True,
-            'reviewed_at': datetime.now()
-        })
-
-        create_notification(
-            contractor_id,
-            'New Review Received',
-            f'{current_user.name} rated your work {rating}/5 stars',
-            'review',
-            '/contractor/reviews'
-        )
+        create_notification(contractor_id, 'New Review Received',
+                            f'{current_user.name} rated your work {rating}/5 stars', 'review', '/contractor/reviews')
 
         return jsonify({'success': True, 'message': 'Thank you for your review!'})
 
     except Exception as e:
         print(f"Error rating contractor: {e}")
-        import traceback
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
@@ -1763,7 +1522,6 @@ def rate_contractor(project_id):
 @login_required
 def project_updates(project_id):
     db = get_db()
-
     try:
         project_doc  = db.collection('projects').document(project_id).get()
         project_data = project_doc.to_dict()
@@ -1786,8 +1544,7 @@ def project_updates(project_id):
         user_profile_picture = _get_profile_picture(db)
 
         return render_template('user/project_updates.html',
-                               project=project_data,
-                               updates=updates,
+                               project=project_data, updates=updates,
                                user_profile_picture=user_profile_picture)
 
     except Exception as e:
@@ -1799,30 +1556,23 @@ def project_updates(project_id):
 @login_required
 def upload_document(project_id):
     db = get_db()
-
     try:
         if 'document' not in request.files:
             return jsonify({'success': False, 'message': 'No file uploaded'}), 400
 
         file     = request.files['document']
         doc_type = request.form.get('document_type')
+        filename = secure_filename(f"{project_id}_{doc_type}_{int(datetime.now().timestamp())}_{file.filename}")
 
-        filename      = secure_filename(f"{project_id}_{doc_type}_{int(datetime.now().timestamp())}_{file.filename}")
         upload_folder = os.path.join('static', 'uploads', 'documents')
         os.makedirs(upload_folder, exist_ok=True)
+        file.save(os.path.join(upload_folder, filename))
 
-        filepath = os.path.join(upload_folder, filename)
-        file.save(filepath)
-
-        doc_data = {
-            'project_id':    project_id,
-            'user_id':       current_user.id,
-            'filename':      filename,
-            'original_name': file.filename,
-            'type':          doc_type,
-            'uploaded_at':   datetime.now()
-        }
-        db.collection('project_documents').add(doc_data)
+        db.collection('project_documents').add({
+            'project_id': project_id, 'user_id': current_user.id,
+            'filename': filename, 'original_name': file.filename,
+            'type': doc_type, 'uploaded_at': datetime.now()
+        })
 
         return jsonify({'success': True, 'filename': filename})
 
@@ -1839,10 +1589,7 @@ def notifications():
         return redirect(url_for('user.dashboard'))
 
     try:
-        notifications_ref = db.collection('notifications') \
-            .where('user_id', '==', current_user.id) \
-            .stream()
-
+        notifications_ref = db.collection('notifications').where('user_id', '==', current_user.id).stream()
         notifications = []
         unread_count  = 0
 
@@ -1850,24 +1597,20 @@ def notifications():
             notif_data = doc.to_dict()
             notif_data['id'] = doc.id
             notifications.append(notif_data)
-
             if not notif_data.get('read', False):
                 unread_count += 1
 
         notifications.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
         notifications = notifications[:50]
-
         user_profile_picture = _get_profile_picture(db)
 
         return render_template('user/notifications.html',
-                               notifications=notifications,
-                               unread_count=unread_count,
+                               notifications=notifications, unread_count=unread_count,
                                user_profile_picture=user_profile_picture)
 
     except Exception as e:
         print(f"Error loading notifications: {e}")
-        import traceback
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
         flash(f'Error loading notifications: {str(e)}', 'error')
         return redirect(url_for('user.dashboard'))
 
@@ -1878,12 +1621,8 @@ def mark_notification_read(notification_id):
     db = get_db()
     if not db:
         return jsonify({'success': False, 'message': 'Database connection error'}), 500
-
     try:
-        db.collection('notifications').document(notification_id).update({
-            'read':    True,
-            'read_at': datetime.now()
-        })
+        db.collection('notifications').document(notification_id).update({'read': True, 'read_at': datetime.now()})
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -1895,15 +1634,11 @@ def notifications_unread_count():
     db = get_db()
     if not db:
         return jsonify({'count': 0})
-
     try:
         notifications_ref = db.collection('notifications') \
             .where('user_id', '==', current_user.id) \
-            .where('read', '==', False) \
-            .stream()
-
-        count = len(list(notifications_ref))
-        return jsonify({'count': count})
+            .where('read', '==', False).stream()
+        return jsonify({'count': len(list(notifications_ref))})
     except Exception as e:
         print(f"Error getting unread count: {e}")
         return jsonify({'count': 0})
@@ -1913,15 +1648,7 @@ def notifications_unread_count():
 
 def create_notification(user_id, title, message, type, link=None):
     db = firestore.client()
-
-    notification_data = {
-        'user_id':    user_id,
-        'title':      title,
-        'message':    message,
-        'type':       type,
-        'link':       link,
-        'read':       False,
-        'created_at': datetime.now()
-    }
-
-    db.collection('notifications').add(notification_data)
+    db.collection('notifications').add({
+        'user_id': user_id, 'title': title, 'message': message,
+        'type': type, 'link': link, 'read': False, 'created_at': datetime.now()
+    })

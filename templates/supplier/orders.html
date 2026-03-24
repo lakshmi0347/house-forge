@@ -97,7 +97,31 @@
 
         /* order body */
         .order-body { padding:16px 22px; }
-        .project-tag { display:inline-flex; align-items:center; gap:5px; padding:5px 11px; background:var(--accent-l); border-radius:20px; font-size:12px; font-weight:600; color:var(--accent-d, #0060CC); margin-bottom:14px; }
+        .project-tag { display:inline-flex; align-items:center; gap:5px; padding:5px 11px; background:var(--accent-l); border-radius:20px; font-size:12px; font-weight:600; color:#0060CC; margin-bottom:14px; }
+
+        /* ── DELIVERY ADDRESS STRIP ── */
+        .delivery-strip {
+            display:flex; align-items:flex-start; gap:10px;
+            background:#EFF6FF; border:1px solid #BFDBFE;
+            border-radius:9px; padding:11px 15px; margin-bottom:14px;
+        }
+        .delivery-strip svg { flex-shrink:0; margin-top:1px; }
+        .delivery-strip-label {
+            font-size:10px; font-weight:700; text-transform:uppercase;
+            letter-spacing:.6px; color:#1E40AF; margin-bottom:3px;
+        }
+        .delivery-strip-addr {
+            font-size:13px; font-weight:600; color:#1e3a8a; line-height:1.5;
+        }
+        .delivery-strip-note { font-size:12px; color:#3B82F6; margin-top:3px; }
+        .delivery-missing {
+            display:flex; align-items:center; gap:8px;
+            background:var(--amber-bg); border:1px solid #FDE68A;
+            border-radius:9px; padding:10px 14px; margin-bottom:14px;
+            font-size:12px; color:var(--amber); font-weight:600;
+        }
+
+        /* items table */
         .items-table { width:100%; border-collapse:collapse; margin-bottom:14px; }
         .items-table th { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); padding:7px 10px; background:var(--card2); text-align:left; }
         .items-table th:first-child { border-radius:6px 0 0 6px; }
@@ -115,31 +139,31 @@
 
         /* payment strip */
         .pay-strip { display:flex; align-items:flex-start; gap:8px; padding:10px 14px; border-radius:8px; font-size:13px; margin-bottom:12px; }
-        .pay-strip.cod { background:var(--gold-l); color:var(--gold-d); border:1px solid rgba(201,168,76,.35); }
+        .pay-strip.cod  { background:var(--gold-l); color:var(--gold-d); border:1px solid rgba(201,168,76,.35); }
         .pay-strip.paid { background:var(--green-bg); color:var(--green); border:1px solid #A7F3D0; }
 
         /* action buttons */
         .action-row { display:flex; gap:10px; flex-wrap:wrap; }
-        .btn-accept { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; background:#10B981; color:white; border:none; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
-        .btn-accept:hover { background:#059669; transform:translateY(-1px); }
-        .btn-reject { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; background:white; color:var(--red); border:1.5px solid #FECACA; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
-        .btn-reject:hover { background:var(--red-bg); }
+        .btn-accept  { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; background:#10B981; color:white; border:none; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
+        .btn-accept:hover  { background:#059669; transform:translateY(-1px); }
+        .btn-reject  { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; background:white; color:var(--red); border:1.5px solid #FECACA; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
+        .btn-reject:hover  { background:var(--red-bg); }
         .btn-deliver { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; background:var(--accent); color:white; border:none; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
         .btn-deliver:hover { background:var(--accent-d); transform:translateY(-1px); }
-        .btn-cash { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; background:var(--gold); color:#0A0A0A; border:none; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
-        .btn-cash:hover { background:var(--gold-d); transform:translateY(-1px); }
+        .btn-cash    { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; background:var(--gold); color:#0A0A0A; border:none; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
+        .btn-cash:hover    { background:var(--gold-d); transform:translateY(-1px); }
 
         /* ─── EMPTY STATE ─── */
         .empty-state { background:var(--card); border:1px solid var(--stone); border-radius:14px; padding:60px 24px; text-align:center; box-shadow:var(--shadow-sm); }
         .empty-state h2 { font-size:20px; font-weight:600; color:var(--text); margin-bottom:8px; margin-top:14px; }
-        .empty-state p { font-size:14px; color:var(--text2); margin-bottom:22px; }
+        .empty-state p  { font-size:14px; color:var(--text2); margin-bottom:22px; }
         .btn-inv { display:inline-block; padding:11px 26px; background:var(--accent); color:white; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s; }
         .btn-inv:hover { background:var(--accent-d); }
 
         @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         @media(max-width:640px) {
             .navbar { padding:0 16px; }
-            .page { padding:0 14px 50px; }
+            .page   { padding:0 14px 50px; }
             .order-head { flex-direction:column; gap:10px; }
             .order-head-right { align-items:flex-start; }
             .action-row { flex-direction:column; }
@@ -219,7 +243,11 @@
                     <div class="order-id">Order #{{ order.id[:8].upper() }}</div>
                     <div class="order-date">{{ order.created_at.strftime('%d %b %Y, %I:%M %p') if order.created_at else 'N/A' }}</div>
                     {% if order.user_name %}
-                    <div class="customer-name">👤 {{ order.user_name }}{% if order.user_email %} · {{ order.user_email }}{% endif %}</div>
+                    <div class="customer-name">
+                        👤 {{ order.user_name }}
+                        {% if order.user_email %} · {{ order.user_email }}{% endif %}
+                        {% if order.user_phone %} · {{ order.user_phone }}{% endif %}
+                    </div>
                     {% endif %}
                 </div>
                 <div class="order-head-right">
@@ -242,6 +270,7 @@
             <!-- Body -->
             <div class="order-body">
 
+                <!-- Project tag -->
                 {% if order.project_title %}
                 <div class="project-tag">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -249,7 +278,33 @@
                 </div>
                 {% endif %}
 
-                <!-- Items -->
+                <!-- ── DELIVERY ADDRESS ── -->
+                {% if order.delivery_address %}
+                <div class="delivery-strip">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    <div>
+                        <div class="delivery-strip-label">Deliver to</div>
+                        <div class="delivery-strip-addr">{{ order.delivery_address }}</div>
+                        {% if order.delivery_note %}
+                        <div class="delivery-strip-note">📝 {{ order.delivery_note }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="delivery-missing">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    No delivery address provided — contact the customer to confirm delivery location.
+                </div>
+                {% endif %}
+
+                <!-- Items table -->
                 <table class="items-table">
                     <thead>
                         <tr>
@@ -280,16 +335,23 @@
                     <strong>₹{{ "{:,.0f}".format(order.total) }}</strong>
                 </div>
 
-                <!-- Payment strip when COD confirmed -->
+                <!-- Payment strip -->
                 {% if order.payment_status == 'cod_confirmed' and order.status != 'completed' %}
                 <div class="pay-strip cod">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                    <span>Customer confirmed COD · Collect ₹{{ "{:,.0f}".format(order.total) }} cash upon delivery.
-                    {% if order.receipt_number %}<strong> Receipt: {{ order.receipt_number }}</strong>{% endif %}</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;">
+                        <rect x="2" y="5" width="20" height="14" rx="2"/>
+                        <line x1="2" y1="10" x2="22" y2="10"/>
+                    </svg>
+                    <span>
+                        Customer confirmed COD · Collect ₹{{ "{:,.0f}".format(order.total) }} cash upon delivery.
+                        {% if order.receipt_number %}<strong> Receipt: {{ order.receipt_number }}</strong>{% endif %}
+                    </span>
                 </div>
                 {% elif order.payment_status == 'paid' %}
                 <div class="pay-strip paid">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
                     Cash collected — payment complete.
                 </div>
                 {% endif %}
@@ -322,20 +384,23 @@
                 </div>
                 {% endif %}
 
-            </div><!-- /body -->
+            </div><!-- /order-body -->
         </div>
         {% endfor %}
 
     {% else %}
     <div class="empty-state">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);margin:0 auto;display:block;"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);margin:0 auto;display:block;">
+            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+            <rect x="9" y="3" width="6" height="4" rx="2"/>
+        </svg>
         <h2>No Orders Yet</h2>
         <p>Once customers place orders for your materials, they'll appear here.</p>
         <a href="{{ url_for('supplier.inventory') }}" class="btn-inv">Manage Inventory</a>
     </div>
     {% endif %}
 
-</div>
+</div><!-- /page -->
 
 <script>
 // ── FILTER ─────────────────────────────────────────────────────
@@ -351,39 +416,53 @@ function filterOrders(status, btn) {
 function setLoading(btn, on) {
     btn.disabled = on;
     if (on) btn.dataset.orig = btn.innerHTML;
-    btn.innerHTML = on ? '<span style="opacity:.6">Processing…</span>' : btn.dataset.orig;
+    btn.innerHTML = on
+        ? '<span style="opacity:.6">Processing…</span>'
+        : btn.dataset.orig;
 }
 
 function apiPost(url, btnEl, successMsg, onSuccess) {
     setLoading(btnEl, true);
-    fetch(url, { method:'POST' })
+    fetch(url, { method: 'POST' })
         .then(r => r.json())
         .then(data => {
-            if (data.success) { alert(successMsg); if (onSuccess) onSuccess(); else location.reload(); }
-            else { alert('Error: ' + data.message); setLoading(btnEl, false); }
+            if (data.success) {
+                alert(successMsg);
+                if (onSuccess) onSuccess(); else location.reload();
+            } else {
+                alert('Error: ' + data.message);
+                setLoading(btnEl, false);
+            }
         })
-        .catch(() => { alert('A network error occurred. Please try again.'); setLoading(btnEl, false); });
+        .catch(() => {
+            alert('A network error occurred. Please try again.');
+            setLoading(btnEl, false);
+        });
 }
 
 // ── ACTIONS ────────────────────────────────────────────────────
 function acceptOrder(id, btn) {
     if (!confirm('Accept this order? Stock will be reserved and the customer will be notified.')) return;
-    apiPost(`/supplier/order/${id}/accept`, btn, 'Order accepted! Customer has been notified.', () => location.reload());
+    apiPost(`/supplier/order/${id}/accept`, btn,
+            'Order accepted! Customer has been notified.', () => location.reload());
 }
 
 function rejectOrder(id, btn) {
     if (!confirm('Decline this order? The customer will be notified.')) return;
-    apiPost(`/supplier/order/${id}/reject`, btn, 'Order declined.', () => location.reload());
+    apiPost(`/supplier/order/${id}/reject`, btn,
+            'Order declined.', () => location.reload());
 }
 
 function completeOrder(id, btn) {
     if (!confirm('Mark this order as delivered? This confirms delivery to the customer.')) return;
-    apiPost(`/supplier/order/${id}/complete`, btn, 'Order marked as delivered!', () => location.reload());
+    apiPost(`/supplier/order/${id}/complete`, btn,
+            'Order marked as delivered!', () => location.reload());
 }
 
 function collectCash(id, btn) {
     if (!confirm('Confirm cash received from customer? This will close the order as fully paid.')) return;
-    apiPost(`/payment/supplier/order/${id}/collect-cash`, btn, 'Cash collected — order closed!', () => location.reload());
+    apiPost(`/payment/supplier/order/${id}/collect-cash`, btn,
+            'Cash collected — order closed!', () => location.reload());
 }
 </script>
 

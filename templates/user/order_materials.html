@@ -46,8 +46,42 @@
 
         /* ─── LAYOUT ─── */
         .page { max-width:1280px; margin:0 auto; padding:32px 24px 60px; position:relative; z-index:1; }
-        .back-link { display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-size:14px; font-weight:600; text-decoration:none; margin-bottom:22px; transition:gap .2s; }
+        .back-link { display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-size:14px; font-weight:600; text-decoration:none; margin-bottom:16px; transition:gap .2s; }
         .back-link:hover { gap:10px; }
+
+        /* ─── DELIVER-TO BAR ─── */
+        .loc-bar { display:flex; align-items:center; gap:14px; padding:13px 22px; background:var(--card); border:1.5px solid var(--stone); border-radius:13px; margin-bottom:20px; cursor:pointer; transition:border-color .2s, box-shadow .2s; box-shadow:var(--shadow-sm); }
+        .loc-bar:hover { border-color:var(--accent); box-shadow:0 2px 10px rgba(201,168,76,.18); }
+        .loc-bar-icon { width:36px; height:36px; border-radius:50%; background:var(--accent-l); color:var(--accent-d); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .loc-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:2px; }
+        .loc-value { font-size:14px; font-weight:600; color:var(--text); }
+        .loc-change { margin-left:auto; display:flex; align-items:center; gap:5px; font-size:13px; color:var(--accent-d); font-weight:600; flex-shrink:0; white-space:nowrap; }
+
+        /* ─── LOCATION MODAL ─── */
+        .loc-overlay { display:none; position:fixed; inset:0; background:rgba(28,25,23,.55); z-index:400; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+        .loc-overlay.show { display:flex; }
+        .loc-modal { background:var(--card); border:1px solid var(--stone); border-radius:20px; padding:30px 32px; max-width:500px; width:90%; max-height:92vh; overflow-y:auto; box-shadow:0 24px 70px rgba(28,25,23,.22); animation:scaleIn .3s cubic-bezier(.34,1.56,.64,1) both; }
+        .loc-modal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+        .loc-modal-title { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--text); }
+        .loc-modal-close { background:var(--sand); border:1.5px solid var(--stone); border-radius:50%; width:30px; height:30px; font-size:16px; color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+        .loc-modal-close:hover { background:var(--stone); color:var(--text); }
+        .loc-divider { width:32px; height:3px; background:var(--accent); border-radius:2px; margin:8px 0 20px; }
+        .loc-saved { display:flex; align-items:center; gap:10px; padding:12px 15px; background:var(--accent-l); border:1.5px solid rgba(201,168,76,.35); border-radius:10px; margin-bottom:16px; cursor:pointer; transition:all .2s; }
+        .loc-saved:hover { border-color:var(--accent); background:var(--accent-l); transform:translateX(3px); }
+        .loc-saved-tag { font-size:10px; font-weight:700; background:var(--green-bg); color:var(--green); padding:3px 10px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
+        .loc-saved-addr { font-size:13px; color:var(--text2); font-weight:500; }
+        .or-sep { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+        .or-line { flex:1; height:1px; background:var(--stone); }
+        .or-text { font-size:11px; color:var(--muted); font-weight:600; white-space:nowrap; }
+        .loc-section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:6px; display:block; }
+        .loc-input { width:100%; padding:10px 13px; border:1.5px solid var(--stone); border-radius:9px; font-size:14px; font-family:'DM Sans',sans-serif; background:var(--card2); color:var(--text); transition:border-color .2s; }
+        .loc-input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(201,168,76,.15); }
+        .loc-form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+        .loc-btn-row { display:flex; gap:10px; margin-top:20px; }
+        .loc-btn-cancel { flex:1; padding:11px; background:var(--sand); border:1.5px solid var(--stone); border-radius:9px; font-size:13px; font-weight:600; color:var(--text2); cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; }
+        .loc-btn-cancel:hover { background:var(--stone); }
+        .loc-btn-use { flex:2; padding:11px; background:var(--accent); border:none; border-radius:9px; font-size:14px; font-weight:700; color:#0A0A0A; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:7px; }
+        .loc-btn-use:hover { background:var(--accent-d); }
 
         /* ─── PROJECT HEADER ─── */
         .project-header { background:var(--card); border:1px solid var(--stone); border-radius:18px; padding:26px 34px; margin-bottom:24px; box-shadow:var(--shadow); display:flex; justify-content:space-between; align-items:center; gap:20px; animation:fadeUp .4s ease both; }
@@ -72,7 +106,6 @@
         .main-grid { display:grid; grid-template-columns:1fr 340px; gap:22px; align-items:start; }
         @media(max-width:1060px) { .main-grid { grid-template-columns:1fr; } }
 
-        /* ─── LEFT PANEL ─── */
         .left-panel { animation:fadeUp .4s .08s ease both; }
 
         /* ─── FILTER BAR ─── */
@@ -101,12 +134,8 @@
         .material-row:hover { background:rgba(201,168,76,.04); }
         .material-row.selected { background:var(--accent-l); }
         .material-row.out-of-stock { opacity:.55; }
-
-        /* checkbox */
         .mat-check { width:18px; height:18px; cursor:pointer; accent-color:var(--accent); flex-shrink:0; }
         .mat-check:disabled { cursor:not-allowed; }
-
-        /* info */
         .mat-info { flex:1; min-width:0; }
         .mat-name { font-size:14px; font-weight:600; color:var(--text); margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .mat-sub { font-size:12px; color:var(--muted); display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:3px; }
@@ -114,13 +143,9 @@
         .stock-ok   { background:var(--green-bg); color:var(--green); }
         .stock-low  { background:#FEF3C7; color:#92400E; }
         .stock-out  { background:var(--red-bg); color:var(--red); }
-
-        /* price */
         .mat-price { text-align:right; flex-shrink:0; min-width:80px; }
         .mat-price-val { font-family:'Playfair Display',serif; font-size:17px; font-weight:700; color:var(--accent-d); }
         .mat-price-unit { font-size:11px; color:var(--muted); }
-
-        /* quantity controls */
         .qty-wrap { display:flex; align-items:center; gap:0; border:1.5px solid var(--stone); border-radius:8px; overflow:hidden; flex-shrink:0; }
         .qty-btn { width:32px; height:32px; border:none; background:var(--card2); cursor:pointer; font-size:16px; font-weight:700; color:var(--text2); transition:all .15s; display:flex; align-items:center; justify-content:center; }
         .qty-btn:hover:not(:disabled) { background:var(--accent); color:#0A0A0A; }
@@ -142,7 +167,7 @@
         .empty-state { text-align:center; padding:60px 20px; background:var(--card); border:1px solid var(--stone); border-radius:14px; }
         .empty-state p { font-size:14px; color:var(--text2); margin-top:12px; }
 
-        /* ─── RIGHT PANEL / CART ─── */
+        /* ─── CART PANEL ─── */
         .cart-panel { position:sticky; top:88px; animation:fadeUp .4s .16s ease both; }
         .cart-card { background:var(--card); border:1px solid var(--stone); border-radius:16px; overflow:hidden; box-shadow:var(--shadow); }
         .cart-header { background:var(--accent); padding:18px 22px; }
@@ -150,7 +175,15 @@
         .cart-header p { font-size:12px; color:rgba(0,0,0,.55); margin-top:2px; }
         .cart-body { padding:20px 22px; }
 
-        /* supplier subtotals in cart */
+        /* delivery address inside cart */
+        .cart-loc-strip { display:flex; align-items:flex-start; gap:8px; padding:10px 13px; background:var(--accent-l); border:1px solid rgba(201,168,76,.3); border-radius:9px; margin-bottom:14px; font-size:12px; color:var(--text2); cursor:pointer; transition:border-color .2s; }
+        .cart-loc-strip:hover { border-color:var(--accent); }
+        .cart-loc-strip svg { flex-shrink:0; color:var(--accent-d); margin-top:1px; }
+        .cart-loc-strip-text { flex:1; min-width:0; }
+        .cart-loc-strip-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:2px; }
+        .cart-loc-strip-value { font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .cart-loc-strip-change { font-size:11px; color:var(--accent-d); font-weight:700; flex-shrink:0; white-space:nowrap; }
+
         .cart-supplier { margin-bottom:16px; }
         .cart-supplier-name { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
         .cart-item { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:7px; gap:10px; font-size:13px; }
@@ -166,25 +199,24 @@
         .cart-total-label { font-size:14px; font-weight:700; color:var(--text); }
         .cart-total-val { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--accent-d); }
         .cart-orders-note { font-size:11px; color:var(--muted); margin-bottom:16px; padding:9px 12px; background:var(--sand); border-radius:8px; line-height:1.55; }
-
-        /* empty cart */
         .cart-empty { text-align:center; padding:28px 10px; color:var(--muted); }
         .cart-empty svg { opacity:.35; margin-bottom:10px; }
         .cart-empty p { font-size:13px; }
 
-        /* action buttons */
         .btn-place { width:100%; padding:14px; background:var(--accent); color:#0A0A0A; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; }
         .btn-place:hover:not(:disabled) { background:var(--accent-d); transform:translateY(-2px); box-shadow:0 6px 20px rgba(201,168,76,.35); }
         .btn-place:disabled { background:var(--stone); color:var(--muted); cursor:not-allowed; transform:none; box-shadow:none; }
         .btn-clear { width:100%; padding:10px; background:transparent; color:var(--muted); border:1.5px solid var(--stone); border-radius:10px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; margin-top:8px; }
         .btn-clear:hover { color:var(--red); border-color:#FECACA; background:#FEF2F2; }
 
-        /* ─── CONFIRMATION MODAL ─── */
+        /* ─── CONFIRM MODAL ─── */
         .modal-overlay { display:none; position:fixed; inset:0; background:rgba(28,25,23,.55); z-index:200; align-items:center; justify-content:center; backdrop-filter:blur(3px); }
         .modal-overlay.show { display:flex; }
-        .modal-box { background:var(--card); border:1px solid var(--stone); border-radius:20px; padding:36px; max-width:540px; width:90%; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(28,25,23,.18); animation:scaleIn .3s cubic-bezier(.34,1.56,.64,1) both; }
+        .modal-box { background:var(--card); border:1px solid var(--stone); border-radius:20px; padding:36px; max-width:560px; width:90%; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(28,25,23,.18); animation:scaleIn .3s cubic-bezier(.34,1.56,.64,1) both; }
         .modal-title { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--text); margin-bottom:4px; }
         .modal-divider { width:36px; height:3px; background:var(--accent); border-radius:2px; margin:10px 0 20px; }
+        .modal-delivery-row { display:flex; align-items:flex-start; gap:9px; padding:12px 16px; background:var(--accent-l); border:1px solid rgba(201,168,76,.3); border-radius:10px; margin-bottom:16px; font-size:13px; color:var(--text2); }
+        .modal-delivery-row svg { flex-shrink:0; color:var(--accent-d); margin-top:1px; }
         .modal-supplier-block { background:var(--sand); border:1px solid var(--stone); border-radius:10px; padding:14px 16px; margin-bottom:10px; }
         .modal-supplier-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:8px; }
         .modal-item-row { display:flex; justify-content:space-between; font-size:13px; padding:3px 0; color:var(--text2); }
@@ -199,10 +231,10 @@
         .btn-modal-confirm { flex:2; padding:12px; background:var(--accent); color:#0A0A0A; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; }
         .btn-modal-confirm:hover:not(:disabled) { background:var(--accent-d); }
         .btn-modal-confirm:disabled { opacity:.6; cursor:not-allowed; }
+        .modal-info { font-size:12px; color:var(--muted); background:var(--sand); border-radius:8px; padding:10px 13px; margin-bottom:16px; line-height:1.6; }
         .spinner { width:16px; height:16px; border:2px solid rgba(0,0,0,.2); border-top-color:#0A0A0A; border-radius:50%; animation:spin .7s linear infinite; display:none; }
         .btn-modal-confirm.loading .btn-label { display:none; }
         .btn-modal-confirm.loading .spinner { display:block; }
-        .modal-info { font-size:12px; color:var(--muted); background:var(--sand); border-radius:8px; padding:10px 13px; margin-bottom:16px; line-height:1.6; }
 
         /* ─── LOADING OVERLAY ─── */
         .loading-overlay { display:none; position:fixed; inset:0; background:rgba(250,247,242,.85); z-index:300; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
@@ -222,6 +254,7 @@
             .project-header { flex-direction:column; align-items:flex-start; padding:20px; }
             .material-row { flex-wrap:wrap; gap:10px; }
             .mat-price { min-width:auto; }
+            .loc-form-row { grid-template-columns:1fr; }
         }
     </style>
 </head>
@@ -255,6 +288,29 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         Back to Project
     </a>
+
+    <!-- ─── DELIVER TO BAR ─── -->
+    <div class="loc-bar" id="locBar" onclick="openLocModal()">
+        <div class="loc-bar-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div>
+            <div class="loc-label">Deliver to</div>
+            <div class="loc-value" id="locDisplay">
+                {% if project.location_address %}
+                    {{ project.location_address }}{% if project.location_district %}, {{ project.location_district }}{% endif %}{% if project.location_pin %} – {{ project.location_pin }}{% endif %}
+                {% elif project.location %}
+                    {{ project.location }}
+                {% else %}
+                    Set delivery location
+                {% endif %}
+            </div>
+        </div>
+        <div class="loc-change">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Change
+        </div>
+    </div>
 
     <!-- Project Header -->
     <div class="project-header">
@@ -347,32 +403,11 @@
 
         <!-- Left: Supplier Groups -->
         <div class="left-panel" id="leftPanel">
-            {% set suppliers_seen = [] %}
-            {% set supplier_groups = {} %}
-            {% for m in materials %}
-                {% set sid = m.supplier_id or '__none__' %}
-                {% if sid not in supplier_groups %}
-                    {% set _ = supplier_groups.update({sid: []}) %}
-                {% endif %}
-            {% endfor %}
-
-            {# Group materials by supplier #}
-            {% set ns = namespace(groups={}) %}
-            {% for m in materials %}
-                {% set sid = m.supplier_id or '__none__' %}
-                {% if sid not in ns.groups %}
-                    {% set _ = ns.groups.update({sid: {'name': m.supplier_name or 'Unknown Supplier', 'materials': []}}) %}
-                {% endif %}
-            {% endfor %}
-
-            {# Render directly since Jinja groupby doesn't support dynamic dicts easily #}
             {% set rendered_suppliers = [] %}
             {% for m in materials %}
                 {% set sid = m.supplier_id or '__none__' %}
                 {% if sid not in rendered_suppliers %}
                     {% set _ = rendered_suppliers.append(sid) %}
-
-                    {# Collect all materials for this supplier #}
                     {% set sup_name = m.supplier_name or 'Unknown Supplier' %}
                     {% set sup_materials = materials | selectattr('supplier_id', 'equalto', m.supplier_id) | list %}
 
@@ -398,7 +433,6 @@
                              data-price="{{ mat.price }}"
                              data-unit="{{ mat.unit }}"
                              data-stock="{{ mat.quantity or 0 }}"
-                             data-price-fmt="₹{{ '{:,.0f}'.format(mat.price) }}"
                              data-out="{{ 'true' if is_out else 'false' }}"
                              id="row-{{ mat.id }}">
 
@@ -456,7 +490,6 @@
                 {% endif %}
             {% endfor %}
 
-            <!-- No results state -->
             <div id="noResults" style="display:none;" class="empty-state">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);margin:0 auto;display:block;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <p>No materials match your filters. Try adjusting the search or category.</p>
@@ -472,14 +505,30 @@
                 </div>
                 <div class="cart-body">
 
+                    <!-- Delivery address strip inside cart (always visible) -->
+                    <div class="cart-loc-strip" onclick="openLocModal()">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <div class="cart-loc-strip-text">
+                            <div class="cart-loc-strip-label">Deliver to</div>
+                            <div class="cart-loc-strip-value" id="cartLocDisplay">
+                                {% if project.location_address %}
+                                    {{ project.location_address }}{% if project.location_district %}, {{ project.location_district }}{% endif %}
+                                {% elif project.location %}
+                                    {{ project.location }}
+                                {% else %}
+                                    Set delivery location
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="cart-loc-strip-change">Change</div>
+                    </div>
+
                     <div id="cartEmpty" class="cart-empty">
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                         <p>Select materials from the left to build your order</p>
                     </div>
 
-                    <div id="cartItems" style="display:none;">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div id="cartItems" style="display:none;"></div>
 
                     <div id="cartFooter" style="display:none;">
                         <hr class="cart-divider">
@@ -511,6 +560,86 @@
 
 </div><!-- /page -->
 
+<!-- ─── LOCATION MODAL ─── -->
+<div class="loc-overlay" id="locModal">
+    <div class="loc-modal">
+        <div class="loc-modal-head">
+            <div class="loc-modal-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;color:var(--accent-d);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Choose delivery location
+            </div>
+            <button class="loc-modal-close" onclick="closeLocModal()">✕</button>
+        </div>
+        <div class="loc-divider"></div>
+
+        <!-- Project saved address (one-tap) -->
+        <div class="loc-saved" onclick="useProjectAddress()" title="Click to use project address">
+            <span class="loc-saved-tag">✓ Project address</span>
+            <span class="loc-saved-addr">
+                {% if project.location_address %}
+                    {{ project.location_address }}{% if project.location_district %}, {{ project.location_district }}{% endif %}{% if project.location_state %}, {{ project.location_state }}{% endif %}{% if project.location_pin %} – {{ project.location_pin }}{% endif %}
+                {% elif project.location %}
+                    {{ project.location }}
+                {% else %}
+                    Not set on project
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="or-sep">
+            <div class="or-line"></div>
+            <span class="or-text">or enter a different address</span>
+            <div class="or-line"></div>
+        </div>
+
+        <!-- Custom address form -->
+        <label class="loc-section-label">Site / delivery address</label>
+        <input class="loc-input" id="loc_address"
+               placeholder="Plot no., street, area, colony…"
+               style="margin-bottom:12px;"
+               value="{{ project.location_address or '' }}">
+
+        <div class="loc-form-row">
+            <div>
+                <label class="loc-section-label">District</label>
+                <input class="loc-input" id="loc_district"
+                       placeholder="e.g. Ernakulam"
+                       value="{{ project.location_district or '' }}">
+            </div>
+            <div>
+                <label class="loc-section-label">PIN code</label>
+                <input class="loc-input" id="loc_pin"
+                       placeholder="6-digit PIN"
+                       value="{{ project.location_pin or '' }}"
+                       maxlength="6"
+                       inputmode="numeric">
+            </div>
+        </div>
+
+        <div class="loc-form-row">
+            <div>
+                <label class="loc-section-label">State</label>
+                <input class="loc-input" id="loc_state"
+                       placeholder="e.g. Kerala"
+                       value="{{ project.location_state or '' }}">
+            </div>
+            <div>
+                <label class="loc-section-label">Landmark (optional)</label>
+                <input class="loc-input" id="loc_landmark"
+                       placeholder="Near bus stand, school, etc.">
+            </div>
+        </div>
+
+        <div class="loc-btn-row">
+            <button class="loc-btn-cancel" onclick="closeLocModal()">Cancel</button>
+            <button class="loc-btn-use" onclick="saveLocModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Use this address
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- ─── CONFIRM MODAL ─── -->
 <div class="modal-overlay" id="confirmModal">
     <div class="modal-box">
@@ -520,9 +649,7 @@
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             One order will be created per supplier. Suppliers will be notified and must accept before delivery. Payment is via <strong>Cash on Delivery</strong>.
         </div>
-        <div id="modalOrderBlocks">
-            <!-- Populated by JS -->
-        </div>
+        <div id="modalOrderBlocks"></div>
         <div class="modal-grand-total">
             <span>Grand Total (all suppliers)</span>
             <strong id="modalGrandTotal">₹0</strong>
@@ -549,8 +676,72 @@
 </div>
 
 <script>
-// ── STATE ──────────────────────────────────────────────────────────────────
-const cart = {}; // { materialId: { name, price, unit, qty, supplierId, supplierName, stock } }
+// ── DELIVERY LOCATION STATE ────────────────────────────────────────────────
+// NEW — replace with:
+const _pd = JSON.parse(document.getElementById('projectData').textContent);
+const projectAddr = {
+    address:  _pd.address,
+    district: _pd.district,
+    pin:      _pd.pin,
+    state:    _pd.state,
+    landmark: ''
+};
+
+let deliveryAddr = { ...projectAddr };
+
+function buildDisplayStr(a) {
+    const parts = [a.address, a.district, a.state, a.pin].filter(Boolean);
+    return parts.length ? parts.join(', ') : 'Set delivery location';
+}
+
+function syncLocDisplays() {
+    const str = buildDisplayStr(deliveryAddr);
+    document.getElementById('locDisplay').textContent    = str;
+    document.getElementById('cartLocDisplay').textContent = str;
+}
+
+function openLocModal() {
+    document.getElementById('loc_address').value  = deliveryAddr.address;
+    document.getElementById('loc_district').value = deliveryAddr.district;
+    document.getElementById('loc_pin').value      = deliveryAddr.pin;
+    document.getElementById('loc_state').value    = deliveryAddr.state;
+    document.getElementById('loc_landmark').value = deliveryAddr.landmark;
+    document.getElementById('locModal').classList.add('show');
+}
+
+function closeLocModal() {
+    document.getElementById('locModal').classList.remove('show');
+}
+
+function useProjectAddress() {
+    deliveryAddr = { ...projectAddr };
+    syncLocDisplays();
+    closeLocModal();
+}
+
+function saveLocModal() {
+    const addr     = document.getElementById('loc_address').value.trim();
+    const district = document.getElementById('loc_district').value.trim();
+    const pin      = document.getElementById('loc_pin').value.trim();
+    const state    = document.getElementById('loc_state').value.trim();
+    const landmark = document.getElementById('loc_landmark').value.trim();
+
+    if (!addr && !district && !pin) {
+        showAlert('Please enter at least an address or district to set a delivery location.', 'error');
+        return;
+    }
+
+    deliveryAddr = { address: addr, district, pin, state, landmark };
+    syncLocDisplays();
+    closeLocModal();
+}
+
+document.getElementById('locModal').addEventListener('click', function(e) {
+    if (e.target === this) closeLocModal();
+});
+
+// ── CART STATE ─────────────────────────────────────────────────────────────
+const cart = {};
 
 // ── MATERIAL TOGGLE ────────────────────────────────────────────────────────
 function toggleMaterial(chk) {
@@ -573,8 +764,7 @@ function toggleMaterial(chk) {
             qty:          parseInt(qty.value) || 1,
             supplierId:   row.dataset.supplier,
             supplierName: row.dataset.supplierName,
-            stock:        parseInt(row.dataset.stock) || 9999,
-            priceStr:     row.dataset.priceStr || ('₹' + parseFloat(row.dataset.price).toLocaleString('en-IN'))
+            stock:        parseInt(row.dataset.stock) || 9999
         };
     } else {
         qty.disabled = true;
@@ -591,10 +781,9 @@ function toggleMaterial(chk) {
 // ── QUANTITY CHANGE ────────────────────────────────────────────────────────
 function changeQty(id, delta) {
     const input = document.getElementById('qty-' + id);
-    let val = parseInt(input.value) || 1;
-    const row = document.getElementById('row-' + id);
+    const row   = document.getElementById('row-' + id);
     const stock = parseInt(row.dataset.stock) || 9999;
-    val = Math.max(1, Math.min(stock, val + delta));
+    let val = Math.max(1, Math.min(stock, (parseInt(input.value) || 1) + delta));
     input.value = val;
     if (cart[id]) { cart[id].qty = val; renderCart(); }
 }
@@ -605,14 +794,17 @@ function onQtyChange(id) {
     const stock = parseInt(row.dataset.stock) || 9999;
     let val = parseInt(input.value) || 1;
     if (val < 1) val = 1;
-    if (val > stock) { val = stock; showAlert('Maximum available stock is ' + stock + ' ' + row.dataset.unit, 'error'); }
+    if (val > stock) {
+        val = stock;
+        showAlert('Maximum available stock is ' + stock + ' ' + row.dataset.unit, 'error');
+    }
     input.value = val;
     if (cart[id]) { cart[id].qty = val; renderCart(); }
 }
 
 // ── CART RENDERING ─────────────────────────────────────────────────────────
 function renderCart() {
-    const ids = Object.keys(cart);
+    const ids        = Object.keys(cart);
     const cartEmpty  = document.getElementById('cartEmpty');
     const cartItems  = document.getElementById('cartItems');
     const cartFooter = document.getElementById('cartFooter');
@@ -623,13 +815,13 @@ function renderCart() {
         cartEmpty.style.display  = 'block';
         cartItems.style.display  = 'none';
         cartFooter.style.display = 'none';
-        step2.className = 'step'; step3.className = 'step';
+        step2.className = 'step';
+        step3.className = 'step';
         return;
     }
 
     step2.className = 'step active';
 
-    // Group by supplier
     const groups = {};
     let grand = 0;
     ids.forEach(id => {
@@ -644,7 +836,6 @@ function renderCart() {
 
     const numOrders = Object.keys(groups).length;
 
-    // Render groups
     let html = '';
     Object.values(groups).forEach(g => {
         html += `<div class="cart-supplier">
@@ -675,17 +866,14 @@ function renderCart() {
         `${numOrders} order${numOrders > 1 ? 's' : ''} will be created — one per supplier. Each supplier accepts independently.`;
 }
 
-// ── REMOVE ITEM ─────────────────────────────────────────────────────────────
+// ── REMOVE / CLEAR ─────────────────────────────────────────────────────────
 function removeItem(id) {
     const chk = document.getElementById('chk-' + id);
     const row = document.getElementById('row-' + id);
     if (chk) chk.checked = false;
-    const dec = document.getElementById('dec-' + id);
-    const inc = document.getElementById('inc-' + id);
-    const qty = document.getElementById('qty-' + id);
-    if (qty) qty.disabled = true;
-    if (dec) dec.disabled = true;
-    if (inc) inc.disabled = true;
+    if (document.getElementById('dec-' + id)) document.getElementById('dec-' + id).disabled = true;
+    if (document.getElementById('inc-' + id)) document.getElementById('inc-' + id).disabled = true;
+    if (document.getElementById('qty-' + id)) document.getElementById('qty-' + id).disabled = true;
     if (row) row.classList.remove('selected');
     const sid = cart[id]?.supplierId;
     delete cart[id];
@@ -693,7 +881,6 @@ function removeItem(id) {
     renderCart();
 }
 
-// ── CLEAR CART ─────────────────────────────────────────────────────────────
 function clearCart() {
     Object.keys(cart).forEach(removeItem);
 }
@@ -719,30 +906,25 @@ function applyFilters() {
     const stock    = document.getElementById('stockFilter').value;
 
     let visibleCount = 0;
-    const groups = document.querySelectorAll('.supplier-group');
-
-    groups.forEach(group => {
+    document.querySelectorAll('.supplier-group').forEach(group => {
         let groupVisible = false;
         group.querySelectorAll('.material-row').forEach(row => {
             const name = row.dataset.name;
             const cat  = row.dataset.category;
             const stk  = parseInt(row.dataset.stock) || 0;
-
             let show = true;
-            if (search   && !name.includes(search) && !cat.includes(search))    show = false;
-            if (category && cat !== category)                                    show = false;
-            if (stock === 'in'  && stk <= 0)  show = false;
+            if (search   && !name.includes(search) && !cat.includes(search)) show = false;
+            if (category && cat !== category)                                 show = false;
+            if (stock === 'in'  && stk <= 0)          show = false;
             if (stock === 'low' && (stk <= 0 || stk > 20)) show = false;
-
             row.style.display = show ? '' : 'none';
             if (show) { groupVisible = true; visibleCount++; }
         });
         group.style.display = groupVisible ? '' : 'none';
     });
 
-    const noResults = document.getElementById('noResults');
-    noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-    document.getElementById('filterCount').textContent = visibleCount + ' item' + (visibleCount !== 1 ? 's' : '');
+    document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+    document.getElementById('filterCount').textContent  = visibleCount + ' item' + (visibleCount !== 1 ? 's' : '');
 }
 
 document.getElementById('searchInput').addEventListener('input', applyFilters);
@@ -754,7 +936,7 @@ function openConfirmModal() {
     const ids = Object.keys(cart);
     if (ids.length === 0) { showAlert('Please select at least one material.', 'error'); return; }
 
-    // Validate stock one more time client-side
+    // Client-side stock re-check
     let stockErr = null;
     ids.forEach(id => {
         const item = cart[id];
@@ -764,7 +946,14 @@ function openConfirmModal() {
     });
     if (stockErr) { showAlert(stockErr, 'error'); return; }
 
-    // Build modal content
+    // Validate delivery address
+    if (!deliveryAddr.address && !deliveryAddr.district) {
+        showAlert('Please set a delivery location before placing your order.', 'error');
+        openLocModal();
+        return;
+    }
+
+    // Build modal groups
     const groups = {};
     let grand = 0;
     ids.forEach(id => {
@@ -777,7 +966,17 @@ function openConfirmModal() {
         grand += total;
     });
 
-    let blocksHtml = '';
+    // Delivery address row at top of modal
+    const addrStr = buildDisplayStr(deliveryAddr);
+    let blocksHtml = `<div class="modal-delivery-row">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:2px;">Delivering to</div>
+            <div style="font-weight:600;color:var(--text);font-size:13px;">${escHtml(addrStr)}</div>
+            ${deliveryAddr.landmark ? `<div style="font-size:12px;color:var(--muted);margin-top:2px;">Near: ${escHtml(deliveryAddr.landmark)}</div>` : ''}
+        </div>
+    </div>`;
+
     Object.values(groups).forEach(g => {
         blocksHtml += `<div class="modal-supplier-block">
             <div class="modal-supplier-label">📦 ${escHtml(g.name)}</div>`;
@@ -822,6 +1021,13 @@ function submitOrder() {
         fd.append('material_ids[]', id);
         fd.append('quantities[]', cart[id].qty);
     });
+
+    // Append delivery address fields
+    fd.append('delivery_address',  deliveryAddr.address);
+    fd.append('delivery_district', deliveryAddr.district);
+    fd.append('delivery_pin',      deliveryAddr.pin);
+    fd.append('delivery_state',    deliveryAddr.state);
+    fd.append('delivery_landmark', deliveryAddr.landmark);
 
     document.getElementById('loadingOverlay').classList.add('show');
 
@@ -872,11 +1078,13 @@ function escHtml(s) {
     return d.innerHTML;
 }
 
-// Close modal on backdrop click
+// Close confirm modal on backdrop click
 document.getElementById('confirmModal').addEventListener('click', function(e) {
     if (e.target === this) closeConfirmModal();
 });
-</script>
 
+// Init display strings on load
+syncLocDisplays();
+</script>
 </body>
 </html>

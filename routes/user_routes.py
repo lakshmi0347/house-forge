@@ -781,33 +781,31 @@ def create_order():
     db = get_db()
     if not db:
         return jsonify({'success': False, 'message': 'Database connection error'}), 500
-
+ 
     try:
         project_id   = request.form.get('project_id')
         material_ids = request.form.getlist('material_ids[]')
         quantities   = request.form.getlist('quantities[]')
-
-        # Delivery address fields sent by the order_materials page.
-        # The page pre-fills from the project but the user can edit freely.
+ 
         delivery_address  = request.form.get('delivery_address', '').strip()
         delivery_district = request.form.get('delivery_district', '').strip()
         delivery_pin      = request.form.get('delivery_pin', '').strip()
         delivery_state    = request.form.get('delivery_state', '').strip()
         delivery_landmark = request.form.get('delivery_landmark', '').strip()
-
+ 
         if not material_ids or not quantities:
             return jsonify({'success': False, 'message': 'No materials selected'}), 400
-
-        # ── Verify project ownership ───────────────────────────────────────
+ 
+        # ── Verify project ownership ──────────────────────────────────────────
         project_doc = db.collection('projects').document(project_id).get()
         if not project_doc.exists:
             return jsonify({'success': False, 'message': 'Project not found'}), 404
-
+ 
         project_data = project_doc.to_dict()
         if project_data.get('user_id') != current_user.id:
             return jsonify({'success': False, 'message': 'Access denied'}), 403
-
-        # ── Build delivery_info — fall back to project address if not provided
+ 
+        # ── Build delivery info ───────────────────────────────────────────────
         delivery_info = {
             'address':  delivery_address  or project_data.get('location_address', project_data.get('location', '')),
             'district': delivery_district or project_data.get('location_district', ''),
@@ -815,17 +813,16 @@ def create_order():
             'pin':      delivery_pin      or project_data.get('location_pin', ''),
             'landmark': delivery_landmark,
         }
-
-        # Build a human-readable single string for the supplier's order card
+ 
         addr_parts = [p for p in [
             delivery_info['address'], delivery_info['district'],
-            delivery_info['state'], delivery_info['pin']
+            delivery_info['state'],   delivery_info['pin']
         ] if p]
         if delivery_info['landmark']:
             addr_parts.append(f"Near: {delivery_info['landmark']}")
         delivery_display = ', '.join(addr_parts) if addr_parts else ''
-
-        # ── Validate quantities ────────────────────────────────────────────
+ 
+        # ── Validate quantities ───────────────────────────────────────────────
         validated_quantities = []
         for raw_qty in quantities:
             try:
@@ -835,34 +832,34 @@ def create_order():
             if qty < 1:
                 return jsonify({'success': False, 'message': 'Quantity must be at least 1'}), 400
             validated_quantities.append(qty)
-
-        # ── Check stock & supplier ─────────────────────────────────────────
+ 
+        # ── Resolve materials + stock check ──────────────────────────────────
         resolved_items   = []
         orphan_materials = []
         stock_errors     = []
-
+ 
         for i, material_id in enumerate(material_ids):
             quantity     = validated_quantities[i]
             material_doc = db.collection('materials').document(material_id).get()
-
+ 
             if not material_doc.exists:
                 return jsonify({'success': False, 'message': f'Material {material_id} not found'}), 404
-
+ 
             material_data = material_doc.to_dict()
             supplier_id   = material_data.get('supplier_id')
-
+ 
             if not supplier_id:
                 orphan_materials.append(material_data.get('name', material_id))
                 continue
-
+ 
             available_qty = material_data.get('quantity', 0)
             if quantity > available_qty:
                 stock_errors.append(
                     f"{material_data.get('name', material_id)}: "
-                    f"requested {quantity}, available {available_qty}"
+                    f"ordered {quantity}, available {available_qty}"
                 )
                 continue
-
+ 
             resolved_items.append({
                 'material_id':    material_id,
                 'material_name':  material_data.get('name'),
@@ -872,7 +869,7 @@ def create_order():
                 'total':          material_data.get('price', 0) * quantity,
                 'supplier_id':    supplier_id,
             })
-
+ 
         if stock_errors:
             return jsonify({'success': False,
                             'message': 'Insufficient stock for: ' + '; '.join(stock_errors)}), 400
@@ -881,19 +878,39 @@ def create_order():
                             'message': 'No supplier assigned for: ' + ', '.join(orphan_materials)}), 400
         if not resolved_items:
             return jsonify({'success': False, 'message': 'No valid materials to order'}), 400
-
-        # ── Group by supplier, one order per supplier ──────────────────────
+ 
+        # ── Group by supplier ─────────────────────────────────────────────────
         groups = {}
         for item in resolved_items:
             groups.setdefault(item['supplier_id'], []).append(item)
-
+ 
         created_orders = []
-
+ 
         for supplier_id, items in groups.items():
             supplier_total = sum(item['total'] for item in items)
             supplier_doc   = db.collection('suppliers').document(supplier_id).get()
             supplier_data  = supplier_doc.to_dict() if supplier_doc.exists else {}
-
+ 
+            # ── Deduct stock immediately (atomic transaction) ─────────────────
+            @firestore.transactional
+            def _deduct_stock(transaction, items):
+                for item in items:
+                    mat_ref  = db.collection('materials').document(item['material_id'])
+                    mat_snap = mat_ref.get(transaction=transaction)
+                    if not mat_snap.exists:
+                        raise ValueError(f"Material {item['material_id']} not found")
+                    current_qty = mat_snap.to_dict().get('quantity', 0)
+                    if item['quantity'] > current_qty:
+                        raise ValueError(
+                            f"Insufficient stock for '{item['material_name']}': "
+                            f"ordered {item['quantity']}, available {current_qty}"
+                        )
+                    transaction.update(mat_ref, {'quantity': current_qty - item['quantity']})
+ 
+            txn = db.transaction()
+            _deduct_stock(txn, items)
+ 
+            # ── Create order — status = 'processing' immediately ──────────────
             order_doc = {
                 'user_id':          current_user.id,
                 'user_name':        current_user.name,
@@ -901,34 +918,61 @@ def create_order():
                 'user_phone':       current_user.phone if hasattr(current_user, 'phone') else '',
                 'project_id':       project_id,
                 'project_title':    project_data.get('title', 'Untitled Project'),
-
-                # Delivery — structured dict + flat display string for the supplier view
+ 
                 'delivery_address': delivery_display,
                 'delivery_info':    delivery_info,
-
+ 
                 'supplier_id':      supplier_id,
                 'supplier_name':    supplier_data.get('company_name') or supplier_data.get('name', 'Supplier'),
                 'items':            items,
                 'total':            supplier_total,
-                'status':           'pending',
+ 
+                # Instant processing — no acceptance queue
+                'status':           'processing',
+                'accepted_at':      datetime.now(),   # auto-accepted
+ 
                 'payment_status':   None,
                 'created_at':       datetime.now(),
                 'updated_at':       datetime.now(),
             }
-
+ 
             order_ref = db.collection('orders').add(order_doc)
-            created_orders.append(order_ref[1].id)
-            print(f"✅ Order for supplier {supplier_id}: ₹{supplier_total} → {delivery_display}")
-
+            new_order_id = order_ref[1].id
+            created_orders.append(new_order_id)
+ 
+            # Notify supplier about new order
+            _notify_supplier_new_order(supplier_id, current_user.name, new_order_id, supplier_total)
+ 
+            print(f"✅ Instant order for supplier {supplier_id}: ₹{supplier_total} → {delivery_display}")
+ 
         return jsonify({
             'success':   True,
             'message':   f'{len(created_orders)} order{"s" if len(created_orders) > 1 else ""} placed successfully!',
             'order_ids': created_orders,
         })
-
+ 
+    except ValueError as ve:
+        return jsonify({'success': False, 'message': str(ve)}), 400
     except Exception as e:
         import traceback; traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
+ 
+ 
+def _notify_supplier_new_order(supplier_id, user_name, order_id, total):
+    """Fire-and-forget notification helper."""
+    try:
+        db.collection('notifications').add({
+            'user_id':    supplier_id,
+            'title':      'New Order Received',
+            'message':    f'{user_name} placed an order (#{order_id[:8]}). '
+                          f'Amount: ₹{total:,.0f}. Ready to prepare for delivery.',
+            'type':       'order',
+            'link':       f'/supplier/orders',
+            'read':       False,
+            'created_at': datetime.now()
+        })
+    except Exception as e:
+        print(f"Supplier notification error: {e}")
 
 
 @user_bp.route('/my-orders')

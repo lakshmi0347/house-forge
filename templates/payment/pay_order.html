@@ -18,95 +18,42 @@
             --text:     #1C1917;
             --text2:    #5C4F43;
             --muted:    #8C7E72;
-            --success:  #065F46;
-            --success-b:#D1FAE5;
+            --shadow:   0 4px 18px rgba(28,25,23,0.08);
+            --shadow-sm:0 1px 3px rgba(28,25,23,0.06);
+            --purple:   #5B21B6;
+            --purple-bg:#EDE9FE;
+            --purple-bd:rgba(91,33,182,.25);
         }
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg);
-            min-height: 100vh;
-            color: var(--text);
-        }
-
-        body::before {
-            content:'';
-            position:fixed; inset:0;
-            background: url('/static/images/house.jpg') no-repeat center/cover;
-            opacity:.045; z-index:0; pointer-events:none;
-        }
+        body { font-family:'DM Sans',sans-serif; background:var(--bg); min-height:100vh; color:var(--text); }
+        body::before { content:''; position:fixed; inset:0; background:url('/static/images/house.jpg') no-repeat center/cover; opacity:.045; z-index:0; pointer-events:none; }
 
         /* ── Navbar ── */
-        .navbar {
-            background: rgba(250,247,242,.92);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--stone);
-            padding: 0 40px; height: 68px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top:0; z-index:100;
-            box-shadow: 0 1px 3px rgba(28,25,23,.07);
-        }
-        .navbar-brand {
-            font-family:'Playfair Display',serif; font-size:21px; font-weight:700;
-            color:var(--text); text-decoration:none; display:flex; align-items:center; gap:10px;
-        }
-        .brand-icon {
-            width:34px; height:34px; background:var(--accent); border-radius:9px;
-            display:flex; align-items:center; justify-content:center; color:#0A0A0A;
-        }
+        .navbar { background:rgba(250,247,242,.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--stone); padding:0 40px; height:68px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; box-shadow:var(--shadow-sm); }
+        .navbar-brand { font-family:'Playfair Display',serif; font-size:21px; font-weight:700; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:10px; }
+        .brand-icon { width:34px; height:34px; background:var(--accent); border-radius:9px; display:flex; align-items:center; justify-content:center; color:#0A0A0A; }
         .navbar-menu { display:flex; align-items:center; gap:4px; }
-        .navbar-menu a {
-            color:var(--text2); text-decoration:none; padding:8px 13px; border-radius:8px;
-            font-size:14px; font-weight:500; transition:all .2s;
-        }
+        .navbar-menu a { color:var(--text2); text-decoration:none; padding:8px 13px; border-radius:8px; font-size:14px; font-weight:500; transition:all .2s; }
         .navbar-menu a:hover { color:var(--accent); background:var(--accent-l); }
         .profile-pic { width:33px; height:33px; border-radius:50%; object-fit:cover; border:2px solid var(--stone); }
-        .profile-ph {
-            width:33px; height:33px; border-radius:50%; background:var(--accent-l);
-            color:var(--accent); display:flex; align-items:center; justify-content:center;
-            font-weight:600; font-size:13px; border:2px solid var(--stone);
-        }
+        .profile-ph { width:33px; height:33px; border-radius:50%; background:var(--accent-l); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; border:2px solid var(--stone); }
         .nav-div { width:1px; height:20px; background:var(--stone); margin:0 6px; }
-        .logout-link {
-            color:var(--muted); text-decoration:none; padding:8px 13px; border-radius:8px;
-            font-size:13px; font-weight:500; transition:all .2s;
-        }
+        .logout-link { color:var(--muted); text-decoration:none; padding:8px 13px; border-radius:8px; font-size:13px; font-weight:500; transition:all .2s; }
         .logout-link:hover { color:#DC2626; background:#FEF2F2; }
 
         /* ── Layout ── */
-        .page { max-width:780px; margin:40px auto; padding:0 24px; position:relative; z-index:1; }
-
-        .back-link {
-            display:inline-flex; align-items:center; gap:6px; color:var(--accent);
-            text-decoration:none; font-size:14px; font-weight:500; margin-bottom:24px;
-            transition:gap .2s;
-        }
+        .page { max-width:820px; margin:40px auto; padding:0 24px; position:relative; z-index:1; }
+        .back-link { display:inline-flex; align-items:center; gap:6px; color:var(--accent); text-decoration:none; font-size:14px; font-weight:500; margin-bottom:24px; transition:gap .2s; }
         .back-link:hover { gap:10px; }
 
         /* ── Order summary card ── */
-        .summary-card {
-            background:var(--card); border:1px solid var(--stone); border-radius:20px;
-            padding:32px 36px; margin-bottom:20px;
-            box-shadow:0 4px 18px rgba(28,25,23,.08);
-            animation: fadeUp .4s ease both;
-        }
-
-        .card-label {
-            font-size:11px; font-weight:600; text-transform:uppercase;
-            letter-spacing:.9px; color:var(--muted); margin-bottom:6px;
-        }
-        .card-title {
-            font-family:'Playfair Display',serif; font-size:22px; font-weight:700;
-            color:var(--text); margin-bottom:4px;
-        }
+        .summary-card { background:var(--card); border:1px solid var(--stone); border-radius:20px; padding:32px 36px; margin-bottom:20px; box-shadow:var(--shadow); animation:fadeUp .4s ease both; }
+        .card-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.9px; color:var(--muted); margin-bottom:6px; }
+        .card-title { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--text); margin-bottom:4px; }
         .divider { width:36px; height:3px; background:var(--accent); border-radius:2px; margin:12px 0 20px; }
 
         .items-table { width:100%; border-collapse:collapse; margin-bottom:20px; }
-        .items-table th {
-            font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.7px;
-            color:var(--muted); padding:0 0 10px; text-align:left; border-bottom:1px solid var(--sand);
-        }
+        .items-table th { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); padding:0 0 10px; text-align:left; border-bottom:1px solid var(--sand); }
         .items-table th:last-child { text-align:right; }
         .items-table td { padding:12px 0; border-bottom:1px solid var(--sand); font-size:14px; color:var(--text2); vertical-align:top; }
         .items-table td:last-child { text-align:right; font-weight:600; color:var(--text); }
@@ -114,88 +61,112 @@
         .item-name { font-weight:600; color:var(--text); margin-bottom:2px; }
         .item-sub  { font-size:12px; color:var(--muted); }
 
-        .total-row {
-            background:var(--accent); border-radius:12px; padding:16px 20px;
-            display:flex; justify-content:space-between; align-items:center;
-            margin-top:4px;
-        }
-        .total-label { font-size:14px; color:rgba(255,255,255,.85); font-weight:500; }
+        .total-row { background:var(--accent); border-radius:12px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
+        .total-label { font-size:14px; color:rgba(0,0,0,.65); font-weight:500; }
         .total-value { font-family:'Playfair Display',serif; font-size:26px; font-weight:700; color:#0A0A0A; }
 
-        .meta-row {
-            display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px;
-        }
+        .meta-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px; }
         .meta-item { background:var(--card2); border:1px solid var(--stone); border-radius:10px; padding:14px 16px; }
         .meta-key { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:4px; }
         .meta-val { font-size:14px; font-weight:600; color:var(--text); }
 
-        /* ── COD card ── */
-        .cod-card {
-            background:var(--card); border:1px solid var(--stone); border-radius:20px;
-            padding:32px 36px; box-shadow:0 4px 18px rgba(28,25,23,.08);
-            animation: fadeUp .4s .08s ease both;
-        }
+        /* ── Delivery strip ── */
+        .delivery-strip { display:flex; align-items:flex-start; gap:10px; padding:11px 16px; background:var(--accent-l); border:1px solid rgba(201,168,76,.3); border-radius:10px; margin-top:16px; font-size:13px; color:var(--text2); }
+        .delivery-strip svg { flex-shrink:0; color:var(--accent-d); margin-top:1px; }
+        .delivery-strip-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:2px; }
+        .delivery-strip-value { font-weight:600; color:var(--text); }
 
-        .cod-icon {
-            width:56px; height:56px; background:var(--accent-l); border-radius:14px;
-            display:flex; align-items:center; justify-content:center; margin-bottom:16px;
-        }
-        .cod-icon svg { width:28px; height:28px; color:var(--accent); }
+        /* ── Payment method selector ── */
+        .payment-card { background:var(--card); border:1px solid var(--stone); border-radius:20px; padding:32px 36px; box-shadow:var(--shadow); animation:fadeUp .4s .08s ease both; }
+        .payment-title { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--text); margin-bottom:6px; }
+        .payment-sub { font-size:14px; color:var(--text2); line-height:1.6; margin-bottom:28px; }
 
-        .cod-title { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--text); margin-bottom:8px; }
-        .cod-desc  { font-size:14px; color:var(--text2); line-height:1.7; margin-bottom:24px; }
+        /* Method tabs */
+        .method-tabs { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:28px; }
+        .method-tab { border:2px solid var(--stone); border-radius:14px; padding:18px 20px; cursor:pointer; transition:all .2s; background:var(--card2); display:flex; align-items:center; gap:14px; }
+        .method-tab:hover { border-color:var(--accent); background:var(--accent-l); }
+        .method-tab.selected-cod { border-color:var(--accent); background:var(--accent-l); }
+        .method-tab.selected-upi { border-color:var(--purple); background:var(--purple-bg); }
+        .method-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:22px; transition:all .2s; }
+        .method-tab-cod .method-icon { background:var(--sand); }
+        .method-tab-upi .method-icon { background:var(--sand); }
+        .method-tab.selected-cod .method-icon { background:var(--accent); }
+        .method-tab.selected-upi .method-icon { background:var(--purple-bg); }
+        .method-name { font-size:15px; font-weight:700; color:var(--text); margin-bottom:2px; }
+        .method-desc { font-size:12px; color:var(--muted); line-height:1.45; }
+        .method-tab.selected-cod .method-name { color:var(--accent-d); }
+        .method-tab.selected-upi .method-name { color:var(--purple); }
+        .method-check { width:20px; height:20px; border-radius:50%; border:2px solid var(--stone); margin-left:auto; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+        .method-tab.selected-cod .method-check { background:var(--accent); border-color:var(--accent); }
+        .method-tab.selected-upi .method-check { background:var(--purple); border-color:var(--purple); }
+        .checkmark { display:none; }
+        .method-tab.selected-cod .checkmark,
+        .method-tab.selected-upi .checkmark { display:block; }
 
-        .steps {
-            background:var(--card2); border:1px solid var(--stone); border-radius:12px;
-            padding:20px; margin-bottom:24px; display:flex; flex-direction:column; gap:14px;
-        }
+        /* Method detail panels */
+        .method-panel { display:none; animation:fadeUp .3s ease both; }
+        .method-panel.visible { display:block; }
+
+        /* COD panel */
+        .steps { background:var(--card2); border:1px solid var(--stone); border-radius:12px; padding:20px; margin-bottom:24px; display:flex; flex-direction:column; gap:14px; }
         .step { display:flex; align-items:flex-start; gap:14px; }
-        .step-num {
-            width:26px; height:26px; border-radius:50%; background:var(--accent);
-            color:#0A0A0A; font-size:12px; font-weight:700;
-            display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;
-        }
+        .step-num { width:26px; height:26px; border-radius:50%; background:var(--accent); color:#0A0A0A; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
         .step-text { font-size:14px; color:var(--text2); line-height:1.5; }
         .step-text strong { color:var(--text); }
 
-        .amount-highlight {
-            background:var(--accent-l); border:1px solid rgba(201,168,76,.4);
-            border-radius:10px; padding:14px 18px; margin-bottom:24px;
-            display:flex; justify-content:space-between; align-items:center;
-        }
+        /* UPI panel */
+        .upi-info-box { background:var(--purple-bg); border:1px solid var(--purple-bd); border-radius:12px; padding:18px 20px; margin-bottom:22px; }
+        .upi-info-title { font-size:13px; font-weight:700; color:var(--purple); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+        .upi-steps { display:flex; flex-direction:column; gap:10px; }
+        .upi-step { display:flex; align-items:flex-start; gap:12px; }
+        .upi-step-num { width:22px; height:22px; border-radius:50%; background:var(--purple); color:white; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+        .upi-step-text { font-size:13px; color:#3b0764; line-height:1.5; }
+        .upi-step-text strong { color:var(--purple); }
+
+        .upi-txn-group { margin-bottom:22px; }
+        .upi-txn-label { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:8px; display:block; }
+        .upi-txn-input { width:100%; padding:12px 15px; border:2px solid var(--stone); border-radius:10px; font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text); background:var(--card2); transition:border-color .2s; }
+        .upi-txn-input:focus { outline:none; border-color:var(--purple); box-shadow:0 0 0 3px rgba(91,33,182,.12); }
+        .upi-txn-hint { font-size:11px; color:var(--muted); margin-top:5px; }
+
+        .upi-notice { display:flex; align-items:flex-start; gap:10px; padding:12px 15px; background:var(--accent-l); border:1px solid rgba(201,168,76,.3); border-radius:9px; margin-bottom:22px; font-size:12px; color:var(--text2); }
+        .upi-notice svg { flex-shrink:0; color:var(--accent-d); margin-top:1px; }
+
+        /* Amount highlight — shared */
+        .amount-highlight { background:var(--accent-l); border:1px solid rgba(201,168,76,.4); border-radius:10px; padding:14px 18px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; }
+        .amount-highlight.upi { background:var(--purple-bg); border-color:var(--purple-bd); }
         .amount-highlight span { font-size:14px; color:var(--text2); font-weight:500; }
         .amount-highlight strong { font-family:'Playfair Display',serif; font-size:22px; color:var(--accent-d); }
+        .amount-highlight.upi strong { color:var(--purple); }
 
-        .btn-confirm {
-            width:100%; padding:16px; background:var(--accent); color:#0A0A0A;
-            border:none; border-radius:12px; font-family:'DM Sans',sans-serif;
-            font-size:16px; font-weight:700; cursor:pointer; transition:all .2s;
-            display:flex; align-items:center; justify-content:center; gap:8px;
-        }
-        .btn-confirm:hover { background:var(--accent-d); transform:translateY(-2px); box-shadow:0 6px 20px rgba(201,168,76,.35); }
+        /* Confirm button */
+        .btn-confirm { width:100%; padding:16px; border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:16px; font-weight:700; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .btn-confirm.cod-btn { background:var(--accent); color:#0A0A0A; }
+        .btn-confirm.cod-btn:hover { background:var(--accent-d); transform:translateY(-2px); box-shadow:0 6px 20px rgba(201,168,76,.35); }
+        .btn-confirm.upi-btn { background:var(--purple); color:white; }
+        .btn-confirm.upi-btn:hover { background:#4c1d95; transform:translateY(-2px); box-shadow:0 6px 20px rgba(91,33,182,.3); }
         .btn-confirm:disabled { background:var(--stone); color:var(--muted); cursor:not-allowed; transform:none; box-shadow:none; }
 
-        .spinner {
-            width:18px; height:18px; border:2px solid rgba(0,0,0,.2);
-            border-top-color:#0A0A0A; border-radius:50%;
-            animation:spin .7s linear infinite; display:none;
-        }
+        .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.25); border-top-color:white; border-radius:50%; animation:spin .7s linear infinite; display:none; }
+        .cod-btn .spinner { border-top-color:#0A0A0A; border-color:rgba(0,0,0,.15); }
         .btn-confirm.loading .btn-label { display:none; }
         .btn-confirm.loading .spinner  { display:block; }
 
-        .cancel-link {
-            display:block; text-align:center; margin-top:14px;
-            color:var(--muted); font-size:13px; text-decoration:none;
-        }
+        .cancel-link { display:block; text-align:center; margin-top:14px; color:var(--muted); font-size:13px; text-decoration:none; }
         .cancel-link:hover { color:var(--text); }
+
+        /* Select-method prompt */
+        .select-prompt { text-align:center; padding:28px 20px; color:var(--muted); font-size:14px; }
+        .select-prompt svg { display:block; margin:0 auto 10px; opacity:.35; }
 
         @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
         @keyframes spin   { to{transform:rotate(360deg)} }
 
-        @media(max-width:600px){
+        @media(max-width:600px) {
             .navbar{padding:0 16px;}
-            .summary-card,.cod-card{padding:22px 20px;}
+            .summary-card,.payment-card{padding:22px 20px;}
             .meta-row{grid-template-columns:1fr;}
+            .method-tabs{grid-template-columns:1fr;}
         }
     </style>
 </head>
@@ -229,7 +200,7 @@
         Back to Orders
     </a>
 
-    <!-- Order Summary -->
+    <!-- ── Order Summary ── -->
     <div class="summary-card">
         <div class="card-label">Material Order</div>
         <div class="card-title">Order #{{ order.id[:8] }}</div>
@@ -270,74 +241,222 @@
                 <div class="meta-val">{{ order.project_title or '—' }}</div>
             </div>
         </div>
+
+        {% if order.delivery_address %}
+        <div class="delivery-strip">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div>
+                <div class="delivery-strip-label">Deliver to</div>
+                <div class="delivery-strip-value">{{ order.delivery_address }}</div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
-    <!-- COD Confirmation -->
-    <div class="cod-card">
-        <div class="cod-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-        </div>
+    <!-- ── Payment Method Card ── -->
+    <div class="payment-card">
+        <div class="payment-title">Choose Payment Method</div>
+        <div class="payment-sub">Select how you would like to pay for this order. Your supplier will be notified immediately.</div>
 
-        <div class="cod-title">Cash on Delivery</div>
-        <div class="cod-desc">
-            Confirm your intent to pay cash when the materials are delivered.
-            The supplier will be notified immediately.
-        </div>
-
-        <div class="steps">
-            <div class="step">
-                <div class="step-num">1</div>
-                <div class="step-text">Click <strong>Confirm COD</strong> below — supplier gets notified.</div>
+        <!-- Method selector tabs -->
+        <div class="method-tabs">
+            <div class="method-tab method-tab-cod" id="tab-cod" onclick="selectMethod('cod')">
+                <div class="method-icon">💵</div>
+                <div style="flex:1;">
+                    <div class="method-name">Cash on Delivery</div>
+                    <div class="method-desc">Pay in cash when materials arrive at your site</div>
+                </div>
+                <div class="method-check">
+                    <svg class="checkmark" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg>
+                </div>
             </div>
-            <div class="step">
-                <div class="step-num">2</div>
-                <div class="step-text">Supplier delivers the materials to your site.</div>
-            </div>
-            <div class="step">
-                <div class="step-num">3</div>
-                <div class="step-text"><strong>Pay cash on delivery.</strong> Supplier marks payment as collected and the order closes.</div>
+
+            <div class="method-tab method-tab-upi" id="tab-upi" onclick="selectMethod('upi')">
+                <div class="method-icon">🔷</div>
+                <div style="flex:1;">
+                    <div class="method-name">UPI Payment</div>
+                    <div class="method-desc">Pay via any UPI app. Supplier verifies on delivery</div>
+                </div>
+                <div class="method-check">
+                    <svg class="checkmark" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg>
+                </div>
             </div>
         </div>
 
-        <div class="amount-highlight">
-            <span>Amount to pay on delivery</span>
-            <strong>₹{{ "{:,.0f}".format(order.total) }}</strong>
+        <!-- No method selected prompt -->
+        <div id="panel-none" class="method-panel visible select-prompt">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            Select a payment method above to continue
         </div>
 
-        <button class="btn-confirm" id="confirmBtn" onclick="confirmCOD()">
-            <span class="btn-label">✓ Confirm Cash on Delivery</span>
-            <div class="spinner"></div>
-        </button>
-        <a href="{{ url_for('user.my_orders') }}" class="cancel-link">Cancel and go back</a>
+        <!-- ── COD Panel ── -->
+        <div id="panel-cod" class="method-panel">
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-text">Click <strong>Confirm COD</strong> — supplier gets notified instantly.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-text">Supplier prepares and delivers the materials to your site.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-text"><strong>Pay ₹{{ "{:,.0f}".format(order.total) }} in cash</strong> on delivery. Supplier marks payment collected.</div>
+                </div>
+            </div>
+
+            <div class="amount-highlight">
+                <span>Amount to pay on delivery</span>
+                <strong>₹{{ "{:,.0f}".format(order.total) }}</strong>
+            </div>
+
+            <button class="btn-confirm cod-btn" id="codBtn" onclick="confirmCOD()">
+                <span class="btn-label">✓ Confirm Cash on Delivery</span>
+                <div class="spinner"></div>
+            </button>
+            <a href="{{ url_for('user.my_orders') }}" class="cancel-link">Cancel and go back</a>
+        </div>
+
+        <!-- ── UPI Panel ── -->
+        <div id="panel-upi" class="method-panel">
+            <div class="upi-info-box">
+                <div class="upi-info-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    How UPI payment works
+                </div>
+                <div class="upi-steps">
+                    <div class="upi-step">
+                        <div class="upi-step-num">1</div>
+                        <div class="upi-step-text">Open <strong>PhonePe, Google Pay, Paytm</strong> or any UPI app on your phone.</div>
+                    </div>
+                    <div class="upi-step">
+                        <div class="upi-step-num">2</div>
+                        <div class="upi-step-text">Transfer <strong>₹{{ "{:,.0f}".format(order.total) }}</strong> to the supplier's UPI ID. Contact the supplier for their UPI ID if needed.</div>
+                    </div>
+                    <div class="upi-step">
+                        <div class="upi-step-num">3</div>
+                        <div class="upi-step-text">Enter your <strong>UPI Transaction ID / Reference</strong> below (optional but recommended).</div>
+                    </div>
+                    <div class="upi-step">
+                        <div class="upi-step-num">4</div>
+                        <div class="upi-step-text">Click <strong>Declare UPI Payment</strong>. Supplier verifies on delivery and marks the order complete.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="upi-txn-group">
+                <label class="upi-txn-label" for="upiTxnInput">UPI Transaction ID / Reference (optional)</label>
+                <input
+                    type="text"
+                    id="upiTxnInput"
+                    class="upi-txn-input"
+                    placeholder="e.g. 428539201839 or T2506XXXXXX"
+                    autocomplete="off"
+                    inputmode="text"
+                >
+                <div class="upi-txn-hint">You can find this in your UPI app's transaction history after payment</div>
+            </div>
+
+            <div class="upi-notice">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span>Declare only after you have actually completed the UPI transfer. The supplier will verify the payment on delivery.</span>
+            </div>
+
+            <div class="amount-highlight upi">
+                <span>Declared UPI payment amount</span>
+                <strong>₹{{ "{:,.0f}".format(order.total) }}</strong>
+            </div>
+
+            <button class="btn-confirm upi-btn" id="upiBtn" onclick="declareUPI()">
+                <span class="btn-label">🔷 Declare UPI Payment</span>
+                <div class="spinner"></div>
+            </button>
+            <a href="{{ url_for('user.my_orders') }}" class="cancel-link">Cancel and go back</a>
+        </div>
     </div>
 </div>
 
 <script>
-function confirmCOD() {
-    const btn = document.getElementById('confirmBtn');
-    btn.disabled = true;
-    btn.classList.add('loading');
+    let selectedMethod = null;
 
-    fetch('{{ url_for("payment.confirm_order_cod", order_id=order.id) }}', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            window.location.href = data.redirect_url;
+    function selectMethod(method) {
+        selectedMethod = method;
+
+        // Reset tabs
+        document.getElementById('tab-cod').className = 'method-tab method-tab-cod';
+        document.getElementById('tab-upi').className = 'method-tab method-tab-upi';
+
+        // Activate selected tab
+        if (method === 'cod') {
+            document.getElementById('tab-cod').classList.add('selected-cod');
         } else {
-            alert('Error: ' + data.message);
+            document.getElementById('tab-upi').classList.add('selected-upi');
+        }
+
+        // Show/hide panels
+        document.getElementById('panel-none').classList.remove('visible');
+        document.getElementById('panel-cod').classList.remove('visible');
+        document.getElementById('panel-upi').classList.remove('visible');
+        document.getElementById('panel-' + method).classList.add('visible');
+    }
+
+    // ── COD ──
+    function confirmCOD() {
+        const btn = document.getElementById('codBtn');
+        btn.disabled = true;
+        btn.classList.add('loading');
+
+        fetch('{{ url_for("payment.confirm_order_cod", order_id=order.id) }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirect_url;
+            } else {
+                alert('Error: ' + data.message);
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
+        })
+        .catch(() => {
+            alert('Something went wrong. Please try again.');
             btn.disabled = false;
             btn.classList.remove('loading');
-        }
-    })
-    .catch(() => {
-        alert('Something went wrong. Please try again.');
-        btn.disabled = false;
-        btn.classList.remove('loading');
-    });
-}
+        });
+    }
+
+    // ── UPI ──
+    function declareUPI() {
+        const btn    = document.getElementById('upiBtn');
+        const txnId  = document.getElementById('upiTxnInput').value.trim();
+
+        btn.disabled = true;
+        btn.classList.add('loading');
+
+        fetch('{{ url_for("payment.declare_order_upi", order_id=order.id) }}', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ upi_transaction_id: txnId })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirect_url;
+            } else {
+                alert('Error: ' + data.message);
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
+        })
+        .catch(() => {
+            alert('Something went wrong. Please try again.');
+            btn.disabled = false;
+            btn.classList.remove('loading');
+        });
+    }
 </script>
 </body>
 </html>

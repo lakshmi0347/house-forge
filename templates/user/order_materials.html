@@ -675,6 +675,14 @@
     </div>
 </div>
 
+<script id="projectData" type="application/json">
+{
+    "address":  "{{ project.location_address | default('') | e }}",
+    "district": "{{ project.location_district | default('') | e }}",
+    "pin":      "{{ project.location_pin | default('') | e }}",
+    "state":    "{{ project.location_state | default('') | e }}"
+}
+</script>
 <script>
 // ── DELIVERY LOCATION STATE ────────────────────────────────────────────────
 // NEW — replace with:
@@ -1085,6 +1093,16 @@ document.getElementById('confirmModal').addEventListener('click', function(e) {
 
 // Init display strings on load
 syncLocDisplays();
+
+
+</script>
+<script id="projectData" type="application/json">
+{
+    "address":  "{{ project.location_address | default('') | e }}",
+    "district": "{{ project.location_district | default('') | e }}",
+    "pin":      "{{ project.location_pin | default('') | e }}",
+    "state":    "{{ project.location_state | default('') | e }}"
+}
 </script>
 </body>
 </html>

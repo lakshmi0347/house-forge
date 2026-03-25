@@ -259,6 +259,8 @@
                         <span class="pay-badge pay-paid">✓ Paid</span>
                     {% elif order.payment_status == 'cod_confirmed' %}
                         <span class="pay-badge pay-cod-confirmed">💵 COD Confirmed</span>
+                    {% elif order.payment_status == 'upi_pending' %}
+                        <span class="pay-badge" style="background:#EDE9FE;color:#5B21B6;">🔷 UPI Pending</span>
                     {% endif %}
                 </div>
             </div>
@@ -350,6 +352,15 @@
                         <span class="cod-note">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                             COD confirmed · Pay ₹{{ "{:,.0f}".format(order.total) }} cash on delivery
+                        </span>
+                        <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            View Receipt
+                        </a>
+                    {% elif order.payment_status == 'upi_pending' %}
+                        <span class="cod-note" style="background:#EDE9FE;border-color:rgba(91,33,182,.3);color:#5B21B6;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                            UPI declared · Supplier will verify ₹{{ "{:,.0f}".format(order.total) }} on delivery
                         </span>
                         <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>

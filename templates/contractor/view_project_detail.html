@@ -60,11 +60,94 @@
         .btn-outline:hover { background: var(--accent-light); }
         .btn-disabled { background: var(--sand); color: var(--text-muted); cursor: not-allowed; border: 1.5px solid var(--stone); }
         .description-text { color: var(--text-secondary); line-height: 1.8; font-size: 14px; }
+
+        /* ── BUDGET ESTIMATION STYLES ── */
+        .est-tier-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+        .est-tier {
+            padding: 14px 10px; border-radius: 10px; text-align: center;
+            border: 1px solid var(--stone); background: var(--sand);
+            transition: transform 0.2s;
+        }
+        .est-tier:hover { transform: translateY(-2px); }
+        .est-tier.active {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-mid) 100%);
+            color: white; border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(27,79,114,0.25);
+        }
+        .est-tier-label {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 5px;
+        }
+        .est-tier.active .est-tier-label { color: rgba(255,255,255,0.75); }
+        .est-tier-total {
+            font-family: 'Playfair Display', serif; font-size: 17px;
+            font-weight: 700; color: var(--text-primary); line-height: 1.2;
+        }
+        .est-tier.active .est-tier-total { color: white; }
+        .est-tier-sqft { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .est-tier.active .est-tier-sqft { color: rgba(255,255,255,0.7); }
+        .est-tier-chosen {
+            font-size: 9px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-top: 6px;
+            background: rgba(255,255,255,0.25); border-radius: 20px;
+            padding: 2px 8px; display: inline-block;
+        }
+
+        .est-breakdown {
+            background: var(--sand); border-radius: 10px; padding: 16px;
+            margin-bottom: 14px;
+        }
+        .est-breakdown-title {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 12px;
+        }
+        .est-breakdown-grid { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+        .est-breakdown-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+        .est-breakdown-item { text-align: center; }
+        .est-breakdown-item-label {
+            font-size: 11px; color: var(--text-muted); font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .est-breakdown-item-value {
+            font-family: 'Playfair Display', serif; font-size: 17px;
+            font-weight: 700; color: var(--text-primary);
+        }
+
+        .est-stage-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 7px 0; border-bottom: 1px solid var(--stone);
+        }
+        .est-stage-row:last-child { border-bottom: none; }
+        .est-stage-name { font-size: 12px; color: var(--text-secondary); width: 130px; flex-shrink: 0; }
+        .est-stage-bar-wrap { flex: 1; height: 4px; background: var(--stone); border-radius: 2px; overflow: hidden; }
+        .est-stage-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-mid)); border-radius: 2px; }
+        .est-stage-cost { font-size: 12px; font-weight: 700; color: var(--text-primary); width: 70px; text-align: right; flex-shrink: 0; }
+        .est-stage-heading { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-muted); margin-bottom:10px; }
+
+        .est-timeline-hint {
+            margin-top: 14px; background: var(--accent-light);
+            border: 1px solid var(--stone); border-radius: 8px;
+            padding: 11px 14px; display: flex; align-items: center; gap: 10px;
+        }
+        .est-timeline-hint-icon { font-size: 18px; flex-shrink: 0; }
+        .est-timeline-hint-label {
+            font-size: 11px; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
+        }
+        .est-timeline-hint-value { font-size: 14px; font-weight: 700; color: var(--accent); }
+        .est-timeline-hint-sub { font-size: 12px; font-weight: 400; color: var(--text-muted); }
+
+        .est-tip {
+            margin-top: 12px; padding: 10px 12px;
+            background: #FEF3C7; border: 1px solid #FCD34D;
+            border-radius: 8px; font-size: 12px; color: #92400E; line-height: 1.5;
+        }
+
         @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         .page-banner { animation: fadeUp 0.4s ease both; }
         .two-column { animation: fadeUp 0.4s 0.1s ease both; }
         @media (max-width: 1024px) { .two-column { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) { .navbar { padding: 0 16px; } .container { padding: 0 16px; } .info-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .navbar { padding: 0 16px; } .container { padding: 0 16px; } .info-grid { grid-template-columns: 1fr; } .est-tier-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -109,6 +192,8 @@
 
         <div class="two-column">
             <div>
+
+                <!-- ── PROJECT DETAILS ── -->
                 <div class="section">
                     <h3 class="section-title">📋 Project Details</h3>
                     <div class="info-grid">
@@ -128,6 +213,134 @@
                 </div>
                 {% endif %}
 
+                <!-- ══════════════════════════════════════════════ -->
+                <!-- ── OWNER'S BUDGET ESTIMATION BLOCK ──────────── -->
+                <!-- ══════════════════════════════════════════════ -->
+                {% set estimation = project.get('estimation', {}) %}
+                {% set budget     = (project.budget_range or 'medium') | lower %}
+                {% set scope      = project.estimate_scope or 'material_only' %}
+                {% set sqf        = project.square_feet | float or 1 %}
+
+                {% if estimation %}
+                {% set costs = estimation.get('costs', {}) %}
+                {% set tc    = costs.get(budget, costs.get('medium', {})) %}
+
+                <div class="section">
+                    <h3 class="section-title">💰 Owner's Budget Estimation</h3>
+
+                    <!-- Three tier cards -->
+                    <div class="est-tier-grid">
+                        {% for tk, tl in [('low','Budget'), ('medium','Standard'), ('high','Premium')] %}
+                        {% set t  = costs.get(tk, {}) %}
+                        {% set tv = t.get('total_cost', 0) %}
+                        <div class="est-tier {% if tk == budget %}active{% endif %}">
+                            <div class="est-tier-label">{{ tl }}</div>
+                            <div class="est-tier-total">
+                                {% if tv >= 10000000 %}₹{{ "%.2f"|format(tv/10000000) }} Cr
+                                {% elif tv >= 100000  %}₹{{ "%.1f"|format(tv/100000)  }} L
+                                {% else %}₹{{ "{:,.0f}".format(tv) }}{% endif %}
+                            </div>
+                            <div class="est-tier-sqft">₹{{ "{:,.0f}".format((tv / sqf) | round) }}/sqft</div>
+                            {% if tk == budget %}
+                            <div class="est-tier-chosen">Owner's Choice ✓</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Chosen tier breakdown -->
+                    {% set mat_cost = tc.get('material_cost', 0) %}
+                    {% set lab_cost = tc.get('labor_cost', 0) %}
+                    {% set oth_cost = tc.get('other_costs', 0) %}
+                    {% set tot_cost = tc.get('total_cost', 0) %}
+
+                    <div class="est-breakdown">
+                        <div class="est-breakdown-title">
+                            {{ {'low':'Budget','medium':'Standard','high':'Premium'}.get(budget,'Standard') }} Tier Breakdown
+                            &nbsp;·&nbsp;
+                            {% if scope == 'material_and_labour' %}Material + Labour{% else %}Material Only{% endif %}
+                        </div>
+                        <div class="est-breakdown-grid {% if scope == 'material_and_labour' %}three-col{% endif %}">
+                            <div class="est-breakdown-item">
+                                <div class="est-breakdown-item-label">MATERIALS</div>
+                                <div class="est-breakdown-item-value">₹{{ "{:,.0f}".format(mat_cost) }}</div>
+                            </div>
+                            {% if scope == 'material_and_labour' %}
+                            <div class="est-breakdown-item">
+                                <div class="est-breakdown-item-label">LABOUR</div>
+                                <div class="est-breakdown-item-value">₹{{ "{:,.0f}".format(lab_cost) }}</div>
+                            </div>
+                            {% endif %}
+                            <div class="est-breakdown-item">
+                                <div class="est-breakdown-item-label">OTHER / CONTINGENCY</div>
+                                <div class="est-breakdown-item-value">₹{{ "{:,.0f}".format(oth_cost) }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stage-wise mini bar chart -->
+                    {% set stg = tc.get('stage_breakdown', {}) %}
+                    {% if stg %}
+                    {% set stage_labels = {
+                        'foundation':'Foundation', 'walls':'Walls',
+                        'flooring':'Flooring & Slab', 'roofing':'Roofing',
+                        'plumbing':'Plumbing', 'electrical':'Electrical',
+                        'finishing':'Finishing', 'carpentry':'Carpentry',
+                        'exterior':'Exterior', 'miscellaneous':'Miscellaneous'
+                    } %}
+                    {% set max_c = stg.values() | list | max if stg else 1 %}
+
+                    <div class="est-stage-heading">
+                        Stage-wise Cost Breakdown
+                    </div>
+
+                    {% for sk, sl in stage_labels.items() %}
+                    {% set sc = stg.get(sk, 0) %}
+                    {% if sc > 0 %}
+                    {% set bp = ((sc / max_c) * 100) | round | int %}
+                    <div class="est-stage-row">
+                        <span class="est-stage-name">{{ sl }}</span>
+                        <div class="est-stage-bar-wrap">
+                            <div class="est-stage-bar" data-width="{{ bp }}"></div>
+                        </div>
+                        <span class="est-stage-cost">
+                            {% if sc >= 100000 %}₹{{ "%.1f"|format(sc/100000) }}L
+                            {% else %}₹{{ "{:,.0f}".format(sc) }}{% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+
+                    <!-- Timeline hint -->
+                    {% set timeline = estimation.get('timeline', {}) %}
+                    {% if timeline.get('total_days', 0) > 0 %}
+                    <div class="est-timeline-hint">
+                        <span class="est-timeline-hint-icon">⏱️</span>
+                        <div>
+                            <div class="est-timeline-hint-label">Owner's System Timeline Estimate</div>
+                            <div class="est-timeline-hint-value">
+                                {{ timeline.get('total_days', 0) | int }} days
+                                <span class="est-timeline-hint-sub">
+                                    (≈ {{ ((timeline.get('total_days', 0)) / 30) | round(1) }} months)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Bidding tip -->
+                    <div class="est-tip">
+                        <strong>💡 Bidding Tip:</strong> These figures are auto-generated system estimates for the owner's
+                        reference — not the owner's confirmed budget. Submit a bid that reflects your
+                        <em>actual</em> costs, expertise, and realistic timeline. Quality and reliability
+                        often win over the lowest price.
+                    </div>
+                </div>
+                {% endif %}
+                <!-- ── END BUDGET ESTIMATION BLOCK ── -->
+
+                <!-- ── PROJECT OWNER ── -->
                 <div class="section">
                     <h3 class="section-title">👤 Project Owner</h3>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -150,8 +363,10 @@
                     </div>
                 </div>
                 {% endif %}
-            </div>
 
+            </div><!-- end left col -->
+
+            <!-- ── RIGHT SIDEBAR ── -->
             <div>
                 <div class="budget-strip">
                     <div class="label">Budget Range</div>
@@ -188,11 +403,17 @@
                         <div class="mini-stat"><div class="val">{{ project.bathrooms or 2 }}</div><div class="lbl">Baths</div></div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div><!-- end right col -->
+
+        </div><!-- end two-column -->
     </div>
 
     <script>
+        // Apply stage bar widths from data attributes (avoids Jinja in CSS)
+        document.querySelectorAll('.est-stage-bar[data-width]').forEach(function(el) {
+            el.style.width = el.getAttribute('data-width') + '%';
+        });
+
         function updateMessageBadge() {
             fetch('/contractor/messages/unread-count')
                 .then(r => { if (!r.ok || !r.headers.get('content-type')?.includes('application/json')) return null; return r.json(); })

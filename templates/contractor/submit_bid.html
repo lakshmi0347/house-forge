@@ -138,7 +138,6 @@
                         <div class="form-group">
                             <label for="proposal">Detailed Proposal</label>
                             <textarea id="proposal" name="proposal" required placeholder="Explain your approach, experience with similar projects, what makes your bid competitive, timeline breakdown, etc."></textarea>
-                            <div class="helper-text">Minimum 50 characters — be specific about your approach</div>
                         </div>
                     </div>
 
@@ -191,9 +190,6 @@
             }
             if (parseInt(document.getElementById('duration_days').value) < 1) {
                 e.preventDefault(); alert('Duration must be at least 1 month.'); return;
-            }
-            if (document.getElementById('proposal').value.trim().length < 50) {
-                e.preventDefault(); alert('Please provide a more detailed proposal (at least 50 characters).'); return;
             }
             if (!confirm('Are you sure you want to submit this bid? Make sure all details are correct.')) e.preventDefault();
         });

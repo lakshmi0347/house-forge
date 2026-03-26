@@ -6,94 +6,514 @@
     <title>Notifications - House-Forge</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root{--cream:#FAF8F5;--warm-white:#FFFFFF;--sand:#F0EBE3;--stone:#E2D9CE;--accent:#B5804F;--accent-dark:#8C5E35;--accent-light:#F7EDE2;--text-primary:#1C1917;--text-secondary:#6B5E52;--text-muted:#9C8E84;--shadow-sm:0 1px 3px rgba(28,25,23,0.06);--shadow-md:0 4px 16px rgba(28,25,23,0.08);}
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;color:var(--text-primary);position:relative;}
-        body::before{content:'';position:fixed;inset:0;background:url('/static/images/house.jpg') no-repeat center/cover;opacity:0.08;z-index:0;pointer-events:none;}
-        .navbar{background:var(--warm-white);border-bottom:1px solid var(--stone);padding:0 40px;height:68px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
-        .navbar-brand{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:10px;text-decoration:none;}
-        .navbar-menu{display:flex;align-items:center;gap:4px;}
-        .navbar-menu a{color:var(--text-secondary);text-decoration:none;padding:8px 14px;border-radius:8px;font-size:14px;font-weight:500;transition:all .2s;}
-        .navbar-menu a:hover,.navbar-menu a.active{color:var(--accent);background:var(--accent-light);}
-        .profile-pic{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--stone);}
-        .profile-placeholder{width:36px;height:36px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;border:2px solid var(--stone);}
-        .container{max-width:900px;margin:36px auto;padding:0 24px;position:relative;z-index:1;}
-        .page-header{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:30px 40px;margin-bottom:24px;box-shadow:var(--shadow-md);position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;}
-        .page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--text-primary);}
-        .unread-pill{background:#DC2626;color:white;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.3px;}
-        .notif-item{background:var(--warm-white);border:1px solid var(--stone);padding:18px 22px;border-radius:14px;margin-bottom:14px;box-shadow:var(--shadow-sm);display:flex;gap:14px;cursor:pointer;transition:all .25s;}
-        .notif-item:hover{transform:translateX(4px);box-shadow:var(--shadow-md);border-color:rgba(181,128,79,.3);}
-        .notif-item.unread{background:var(--accent-light);border-color:rgba(181,128,79,.35);border-left:3px solid var(--accent);}
-        .notif-icon{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
-        .notif-icon.bid{background:#FEE2E2;}
-        .notif-icon.message{background:#DBEAFE;}
-        .notif-icon.order{background:#D1FAE5;}
-        .notif-icon.project{background:var(--accent-light);}
-        .notif-icon.payment{background:#EDE9FE;}
-        .notif-icon.review{background:#FEF3C7;}
-        .notif-content{flex:1;}
-        .notif-title{font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:4px;}
-        .notif-message{font-size:13px;color:var(--text-secondary);margin-bottom:6px;line-height:1.5;}
-        .notif-time{font-size:11px;color:var(--text-muted);font-weight:500;}
-        .empty-state{text-align:center;padding:60px 20px;background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;}
-        .empty-icon{font-size:56px;margin-bottom:14px;opacity:.6;}
-        .empty-state h2{font-family:'Playfair Display',serif;font-size:20px;color:var(--text-primary);margin-bottom:8px;}
-        .empty-state p{color:var(--text-secondary);font-size:14px;}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-        .page-header{animation:fadeUp .45s ease both;}
-        .notif-item{animation:fadeUp .4s ease both;}
+        :root {
+            --cream: #FAF8F5;
+            --warm-white: #FFFFFF;
+            --sand: #F0EBE3;
+            --stone: #E2D9CE;
+            --accent: #B5804F;
+            --accent-dark: #8C5E35;
+            --accent-light: #F7EDE2;
+            --text-primary: #1C1917;
+            --text-secondary: #6B5E52;
+            --text-muted: #9C8E84;
+            --shadow-sm: 0 1px 3px rgba(28,25,23,0.06);
+            --shadow-md: 0 4px 16px rgba(28,25,23,0.08);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            min-height: 100vh;
+            color: var(--text-primary);
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: url('/static/images/house.jpg') no-repeat center/cover;
+            opacity: 0.055;
+            filter: saturate(0.2) sepia(0.3);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ─── NAVBAR ─── */
+        .navbar {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--stone);
+            padding: 0 40px;
+            height: 68px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 21px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .navbar-brand-icon {
+            width: 34px; height: 34px;
+            background: #C9A84C;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0A0A0A;
+            flex-shrink: 0;
+        }
+
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .navbar-menu a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 13px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .navbar-menu a:hover,
+        .navbar-menu a.active { color: #C9A84C; background: #FBF3E0; }
+
+        .profile-pic {
+            width: 33px; height: 33px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--stone);
+            display: block;
+        }
+
+        .profile-placeholder {
+            width: 33px; height: 33px;
+            border-radius: 50%;
+            background: #FBF3E0;
+            color: #C9A84C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 13px;
+            border: 2px solid var(--stone);
+        }
+
+        .nav-divider { width: 1px; height: 20px; background: var(--stone); margin: 0 6px; }
+
+        .logout-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 8px 13px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.2s, background 0.2s;
+        }
+        .logout-link:hover { color: #DC2626; background: #FEF2F2; }
+
+        /* ─── LAYOUT ─── */
+        .container {
+            max-width: 860px;
+            margin: 36px auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ─── PAGE HEADER ─── */
+        .page-header {
+            background: var(--warm-white);
+            border: 1px solid var(--stone);
+            border-radius: 16px;
+            padding: 28px 36px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeUp 0.4s ease both;
+        }
+
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+
+        .unread-pill {
+            background: #DC2626;
+            color: #fff;
+            padding: 4px 13px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-mark-all {
+            background: transparent;
+            border: 1.5px solid var(--stone);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.2s, color 0.2s, background 0.2s;
+        }
+        .btn-mark-all:hover { border-color: #C9A84C; color: #C9A84C; background: #FBF3E0; }
+
+        /* ─── NOTIFICATION ITEMS ─── */
+        .notif-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .notif-item {
+            background: var(--warm-white);
+            border: 1px solid var(--stone);
+            padding: 18px 22px;
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            gap: 14px;
+            cursor: pointer;
+            transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s, background 0.22s, opacity 0.3s;
+            animation: fadeUp 0.38s ease both;
+        }
+
+        .notif-item:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(201,168,76,0.4);
+        }
+
+        .notif-item.unread {
+            background: #FBF3E0;
+            border-color: rgba(201,168,76,0.45);
+            border-left: 3px solid #C9A84C;
+        }
+
+        .notif-item.read-now {
+            opacity: 0.6;
+        }
+
+        .notif-icon {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .notif-icon.bid      { background: #FEE2E2; }
+        .notif-icon.message  { background: #DBEAFE; }
+        .notif-icon.order    { background: #D1FAE5; }
+        .notif-icon.project  { background: #FBF3E0; }
+        .notif-icon.payment  { background: #EDE9FE; }
+        .notif-icon.review   { background: #FEF3C7; }
+        .notif-icon.default  { background: var(--sand); }
+
+        .notif-content { flex: 1; min-width: 0; }
+
+        .notif-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .notif-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+
+        .notif-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notif-time {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .notif-unread-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #C9A84C;
+            flex-shrink: 0;
+        }
+
+        /* ─── EMPTY STATE ─── */
+        .empty-state {
+            text-align: center;
+            padding: 64px 24px;
+            background: var(--warm-white);
+            border: 1px solid var(--stone);
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            animation: fadeUp 0.4s ease both;
+        }
+
+        .empty-icon {
+            width: 68px; height: 68px;
+            background: var(--sand);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+            font-size: 30px;
+        }
+
+        .empty-state h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p { color: var(--text-secondary); font-size: 14px; }
+
+        /* ─── ANIMATIONS ─── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 640px) {
+            .navbar { padding: 0 16px; }
+            .nav-label { display: none; }
+            .container { padding: 0 12px; margin: 16px auto; }
+            .page-header { padding: 18px 18px; }
+            .notif-item { padding: 14px 14px; }
+        }
     </style>
 </head>
 <body>
+
     <nav class="navbar">
-        <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">🏗️ House-Forge</a>
+        <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">
+            <div class="navbar-brand-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            House-Forge
+        </a>
         <div class="navbar-menu">
-            <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('user.projects') }}">My Projects</a>
-            <a href="{{ url_for('user.my_orders') }}">My Orders</a>
-            <a href="{{ url_for('user.messages') }}">Messages</a>
-            <a href="{{ url_for('user.notifications') }}" class="active">Notifications</a>
-            <a href="{{ url_for('user.profile') }}" style="padding:8px 10px;">
-                {% if user_profile_picture %}<img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
-                {% else %}<div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>{% endif %}
+            <a href="{{ url_for('user.dashboard') }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span class="nav-label">Dashboard</span>
             </a>
-            <a href="{{ url_for('auth.logout') }}" style="color:var(--text-muted);font-size:13px;">Logout</a>
+            <a href="{{ url_for('user.projects') }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span class="nav-label">My Projects</span>
+            </a>
+            <a href="{{ url_for('user.my_orders') }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                <span class="nav-label">My Orders</span>
+            </a>
+            <a href="{{ url_for('user.messages') }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span class="nav-label">Messages</span>
+            </a>
+            <a href="{{ url_for('user.notifications') }}" class="active">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <span class="nav-label">Notifications</span>
+            </a>
+            <div class="nav-divider"></div>
+            <a href="{{ url_for('user.profile') }}" style="padding:8px 9px;">
+                {% if user_profile_picture %}
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
+                {% else %}
+                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('auth.logout') }}" class="logout-link">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span class="nav-label">Logout</span>
+            </a>
         </div>
     </nav>
+
     <div class="container">
+
         <div class="page-header">
-            <h1>🔔 Notifications</h1>
-            {% if unread_count > 0 %}<span class="unread-pill">{{ unread_count }} Unread</span>{% endif %}
-        </div>
-        {% if notifications and notifications|length > 0 %}
-            {% for notification in notifications %}
-            <div class="notif-item {% if not notification.get('read',True) %}unread{% endif %}" onclick="markAsRead('{{ notification.id }}')">
-                <div class="notif-icon {{ notification.get('type','project') }}">
-                    {% if notification.get('type')=='bid' %}💼
-                    {% elif notification.get('type')=='message' %}💬
-                    {% elif notification.get('type')=='order' %}📦
-                    {% elif notification.get('type')=='project' %}🏗️
-                    {% elif notification.get('type')=='payment' %}💰
-                    {% elif notification.get('type')=='review' %}⭐
-                    {% else %}🔔{% endif %}
-                </div>
-                <div class="notif-content">
-                    <div class="notif-title">{{ notification.get('title','Notification') }}</div>
-                    <div class="notif-message">{{ notification.get('message','') }}</div>
-                    <div class="notif-time">Just now</div>
-                </div>
+            <h1>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                Notifications
+            </h1>
+            <div class="header-actions">
+                {% if unread_count > 0 %}
+                    <span class="unread-pill" id="unreadPill">{{ unread_count }} Unread</span>
+                    <button class="btn-mark-all" onclick="markAllRead()">Mark all read</button>
+                {% endif %}
             </div>
-            {% endfor %}
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-icon">🔔</div>
-            <h2>All Caught Up!</h2>
-            <p>You have no new notifications right now.</p>
         </div>
+
+        {% if notifications and notifications|length > 0 %}
+            <div class="notif-list" id="notifList">
+            {% for notification in notifications %}
+                <div class="notif-item {% if not notification.get('read', False) %}unread{% endif %}"
+                     id="notif-{{ notification.id }}"
+                     data-read="{{ 'true' if notification.get('read', False) else 'false' }}"
+                     onclick="markAsRead('{{ notification.id }}', this)"
+                     {% if notification.get('link') %}data-link="{{ notification.get('link') }}"{% endif %}>
+
+                    <div class="notif-icon {{ notification.get('type', 'default') }}">
+                        {% set t = notification.get('type', '') %}
+                        {% if t == 'bid' %}💼
+                        {% elif t == 'message' %}💬
+                        {% elif t == 'order' %}📦
+                        {% elif t == 'project' %}🏗️
+                        {% elif t == 'payment' %}💰
+                        {% elif t == 'review' %}⭐
+                        {% else %}🔔
+                        {% endif %}
+                    </div>
+
+                    <div class="notif-content">
+                        <div class="notif-title">{{ notification.get('title', 'Notification') }}</div>
+                        <div class="notif-message">{{ notification.get('message', '') }}</div>
+                        <div class="notif-meta">
+                            {% if not notification.get('read', False) %}
+                                <span class="notif-unread-dot" id="dot-{{ notification.id }}"></span>
+                            {% endif %}
+                            <span class="notif-time">
+                                {% if notification.get('created_at') %}
+                                    {{ notification.created_at.strftime('%d %b %Y, %I:%M %p') }}
+                                {% else %}
+                                    Just now
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🔔</div>
+                <h2>All Caught Up!</h2>
+                <p>You have no notifications right now.</p>
+            </div>
         {% endif %}
+
     </div>
+
     <script>
-        function markAsRead(id){fetch(`/user/notifications/mark-read/${id}`,{method:'POST'}).then(()=>location.reload());}
+        // Read count from DOM — avoids Jinja2-inside-JS parsing issues
+        let unreadCount = parseInt(document.getElementById('unreadPill')?.textContent || '0');
+
+        function updateUnreadPill() {
+            const pill = document.getElementById('unreadPill');
+            const btn  = document.querySelector('.btn-mark-all');
+            if (pill) {
+                if (unreadCount > 0) {
+                    pill.textContent = unreadCount + ' Unread';
+                } else {
+                    pill.remove();
+                    if (btn) btn.remove();
+                }
+            }
+        }
+
+        function markAsRead(id, el) {
+            // Already read — just follow the link if any
+            if (!el || el.dataset.read === 'true') {
+                followLink(el);
+                return;
+            }
+
+            fetch('/user/notifications/mark-read/' + id, { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success !== false) {
+                        el.classList.remove('unread');
+                        el.classList.add('read-now');
+                        el.dataset.read = 'true';
+
+                        const dot = document.getElementById('dot-' + id);
+                        if (dot) dot.remove();
+
+                        unreadCount = Math.max(0, unreadCount - 1);
+                        updateUnreadPill();
+                    }
+                    followLink(el);
+                })
+                .catch(() => followLink(el));
+        }
+
+        function followLink(el) {
+            if (el && el.dataset.link) {
+                window.location.href = el.dataset.link;
+            }
+        }
+
+        function markAllRead() {
+            const unreadItems = document.querySelectorAll('.notif-item.unread');
+            const promises = [];
+
+            unreadItems.forEach(item => {
+                const id = item.id.replace('notif-', '');
+                promises.push(
+                    fetch('/user/notifications/mark-read/' + id, { method: 'POST' })
+                        .then(() => {
+                            item.classList.remove('unread');
+                            item.classList.add('read-now');
+                            item.dataset.read = 'true';
+                            const dot = document.getElementById('dot-' + id);
+                            if (dot) dot.remove();
+                        })
+                        .catch(() => {})
+                );
+            });
+
+            Promise.all(promises).then(() => {
+                unreadCount = 0;
+                updateUnreadPill();
+            });
+        }
     </script>
+
 </body>
 </html>

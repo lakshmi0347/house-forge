@@ -31,7 +31,6 @@
         body { font-family:'DM Sans',sans-serif; background:var(--bg); min-height:100vh; color:var(--text); }
         body::before { content:''; position:fixed; inset:0; background:url('/static/images/house.jpg') no-repeat center/cover; opacity:.04; z-index:0; pointer-events:none; }
 
-        /* ─── NAVBAR ─── */
         .navbar { background:rgba(250,247,242,.93); backdrop-filter:blur(12px); border-bottom:1px solid var(--stone); padding:0 40px; height:68px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; box-shadow:var(--shadow-sm); }
         .navbar-brand { font-family:'Playfair Display',serif; font-size:21px; font-weight:700; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:10px; }
         .brand-icon { width:34px; height:34px; background:var(--accent); border-radius:9px; display:flex; align-items:center; justify-content:center; color:#0A0A0A; }
@@ -44,16 +43,12 @@
         .logout-link { color:var(--muted); text-decoration:none; padding:8px 13px; border-radius:8px; font-size:13px; font-weight:500; transition:all .2s; }
         .logout-link:hover { color:#DC2626; background:#FEF2F2; }
 
-        /* ─── PAGE ─── */
         .page { max-width:1040px; margin:36px auto; padding:0 24px 60px; position:relative; z-index:1; }
-
-        /* ─── HEADER ─── */
         .page-header { background:var(--card); border:1px solid var(--stone); border-radius:18px; padding:28px 36px; margin-bottom:22px; box-shadow:var(--shadow); animation:fadeUp .4s ease both; }
         .page-header h1 { font-family:'Playfair Display',serif; font-size:25px; font-weight:700; margin-bottom:4px; }
         .page-header p { font-size:14px; color:var(--text2); margin-bottom:20px; }
         .divider { width:36px; height:3px; background:var(--accent); border-radius:2px; margin:10px 0 20px; }
 
-        /* stats */
         .stats-row { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
         @media(max-width:700px) { .stats-row { grid-template-columns:repeat(2,1fr); } }
         .stat { background:var(--card2); border:1px solid var(--stone); border-radius:12px; padding:16px; text-align:center; transition:all .2s; cursor:default; }
@@ -61,29 +56,24 @@
         .stat-num { font-family:'Playfair Display',serif; font-size:24px; font-weight:700; color:var(--accent-d); display:block; margin-bottom:3px; }
         .stat-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); }
 
-        /* ─── FILTER BAR ─── */
         .filter-bar { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
         .filter-btn { padding:7px 16px; border-radius:20px; font-size:13px; font-weight:600; cursor:pointer; border:1.5px solid var(--stone); background:var(--card); color:var(--text2); transition:all .2s; font-family:'DM Sans',sans-serif; }
         .filter-btn:hover, .filter-btn.active { background:var(--accent); border-color:var(--accent); color:#0A0A0A; }
 
-        /* ─── ORDER CARD ─── */
         .order-card { background:var(--card); border:1px solid var(--stone); border-radius:16px; margin-bottom:16px; overflow:hidden; box-shadow:var(--shadow-sm); transition:all .25s; animation:fadeUp .4s ease both; }
         .order-card:hover { transform:translateY(-2px); box-shadow:var(--shadow); border-color:rgba(201,168,76,.3); }
 
-        /* status stripe */
         .order-stripe { height:4px; }
         .stripe-pending    { background:linear-gradient(90deg, #F59E0B, #FDE68A); }
         .stripe-processing { background:linear-gradient(90deg, var(--blue), #93C5FD); }
         .stripe-completed  { background:linear-gradient(90deg, var(--green), #6EE7B7); }
         .stripe-cancelled  { background:linear-gradient(90deg, var(--red), #FCA5A5); }
 
-        /* order header */
         .order-head { padding:18px 24px 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:16px; border-bottom:1px solid var(--sand); }
         .order-id { font-family:'Playfair Display',serif; font-size:16px; font-weight:700; color:var(--text); }
         .order-date { font-size:12px; color:var(--muted); margin-top:2px; }
         .order-head-right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
 
-        /* status badge */
         .status-badge { display:inline-flex; align-items:center; gap:5px; padding:5px 13px; border-radius:20px; font-size:11px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; }
         .status-dot { width:6px; height:6px; border-radius:50%; }
         .s-pending    { background:#FEF3C7; color:#92400E; }
@@ -95,22 +85,19 @@
         .s-cancelled  { background:var(--red-bg); color:var(--red); }
         .s-cancelled .status-dot  { background:#EF4444; }
 
-        /* payment badge */
         .pay-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; }
-        .pay-cod-confirmed { background:var(--accent-l); color:var(--accent-d); }
-        .pay-paid { background:var(--green-bg); color:var(--green); }
+        .pay-cod-confirmed  { background:var(--accent-l); color:var(--accent-d); }
+        .pay-paid           { background:var(--green-bg); color:var(--green); }
+        .pay-card-pending   { background:var(--blue-bg);  color:var(--blue); }
 
-        /* order body */
         .order-body { padding:16px 24px; }
         .supplier-row { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
         .supplier-icon { width:36px; height:36px; border-radius:50%; background:var(--sand); border:1px solid var(--stone); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
         .supplier-info h4 { font-size:14px; font-weight:600; color:var(--text); }
         .supplier-info p { font-size:12px; color:var(--muted); }
 
-        /* project tag */
         .project-tag { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; background:var(--accent-l); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; font-size:12px; font-weight:600; color:var(--accent-d); margin-bottom:14px; }
 
-        /* items table */
         .items-table { width:100%; border-collapse:collapse; margin-bottom:14px; }
         .items-table th { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); padding:7px 10px; background:var(--sand); text-align:left; }
         .items-table th:first-child { border-radius:6px 0 0 6px; }
@@ -121,19 +108,16 @@
         .item-name { font-weight:600; color:var(--text); }
         .item-detail { font-size:11px; color:var(--muted); margin-top:2px; }
 
-        /* total row */
         .total-bar { background:var(--accent); border-radius:10px; padding:13px 18px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
         .total-bar-label { font-size:13px; color:rgba(0,0,0,.65); font-weight:500; }
         .total-bar-val { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:#0A0A0A; }
 
-        /* status info strip */
         .status-strip { display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:8px; font-size:13px; font-weight:500; margin-bottom:12px; }
         .status-strip.pending    { background:#FEF3C7; color:#92400E; border:1px solid #FDE68A; }
         .status-strip.processing { background:var(--blue-bg); color:var(--blue); border:1px solid #93C5FD; }
         .status-strip.completed  { background:var(--green-bg); color:var(--green); border:1px solid #A7F3D0; }
         .status-strip.cancelled  { background:var(--red-bg); color:var(--red); border:1px solid #FCA5A5; }
 
-        /* payment actions */
         .payment-actions { display:flex; gap:10px; flex-wrap:wrap; }
         .btn-pay { display:inline-flex; align-items:center; gap:6px; padding:11px 22px; background:var(--accent); color:#0A0A0A; border-radius:9px; font-weight:700; font-size:13px; text-decoration:none; transition:all .2s; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; }
         .btn-pay:hover { background:var(--accent-d); transform:translateY(-1px); box-shadow:0 4px 14px rgba(201,168,76,.35); }
@@ -142,7 +126,6 @@
         .cod-note { display:inline-flex; align-items:center; gap:6px; padding:10px 14px; background:var(--accent-l); color:var(--accent-d); border-radius:9px; font-size:12px; font-weight:600; border:1px solid rgba(201,168,76,.3); }
         .completed-note { display:inline-flex; align-items:center; gap:6px; padding:10px 14px; background:var(--green-bg); color:var(--green); border-radius:9px; font-size:12px; font-weight:600; border:1px solid #A7F3D0; }
 
-        /* ─── EMPTY STATE ─── */
         .empty-state { background:var(--card); border:1px solid var(--stone); border-radius:16px; padding:60px 24px; text-align:center; box-shadow:var(--shadow-sm); }
         .empty-icon { width:60px; height:60px; background:var(--sand); border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:var(--muted); }
         .empty-state h2 { font-family:'Playfair Display',serif; font-size:20px; color:var(--text); margin-bottom:8px; }
@@ -189,36 +172,19 @@
 
 <div class="page">
 
-    <!-- Page Header -->
     <div class="page-header">
         <h1>📦 My Material Orders</h1>
         <div class="divider"></div>
         <p>Track every order placed with suppliers for your construction projects.</p>
         <div class="stats-row">
-            <div class="stat">
-                <span class="stat-num">{{ stats.total }}</span>
-                <span class="stat-lbl">Total</span>
-            </div>
-            <div class="stat">
-                <span class="stat-num">{{ stats.pending }}</span>
-                <span class="stat-lbl">Pending</span>
-            </div>
-            <div class="stat">
-                <span class="stat-num">{{ stats.processing }}</span>
-                <span class="stat-lbl">Processing</span>
-            </div>
-            <div class="stat">
-                <span class="stat-num">{{ stats.completed }}</span>
-                <span class="stat-lbl">Completed</span>
-            </div>
-            <div class="stat">
-                <span class="stat-num">₹{{ "{:,.0f}".format(stats.total_spent) }}</span>
-                <span class="stat-lbl">Total Spent</span>
-            </div>
+            <div class="stat"><span class="stat-num">{{ stats.total }}</span><span class="stat-lbl">Total</span></div>
+            <div class="stat"><span class="stat-num">{{ stats.pending }}</span><span class="stat-lbl">Pending</span></div>
+            <div class="stat"><span class="stat-num">{{ stats.processing }}</span><span class="stat-lbl">Processing</span></div>
+            <div class="stat"><span class="stat-num">{{ stats.completed }}</span><span class="stat-lbl">Completed</span></div>
+            <div class="stat"><span class="stat-num">₹{{ "{:,.0f}".format(stats.total_spent) }}</span><span class="stat-lbl">Total Spent</span></div>
         </div>
     </div>
 
-    <!-- Filters -->
     {% if orders %}
     <div class="filter-bar">
         <button class="filter-btn active" onclick="filterOrders('all', this)">All Orders</button>
@@ -229,21 +195,16 @@
     </div>
     {% endif %}
 
-    <!-- Orders -->
     {% if orders %}
         {% for order in orders %}
         <div class="order-card" data-status="{{ order.status }}">
 
-            <!-- Status stripe -->
             <div class="order-stripe stripe-{{ order.status }}"></div>
 
-            <!-- Header -->
             <div class="order-head">
                 <div>
                     <div class="order-id">Order #{{ order.id[:8].upper() }}</div>
-                    <div class="order-date">
-                        Placed {{ order.created_at.strftime('%d %b %Y at %I:%M %p') if order.created_at else 'N/A' }}
-                    </div>
+                    <div class="order-date">Placed {{ order.created_at.strftime('%d %b %Y at %I:%M %p') if order.created_at else 'N/A' }}</div>
                 </div>
                 <div class="order-head-right">
                     <span class="status-badge s-{{ order.status }}">
@@ -259,16 +220,14 @@
                         <span class="pay-badge pay-paid">✓ Paid</span>
                     {% elif order.payment_status == 'cod_confirmed' %}
                         <span class="pay-badge pay-cod-confirmed">💵 COD Confirmed</span>
-                    {% elif order.payment_status == 'upi_pending' %}
-                        <span class="pay-badge" style="background:#EDE9FE;color:#5B21B6;">🔷 UPI Pending</span>
+                    {% elif order.payment_status == 'card_pending' %}
+                        <span class="pay-badge pay-card-pending">💳 Card Pending</span>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Body -->
             <div class="order-body">
 
-                <!-- Supplier -->
                 <div class="supplier-row">
                     <div class="supplier-icon">📦</div>
                     <div class="supplier-info">
@@ -277,7 +236,6 @@
                     </div>
                 </div>
 
-                <!-- Project -->
                 {% if order.project_title %}
                 <div class="project-tag">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -285,14 +243,10 @@
                 </div>
                 {% endif %}
 
-                <!-- Items -->
                 <table class="items-table">
                     <thead>
                         <tr>
-                            <th>Material</th>
-                            <th>Unit Price</th>
-                            <th>Qty</th>
-                            <th>Amount</th>
+                            <th>Material</th><th>Unit Price</th><th>Qty</th><th>Amount</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -310,13 +264,11 @@
                     </tbody>
                 </table>
 
-                <!-- Total -->
                 <div class="total-bar">
                     <span class="total-bar-label">Order Total</span>
                     <span class="total-bar-val">₹{{ "{:,.0f}".format(order.total) }}</span>
                 </div>
 
-                <!-- Status strip -->
                 {% if order.status == 'pending' %}
                 <div class="status-strip pending">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -339,7 +291,6 @@
                 </div>
                 {% endif %}
 
-                <!-- Payment actions — only when processing (supplier accepted) -->
                 {% if order.status == 'processing' %}
                 <div class="payment-actions">
                     {% if order.payment_status == 'paid' %}
@@ -357,10 +308,10 @@
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                             View Receipt
                         </a>
-                    {% elif order.payment_status == 'upi_pending' %}
-                        <span class="cod-note" style="background:#EDE9FE;border-color:rgba(91,33,182,.3);color:#5B21B6;">
+                    {% elif order.payment_status == 'card_pending' %}
+                        <span class="cod-note" style="background:var(--blue-bg);border-color:rgba(30,64,175,.3);color:var(--blue);">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                            UPI declared · Supplier will verify ₹{{ "{:,.0f}".format(order.total) }} on delivery
+                            Card declared · Supplier will verify ₹{{ "{:,.0f}".format(order.total) }} on delivery
                         </span>
                         <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -374,7 +325,7 @@
                     {% endif %}
                 </div>
 
-                {% elif order.status == 'completed' and order.payment_status in ('paid', 'cod_confirmed') %}
+                {% elif order.status == 'completed' and order.payment_status in ('paid', 'cod_confirmed', 'card_pending') %}
                 <div class="payment-actions">
                     <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -383,7 +334,7 @@
                 </div>
                 {% endif %}
 
-            </div><!-- /order-body -->
+            </div>
         </div>
         {% endfor %}
 
@@ -408,11 +359,7 @@ function filterOrders(status, btn) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.querySelectorAll('.order-card').forEach(card => {
-        if (status === 'all' || card.dataset.status === status) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
+        card.style.display = (status === 'all' || card.dataset.status === status) ? '' : 'none';
     });
 }
 </script>

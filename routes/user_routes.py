@@ -1679,10 +1679,12 @@ def notifications_unread_count():
     if not db:
         return jsonify({'count': 0})
     try:
+        # Single .where() avoids needing a composite Firestore index.
+        # The read==False filter is done in Python instead.
         notifications_ref = db.collection('notifications') \
-            .where('user_id', '==', current_user.id) \
-            .where('read', '==', False).stream()
-        return jsonify({'count': len(list(notifications_ref))})
+            .where('user_id', '==', current_user.id).stream()
+        count = sum(1 for doc in notifications_ref if not doc.to_dict().get('read', False))
+        return jsonify({'count': count})
     except Exception as e:
         print(f"Error getting unread count: {e}")
         return jsonify({'count': 0})

@@ -20,9 +20,9 @@
             --muted:    #8C7E72;
             --shadow:   0 4px 18px rgba(28,25,23,0.08);
             --shadow-sm:0 1px 3px rgba(28,25,23,0.06);
-            --purple:   #5B21B6;
-            --purple-bg:#EDE9FE;
-            --purple-bd:rgba(91,33,182,.25);
+            --blue:     #1E40AF;
+            --blue-bg:  #DBEAFE;
+            --blue-bd:  rgba(30,64,175,.25);
         }
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'DM Sans',sans-serif; background:var(--bg); min-height:100vh; color:var(--text); }
@@ -85,23 +85,21 @@
         .method-tabs { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:28px; }
         .method-tab { border:2px solid var(--stone); border-radius:14px; padding:18px 20px; cursor:pointer; transition:all .2s; background:var(--card2); display:flex; align-items:center; gap:14px; }
         .method-tab:hover { border-color:var(--accent); background:var(--accent-l); }
-        .method-tab.selected-cod { border-color:var(--accent); background:var(--accent-l); }
-        .method-tab.selected-upi { border-color:var(--purple); background:var(--purple-bg); }
-        .method-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:22px; transition:all .2s; }
-        .method-tab-cod .method-icon { background:var(--sand); }
-        .method-tab-upi .method-icon { background:var(--sand); }
-        .method-tab.selected-cod .method-icon { background:var(--accent); }
-        .method-tab.selected-upi .method-icon { background:var(--purple-bg); }
+        .method-tab.selected-cod  { border-color:var(--accent); background:var(--accent-l); }
+        .method-tab.selected-card { border-color:var(--blue);   background:var(--blue-bg); }
+        .method-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:22px; transition:all .2s; background:var(--sand); }
+        .method-tab.selected-cod  .method-icon { background:var(--accent); }
+        .method-tab.selected-card .method-icon { background:var(--blue-bg); }
         .method-name { font-size:15px; font-weight:700; color:var(--text); margin-bottom:2px; }
         .method-desc { font-size:12px; color:var(--muted); line-height:1.45; }
-        .method-tab.selected-cod .method-name { color:var(--accent-d); }
-        .method-tab.selected-upi .method-name { color:var(--purple); }
+        .method-tab.selected-cod  .method-name { color:var(--accent-d); }
+        .method-tab.selected-card .method-name { color:var(--blue); }
         .method-check { width:20px; height:20px; border-radius:50%; border:2px solid var(--stone); margin-left:auto; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .2s; }
-        .method-tab.selected-cod .method-check { background:var(--accent); border-color:var(--accent); }
-        .method-tab.selected-upi .method-check { background:var(--purple); border-color:var(--purple); }
+        .method-tab.selected-cod  .method-check { background:var(--accent); border-color:var(--accent); }
+        .method-tab.selected-card .method-check { background:var(--blue);   border-color:var(--blue); }
         .checkmark { display:none; }
-        .method-tab.selected-cod .checkmark,
-        .method-tab.selected-upi .checkmark { display:block; }
+        .method-tab.selected-cod  .checkmark,
+        .method-tab.selected-card .checkmark { display:block; }
 
         /* Method detail panels */
         .method-panel { display:none; animation:fadeUp .3s ease both; }
@@ -114,37 +112,39 @@
         .step-text { font-size:14px; color:var(--text2); line-height:1.5; }
         .step-text strong { color:var(--text); }
 
-        /* UPI panel */
-        .upi-info-box { background:var(--purple-bg); border:1px solid var(--purple-bd); border-radius:12px; padding:18px 20px; margin-bottom:22px; }
-        .upi-info-title { font-size:13px; font-weight:700; color:var(--purple); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
-        .upi-steps { display:flex; flex-direction:column; gap:10px; }
-        .upi-step { display:flex; align-items:flex-start; gap:12px; }
-        .upi-step-num { width:22px; height:22px; border-radius:50%; background:var(--purple); color:white; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
-        .upi-step-text { font-size:13px; color:#3b0764; line-height:1.5; }
-        .upi-step-text strong { color:var(--purple); }
+        /* Card panel */
+        .card-info-box { background:var(--blue-bg); border:1px solid var(--blue-bd); border-radius:12px; padding:18px 20px; margin-bottom:22px; }
+        .card-info-title { font-size:13px; font-weight:700; color:var(--blue); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+        .card-steps { display:flex; flex-direction:column; gap:10px; }
+        .card-step { display:flex; align-items:flex-start; gap:12px; }
+        .card-step-num { width:22px; height:22px; border-radius:50%; background:var(--blue); color:white; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+        .card-step-text { font-size:13px; color:#1e3a8a; line-height:1.5; }
+        .card-step-text strong { color:var(--blue); }
 
-        .upi-txn-group { margin-bottom:22px; }
-        .upi-txn-label { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:8px; display:block; }
-        .upi-txn-input { width:100%; padding:12px 15px; border:2px solid var(--stone); border-radius:10px; font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text); background:var(--card2); transition:border-color .2s; }
-        .upi-txn-input:focus { outline:none; border-color:var(--purple); box-shadow:0 0 0 3px rgba(91,33,182,.12); }
-        .upi-txn-hint { font-size:11px; color:var(--muted); margin-top:5px; }
+        /* Card detail inputs */
+        .card-fields { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:22px; }
+        .card-field-full { margin-bottom:22px; }
+        .card-field-label { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:8px; display:block; }
+        .card-field-input { width:100%; padding:12px 15px; border:2px solid var(--stone); border-radius:10px; font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text); background:var(--card2); transition:border-color .2s; }
+        .card-field-input:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(30,64,175,.12); }
+        .card-field-hint { font-size:11px; color:var(--muted); margin-top:5px; }
 
-        .upi-notice { display:flex; align-items:flex-start; gap:10px; padding:12px 15px; background:var(--accent-l); border:1px solid rgba(201,168,76,.3); border-radius:9px; margin-bottom:22px; font-size:12px; color:var(--text2); }
-        .upi-notice svg { flex-shrink:0; color:var(--accent-d); margin-top:1px; }
+        .card-notice { display:flex; align-items:flex-start; gap:10px; padding:12px 15px; background:var(--accent-l); border:1px solid rgba(201,168,76,.3); border-radius:9px; margin-bottom:22px; font-size:12px; color:var(--text2); }
+        .card-notice svg { flex-shrink:0; color:var(--accent-d); margin-top:1px; }
 
         /* Amount highlight — shared */
         .amount-highlight { background:var(--accent-l); border:1px solid rgba(201,168,76,.4); border-radius:10px; padding:14px 18px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; }
-        .amount-highlight.upi { background:var(--purple-bg); border-color:var(--purple-bd); }
+        .amount-highlight.card-hl { background:var(--blue-bg); border-color:var(--blue-bd); }
         .amount-highlight span { font-size:14px; color:var(--text2); font-weight:500; }
         .amount-highlight strong { font-family:'Playfair Display',serif; font-size:22px; color:var(--accent-d); }
-        .amount-highlight.upi strong { color:var(--purple); }
+        .amount-highlight.card-hl strong { color:var(--blue); }
 
         /* Confirm button */
         .btn-confirm { width:100%; padding:16px; border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:16px; font-weight:700; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; }
-        .btn-confirm.cod-btn { background:var(--accent); color:#0A0A0A; }
-        .btn-confirm.cod-btn:hover { background:var(--accent-d); transform:translateY(-2px); box-shadow:0 6px 20px rgba(201,168,76,.35); }
-        .btn-confirm.upi-btn { background:var(--purple); color:white; }
-        .btn-confirm.upi-btn:hover { background:#4c1d95; transform:translateY(-2px); box-shadow:0 6px 20px rgba(91,33,182,.3); }
+        .btn-confirm.cod-btn  { background:var(--accent); color:#0A0A0A; }
+        .btn-confirm.cod-btn:hover  { background:var(--accent-d); transform:translateY(-2px); box-shadow:0 6px 20px rgba(201,168,76,.35); }
+        .btn-confirm.card-btn { background:var(--blue); color:white; }
+        .btn-confirm.card-btn:hover { background:#1e3a8a; transform:translateY(-2px); box-shadow:0 6px 20px rgba(30,64,175,.3); }
         .btn-confirm:disabled { background:var(--stone); color:var(--muted); cursor:not-allowed; transform:none; box-shadow:none; }
 
         .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.25); border-top-color:white; border-radius:50%; animation:spin .7s linear infinite; display:none; }
@@ -167,6 +167,7 @@
             .summary-card,.payment-card{padding:22px 20px;}
             .meta-row{grid-template-columns:1fr;}
             .method-tabs{grid-template-columns:1fr;}
+            .card-fields{grid-template-columns:1fr;}
         }
     </style>
 </head>
@@ -271,11 +272,11 @@
                 </div>
             </div>
 
-            <div class="method-tab method-tab-upi" id="tab-upi" onclick="selectMethod('upi')">
-                <div class="method-icon">🔷</div>
+            <div class="method-tab method-tab-card" id="tab-card" onclick="selectMethod('card')">
+                <div class="method-icon">💳</div>
                 <div style="flex:1;">
-                    <div class="method-name">UPI Payment</div>
-                    <div class="method-desc">Pay via any UPI app. Supplier verifies on delivery</div>
+                    <div class="method-name">Card Payment</div>
+                    <div class="method-desc">Pay via debit or credit card. Supplier verifies on delivery</div>
                 </div>
                 <div class="method-check">
                     <svg class="checkmark" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg>
@@ -318,58 +319,69 @@
             <a href="{{ url_for('user.my_orders') }}" class="cancel-link">Cancel and go back</a>
         </div>
 
-        <!-- ── UPI Panel ── -->
-        <div id="panel-upi" class="method-panel">
-            <div class="upi-info-box">
-                <div class="upi-info-title">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    How UPI payment works
+        <!-- ── Card Panel ── -->
+        <div id="panel-card" class="method-panel">
+            <div class="card-info-box">
+                <div class="card-info-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                    How card payment works
                 </div>
-                <div class="upi-steps">
-                    <div class="upi-step">
-                        <div class="upi-step-num">1</div>
-                        <div class="upi-step-text">Open <strong>PhonePe, Google Pay, Paytm</strong> or any UPI app on your phone.</div>
+                <div class="card-steps">
+                    <div class="card-step">
+                        <div class="card-step-num">1</div>
+                        <div class="card-step-text">Complete your card payment of <strong>₹{{ "{:,.0f}".format(order.total) }}</strong> using your debit or credit card via your bank or payment portal.</div>
                     </div>
-                    <div class="upi-step">
-                        <div class="upi-step-num">2</div>
-                        <div class="upi-step-text">Transfer <strong>₹{{ "{:,.0f}".format(order.total) }}</strong> to the supplier's UPI ID. Contact the supplier for their UPI ID if needed.</div>
+                    <div class="card-step">
+                        <div class="card-step-num">2</div>
+                        <div class="card-step-text">Enter the <strong>last 4 digits</strong> of the card used and the <strong>Transaction / Reference ID</strong> from your bank statement (optional but recommended).</div>
                     </div>
-                    <div class="upi-step">
-                        <div class="upi-step-num">3</div>
-                        <div class="upi-step-text">Enter your <strong>UPI Transaction ID / Reference</strong> below (optional but recommended).</div>
-                    </div>
-                    <div class="upi-step">
-                        <div class="upi-step-num">4</div>
-                        <div class="upi-step-text">Click <strong>Declare UPI Payment</strong>. Supplier verifies on delivery and marks the order complete.</div>
+                    <div class="card-step">
+                        <div class="card-step-num">3</div>
+                        <div class="card-step-text">Click <strong>Confirm Card Payment</strong>. Supplier is notified and will verify on delivery.</div>
                     </div>
                 </div>
             </div>
 
-            <div class="upi-txn-group">
-                <label class="upi-txn-label" for="upiTxnInput">UPI Transaction ID / Reference (optional)</label>
-                <input
-                    type="text"
-                    id="upiTxnInput"
-                    class="upi-txn-input"
-                    placeholder="e.g. 428539201839 or T2506XXXXXX"
-                    autocomplete="off"
-                    inputmode="text"
-                >
-                <div class="upi-txn-hint">You can find this in your UPI app's transaction history after payment</div>
+            <!-- Card detail fields -->
+            <div class="card-fields">
+                <div>
+                    <label class="card-field-label" for="cardLast4Input">Last 4 digits of card (optional)</label>
+                    <input
+                        type="text"
+                        id="cardLast4Input"
+                        class="card-field-input"
+                        placeholder="e.g. 4321"
+                        maxlength="4"
+                        inputmode="numeric"
+                        autocomplete="off"
+                    >
+                    <div class="card-field-hint">The last 4 digits printed on your card</div>
+                </div>
+                <div>
+                    <label class="card-field-label" for="cardTxnInput">Transaction / Reference ID (optional)</label>
+                    <input
+                        type="text"
+                        id="cardTxnInput"
+                        class="card-field-input"
+                        placeholder="e.g. TXN20250326XXXXXX"
+                        autocomplete="off"
+                    >
+                    <div class="card-field-hint">Found in your bank SMS or statement</div>
+                </div>
             </div>
 
-            <div class="upi-notice">
+            <div class="card-notice">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                <span>Declare only after you have actually completed the UPI transfer. The supplier will verify the payment on delivery.</span>
+                <span>Submit only after you have actually completed the card transaction. The supplier will verify the payment on delivery before handing over the materials.</span>
             </div>
 
-            <div class="amount-highlight upi">
-                <span>Declared UPI payment amount</span>
+            <div class="amount-highlight card-hl">
+                <span>Card payment amount declared</span>
                 <strong>₹{{ "{:,.0f}".format(order.total) }}</strong>
             </div>
 
-            <button class="btn-confirm upi-btn" id="upiBtn" onclick="declareUPI()">
-                <span class="btn-label">🔷 Declare UPI Payment</span>
+            <button class="btn-confirm card-btn" id="cardBtn" onclick="declareCard()">
+                <span class="btn-label">💳 Confirm Card Payment</span>
                 <div class="spinner"></div>
             </button>
             <a href="{{ url_for('user.my_orders') }}" class="cancel-link">Cancel and go back</a>
@@ -384,20 +396,20 @@
         selectedMethod = method;
 
         // Reset tabs
-        document.getElementById('tab-cod').className = 'method-tab method-tab-cod';
-        document.getElementById('tab-upi').className = 'method-tab method-tab-upi';
+        document.getElementById('tab-cod').className  = 'method-tab method-tab-cod';
+        document.getElementById('tab-card').className = 'method-tab method-tab-card';
 
         // Activate selected tab
         if (method === 'cod') {
             document.getElementById('tab-cod').classList.add('selected-cod');
         } else {
-            document.getElementById('tab-upi').classList.add('selected-upi');
+            document.getElementById('tab-card').classList.add('selected-card');
         }
 
         // Show/hide panels
         document.getElementById('panel-none').classList.remove('visible');
         document.getElementById('panel-cod').classList.remove('visible');
-        document.getElementById('panel-upi').classList.remove('visible');
+        document.getElementById('panel-card').classList.remove('visible');
         document.getElementById('panel-' + method).classList.add('visible');
     }
 
@@ -428,18 +440,25 @@
         });
     }
 
-    // ── UPI ──
-    function declareUPI() {
-        const btn    = document.getElementById('upiBtn');
-        const txnId  = document.getElementById('upiTxnInput').value.trim();
+    // ── Card ──
+    function declareCard() {
+        const btn      = document.getElementById('cardBtn');
+        const last4    = document.getElementById('cardLast4Input').value.trim();
+        const txnId    = document.getElementById('cardTxnInput').value.trim();
+
+        // Validate last4 if provided
+        if (last4 && !/^\d{4}$/.test(last4)) {
+            alert('Card last 4 digits must be exactly 4 numbers.');
+            return;
+        }
 
         btn.disabled = true;
         btn.classList.add('loading');
 
-        fetch('{{ url_for("payment.declare_order_upi", order_id=order.id) }}', {
+        fetch('{{ url_for("payment.declare_order_card", order_id=order.id) }}', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ upi_transaction_id: txnId })
+            body:    JSON.stringify({ card_last4: last4, card_txn_id: txnId })
         })
         .then(r => r.json())
         .then(data => {

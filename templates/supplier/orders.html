@@ -7,166 +7,127 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg:       #F0F4F8;
-            --card:     #FFFFFF;
-            --card2:    #F8FAFB;
-            --sand:     #EEF2F6;
-            --stone:    #DDE4EC;
-            --accent:   #0A84FF;
-            --accent-d: #0060CC;
-            --accent-l: #E8F3FF;
-            --text:     #111827;
-            --text2:    #374151;
-            --muted:    #6B7280;
-            --green:    #065F46;
-            --green-bg: #D1FAE5;
-            --red:      #991B1B;
-            --red-bg:   #FEE2E2;
-            --amber:    #92400E;
-            --amber-bg: #FEF3C7;
-            --gold:     #C9A84C;
-            --gold-d:   #a8893a;
-            --gold-l:   #FBF3E0;
-            --shadow:   0 4px 18px rgba(0,0,0,0.07);
-            --shadow-sm:0 1px 3px rgba(0,0,0,0.05);
+            --bg:#F0F4F8;--card:#FFFFFF;--card2:#F8FAFB;--sand:#EEF2F6;--stone:#DDE4EC;
+            --accent:#0A84FF;--accent-d:#0060CC;--accent-l:#E8F3FF;
+            --text:#111827;--text2:#374151;--muted:#6B7280;
+            --green:#065F46;--green-bg:#D1FAE5;--red:#991B1B;--red-bg:#FEE2E2;
+            --amber:#92400E;--amber-bg:#FEF3C7;
+            --gold:#C9A84C;--gold-d:#a8893a;--gold-l:#FBF3E0;
+            --blue:#1E40AF;--blue-bg:#DBEAFE;--blue-bd:rgba(30,64,175,.25);
+            --shadow:0 4px 18px rgba(0,0,0,0.07);--shadow-sm:0 1px 3px rgba(0,0,0,0.05);
         }
-        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'DM Sans',sans-serif; background:var(--bg); min-height:100vh; color:var(--text); }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);}
 
-        /* ─── NAVBAR ─── */
-        .navbar { background:var(--card); border-bottom:1px solid var(--stone); padding:0 40px; height:66px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; box-shadow:var(--shadow-sm); }
-        .navbar-brand { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:10px; }
-        .brand-dot { width:10px; height:10px; background:var(--accent); border-radius:50%; }
-        .navbar-menu { display:flex; align-items:center; gap:4px; }
-        .navbar-menu a { color:var(--text2); text-decoration:none; padding:7px 13px; border-radius:8px; font-size:14px; font-weight:500; transition:all .2s; }
-        .navbar-menu a:hover, .navbar-menu a.active { color:var(--accent); background:var(--accent-l); }
-        .profile-pic { width:32px; height:32px; border-radius:50%; object-fit:cover; border:2px solid var(--stone); }
-        .profile-ph { width:32px; height:32px; border-radius:50%; background:var(--accent-l); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; border:2px solid var(--stone); }
-        .nav-div { width:1px; height:18px; background:var(--stone); margin:0 6px; }
-        .logout-link { color:var(--muted); text-decoration:none; padding:7px 13px; border-radius:8px; font-size:13px; transition:all .2s; }
-        .logout-link:hover { color:#DC2626; background:#FEF2F2; }
+        .navbar{background:var(--card);border-bottom:1px solid var(--stone);padding:0 40px;height:66px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
+        .navbar-brand{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px;}
+        .brand-dot{width:10px;height:10px;background:var(--accent);border-radius:50%;}
+        .navbar-menu{display:flex;align-items:center;gap:4px;}
+        .navbar-menu a{color:var(--text2);text-decoration:none;padding:7px 13px;border-radius:8px;font-size:14px;font-weight:500;transition:all .2s;}
+        .navbar-menu a:hover,.navbar-menu a.active{color:var(--accent);background:var(--accent-l);}
+        .profile-pic{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--stone);}
+        .profile-ph{width:32px;height:32px;border-radius:50%;background:var(--accent-l);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;border:2px solid var(--stone);}
+        .nav-div{width:1px;height:18px;background:var(--stone);margin:0 6px;}
+        .logout-link{color:var(--muted);text-decoration:none;padding:7px 13px;border-radius:8px;font-size:13px;transition:all .2s;}
+        .logout-link:hover{color:#DC2626;background:#FEF2F2;}
 
-        /* ─── PAGE ─── */
-        .page { max-width:1060px; margin:32px auto; padding:0 24px 60px; }
+        .page{max-width:1060px;margin:32px auto;padding:0 24px 60px;}
 
-        /* ─── HEADER ─── */
-        .page-header { background:var(--card); border:1px solid var(--stone); border-radius:16px; padding:26px 32px; margin-bottom:20px; box-shadow:var(--shadow-sm); animation:fadeUp .4s ease both; }
-        .page-header h1 { font-family:'Playfair Display',serif; font-size:24px; font-weight:700; margin-bottom:16px; }
-        .divider { width:36px; height:3px; background:var(--accent); border-radius:2px; margin:8px 0 18px; }
-        .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-        @media(max-width:640px) { .stats-row { grid-template-columns:repeat(2,1fr); } }
-        .stat { background:var(--card2); border:1px solid var(--stone); border-radius:10px; padding:14px 16px; text-align:center; }
-        .stat-num { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--accent); display:block; }
-        .stat-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-top:3px; }
+        .page-header{background:var(--card);border:1px solid var(--stone);border-radius:16px;padding:26px 32px;margin-bottom:20px;box-shadow:var(--shadow-sm);animation:fadeUp .4s ease both;}
+        .page-header h1{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:16px;}
+        .divider{width:36px;height:3px;background:var(--accent);border-radius:2px;margin:8px 0 18px;}
+        .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+        @media(max-width:640px){.stats-row{grid-template-columns:repeat(2,1fr);}}
+        .stat{background:var(--card2);border:1px solid var(--stone);border-radius:10px;padding:14px 16px;text-align:center;}
+        .stat-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--accent);display:block;}
+        .stat-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-top:3px;}
 
-        /* ─── FILTER ─── */
-        .filter-bar { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
-        .filter-btn { padding:6px 15px; border-radius:20px; font-size:13px; font-weight:600; cursor:pointer; border:1.5px solid var(--stone); background:var(--card); color:var(--text2); transition:all .2s; font-family:'DM Sans',sans-serif; }
-        .filter-btn:hover, .filter-btn.active { background:var(--accent); border-color:var(--accent); color:white; }
+        .filter-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+        .filter-btn{padding:6px 15px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--stone);background:var(--card);color:var(--text2);transition:all .2s;font-family:'DM Sans',sans-serif;}
+        .filter-btn:hover,.filter-btn.active{background:var(--accent);border-color:var(--accent);color:white;}
 
-        /* ─── ORDER CARD ─── */
-        .order-card { background:var(--card); border:1px solid var(--stone); border-radius:14px; margin-bottom:14px; overflow:hidden; box-shadow:var(--shadow-sm); transition:all .25s; animation:fadeUp .4s ease both; }
-        .order-card:hover { box-shadow:var(--shadow); border-color:#B0BFCC; }
+        .order-card{background:var(--card);border:1px solid var(--stone);border-radius:14px;margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow-sm);transition:all .25s;animation:fadeUp .4s ease both;}
+        .order-card:hover{box-shadow:var(--shadow);border-color:#B0BFCC;}
 
-        /* status stripe */
-        .order-stripe { height:3px; }
-        .stripe-pending    { background:linear-gradient(90deg,#F59E0B,#FDE68A); }
-        .stripe-processing { background:linear-gradient(90deg,var(--accent),#93C5FD); }
-        .stripe-completed  { background:linear-gradient(90deg,#10B981,#6EE7B7); }
-        .stripe-cancelled  { background:linear-gradient(90deg,#EF4444,#FCA5A5); }
+        .order-stripe{height:3px;}
+        .stripe-pending{background:linear-gradient(90deg,#F59E0B,#FDE68A);}
+        .stripe-processing{background:linear-gradient(90deg,var(--accent),#93C5FD);}
+        .stripe-completed{background:linear-gradient(90deg,#10B981,#6EE7B7);}
+        .stripe-cancelled{background:linear-gradient(90deg,#EF4444,#FCA5A5);}
 
-        /* order head */
-        .order-head { padding:16px 22px 14px; display:flex; justify-content:space-between; align-items:flex-start; gap:14px; border-bottom:1px solid var(--sand); }
-        .order-id { font-weight:700; font-size:15px; color:var(--text); }
-        .order-date { font-size:12px; color:var(--muted); margin-top:2px; }
-        .customer-name { font-size:12px; color:var(--text2); margin-top:4px; font-weight:600; }
-        .order-head-right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
-        .status-badge { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:20px; font-size:11px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; }
-        .status-dot { width:5px; height:5px; border-radius:50%; }
-        .s-pending    { background:var(--amber-bg); color:var(--amber); }
-        .s-pending    .status-dot { background:#D97706; }
-        .s-processing { background:var(--accent-l); color:var(--accent); }
-        .s-processing .status-dot { background:var(--accent); }
-        .s-completed  { background:var(--green-bg); color:var(--green); }
-        .s-completed  .status-dot { background:#10B981; }
-        .s-cancelled  { background:var(--red-bg); color:var(--red); }
-        .s-cancelled  .status-dot { background:#EF4444; }
-        .pay-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:20px; font-size:10px; font-weight:700; }
-        .pay-cod  { background:var(--gold-l); color:var(--gold-d); }
-        .pay-paid { background:var(--green-bg); color:var(--green); }
+        .order-head{padding:16px 22px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;border-bottom:1px solid var(--sand);}
+        .order-id{font-weight:700;font-size:15px;color:var(--text);}
+        .order-date{font-size:12px;color:var(--muted);margin-top:2px;}
+        .customer-name{font-size:12px;color:var(--text2);margin-top:4px;font-weight:600;}
+        .order-head-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+        .status-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;}
+        .status-dot{width:5px;height:5px;border-radius:50%;}
+        .s-pending{background:var(--amber-bg);color:var(--amber);}
+        .s-pending .status-dot{background:#D97706;}
+        .s-processing{background:var(--accent-l);color:var(--accent);}
+        .s-processing .status-dot{background:var(--accent);}
+        .s-completed{background:var(--green-bg);color:var(--green);}
+        .s-completed .status-dot{background:#10B981;}
+        .s-cancelled{background:var(--red-bg);color:var(--red);}
+        .s-cancelled .status-dot{background:#EF4444;}
 
-        /* order body */
-        .order-body { padding:16px 22px; }
-        .project-tag { display:inline-flex; align-items:center; gap:5px; padding:5px 11px; background:var(--accent-l); border-radius:20px; font-size:12px; font-weight:600; color:#0060CC; margin-bottom:14px; }
+        /* Payment badges */
+        .pay-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;}
+        .pay-cod{background:var(--gold-l);color:var(--gold-d);}
+        .pay-card{background:var(--blue-bg);color:var(--blue);}
+        .pay-paid{background:var(--green-bg);color:var(--green);}
 
-        /* ── DELIVERY ADDRESS STRIP ── */
-        .delivery-strip {
-            display:flex; align-items:flex-start; gap:10px;
-            background:#EFF6FF; border:1px solid #BFDBFE;
-            border-radius:9px; padding:11px 15px; margin-bottom:14px;
-        }
-        .delivery-strip svg { flex-shrink:0; margin-top:1px; }
-        .delivery-strip-label {
-            font-size:10px; font-weight:700; text-transform:uppercase;
-            letter-spacing:.6px; color:#1E40AF; margin-bottom:3px;
-        }
-        .delivery-strip-addr {
-            font-size:13px; font-weight:600; color:#1e3a8a; line-height:1.5;
-        }
-        .delivery-strip-note { font-size:12px; color:#3B82F6; margin-top:3px; }
-        .delivery-missing {
-            display:flex; align-items:center; gap:8px;
-            background:var(--amber-bg); border:1px solid #FDE68A;
-            border-radius:9px; padding:10px 14px; margin-bottom:14px;
-            font-size:12px; color:var(--amber); font-weight:600;
-        }
+        .order-body{padding:16px 22px;}
+        .project-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:var(--accent-l);border-radius:20px;font-size:12px;font-weight:600;color:#0060CC;margin-bottom:14px;}
 
-        /* items table */
-        .items-table { width:100%; border-collapse:collapse; margin-bottom:14px; }
-        .items-table th { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); padding:7px 10px; background:var(--card2); text-align:left; }
-        .items-table th:first-child { border-radius:6px 0 0 6px; }
-        .items-table th:last-child { border-radius:0 6px 6px 0; text-align:right; }
-        .items-table td { padding:10px; font-size:13px; color:var(--text2); border-bottom:1px solid var(--sand); vertical-align:top; }
-        .items-table tr:last-child td { border-bottom:none; }
-        .items-table td:last-child { text-align:right; font-weight:700; color:var(--text); }
-        .item-name { font-weight:600; color:var(--text); }
-        .item-detail { font-size:11px; color:var(--muted); margin-top:2px; }
+        .delivery-strip{display:flex;align-items:flex-start;gap:10px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:9px;padding:11px 15px;margin-bottom:14px;}
+        .delivery-strip svg{flex-shrink:0;margin-top:1px;}
+        .delivery-strip-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#1E40AF;margin-bottom:3px;}
+        .delivery-strip-addr{font-size:13px;font-weight:600;color:#1e3a8a;line-height:1.5;}
+        .delivery-missing{display:flex;align-items:center;gap:8px;background:var(--amber-bg);border:1px solid #FDE68A;border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--amber);font-weight:600;}
 
-        /* total bar */
-        .total-bar { background:var(--accent); border-radius:9px; padding:12px 17px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
-        .total-bar span { font-size:13px; color:rgba(255,255,255,.8); }
-        .total-bar strong { font-family:'Playfair Display',serif; font-size:20px; color:white; }
+        .items-table{width:100%;border-collapse:collapse;margin-bottom:14px;}
+        .items-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);padding:7px 10px;background:var(--card2);text-align:left;}
+        .items-table th:first-child{border-radius:6px 0 0 6px;}
+        .items-table th:last-child{border-radius:0 6px 6px 0;text-align:right;}
+        .items-table td{padding:10px;font-size:13px;color:var(--text2);border-bottom:1px solid var(--sand);vertical-align:top;}
+        .items-table tr:last-child td{border-bottom:none;}
+        .items-table td:last-child{text-align:right;font-weight:700;color:var(--text);}
+        .item-name{font-weight:600;color:var(--text);}
+        .item-detail{font-size:11px;color:var(--muted);margin-top:2px;}
 
-        /* payment strip */
-        .pay-strip { display:flex; align-items:flex-start; gap:8px; padding:10px 14px; border-radius:8px; font-size:13px; margin-bottom:12px; }
-        .pay-strip.cod  { background:var(--gold-l); color:var(--gold-d); border:1px solid rgba(201,168,76,.35); }
-        .pay-strip.paid { background:var(--green-bg); color:var(--green); border:1px solid #A7F3D0; }
+        .total-bar{background:var(--accent);border-radius:9px;padding:12px 17px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+        .total-bar span{font-size:13px;color:rgba(255,255,255,.8);}
+        .total-bar strong{font-family:'Playfair Display',serif;font-size:20px;color:white;}
 
-        /* action buttons */
-        .action-row { display:flex; gap:10px; flex-wrap:wrap; }
-        .btn-accept  { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; background:#10B981; color:white; border:none; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
-        .btn-accept:hover  { background:#059669; transform:translateY(-1px); }
-        .btn-reject  { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; background:white; color:var(--red); border:1.5px solid #FECACA; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
-        .btn-reject:hover  { background:var(--red-bg); }
-        .btn-deliver { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; background:var(--accent); color:white; border:none; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
-        .btn-deliver:hover { background:var(--accent-d); transform:translateY(-1px); }
-        .btn-cash    { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; background:var(--gold); color:#0A0A0A; border:none; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
-        .btn-cash:hover    { background:var(--gold-d); transform:translateY(-1px); }
+        /* Payment strips */
+        .pay-strip{display:flex;align-items:flex-start;gap:8px;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;}
+        .pay-strip.cod{background:var(--gold-l);color:var(--gold-d);border:1px solid rgba(201,168,76,.35);}
+        .pay-strip.card{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd);}
+        .pay-strip.paid{background:var(--green-bg);color:var(--green);border:1px solid #A7F3D0;}
 
-        /* ─── EMPTY STATE ─── */
-        .empty-state { background:var(--card); border:1px solid var(--stone); border-radius:14px; padding:60px 24px; text-align:center; box-shadow:var(--shadow-sm); }
-        .empty-state h2 { font-size:20px; font-weight:600; color:var(--text); margin-bottom:8px; margin-top:14px; }
-        .empty-state p  { font-size:14px; color:var(--text2); margin-bottom:22px; }
-        .btn-inv { display:inline-block; padding:11px 26px; background:var(--accent); color:white; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s; }
-        .btn-inv:hover { background:var(--accent-d); }
+        .action-row{display:flex;gap:10px;flex-wrap:wrap;}
+        .btn-accept{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:#10B981;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+        .btn-accept:hover{background:#059669;transform:translateY(-1px);}
+        .btn-reject{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:white;color:var(--red);border:1.5px solid #FECACA;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+        .btn-reject:hover{background:var(--red-bg);}
+        .btn-deliver{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:var(--accent);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+        .btn-deliver:hover{background:var(--accent-d);transform:translateY(-1px);}
+        .btn-cash{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:var(--gold);color:#0A0A0A;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+        .btn-cash:hover{background:var(--gold-d);transform:translateY(-1px);}
 
-        @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        @media(max-width:640px) {
-            .navbar { padding:0 16px; }
-            .page   { padding:0 14px 50px; }
-            .order-head { flex-direction:column; gap:10px; }
-            .order-head-right { align-items:flex-start; }
-            .action-row { flex-direction:column; }
+        .empty-state{background:var(--card);border:1px solid var(--stone);border-radius:14px;padding:60px 24px;text-align:center;box-shadow:var(--shadow-sm);}
+        .empty-state h2{font-size:20px;font-weight:600;color:var(--text);margin-bottom:8px;margin-top:14px;}
+        .empty-state p{font-size:14px;color:var(--text2);margin-bottom:22px;}
+        .btn-inv{display:inline-block;padding:11px 26px;background:var(--accent);color:white;text-decoration:none;border-radius:8px;font-weight:700;font-size:14px;transition:all .2s;}
+        .btn-inv:hover{background:var(--accent-d);}
+
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        @media(max-width:640px){
+            .navbar{padding:0 16px;}.page{padding:0 14px 50px;}
+            .order-head{flex-direction:column;gap:10px;}
+            .order-head-right{align-items:flex-start;}
+            .action-row{flex-direction:column;}
         }
     </style>
 </head>
@@ -196,31 +157,17 @@
 
 <div class="page">
 
-    <!-- Header -->
     <div class="page-header">
         <h1>📋 Orders</h1>
         <div class="divider"></div>
         <div class="stats-row">
-            <div class="stat">
-                <span class="stat-num">{{ orders | length }}</span>
-                <span class="stat-lbl">Total</span>
-            </div>
-            <div class="stat">
-                <span class="stat-num">{{ orders | selectattr('status','equalto','pending') | list | length }}</span>
-                <span class="stat-lbl">Pending</span>
-            </div>
-            <div class="stat">
-                <span class="stat-num">{{ orders | selectattr('status','equalto','processing') | list | length }}</span>
-                <span class="stat-lbl">Processing</span>
-            </div>
-            <div class="stat">
-                <span class="stat-num">{{ orders | selectattr('status','equalto','completed') | list | length }}</span>
-                <span class="stat-lbl">Completed</span>
-            </div>
+            <div class="stat"><span class="stat-num">{{ orders | length }}</span><span class="stat-lbl">Total</span></div>
+            <div class="stat"><span class="stat-num">{{ orders | selectattr('status','equalto','pending') | list | length }}</span><span class="stat-lbl">Pending</span></div>
+            <div class="stat"><span class="stat-num">{{ orders | selectattr('status','equalto','processing') | list | length }}</span><span class="stat-lbl">Processing</span></div>
+            <div class="stat"><span class="stat-num">{{ orders | selectattr('status','equalto','completed') | list | length }}</span><span class="stat-lbl">Completed</span></div>
         </div>
     </div>
 
-    <!-- Filters -->
     {% if orders %}
     <div class="filter-bar">
         <button class="filter-btn active" onclick="filterOrders('all', this)">All</button>
@@ -231,13 +178,11 @@
     </div>
     {% endif %}
 
-    <!-- Orders -->
     {% if orders %}
         {% for order in orders %}
         <div class="order-card" data-status="{{ order.status }}" data-order-id="{{ order.id }}">
             <div class="order-stripe stripe-{{ order.status }}"></div>
 
-            <!-- Head -->
             <div class="order-head">
                 <div>
                     <div class="order-id">Order #{{ order.id[:8].upper() }}</div>
@@ -260,17 +205,17 @@
                         {% else %}{{ order.status | title }}{% endif %}
                     </span>
                     {% if order.payment_status == 'paid' %}
-                        <span class="pay-badge pay-paid">✓ Cash Received</span>
+                        <span class="pay-badge pay-paid">✓ Payment Confirmed</span>
                     {% elif order.payment_status == 'cod_confirmed' %}
                         <span class="pay-badge pay-cod">💵 COD Confirmed</span>
+                    {% elif order.payment_status == 'card_pending' %}
+                        <span class="pay-badge pay-card">💳 Card Declared</span>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Body -->
             <div class="order-body">
 
-                <!-- Project tag -->
                 {% if order.project_title %}
                 <div class="project-tag">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -278,7 +223,6 @@
                 </div>
                 {% endif %}
 
-                <!-- ── DELIVERY ADDRESS ── -->
                 {% if order.delivery_address %}
                 <div class="delivery-strip">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -288,31 +232,18 @@
                     <div>
                         <div class="delivery-strip-label">Deliver to</div>
                         <div class="delivery-strip-addr">{{ order.delivery_address }}</div>
-                        {% if order.delivery_note %}
-                        <div class="delivery-strip-note">📝 {{ order.delivery_note }}</div>
-                        {% endif %}
                     </div>
                 </div>
                 {% else %}
                 <div class="delivery-missing">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                     No delivery address provided — contact the customer to confirm delivery location.
                 </div>
                 {% endif %}
 
-                <!-- Items table -->
                 <table class="items-table">
                     <thead>
-                        <tr>
-                            <th>Material</th>
-                            <th>Unit Price</th>
-                            <th>Qty</th>
-                            <th>Amount</th>
-                        </tr>
+                        <tr><th>Material</th><th>Unit Price</th><th>Qty</th><th>Amount</th></tr>
                     </thead>
                     <tbody>
                         {% for item in order.order_items %}
@@ -329,34 +260,38 @@
                     </tbody>
                 </table>
 
-                <!-- Total -->
                 <div class="total-bar">
                     <span>Order Total</span>
                     <strong>₹{{ "{:,.0f}".format(order.total) }}</strong>
                 </div>
 
-                <!-- Payment strip -->
+                {# ── Payment information strips ── #}
                 {% if order.payment_status == 'cod_confirmed' and order.status != 'completed' %}
                 <div class="pay-strip cod">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;">
-                        <rect x="2" y="5" width="20" height="14" rx="2"/>
-                        <line x1="2" y1="10" x2="22" y2="10"/>
-                    </svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                     <span>
                         Customer confirmed COD · Collect ₹{{ "{:,.0f}".format(order.total) }} cash upon delivery.
                         {% if order.receipt_number %}<strong> Receipt: {{ order.receipt_number }}</strong>{% endif %}
                     </span>
                 </div>
+                {% elif order.payment_status == 'card_pending' and order.status != 'completed' %}
+                <div class="pay-strip card">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                    <span>
+                        Customer declared a <strong>card payment</strong> of ₹{{ "{:,.0f}".format(order.total) }}.
+                        {% if order.card_last4 %} Card: ···· {{ order.card_last4 }}.{% endif %}
+                        {% if order.card_txn_id %} Txn: {{ order.card_txn_id }}.{% endif %}
+                        Please verify on delivery.
+                    </span>
+                </div>
                 {% elif order.payment_status == 'paid' %}
                 <div class="pay-strip paid">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    Cash collected — payment complete.
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
+                    Payment confirmed — order complete.
                 </div>
                 {% endif %}
 
-                <!-- Actions -->
+                {# ── Action buttons ── #}
                 {% if order.status == 'pending' %}
                 <div class="action-row">
                     <button class="btn-accept" onclick="acceptOrder('{{ order.id }}', this)">
@@ -375,16 +310,16 @@
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
                         Mark as Delivered
                     </button>
-                    {% if order.payment_status == 'cod_confirmed' %}
+                    {% if order.payment_status in ('cod_confirmed', 'card_pending') %}
                     <button class="btn-cash" onclick="collectCash('{{ order.id }}', this)">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                        Collect Cash
+                        {% if order.payment_status == 'card_pending' %}Verify Card Payment{% else %}Collect Cash{% endif %}
                     </button>
                     {% endif %}
                 </div>
                 {% endif %}
 
-            </div><!-- /order-body -->
+            </div>
         </div>
         {% endfor %}
 
@@ -400,10 +335,9 @@
     </div>
     {% endif %}
 
-</div><!-- /page -->
+</div>
 
 <script>
-// ── FILTER ─────────────────────────────────────────────────────
 function filterOrders(status, btn) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -412,13 +346,10 @@ function filterOrders(status, btn) {
     });
 }
 
-// ── HELPERS ────────────────────────────────────────────────────
 function setLoading(btn, on) {
     btn.disabled = on;
     if (on) btn.dataset.orig = btn.innerHTML;
-    btn.innerHTML = on
-        ? '<span style="opacity:.6">Processing…</span>'
-        : btn.dataset.orig;
+    btn.innerHTML = on ? '<span style="opacity:.6">Processing…</span>' : btn.dataset.orig;
 }
 
 function apiPost(url, btnEl, successMsg, onSuccess) {
@@ -440,29 +371,24 @@ function apiPost(url, btnEl, successMsg, onSuccess) {
         });
 }
 
-// ── ACTIONS ────────────────────────────────────────────────────
 function acceptOrder(id, btn) {
     if (!confirm('Accept this order? Stock will be reserved and the customer will be notified.')) return;
-    apiPost(`/supplier/order/${id}/accept`, btn,
-            'Order accepted! Customer has been notified.', () => location.reload());
+    apiPost(`/supplier/order/${id}/accept`, btn, 'Order accepted!', () => location.reload());
 }
 
 function rejectOrder(id, btn) {
     if (!confirm('Decline this order? The customer will be notified.')) return;
-    apiPost(`/supplier/order/${id}/reject`, btn,
-            'Order declined.', () => location.reload());
+    apiPost(`/supplier/order/${id}/reject`, btn, 'Order declined.', () => location.reload());
 }
 
 function completeOrder(id, btn) {
-    if (!confirm('Mark this order as delivered? This confirms delivery to the customer.')) return;
-    apiPost(`/supplier/order/${id}/complete`, btn,
-            'Order marked as delivered!', () => location.reload());
+    if (!confirm('Mark this order as delivered?')) return;
+    apiPost(`/supplier/order/${id}/complete`, btn, 'Order marked as delivered!', () => location.reload());
 }
 
 function collectCash(id, btn) {
-    if (!confirm('Confirm cash received from customer? This will close the order as fully paid.')) return;
-    apiPost(`/payment/supplier/order/${id}/collect-cash`, btn,
-            'Cash collected — order closed!', () => location.reload());
+    if (!confirm('Confirm payment received from customer? This will close the order as fully paid.')) return;
+    apiPost(`/payment/supplier/order/${id}/collect-cash`, btn, 'Payment confirmed — order closed!', () => location.reload());
 }
 </script>
 

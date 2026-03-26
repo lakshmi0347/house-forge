@@ -11,7 +11,7 @@
             --accent:#C9A84C; --accent-d:#a8893a; --accent-l:#FBF3E0;
             --text:#1C1917; --text2:#5C4F43; --muted:#8C7E72;
             --green:#065F46; --green-bg:#D1FAE5;
-            --purple:#5B21B6; --purple-bg:#EDE9FE; --purple-bd:rgba(91,33,182,.25);
+            --blue:#1E40AF; --blue-bg:#DBEAFE; --blue-bd:rgba(30,64,175,.25);
         }
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
         body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);}
@@ -51,25 +51,19 @@
             animation:fadeUp .4s .06s ease both;
         }
 
-        /* COD header stays gold; UPI header is purple */
-        .receipt-header{
-            padding:28px 36px;
-            display:flex;justify-content:space-between;align-items:flex-start;
-        }
-        .receipt-header.cod { background:var(--accent); }
-        .receipt-header.upi { background:var(--purple); }
+        /* COD header = gold; Card header = blue */
+        .receipt-header{ padding:28px 36px; display:flex;justify-content:space-between;align-items:flex-start; }
+        .receipt-header.cod  { background:var(--accent); }
+        .receipt-header.card { background:var(--blue); }
         .receipt-header h1{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;}
-        .receipt-header.cod h1 { color:#0A0A0A; }
-        .receipt-header.upi h1 { color:#fff; }
+        .receipt-header.cod  h1 { color:#0A0A0A; }
+        .receipt-header.card h1 { color:#fff; }
         .receipt-header p{font-size:13px;margin-top:4px;}
-        .receipt-header.cod p { color:rgba(0,0,0,.6); }
-        .receipt-header.upi p { color:rgba(255,255,255,.7); }
-        .receipt-number{
-            border-radius:8px;padding:8px 14px;
-            font-size:13px;font-weight:700;font-family:'DM Sans',monospace;text-align:right;
-        }
-        .receipt-header.cod .receipt-number { background:rgba(0,0,0,.12); color:#0A0A0A; }
-        .receipt-header.upi .receipt-number { background:rgba(255,255,255,.15); color:#fff; }
+        .receipt-header.cod  p { color:rgba(0,0,0,.6); }
+        .receipt-header.card p { color:rgba(255,255,255,.7); }
+        .receipt-number{ border-radius:8px;padding:8px 14px; font-size:13px;font-weight:700;font-family:'DM Sans',monospace;text-align:right; }
+        .receipt-header.cod  .receipt-number { background:rgba(0,0,0,.12); color:#0A0A0A; }
+        .receipt-header.card .receipt-number { background:rgba(255,255,255,.15); color:#fff; }
         .receipt-number span{display:block;font-size:10px;font-weight:500;opacity:.7;margin-bottom:2px;}
 
         .receipt-body{padding:32px 36px;}
@@ -78,15 +72,15 @@
         .info-item .info-key{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:4px;}
         .info-item .info-val{font-size:14px;font-weight:600;color:var(--text);}
 
-        /* UPI txn ID row */
-        .upi-txn-row{
-            background:var(--purple-bg);border:1px solid var(--purple-bd);
+        /* Card detail row (only for card payments) */
+        .card-detail-row{
+            background:var(--blue-bg);border:1px solid var(--blue-bd);
             border-radius:10px;padding:12px 16px;margin-bottom:20px;
             display:flex;align-items:center;gap:10px;font-size:13px;
         }
-        .upi-txn-row svg{flex-shrink:0;color:var(--purple);}
-        .upi-txn-row strong{color:var(--purple);}
-        .upi-txn-row span{color:#3b0764;}
+        .card-detail-row svg{flex-shrink:0;color:var(--blue);}
+        .card-detail-row strong{color:var(--blue);}
+        .card-detail-row span{color:#1e3a8a;}
 
         .section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:14px;}
 
@@ -106,19 +100,16 @@
         .total-block span{font-size:14px;color:var(--text2);font-weight:500;}
         .total-block strong{font-family:'Playfair Display',serif;font-size:24px;color:var(--accent-d);}
 
-        /* Payment notice — COD is gold, UPI is purple */
-        .pay-notice{
-            border-radius:10px;padding:14px 18px;margin-bottom:28px;
-            display:flex;align-items:center;gap:12px;
-        }
-        .pay-notice.cod{background:var(--accent-l);border:1px solid rgba(201,168,76,.3);}
-        .pay-notice.upi{background:var(--purple-bg);border:1px solid var(--purple-bd);}
+        /* Payment notice — COD = gold, Card = blue */
+        .pay-notice{ border-radius:10px;padding:14px 18px;margin-bottom:28px; display:flex;align-items:center;gap:12px; }
+        .pay-notice.cod  { background:var(--accent-l);border:1px solid rgba(201,168,76,.3); }
+        .pay-notice.card { background:var(--blue-bg);border:1px solid var(--blue-bd); }
         .pay-notice svg{width:20px;height:20px;flex-shrink:0;}
-        .pay-notice.cod svg{color:var(--accent);}
-        .pay-notice.upi svg{color:var(--purple);}
+        .pay-notice.cod  svg { color:var(--accent); }
+        .pay-notice.card svg { color:var(--blue); }
         .pay-notice p{font-size:13px;color:var(--text2);line-height:1.6;}
-        .pay-notice.cod p strong{color:var(--text);}
-        .pay-notice.upi p strong{color:var(--purple);}
+        .pay-notice.cod  p strong { color:var(--text); }
+        .pay-notice.card p strong { color:var(--blue); }
 
         .receipt-footer{
             border-top:1px solid var(--sand);padding-top:24px;
@@ -166,9 +157,9 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
         <div class="success-text">
-            {% if order.payment_method == 'upi' %}
-                <h2>UPI Payment Declared!</h2>
-                <p>Your UPI payment has been declared. The supplier will verify on delivery.</p>
+            {% if order.payment_method == 'card' %}
+                <h2>Card Payment Recorded!</h2>
+                <p>Your card payment has been recorded. The supplier will verify on delivery.</p>
             {% else %}
                 <h2>Payment Confirmed!</h2>
                 <p>Your COD confirmation has been sent to the supplier. Keep this receipt for your records.</p>
@@ -177,13 +168,13 @@
     </div>
 
     <div class="receipt-card">
-        {# ── Header — colour-coded by method ── #}
-        <div class="receipt-header {{ 'upi' if order.payment_method == 'upi' else 'cod' }}">
+        {# ── Header colour-coded by method ── #}
+        <div class="receipt-header {{ 'card' if order.payment_method == 'card' else 'cod' }}">
             <div>
                 <h1>Payment Receipt</h1>
                 <p>
-                    {% if order.payment_method == 'upi' %}
-                        UPI Payment — Material Order
+                    {% if order.payment_method == 'card' %}
+                        Card Payment — Material Order
                     {% else %}
                         Cash on Delivery — Material Order
                     {% endif %}
@@ -204,7 +195,7 @@
                 <div class="info-item">
                     <div class="info-key">Date</div>
                     <div class="info-val">
-                        {% if order.payment_method == 'upi' %}
+                        {% if order.payment_method == 'card' %}
                             {{ order.payment_declared_at.strftime('%d %b %Y, %I:%M %p') if order.payment_declared_at else 'N/A' }}
                         {% else %}
                             {{ order.payment_confirmed_at.strftime('%d %b %Y, %I:%M %p') if order.payment_confirmed_at else 'N/A' }}
@@ -226,8 +217,8 @@
                 <div class="info-item">
                     <div class="info-key">Payment Method</div>
                     <div class="info-val">
-                        {% if order.payment_method == 'upi' %}
-                            🔷 UPI Payment
+                        {% if order.payment_method == 'card' %}
+                            💳 Card Payment
                         {% else %}
                             💵 Cash on Delivery
                         {% endif %}
@@ -235,13 +226,18 @@
                 </div>
             </div>
 
-            {# ── UPI transaction ID row (only for UPI) ── #}
-            {% if order.payment_method == 'upi' and order.upi_transaction_id %}
-            <div class="upi-txn-row">
+            {# ── Card detail row (only for card payments) ── #}
+            {% if order.payment_method == 'card' and (order.card_last4 or order.card_txn_id) %}
+            <div class="card-detail-row">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                 <div>
-                    <strong>UPI Transaction ID: </strong>
-                    <span>{{ order.upi_transaction_id }}</span>
+                    {% if order.card_last4 %}
+                        <strong>Card: </strong><span>···· ···· ···· {{ order.card_last4 }}</span>
+                        {% if order.card_txn_id %}&nbsp;&nbsp;{% endif %}
+                    {% endif %}
+                    {% if order.card_txn_id %}
+                        <strong>Txn ID: </strong><span>{{ order.card_txn_id }}</span>
+                    {% endif %}
                 </div>
             </div>
             {% endif %}
@@ -266,8 +262,8 @@
 
             <div class="total-block">
                 <span>
-                    {% if order.payment_method == 'upi' %}
-                        Total Amount (UPI declared)
+                    {% if order.payment_method == 'card' %}
+                        Total Amount (card payment declared)
                     {% else %}
                         Total Amount (payable on delivery)
                     {% endif %}
@@ -275,11 +271,11 @@
                 <strong>₹{{ "{:,.0f}".format(order.total) }}</strong>
             </div>
 
-            {# ── Payment notice — content and colour changes by method ── #}
-            {% if order.payment_method == 'upi' %}
-            <div class="pay-notice upi">
+            {# ── Payment notice ── #}
+            {% if order.payment_method == 'card' %}
+            <div class="pay-notice card">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <p>You declared a <strong>UPI payment of ₹{{ "{:,.0f}".format(order.total) }}</strong>. The supplier has been notified and will verify the transfer when your materials are delivered.</p>
+                <p>You declared a <strong>card payment of ₹{{ "{:,.0f}".format(order.total) }}</strong>. The supplier has been notified and will verify the transaction when your materials are delivered.</p>
             </div>
             {% else %}
             <div class="pay-notice cod">

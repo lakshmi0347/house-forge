@@ -50,15 +50,14 @@ def _create_notification(user_id, title, message, notif_type, link=None):
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  MATERIAL ORDER PAYMENT
-#  Orders are now INSTANT — no supplier acceptance required.
-#  On order creation (user_routes.py → create_order), status is set to
-#  'processing' immediately.  Payment methods: COD or UPI.
+#  Orders are INSTANT — no supplier acceptance required.
+#  Payment methods: COD or Card.
 # ─────────────────────────────────────────────────────────────────────────────
 
 @payment_bp.route('/order/<order_id>/pay', methods=['GET'])
 @login_required
 def pay_order(order_id):
-    """Show payment selection page (COD / UPI) for a material order."""
+    """Show payment selection page (COD / Card) for a material order."""
     db = get_db()
     if not db:
         flash('Database connection error', 'error')
@@ -83,7 +82,7 @@ def pay_order(order_id):
             return redirect(url_for('user.my_orders'))
 
         # Already paid → go to receipt
-        if order_data.get('payment_status') in ('paid', 'cod_confirmed', 'upi_pending'):
+        if order_data.get('payment_status') in ('paid', 'cod_confirmed', 'card_pending'):
             return redirect(url_for('payment.order_receipt', order_id=order_id))
 
         if 'items' in order_data:
@@ -124,7 +123,7 @@ def confirm_order_cod(order_id):
         if order_data.get('user_id') != current_user.id:
             return jsonify({'success': False, 'message': 'Access denied'}), 403
 
-        if order_data.get('payment_status') in ('paid', 'cod_confirmed', 'upi_pending'):
+        if order_data.get('payment_status') in ('paid', 'cod_confirmed', 'card_pending'):
             return jsonify({'success': False, 'message': 'Payment already confirmed for this order'}), 400
 
         receipt_number = _generate_receipt_number()
@@ -179,15 +178,15 @@ def confirm_order_cod(order_id):
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
-# ── UPI DECLARATION ─────────────────────────────────────────────────────────
+# ── CARD PAYMENT DECLARATION ─────────────────────────────────────────────────
 
-@payment_bp.route('/order/<order_id>/declare-upi', methods=['POST'])
+@payment_bp.route('/order/<order_id>/declare-card', methods=['POST'])
 @login_required
-def declare_order_upi(order_id):
+def declare_order_card(order_id):
     """
-    User declares they have paid via UPI.
-    Sets payment_status = 'upi_pending' so the supplier can verify on delivery.
-    Accepts optional upi_transaction_id from the form body.
+    User declares they have paid via card.
+    Sets payment_status = 'card_pending' so the supplier can verify on delivery.
+    Accepts optional card_last4 and card_txn_id from the JSON body.
     """
     db = get_db()
     if not db:
@@ -205,25 +204,28 @@ def declare_order_upi(order_id):
         if order_data.get('user_id') != current_user.id:
             return jsonify({'success': False, 'message': 'Access denied'}), 403
 
-        if order_data.get('payment_status') in ('paid', 'cod_confirmed', 'upi_pending'):
+        if order_data.get('payment_status') in ('paid', 'cod_confirmed', 'card_pending'):
             return jsonify({'success': False, 'message': 'Payment already confirmed for this order'}), 400
 
-        # Pull optional UPI transaction ID from request
-        data = request.get_json(silent=True) or {}
-        upi_txn_id = (data.get('upi_transaction_id') or '').strip()
+        # Pull optional card details from request body
+        data        = request.get_json(silent=True) or {}
+        card_last4  = (data.get('card_last4') or '').strip()
+        card_txn_id = (data.get('card_txn_id') or '').strip()
 
         receipt_number = _generate_receipt_number()
 
         update_payload = {
-            'payment_status':       'upi_pending',
-            'payment_method':       'upi',
-            'receipt_number':       receipt_number,
-            'payment_declared_at':  datetime.now(),
-            'status':               'processing',
-            'updated_at':           datetime.now()
+            'payment_status':        'card_pending',
+            'payment_method':        'card',
+            'receipt_number':        receipt_number,
+            'payment_declared_at':   datetime.now(),
+            'status':                'processing',
+            'updated_at':            datetime.now()
         }
-        if upi_txn_id:
-            update_payload['upi_transaction_id'] = upi_txn_id
+        if card_last4:
+            update_payload['card_last4']  = card_last4
+        if card_txn_id:
+            update_payload['card_txn_id'] = card_txn_id
 
         order_ref.update(update_payload)
 
@@ -236,29 +238,31 @@ def declare_order_upi(order_id):
             'supplier_id':    order_data.get('supplier_id'),
             'supplier_name':  order_data.get('supplier_name'),
             'amount':         order_data.get('total', 0),
-            'method':         'upi',
-            'status':         'upi_pending',
+            'method':         'card',
+            'status':         'card_pending',
             'receipt_number': receipt_number,
             'project_title':  order_data.get('project_title', ''),
             'created_at':     datetime.now()
         }
-        if upi_txn_id:
-            payment_doc['upi_transaction_id'] = upi_txn_id
+        if card_last4:
+            payment_doc['card_last4']  = card_last4
+        if card_txn_id:
+            payment_doc['card_txn_id'] = card_txn_id
         db.collection('payments').add(payment_doc)
 
         # Notify supplier
         supplier_id = order_data.get('supplier_id')
         if supplier_id:
             msg = (
-                f'{current_user.name} declared a UPI payment for Order #{order_id[:8]}. '
+                f'{current_user.name} paid via card for Order #{order_id[:8]}. '
                 f'Amount: ₹{order_data.get("total", 0):,.0f}. '
             )
-            if upi_txn_id:
-                msg += f'UPI Ref: {upi_txn_id}. '
+            if card_last4:
+                msg += f'Card ending ···· {card_last4}. '
             msg += 'Please verify on delivery.'
             _create_notification(
                 supplier_id,
-                'UPI Payment Declared',
+                'Card Payment Declared',
                 msg,
                 'payment',
                 f'/supplier/order/{order_id}'
@@ -266,13 +270,13 @@ def declare_order_upi(order_id):
 
         return jsonify({
             'success':        True,
-            'message':        'UPI payment declared. Supplier will verify on delivery.',
+            'message':        'Card payment recorded. Supplier will verify on delivery.',
             'receipt_number': receipt_number,
             'redirect_url':   url_for('payment.order_receipt', order_id=order_id)
         })
 
     except Exception as e:
-        print(f"UPI declare error: {e}")
+        print(f"Card declare error: {e}")
         import traceback; traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
@@ -510,7 +514,7 @@ def payment_history():
         total_spent = sum(
             p.get('amount', 0)
             for p in payments
-            if p.get('status') in ('paid', 'cod_confirmed', 'upi_pending')
+            if p.get('status') in ('paid', 'cod_confirmed', 'card_pending')
         )
 
         user_profile_picture = _get_profile_picture(db)
@@ -528,13 +532,13 @@ def payment_history():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  SUPPLIER: mark order as cash collected / UPI verified (delivery done)
+#  SUPPLIER: mark order as cash collected / card verified (delivery done)
 # ─────────────────────────────────────────────────────────────────────────────
 
 @payment_bp.route('/supplier/order/<order_id>/collect-cash', methods=['POST'])
 @login_required
 def supplier_collect_cash(order_id):
-    """Supplier marks cash as collected on delivery (closes COD or UPI order)."""
+    """Supplier marks cash collected or card payment verified on delivery."""
     db = get_db()
     if not db:
         return jsonify({'success': False, 'message': 'Database connection error'}), 500
@@ -570,7 +574,11 @@ def supplier_collect_cash(order_id):
 
         user_id = order_data.get('user_id')
         if user_id:
-            method_label = 'UPI payment verified' if order_data.get('payment_method') == 'upi' else 'Cash collected'
+            method = order_data.get('payment_method', '')
+            if method == 'card':
+                method_label = 'Card payment verified'
+            else:
+                method_label = 'Cash collected'
             _create_notification(
                 user_id,
                 f'{method_label} — Order Complete',

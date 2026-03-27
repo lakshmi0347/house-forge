@@ -255,30 +255,57 @@ def change_password():
 @contractor_bp.route('/browse-projects')
 @login_required
 def browse_projects():
-    """Browse available projects"""
     db = get_db()
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('contractor.dashboard'))
     
     try:
-        projects_ref = db.collection('projects').where('status', '==', 'planning').stream()
+        # Get all planning/active projects (not completed/cancelled)
+        projects_ref = db.collection('projects').stream()
         projects = []
+        
+        # Get bids submitted by this contractor
+        my_bids_ref = db.collection('bids').where('contractor_id', '==', current_user.id).stream()
+        my_bid_project_ids = {bid.to_dict().get('project_id') for bid in my_bids_ref}
         
         for doc in projects_ref:
             project_data = doc.to_dict()
-            project_data['id'] = doc.id
+            project_id = doc.id
             
-            # Get user info
-            user_doc = db.collection('users').document(project_data.get('user_id')).get()
-            if user_doc.exists:
-                project_data['user_name'] = user_doc.to_dict().get('name', 'Unknown')
+            # ✅ SKIP projects not in planning status
+            if project_data.get('status') != 'planning':
+                continue
             
-            # Check if contractor already bid
-            existing_bid = list(db.collection('bids').where('project_id', '==', doc.id).where('contractor_id', '==', current_user.id).limit(1).stream())
-            project_data['has_bid'] = len(existing_bid) > 0
+            # ✅ SKIP projects that already have an accepted bid
+            accepted_bids = db.collection('bids')\
+                .where('project_id', '==', project_id)\
+                .where('status', '==', 'accepted')\
+                .stream()
             
+            if len(list(accepted_bids)) > 0:
+                continue  # Already has accepted contractor, skip it
+            
+            project_data['id'] = project_id
+            project_data['has_bid'] = project_id in my_bid_project_ids
             projects.append(project_data)
         
-        return render_template('contractor/browse_projects.html', projects=projects)
+        # Sort by newest first
+        projects.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
         
+        # Fetch contractor profile picture
+        contractor_profile_picture = None
+        try:
+            contractor_doc = db.collection('contractors').document(current_user.id).get()
+            if contractor_doc.exists:
+                contractor_profile_picture = contractor_doc.to_dict().get('profile_picture')
+        except Exception:
+            pass
+        
+        return render_template('contractor/browse_projects.html',
+                               projects=projects,
+                               contractor_profile_picture=contractor_profile_picture)
+    
     except Exception as e:
         flash(f'Error loading projects: {str(e)}', 'error')
         return redirect(url_for('contractor.dashboard'))

@@ -972,31 +972,24 @@ def create_order():
 @user_bp.route('/my-orders')
 @login_required
 def my_orders():
-    """View all material orders placed by the user"""
     db = get_db()
     if not db:
         flash('Database connection error', 'error')
         return redirect(url_for('user.dashboard'))
     
     try:
-        # Get all orders for this user
         orders_ref = db.collection('orders').where('user_id', '==', current_user.id).stream()
         orders = []
         
         for doc in orders_ref:
             order_data = doc.to_dict()
             order_data['id'] = doc.id
-            
-            # Convert items to order_items to avoid conflict with dict.items() method
             if 'items' in order_data:
                 order_data['order_items'] = order_data['items']
-            
             orders.append(order_data)
         
-        # Sort by created_at descending
         orders.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
         
-        # Calculate statistics
         stats = {
             'total': len(orders),
             'pending': len([o for o in orders if o.get('status') == 'pending']),
@@ -1005,8 +998,20 @@ def my_orders():
             'cancelled': len([o for o in orders if o.get('status') == 'cancelled']),
             'total_spent': sum(o.get('total', 0) for o in orders if o.get('status') == 'completed')
         }
+
+        # ✅ FIX: fetch profile picture just like dashboard() does
+        user_profile_picture = None
+        try:
+            user_doc = db.collection('users').document(current_user.id).get()
+            if user_doc.exists:
+                user_profile_picture = user_doc.to_dict().get('profile_picture')
+        except Exception:
+            pass
         
-        return render_template('user/my_orders.html', orders=orders, stats=stats)
+        return render_template('user/my_orders.html',
+                               orders=orders,
+                               stats=stats,
+                               user_profile_picture=user_profile_picture)  # ✅ added
         
     except Exception as e:
         flash(f'Error loading orders: {str(e)}', 'error')

@@ -79,6 +79,7 @@ from routes.contractor_routes import contractor_bp
 from routes.supplier_routes import supplier_bp
 from routes.admin_routes import admin_bp
 from routes.viewer_routes import viewer_bp
+from routes.payment_routes import payment_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(user_bp, url_prefix='/user')
@@ -86,6 +87,7 @@ app.register_blueprint(contractor_bp, url_prefix='/contractor')
 app.register_blueprint(supplier_bp, url_prefix='/supplier')
 app.register_blueprint(admin_bp, url_prefix='/admin')
 app.register_blueprint(viewer_bp, url_prefix='/user')
+app.register_blueprint(payment_bp, url_prefix='/payment')
 
 # Home route
 @app.route('/')

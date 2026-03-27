@@ -4,138 +4,389 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Projects - House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --cream: #F0F4F8; --warm-white: #FFFFFF; --sand: #E8EEF4; --stone: #C8D8E8;
-            --accent: #1B4F72; --accent-dark: #0E2F44; --accent-light: #D6E8F5; --accent-mid: #2E86C1;
-            --text-primary: #0D1B2A; --text-secondary: #2C4A6E; --text-muted: #6B8CAE;
-            --shadow-sm: 0 1px 3px rgba(13,27,42,0.06), 0 1px 2px rgba(13,27,42,0.04);
-            --shadow-md: 0 4px 16px rgba(13,27,42,0.08), 0 2px 6px rgba(13,27,42,0.05);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DM Sans', sans-serif; background-color: var(--cream); min-height: 100vh; color: var(--text-primary); }
-        body::before { content: ''; position: fixed; inset: 0; background: url('/static/images/house.jpg') no-repeat center center / cover; opacity: 0.06; z-index: 0; pointer-events: none; }
-        .navbar { background: var(--warm-white); border-bottom: 1px solid var(--stone); padding: 0 40px; height: 68px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
-        .navbar-brand { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .navbar-menu { display: flex; align-items: center; gap: 4px; }
-        .navbar-menu a { color: var(--text-secondary); text-decoration: none; padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; position: relative; }
-        .navbar-menu a:hover { color: var(--accent); background: var(--accent-light); }
-        .badge-notification { position: absolute; top: 2px; right: 2px; background: #DC2626; color: white; border-radius: 50%; width: 18px; height: 18px; display: none; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; border: 2px solid var(--warm-white); }
-        .profile-pic { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); cursor: pointer; }
-        .profile-placeholder { width: 36px; height: 36px; border-radius: 50%; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; border: 2px solid var(--stone); cursor: pointer; }
-        .logout-link { color: var(--text-muted) !important; font-size: 13px !important; }
-        .container { max-width: 1180px; margin: 40px auto; padding: 0 24px; position: relative; z-index: 1; }
-        .page-banner { background: var(--warm-white); border: 1px solid var(--stone); border-radius: 16px; padding: 36px 40px; margin-bottom: 28px; box-shadow: var(--shadow-md); }
-        .page-banner h1 { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
-        .page-banner p { color: var(--text-secondary); font-size: 15px; }
-        .divider { width: 40px; height: 3px; background: var(--accent); border-radius: 2px; margin: 12px 0 10px; }
-        .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
-        .project-card { background: var(--warm-white); border: 1px solid var(--stone); border-radius: 16px; padding: 26px; box-shadow: var(--shadow-sm); transition: all 0.25s; display: flex; flex-direction: column; gap: 16px; }
-        .project-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--accent); }
-        .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .project-title-text { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
-        .project-location { color: var(--text-muted); font-size: 13px; }
-        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
-        .status-active { background: #DBEAFE; color: #1E40AF; }
-        .status-planning { background: #FEF3C7; color: #92400E; }
-        .status-completed { background: #D1FAE5; color: #065F46; }
-        .project-specs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 14px; background: var(--sand); border-radius: 10px; }
-        .spec-item { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 13px; }
-        .info-strip { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-mid) 100%); color: white; padding: 14px 16px; border-radius: 10px; }
-        .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .info-row:last-child { margin-bottom: 0; }
-        .info-row .label { font-size: 12px; opacity: 0.85; }
-        .info-row .value { font-size: 13px; font-weight: 600; }
-        .card-actions { display: flex; gap: 10px; margin-top: auto; }
-        .btn { flex: 1; padding: 11px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; text-align: center; transition: all 0.2s; border: none; cursor: pointer; font-size: 13px; display: block; }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(27,79,114,0.35); }
-        .btn-outline { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
-        .btn-outline:hover { background: var(--accent-light); }
-        .completed-tag { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #D1FAE5; color: #065F46; border-radius: 8px; font-size: 13px; font-weight: 600; flex: 1; justify-content: center; }
-        .empty-state { text-align: center; padding: 80px 20px; background: var(--warm-white); border-radius: 16px; border: 1px solid var(--stone); box-shadow: var(--shadow-sm); }
-        .empty-icon { font-size: 72px; margin-bottom: 16px; opacity: 0.5; }
-        .empty-state h2 { font-family: 'Playfair Display', serif; color: var(--text-primary); margin-bottom: 8px; }
-        .empty-state p { color: var(--text-muted); font-size: 15px; margin-bottom: 24px; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        .page-banner { animation: fadeUp 0.5s ease both; }
-        .projects-grid { animation: fadeUp 0.5s 0.1s ease both; }
-        @media (max-width: 768px) { .navbar { padding: 0 16px; } .container { margin: 20px auto; padding: 0 16px; } .projects-grid { grid-template-columns: 1fr; } }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+            position: relative;
+        }
+        
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .badge-notification {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff3b30;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .profile-pic:hover {
+            transform: scale(1.1);
+        }
+        
+        .profile-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .profile-placeholder:hover {
+            transform: scale(1.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .page-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 25px;
+        }
+        
+        .project-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        
+        .project-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .project-location {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-planning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .project-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .project-info {
+            padding: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-label {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .project-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            display: block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #f5576c;
+            border: 2px solid #f5576c;
+        }
+        
+        .btn-outline:hover {
+            background: #f5576c;
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 15px;
+        }
+        
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar">
-        <a href="{{ url_for('contractor.dashboard') }}" class="navbar-brand">🔨 House-Forge</a>
+        <div class="navbar-brand">🔨 House-Forge Contractor</div>
         <div class="navbar-menu">
             <a href="{{ url_for('contractor.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('contractor.browse_projects') }}">Browse Projects</a>
             <a href="{{ url_for('contractor.my_bids') }}">My Bids</a>
             <a href="{{ url_for('contractor.my_projects') }}">My Projects</a>
             <a href="{{ url_for('contractor.messages') }}" style="position: relative;">
-                Messages
-                <span class="badge-notification" id="messagesBadge">0</span>
-            </a>
-            <a href="{{ url_for('contractor.profile') }}" style="padding: 8px 10px;">
+        Messages
+        <span class="badge-notification" id="messagesBadge" style="display: none;">0</span>
+    </a>
+            <a href="{{ url_for('contractor.profile') }}">
                 {% if contractor_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ contractor_profile_picture }}" alt="Profile" class="profile-pic">
+                    <img src="/static/uploads/profiles/{{ contractor_profile_picture }}" 
+                         alt="Profile" 
+                         class="profile-pic">
                 {% else %}
-                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
+                    <div class="profile-placeholder">
+                        {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                    </div>
                 {% endif %}
             </a>
-            <a href="{{ url_for('auth.logout') }}" class="logout-link">Logout</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
         </div>
     </nav>
-
+    
     <div class="container">
-        <div class="page-banner">
-            <h1>📁 My Projects</h1>
-            <div class="divider"></div>
-            <p>Projects currently assigned to you</p>
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">📁 My Projects</h1>
+            <p style="color: #666;">Projects assigned to you</p>
         </div>
-
+        
+        <!-- Projects Grid -->
         {% if projects %}
             <div class="projects-grid">
                 {% for project in projects %}
                 <div class="project-card">
-                    <div class="card-top">
+                    <div class="project-header">
                         <div>
-                            <div class="project-title-text">{{ project.title }}</div>
+                            <div class="project-title">{{ project.title }}</div>
                             <div class="project-location">📍 {{ project.location or 'Location not specified' }}</div>
                         </div>
-                        <span class="status-badge status-{{ project.status }}">{{ project.status.upper() }}</span>
+                        <span class="status-badge status-{{ project.status }}">
+                            {{ project.status.upper() }}
+                        </span>
                     </div>
-                    <div class="project-specs">
-                        <div class="spec-item">📏 {{ project.square_feet }} sq ft</div>
-                        <div class="spec-item">🚪 {{ project.rooms }} Rooms</div>
-                        <div class="spec-item">🏢 {{ project.floors }} Floors</div>
-                        <div class="spec-item">🚿 {{ project.bathrooms or 2 }} Baths</div>
+                    
+                    <div class="project-details">
+                        <div class="detail-item">
+                            <span>📏</span>
+                            <span>{{ project.square_feet }} sq ft</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>🚪</span>
+                            <span>{{ project.rooms }} Rooms</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>🏢</span>
+                            <span>{{ project.floors }} Floors</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>🚿</span>
+                            <span>{{ project.bathrooms or 2 }} Bathrooms</span>
+                        </div>
                     </div>
-                    <div class="info-strip">
+                    
+                    <div class="project-info">
                         <div class="info-row">
-                            <span class="label">Agreed Cost</span>
-                            <span class="value">₹{{ "{:,.0f}".format(project.agreed_cost) if project.agreed_cost else 'N/A' }}</span>
+                            <span class="info-label">Agreed Cost</span>
+                            <span class="info-value">₹{{ "{:,.0f}".format(project.agreed_cost) if project.agreed_cost else 'N/A' }}</span>
                         </div>
                         <div class="info-row">
-                            <span class="label">Duration</span>
-                            <span class="value">{{ project.agreed_duration or 'N/A' }} days</span>
+                            <span class="info-label">Duration</span>
+                            <span class="info-value">{{ project.agreed_duration or 'N/A' }} days</span>
                         </div>
                         <div class="info-row">
-                            <span class="label">Started</span>
-                            <span class="value">{{ project.started_at.strftime('%d %b %Y') if project.started_at else 'Not started' }}</span>
+                            <span class="info-label">Started</span>
+                            <span class="info-value">{{ project.started_at.strftime('%d %b %Y') if project.started_at else 'Not started' }}</span>
                         </div>
                     </div>
-                    <div class="card-actions">
-                        <a href="/contractor/project/{{ project.id }}/view" class="btn btn-primary">View Project</a>
+                    
+                    <div class="project-actions">
+                        <a href="/contractor/project/{{ project.id }}/view" class="btn btn-primary">
+                            View Project
+                        </a>
                         {% if project.status == 'active' %}
-                            <button onclick="completeProject('{{ project.id }}')" class="btn btn-outline">Mark Complete</button>
+                         <button onclick="completeProject('{{ project.id }}')" class="btn btn-outline">
+                         Mark Complete
+                        </button>
                         {% elif project.user_id %}
-                            <a href="{{ url_for('contractor.view_user_profile', user_id=project.user_id) }}" class="btn btn-outline">View Owner</a>
-                        {% else %}
-                            <span class="completed-tag">✅ Completed</span>
-                        {% endif %}
-                    </div>
-                </div>
+                         <a href="{{ url_for('contractor.view_user_profile', user_id=project.user_id) }}" class="btn btn-outline">
+                          View Owner
+                            </a>
+                          {% else %}
+                            <span class="status-badge status-completed">✅ Completed</span>
+                         {% endif %}
+                          </div>
+                       </div>
                 {% endfor %}
             </div>
         {% else %}
@@ -143,33 +394,58 @@
                 <div class="empty-icon">📂</div>
                 <h2>No Active Projects</h2>
                 <p>You don't have any assigned projects yet. Submit bids on available projects to get started!</p>
-                <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-primary" style="display: inline-block; width: auto; padding: 12px 32px; flex: none;">Browse Projects</a>
+                <br>
+                <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-primary" style="display: inline-block; width: auto; padding: 14px 40px;">
+                    Browse Projects
+                </a>
             </div>
         {% endif %}
     </div>
-
     <script>
-        function updateMessageBadge() {
-            fetch('/contractor/messages/unread-count')
-                .then(r => { if (!r.ok || !r.headers.get('content-type')?.includes('application/json')) return null; return r.json(); })
-                .then(data => {
-                    if (!data) return;
-                    const badge = document.getElementById('messagesBadge');
-                    if (!badge) return;
-                    badge.style.display = data.count > 0 ? 'flex' : 'none';
+       // Update message badge
+    function updateMessageBadge() {
+        fetch('/contractor/messages/unread-count')
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.getElementById('messagesBadge');
+                if (data.count > 0) {
                     badge.textContent = data.count;
-                }).catch(() => {});
-        }
-        updateMessageBadge();
-        setInterval(updateMessageBadge, 30000);
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error fetching unread count:', error));
+    }
+    
+    // Update badge on page load
+    updateMessageBadge();
+    
+    // Update badge every 30 seconds
+    setInterval(updateMessageBadge, 30000);
 
-        function completeProject(projectId) {
-            if (!confirm('Mark this project as completed?')) return;
-            fetch(`/contractor/project/${projectId}/complete`, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
-                .then(r => r.json())
-                .then(data => { if (data.success) { alert(data.message); window.location.reload(); } else { alert('Error: ' + data.message); } })
-                .catch(() => alert('An error occurred'));
-        }
+    // Complete project function
+    function completeProject(projectId) {
+        if (!confirm('Mark this project as completed?')) return;
+        
+        fetch(`/contractor/project/${projectId}/complete`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                window.location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred');
+        });
+    }
     </script>
 </body>
 </html>

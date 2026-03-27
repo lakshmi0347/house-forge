@@ -40,30 +40,13 @@ def dashboard():
         project_data['id'] = doc.id
         active_projects.append(project_data)
     
-    # Get available projects (planning status, no accepted bid yet)
-    available_projects_ref = db.collection('projects').where('status', '==', 'planning').stream()
+    # Get available projects (not assigned to anyone)
+    available_projects_ref = db.collection('projects').where('status', '==', 'planning').limit(10).stream()
     available_projects = []
     for doc in available_projects_ref:
         project_data = doc.to_dict()
         project_data['id'] = doc.id
-
-        # Skip projects that already have an accepted bid
-        accepted_bid = list(
-            db.collection('bids')
-            .where('project_id', '==', doc.id)
-            .where('status', '==', 'accepted')
-            .limit(1)
-            .stream()
-        )
-        if accepted_bid:
-            continue
-
         available_projects.append(project_data)
-
-    # Sort by created_at descending so newest projects appear first
-    available_projects.sort(
-        key=lambda x: x.get('created_at', datetime.min), reverse=True
-    )
     
     stats = {
         'total_estimates': len(bids),
@@ -76,7 +59,7 @@ def dashboard():
     return render_template('contractor/dashboard.html',
                          estimates=bids[:5],
                          active_projects=active_projects,
-                         available_projects=available_projects[:3],
+                         available_projects=available_projects[:5],
                          stats=stats)
 
 @contractor_bp.route('/profile')
@@ -282,31 +265,14 @@ def browse_projects():
         for doc in projects_ref:
             project_data = doc.to_dict()
             project_data['id'] = doc.id
-
-            # Skip projects that already have an accepted bid
-            accepted_bid = list(
-                db.collection('bids')
-                .where('project_id', '==', doc.id)
-                .where('status', '==', 'accepted')
-                .limit(1)
-                .stream()
-            )
-            if accepted_bid:
-                continue
-
+            
             # Get user info
             user_doc = db.collection('users').document(project_data.get('user_id')).get()
             if user_doc.exists:
                 project_data['user_name'] = user_doc.to_dict().get('name', 'Unknown')
             
-            # Check if this contractor already submitted a bid
-            existing_bid = list(
-                db.collection('bids')
-                .where('project_id', '==', doc.id)
-                .where('contractor_id', '==', current_user.id)
-                .limit(1)
-                .stream()
-            )
+            # Check if contractor already bid
+            existing_bid = list(db.collection('bids').where('project_id', '==', doc.id).where('contractor_id', '==', current_user.id).limit(1).stream())
             project_data['has_bid'] = len(existing_bid) > 0
             
             projects.append(project_data)
@@ -584,12 +550,14 @@ def messages():
 def api_conversations():
     """API endpoint to get all conversations as JSON"""
     try:
+        # Get all unique conversations
         messages_ref = db.collection('messages').where('contractor_id', '==', current_user.id).stream()
         
         conversations = {}
         for doc in messages_ref:
             message_data = doc.to_dict()
             
+            # Skip outgoing messages from this contractor
             if message_data.get('sender_id') == current_user.id and message_data.get('sender_type') == 'contractor':
                 continue
             
@@ -610,10 +578,12 @@ def api_conversations():
                     'unread_count': 0
                 }
             
+            # Update last message if newer
             if message_data.get('created_at') > conversations[conv_key]['last_message_time']:
                 conversations[conv_key]['last_message'] = message_data.get('message', '')
                 conversations[conv_key]['last_message_time'] = message_data.get('created_at')
             
+            # Count unread incoming messages only
             if not message_data.get('read', False) and message_data.get('sender_type') != 'contractor':
                 conversations[conv_key]['unread_count'] += 1
         
@@ -636,6 +606,7 @@ def api_messages(user_id):
     try:
         all_messages = []
         
+        # Get all messages involving this contractor and user
         messages_ref = db.collection('messages')\
             .where('contractor_id', '==', current_user.id)\
             .where('user_id', '==', user_id)\
@@ -645,6 +616,7 @@ def api_messages(user_id):
             msg = doc.to_dict()
             msg['id'] = doc.id
             
+            # Determine direction based on sender
             if msg.get('sender_id') == current_user.id and msg.get('sender_type') == 'contractor':
                 msg['direction'] = 'outgoing'
             else:
@@ -652,8 +624,10 @@ def api_messages(user_id):
             
             all_messages.append(msg)
         
+        # Sort by created_at
         all_messages.sort(key=lambda x: x.get('created_at', datetime.min))
         
+        # Get user info
         user_doc = db.collection('users').document(user_id).get()
         user_info = {}
         if user_doc.exists:
@@ -666,6 +640,7 @@ def api_messages(user_id):
         else:
             user_info = {'name': 'Customer', 'email': '', 'phone': ''}
         
+        # Mark incoming messages as read
         for msg in all_messages:
             if msg['direction'] == 'incoming' and not msg.get('read', False):
                 db.collection('messages').document(msg['id']).update({
@@ -695,6 +670,7 @@ def send_chat_message(user_id):
         if not message_text:
             return jsonify({'success': False, 'message': 'Message cannot be empty'}), 400
         
+        # Create message for user's inbox
         message_data = {
             'user_id': user_id,
             'contractor_id': current_user.id,
@@ -738,6 +714,7 @@ def messages_unread_count():
         unread_count = 0
         for doc in messages_ref:
             message_data = doc.to_dict()
+            # Skip messages sent BY this contractor
             if message_data.get('sender_id') == current_user.id and message_data.get('sender_type') == 'contractor':
                 continue
             if not message_data.get('read', False):
@@ -768,9 +745,11 @@ def complete_project(project_id):
         
         project_data = project_doc.to_dict()
         
+        # Verify this is the contractor's project
         if project_data.get('contractor_id') != current_user.id:
             return jsonify({'success': False, 'message': 'Access denied'}), 403
         
+        # Update project status to completed
         project_ref.update({
             'status': 'completed',
             'completed_at': datetime.now(),
@@ -791,6 +770,7 @@ def user_profile(user_id):
     db = get_db()
     
     try:
+        # Get user data
         user_doc = db.collection('users').document(user_id).get()
         
         if not user_doc.exists:
@@ -800,6 +780,10 @@ def user_profile(user_id):
         user_data = user_doc.to_dict()
         user_data['id'] = user_id
         
+        # Get user's projects that this contractor can see
+        # (projects where contractor has bid or is assigned)
+        
+        # 1. Projects where contractor is assigned
         assigned_projects_ref = db.collection('projects')\
             .where('user_id', '==', user_id)\
             .where('contractor_id', '==', current_user.id)\
@@ -811,6 +795,7 @@ def user_profile(user_id):
             project_data['id'] = doc.id
             assigned_projects.append(project_data)
         
+        # 2. Projects where contractor has bid
         bids_ref = db.collection('bids')\
             .where('contractor_id', '==', current_user.id)\
             .where('user_id', '==', user_id)\
@@ -823,8 +808,10 @@ def user_profile(user_id):
             if project_id:
                 bid_project_ids.add(project_id)
         
+        # Get these projects
         bid_projects = []
         for project_id in bid_project_ids:
+            # Skip if already in assigned projects
             if any(p['id'] == project_id for p in assigned_projects):
                 continue
             
@@ -834,8 +821,10 @@ def user_profile(user_id):
                 project_data['id'] = project_id
                 bid_projects.append(project_data)
         
+        # Combine all visible projects
         all_projects = assigned_projects + bid_projects
         
+        # Format dates
         if 'created_at' in user_data and user_data['created_at']:
             try:
                 user_data['created_at'] = user_data['created_at'].strftime('%B %d, %Y')
@@ -844,6 +833,7 @@ def user_profile(user_id):
         else:
             user_data['created_at'] = 'N/A'
         
+        # Set defaults
         user_data.setdefault('name', 'User')
         user_data.setdefault('email', 'N/A')
         user_data.setdefault('phone', 'N/A')

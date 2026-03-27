@@ -4,100 +4,390 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Bids - House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --cream: #F0F4F8; --warm-white: #FFFFFF; --sand: #E8EEF4; --stone: #C8D8E8;
-            --accent: #1B4F72; --accent-dark: #0E2F44; --accent-light: #D6E8F5; --accent-mid: #2E86C1;
-            --text-primary: #0D1B2A; --text-secondary: #2C4A6E; --text-muted: #6B8CAE;
-            --shadow-sm: 0 1px 3px rgba(13,27,42,0.06), 0 1px 2px rgba(13,27,42,0.04);
-            --shadow-md: 0 4px 16px rgba(13,27,42,0.08), 0 2px 6px rgba(13,27,42,0.05);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DM Sans', sans-serif; background-color: var(--cream); min-height: 100vh; color: var(--text-primary); }
-        body::before { content: ''; position: fixed; inset: 0; background: url('/static/images/house.jpg') no-repeat center center / cover; opacity: 0.06; z-index: 0; pointer-events: none; }
-        .navbar { background: var(--warm-white); border-bottom: 1px solid var(--stone); padding: 0 40px; height: 68px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
-        .navbar-brand { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .navbar-menu { display: flex; align-items: center; gap: 4px; }
-        .navbar-menu a { color: var(--text-secondary); text-decoration: none; padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; position: relative; }
-        .navbar-menu a:hover { color: var(--accent); background: var(--accent-light); }
-        .badge-notification { position: absolute; top: 2px; right: 2px; background: #DC2626; color: white; border-radius: 50%; width: 18px; height: 18px; display: none; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; border: 2px solid var(--warm-white); }
-        .profile-pic { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); cursor: pointer; }
-        .profile-placeholder { width: 36px; height: 36px; border-radius: 50%; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; border: 2px solid var(--stone); cursor: pointer; }
-        .logout-link { color: var(--text-muted) !important; font-size: 13px !important; }
-        .container { max-width: 1000px; margin: 40px auto; padding: 0 24px; position: relative; z-index: 1; }
-        .page-banner { background: var(--warm-white); border: 1px solid var(--stone); border-radius: 16px; padding: 36px 40px; margin-bottom: 28px; box-shadow: var(--shadow-md); }
-        .page-banner h1 { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
-        .divider { width: 40px; height: 3px; background: var(--accent); border-radius: 2px; margin: 12px 0 20px; }
-        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-        .stat-card { text-align: center; padding: 20px; background: var(--sand); border-radius: 12px; border: 1px solid var(--stone); transition: all 0.2s; }
-        .stat-card:hover { border-color: var(--accent); background: var(--accent-light); }
-        .stat-number { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
-        .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.6px; }
-        .filters { background: var(--warm-white); border: 1px solid var(--stone); padding: 18px 24px; border-radius: 12px; margin-bottom: 20px; box-shadow: var(--shadow-sm); display: flex; gap: 8px; }
-        .filter-btn { padding: 8px 18px; border: 1.5px solid var(--stone); background: transparent; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--text-secondary); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
-        .filter-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-        .filter-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
-        .bid-card { background: var(--warm-white); border: 1px solid var(--stone); border-radius: 16px; padding: 26px; margin-bottom: 16px; box-shadow: var(--shadow-sm); transition: all 0.25s; }
-        .bid-card:hover { box-shadow: var(--shadow-md); border-color: var(--accent); }
-        .bid-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-        .bid-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
-        .bid-date { font-size: 13px; color: var(--text-muted); }
-        .status-badge { padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
-        .status-pending { background: #FEF3C7; color: #92400E; }
-        .status-accepted { background: #D1FAE5; color: #065F46; }
-        .status-rejected { background: #FEE2E2; color: #991B1B; }
-        .bid-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 16px 0; padding: 18px; background: var(--sand); border-radius: 10px; }
-        .detail-item { text-align: center; }
-        .detail-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
-        .detail-value { font-size: 17px; font-weight: 700; color: var(--text-primary); }
-        .bid-proposal { padding: 14px 16px; background: var(--sand); border-radius: 8px; margin: 12px 0; color: var(--text-secondary); font-size: 13px; line-height: 1.6; border-left: 3px solid var(--accent); }
-        .bid-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
-        .btn { padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s; border: none; cursor: pointer; font-size: 13px; display: inline-block; font-family: 'DM Sans', sans-serif; }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); }
-        .btn-outline { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
-        .btn-outline:hover { background: var(--accent-light); }
-        .btn-danger { background: #FEE2E2; color: #991B1B; border: 1.5px solid #FECACA; }
-        .btn-danger:hover { background: #DC2626; color: white; }
-        .empty-state { text-align: center; padding: 80px 20px; background: var(--warm-white); border-radius: 16px; border: 1px solid var(--stone); box-shadow: var(--shadow-sm); }
-        .empty-icon { font-size: 72px; margin-bottom: 16px; opacity: 0.5; }
-        .empty-state h2 { font-family: 'Playfair Display', serif; color: var(--text-primary); margin-bottom: 8px; }
-        .empty-state p { color: var(--text-muted); font-size: 15px; margin-bottom: 24px; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        .page-banner { animation: fadeUp 0.5s ease both; }
-        .filters { animation: fadeUp 0.5s 0.05s ease both; }
-        #bidsContainer { animation: fadeUp 0.5s 0.1s ease both; }
-        @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .bid-details { grid-template-columns: 1fr; } .navbar { padding: 0 16px; } .container { padding: 0 16px; } }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+            position: relative;
+        }
+        
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .badge-notification {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff3b30;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .profile-pic:hover {
+            transform: scale(1.1);
+        }
+        
+        .profile-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .profile-placeholder:hover {
+            transform: scale(1.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .page-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #f5576c;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover {
+            border-color: #f5576c;
+        }
+        
+        .filter-btn.active {
+            background: #f5576c;
+            color: white;
+            border-color: #f5576c;
+        }
+        
+        .bid-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .bid-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .bid-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        
+        .bid-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .bid-date {
+            font-size: 13px;
+            color: #999;
+        }
+        
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-accepted {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .bid-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .detail-item {
+            text-align: center;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .bid-proposal {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 15px 0;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            max-height: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .bid-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #f5576c;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #e04558;
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #f5576c;
+            border: 2px solid #f5576c;
+        }
+        
+        .btn-outline:hover {
+            background: #f5576c;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 15px;
+        }
+        
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .bid-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .bid-actions {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar">
-        <a href="{{ url_for('contractor.dashboard') }}" class="navbar-brand">🔨 House-Forge</a>
+        <div class="navbar-brand">🔨 House-Forge Contractor</div>
         <div class="navbar-menu">
             <a href="{{ url_for('contractor.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('contractor.browse_projects') }}">Browse Projects</a>
             <a href="{{ url_for('contractor.my_bids') }}">My Bids</a>
-            <a href="{{ url_for('contractor.my_projects') }}">My Projects</a>
-            <a href="{{ url_for('contractor.messages') }}" style="position: relative;">
-                Messages
-                <span class="badge-notification" id="messagesBadge">0</span>
+            <a href="{{ url_for('contractor.messages') }}" style="position: relative;">Messages
+            <span class="badge-notification" id="messagesBadge" style="display: none;">0</span>
             </a>
-            <a href="{{ url_for('contractor.profile') }}" style="padding: 8px 10px;">
+            <a href="{{ url_for('contractor.profile') }}">
                 {% if contractor_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ contractor_profile_picture }}" alt="Profile" class="profile-pic">
+                    <img src="/static/uploads/profiles/{{ contractor_profile_picture }}" 
+                         alt="Profile" 
+                         class="profile-pic">
                 {% else %}
-                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
+                    <div class="profile-placeholder">
+                        {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                    </div>
                 {% endif %}
             </a>
-            <a href="{{ url_for('auth.logout') }}" class="logout-link">Logout</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
         </div>
     </nav>
-
+    
     <div class="container">
-        <div class="page-banner">
-            <h1>📋 My Bids</h1>
-            <div class="divider"></div>
+        <!-- Page Header with Stats -->
+        <div class="page-header">
+            <h1 class="page-title">📋 My Bids</h1>
+            
             <div class="stats-row">
                 <div class="stat-card">
                     <div class="stat-number">{{ stats.total }}</div>
@@ -117,14 +407,18 @@
                 </div>
             </div>
         </div>
-
+        
+        <!-- Filters -->
         <div class="filters">
-            <button class="filter-btn active" onclick="filterBids('all', event)">All Bids</button>
-            <button class="filter-btn" onclick="filterBids('pending', event)">⏳ Pending</button>
-            <button class="filter-btn" onclick="filterBids('accepted', event)">✅ Accepted</button>
-            <button class="filter-btn" onclick="filterBids('rejected', event)">❌ Rejected</button>
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterBids('all')">All Bids</button>
+                <button class="filter-btn" onclick="filterBids('pending')">Pending</button>
+                <button class="filter-btn" onclick="filterBids('accepted')">Accepted</button>
+                <button class="filter-btn" onclick="filterBids('rejected')">Rejected</button>
+            </div>
         </div>
-
+        
+        <!-- Bids List -->
         {% if bids %}
             <div id="bidsContainer">
                 {% for bid in bids %}
@@ -132,7 +426,9 @@
                     <div class="bid-header">
                         <div>
                             <div class="bid-title">{{ bid.project_title }}</div>
-                            <div class="bid-date">Submitted: {{ bid.created_at.strftime('%d %b %Y, %I:%M %p') if bid.created_at else 'N/A' }}</div>
+                            <div class="bid-date">
+                                Submitted: {{ bid.created_at.strftime('%d %b %Y, %I:%M %p') if bid.created_at else 'N/A' }}
+                            </div>
                         </div>
                         <span class="status-badge status-{{ bid.status }}">
                             {% if bid.status == 'pending' %}⏳ Pending
@@ -141,6 +437,7 @@
                             {% endif %}
                         </span>
                     </div>
+                    
                     <div class="bid-details">
                         <div class="detail-item">
                             <div class="detail-label">Total Amount</div>
@@ -151,27 +448,37 @@
                             <div class="detail-value">{{ bid.duration_days }} days</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Breakdown</div>
-                            <div class="detail-value" style="font-size: 12px; line-height: 1.6;">
+                            <div class="detail-label">Cost Breakdown</div>
+                            <div class="detail-value" style="font-size: 12px;">
                                 M: ₹{{ "{:,.0f}".format(bid.material_cost or 0) }}<br>
                                 L: ₹{{ "{:,.0f}".format(bid.labor_cost or 0) }}<br>
                                 O: ₹{{ "{:,.0f}".format(bid.other_cost or 0) }}
                             </div>
                         </div>
                     </div>
+                    
                     <div class="bid-proposal">
                         <strong>Proposal:</strong> {{ bid.proposal[:200] }}{% if bid.proposal|length > 200 %}...{% endif %}
                     </div>
+                    
                     <div class="bid-actions">
-                        <a href="/contractor/project/{{ bid.project_id }}/view" class="btn btn-primary">View Project</a>
+                        <a href="/contractor/project/{{ bid.project_id }}/view" class="btn btn-primary">
+                            View Project
+                        </a>
+                        
                         {% if bid.status == 'pending' %}
-                        <a href="{{ url_for('contractor.edit_bid', bid_id=bid.id) }}" class="btn btn-outline">Edit Bid</a>
+                        <a href="{{ url_for('contractor.edit_bid', bid_id=bid.id) }}" class="btn btn-outline">
+                            Edit Bid
+                        </a>
                         <form method="POST" action="{{ url_for('contractor.delete_bid', bid_id=bid.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this bid?');">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                         {% endif %}
+                        
                         {% if bid.status == 'accepted' %}
-                        <a href="{{ url_for('contractor.user_profile', user_id=bid.user_id) }}" class="btn btn-outline">👤 View Client</a>
+                        <a href="{{ url_for('contractor.user_profile', user_id=bid.user_id) }}" class="btn btn-outline">
+                            👤 View Profile
+                        </a>
                         {% endif %}
                     </div>
                 </div>
@@ -182,31 +489,73 @@
                 <div class="empty-icon">📋</div>
                 <h2>No Bids Yet</h2>
                 <p>You haven't submitted any bids. Browse available projects to get started!</p>
-                <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-primary">Browse Projects</a>
+                <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-primary" style="display: inline-block;">
+                    Browse Projects
+                </a>
             </div>
         {% endif %}
     </div>
-
+    
     <script>
-        function filterBids(status, event) {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            if (event) event.target.classList.add('active');
-            document.querySelectorAll('.bid-card').forEach(card => {
-                card.style.display = (status === 'all' || card.dataset.status === status) ? 'block' : 'none';
+        function filterBids(status) {
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter bid cards
+            const cards = document.querySelectorAll('.bid-card');
+            cards.forEach(card => {
+                if (status === 'all' || card.dataset.status === status) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
             });
         }
+    </script>
+    <script>
+        // Update message badge
         function updateMessageBadge() {
             fetch('/contractor/messages/unread-count')
-                .then(r => { if (!r.ok || !r.headers.get('content-type')?.includes('application/json')) return null; return r.json(); })
+                .then(response => {
+                    // Check if response is OK and is JSON
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Response is not JSON');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    if (!data) return;
                     const badge = document.getElementById('messagesBadge');
-                    if (!badge) return;
-                    badge.style.display = data.count > 0 ? 'flex' : 'none';
-                    badge.textContent = data.count;
-                }).catch(() => {});
+                    if (badge && data && typeof data.count === 'number') {
+                        if (data.count > 0) {
+                            badge.textContent = data.count;
+                            badge.style.display = 'flex';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => {
+                    // Silently fail - just hide the badge
+                    const badge = document.getElementById('messagesBadge');
+                    if (badge) {
+                        badge.style.display = 'none';
+                    }
+                    // Only log in development
+                    // console.error('Error fetching unread count:', error);
+                });
         }
+        
+        // Update badge on page load
         updateMessageBadge();
+        
+        // Update badge every 30 seconds
         setInterval(updateMessageBadge, 30000);
     </script>
 </body>

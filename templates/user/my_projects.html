@@ -85,7 +85,10 @@
                 Messages
                 <span class="badge-notification" id="messagesBadge"></span>
             </a>
-            
+            <a href="{{ url_for('user.notifications') }}" style="position: relative;">
+                Notifications
+                <span class="badge-notification" id="notificationsBadge"></span>
+            </a>
             <a href="{{ url_for('user.profile') }}" style="padding:8px 10px;">
                 {% if user_profile_picture %}<img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
                 {% else %}<div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>{% endif %}
@@ -116,10 +119,10 @@
                     <div class="detail-item">💰 {{ project.budget_range.title() }}</div>
                 </div>
                 <div class="project-footer">
-                    <div class="project-date">Created: {{ project.created_at.strftime('%d %b %Y') if project.created_at and project.created_at is not string else 'N/A' }}</div>
+                    <div class="project-date">Created: {{ project.created_at.strftime('%d %b %Y') if project.created_at else 'N/A' }}</div>
                     <div class="project-actions">
                         <a href="{{ url_for('user.view_project', project_id=project.id) }}" class="btn-view">View</a>
-                        <button type="button" onclick="confirmDelete('{{ project.id }}','{{ project.title }}')" class="btn-del">🗑️</button>
+                        <button onclick="confirmDelete('{{ project.id }}','{{ project.title }}')" class="btn-del">🗑️</button>
                     </div>
                 </div>
             </div>

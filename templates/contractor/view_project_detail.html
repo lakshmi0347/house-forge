@@ -4,180 +4,311 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Details - House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --cream: #F0F4F8; --warm-white: #FFFFFF; --sand: #E8EEF4; --stone: #C8D8E8;
-            --accent: #1B4F72; --accent-dark: #0E2F44; --accent-light: #D6E8F5; --accent-mid: #2E86C1;
-            --text-primary: #0D1B2A; --text-secondary: #2C4A6E; --text-muted: #6B8CAE;
-            --shadow-sm: 0 1px 3px rgba(13,27,42,0.06); --shadow-md: 0 4px 16px rgba(13,27,42,0.08);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DM Sans', sans-serif; background-color: var(--cream); min-height: 100vh; color: var(--text-primary); }
-        body::before { content: ''; position: fixed; inset: 0; background: url('/static/images/house.jpg') no-repeat center center / cover; opacity: 0.06; z-index: 0; pointer-events: none; }
-        .navbar { background: var(--warm-white); border-bottom: 1px solid var(--stone); padding: 0 40px; height: 68px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
-        .navbar-brand { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        .navbar-menu { display: flex; align-items: center; gap: 4px; }
-        .navbar-menu a { color: var(--text-secondary); text-decoration: none; padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; position: relative; }
-        .navbar-menu a:hover { color: var(--accent); background: var(--accent-light); }
-        .badge-notification { position: absolute; top: 2px; right: 2px; background: #DC2626; color: white; border-radius: 50%; width: 18px; height: 18px; display: none; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; border: 2px solid var(--warm-white); }
-        .profile-pic { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); cursor: pointer; }
-        .profile-placeholder { width: 36px; height: 36px; border-radius: 50%; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; border: 2px solid var(--stone); cursor: pointer; }
-        .logout-link { color: var(--text-muted) !important; font-size: 13px !important; }
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 24px; position: relative; z-index: 1; }
-        .back-link { color: var(--accent); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; font-weight: 600; font-size: 14px; transition: all 0.2s; }
-        .back-link:hover { color: var(--accent-dark); }
-        .page-banner { background: var(--warm-white); border: 1px solid var(--stone); border-radius: 16px; padding: 28px 36px; margin-bottom: 20px; box-shadow: var(--shadow-md); }
-        .page-banner h1 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
-        .project-meta { display: flex; gap: 20px; flex-wrap: wrap; color: var(--text-muted); font-size: 13px; }
-        .project-meta span { display: flex; align-items: center; gap: 4px; }
-        .divider { width: 40px; height: 3px; background: var(--accent); border-radius: 2px; margin: 12px 0; }
-        .alert-info { padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; background: var(--accent-light); color: var(--accent); border: 1px solid var(--stone); }
-        .two-column { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: start; }
-        .section { background: var(--warm-white); border: 1px solid var(--stone); padding: 28px 32px; border-radius: 16px; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
-        .section-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--sand); }
-        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-        .info-item { display: flex; flex-direction: column; }
-        .info-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .info-value { font-size: 15px; color: var(--text-primary); font-weight: 500; }
-        .budget-strip { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-mid) 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
-        .budget-strip .label { font-size: 12px; opacity: 0.85; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .budget-strip .value { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; }
-        .stats-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
-        .mini-stat { text-align: center; padding: 14px 10px; background: var(--sand); border-radius: 10px; border: 1px solid var(--stone); }
-        .mini-stat .val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--text-primary); }
-        .mini-stat .lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-        .big-stat { text-align: center; padding: 20px; }
-        .big-stat .val { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; color: var(--accent); }
-        .big-stat .lbl { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
-        .btn { padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; text-align: center; transition: all 0.2s; border: none; cursor: pointer; font-size: 14px; display: block; width: 100%; margin-bottom: 10px; font-family: 'DM Sans', sans-serif; }
-        .btn:last-child { margin-bottom: 0; }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(27,79,114,0.35); }
-        .btn-success { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
-        .btn-success:hover { background: #059669; color: white; }
-        .btn-outline { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
-        .btn-outline:hover { background: var(--accent-light); }
-        .btn-disabled { background: var(--sand); color: var(--text-muted); cursor: not-allowed; border: 1.5px solid var(--stone); }
-        .description-text { color: var(--text-secondary); line-height: 1.8; font-size: 14px; }
-
-        /* ── BUDGET ESTIMATION STYLES ── */
-        .est-tier-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-        .est-tier {
-            padding: 14px 10px; border-radius: 10px; text-align: center;
-            border: 1px solid var(--stone); background: var(--sand);
-            transition: transform 0.2s;
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
         }
-        .est-tier:hover { transform: translateY(-2px); }
-        .est-tier.active {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-mid) 100%);
-            color: white; border-color: var(--accent);
-            box-shadow: 0 4px 12px rgba(27,79,114,0.25);
+        
+        .navbar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .est-tier-label {
-            font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 5px;
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
         }
-        .est-tier.active .est-tier-label { color: rgba(255,255,255,0.75); }
-        .est-tier-total {
-            font-family: 'Playfair Display', serif; font-size: 17px;
-            font-weight: 700; color: var(--text-primary); line-height: 1.2;
+        
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
         }
-        .est-tier.active .est-tier-total { color: white; }
-        .est-tier-sqft { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
-        .est-tier.active .est-tier-sqft { color: rgba(255,255,255,0.7); }
-        .est-tier-chosen {
-            font-size: 9px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.5px; margin-top: 6px;
-            background: rgba(255,255,255,0.25); border-radius: 20px;
-            padding: 2px 8px; display: inline-block;
+        
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+            position: relative;
+        }
+        
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
         }
 
-        .est-breakdown {
-            background: var(--sand); border-radius: 10px; padding: 16px;
-            margin-bottom: 14px;
-        }
-        .est-breakdown-title {
-            font-size: 11px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 12px;
-        }
-        .est-breakdown-grid { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
-        .est-breakdown-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
-        .est-breakdown-item { text-align: center; }
-        .est-breakdown-item-label {
-            font-size: 11px; color: var(--text-muted); font-weight: 600;
-            margin-bottom: 4px;
-        }
-        .est-breakdown-item-value {
-            font-family: 'Playfair Display', serif; font-size: 17px;
-            font-weight: 700; color: var(--text-primary);
+        .badge-notification {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff3b30;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            pointer-events: none;
         }
 
-        .est-stage-row {
-            display: flex; align-items: center; gap: 10px;
-            padding: 7px 0; border-bottom: 1px solid var(--stone);
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.3s;
         }
-        .est-stage-row:last-child { border-bottom: none; }
-        .est-stage-name { font-size: 12px; color: var(--text-secondary); width: 130px; flex-shrink: 0; }
-        .est-stage-bar-wrap { flex: 1; height: 4px; background: var(--stone); border-radius: 2px; overflow: hidden; }
-        .est-stage-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-mid)); border-radius: 2px; }
-        .est-stage-cost { font-size: 12px; font-weight: 700; color: var(--text-primary); width: 70px; text-align: right; flex-shrink: 0; }
-        .est-stage-heading { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-muted); margin-bottom:10px; }
-
-        .est-timeline-hint {
-            margin-top: 14px; background: var(--accent-light);
-            border: 1px solid var(--stone); border-radius: 8px;
-            padding: 11px 14px; display: flex; align-items: center; gap: 10px;
+        
+        .profile-pic:hover {
+            transform: scale(1.1);
         }
-        .est-timeline-hint-icon { font-size: 18px; flex-shrink: 0; }
-        .est-timeline-hint-label {
-            font-size: 11px; font-weight: 700; color: var(--text-muted);
-            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
+        
+        .profile-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.3s;
         }
-        .est-timeline-hint-value { font-size: 14px; font-weight: 700; color: var(--accent); }
-        .est-timeline-hint-sub { font-size: 12px; font-weight: 400; color: var(--text-muted); }
-
-        .est-tip {
-            margin-top: 12px; padding: 10px 12px;
-            background: #FEF3C7; border: 1px solid #FCD34D;
-            border-radius: 8px; font-size: 12px; color: #92400E; line-height: 1.5;
+        
+        .profile-placeholder:hover {
+            transform: scale(1.1);
         }
-
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        .page-banner { animation: fadeUp 0.4s ease both; }
-        .two-column { animation: fadeUp 0.4s 0.1s ease both; }
-        @media (max-width: 1024px) { .two-column { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) { .navbar { padding: 0 16px; } .container { padding: 0 16px; } .info-grid { grid-template-columns: 1fr; } .est-tier-grid { grid-template-columns: 1fr; } }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .back-link {
+            color: #f5576c;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .project-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .project-meta {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            color: #666;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            font-weight: 600;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .budget-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .budget-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .budget-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .btn {
+            padding: 14px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-disabled {
+            background: #e0e0e0;
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        @media (max-width: 1024px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar">
-        <a href="{{ url_for('contractor.dashboard') }}" class="navbar-brand">🔨 House-Forge</a>
+        <div class="navbar-brand">🔨 House-Forge Contractor</div>
         <div class="navbar-menu">
             <a href="{{ url_for('contractor.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('contractor.browse_projects') }}">Browse Projects</a>
             <a href="{{ url_for('contractor.my_bids') }}">My Bids</a>
             <a href="{{ url_for('contractor.messages') }}" style="position: relative;">
-                Messages
-                <span class="badge-notification" id="messagesBadge">0</span>
-            </a>
-            <a href="{{ url_for('contractor.profile') }}" style="padding: 8px 10px;">
+        Messages
+        <span class="badge-notification" id="messagesBadge" style="display: none;">0</span>
+    </a>
+            <a href="{{ url_for('contractor.profile') }}">
                 {% if contractor_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ contractor_profile_picture }}" alt="Profile" class="profile-pic">
+                    <img src="/static/uploads/profiles/{{ contractor_profile_picture }}" 
+                         alt="Profile" 
+                         class="profile-pic">
                 {% else %}
-                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
+                    <div class="profile-placeholder">
+                        {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                    </div>
                 {% endif %}
             </a>
-            <a href="{{ url_for('auth.logout') }}" class="logout-link">Logout</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
         </div>
     </nav>
-
+    
     <div class="container">
-        <a href="{{ url_for('contractor.browse_projects') }}" class="back-link">← Back to Projects</a>
-
-        <div class="page-banner">
-            <h1>{{ project.title }}</h1>
-            <div class="divider"></div>
+        <a href="{{ url_for('contractor.browse_projects') }}" class="back-link">
+            ← Back to Projects
+        </a>
+        
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="project-title">{{ project.title }}</h1>
             <div class="project-meta">
                 <span>📍 {{ project.location or 'Location not specified' }}</span>
                 <span>📏 {{ project.square_feet }} sq ft</span>
@@ -185,248 +316,189 @@
                 <span>🏢 {{ project.floors }} Floors</span>
             </div>
         </div>
-
+        
+        <!-- Status Messages -->
         {% if project.has_bid %}
-        <div class="alert-info">✓ You have already submitted a bid for this project.</div>
+        <div class="alert alert-info">
+            ✓ You have already submitted a bid for this project.
+        </div>
         {% endif %}
-
+        
         <div class="two-column">
+            <!-- Main Content -->
             <div>
-
-                <!-- ── PROJECT DETAILS ── -->
+                <!-- Project Details -->
                 <div class="section">
                     <h3 class="section-title">📋 Project Details</h3>
+                    
                     <div class="info-grid">
-                        <div class="info-item"><span class="info-label">Total Area</span><span class="info-value">{{ project.square_feet }} sq ft</span></div>
-                        <div class="info-item"><span class="info-label">Location</span><span class="info-value">{{ project.location or 'Not specified' }}</span></div>
-                        <div class="info-item"><span class="info-label">Number of Rooms</span><span class="info-value">{{ project.rooms }}</span></div>
-                        <div class="info-item"><span class="info-label">Number of Floors</span><span class="info-value">{{ project.floors }}</span></div>
-                        <div class="info-item"><span class="info-label">Bathrooms</span><span class="info-value">{{ project.bathrooms or 2 }}</span></div>
-                        <div class="info-item"><span class="info-label">Property Type</span><span class="info-value">{{ project.property_type.title() if project.property_type else 'Residential' }}</span></div>
+                        <div class="info-item">
+                            <span class="info-label">Total Area</span>
+                            <span class="info-value">{{ project.square_feet }} sq ft</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Location</span>
+                            <span class="info-value">{{ project.location or 'Not specified' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Number of Rooms</span>
+                            <span class="info-value">{{ project.rooms }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Number of Floors</span>
+                            <span class="info-value">{{ project.floors }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Bathrooms</span>
+                            <span class="info-value">{{ project.bathrooms or 2 }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Property Type</span>
+                            <span class="info-value">{{ project.property_type.title() if project.property_type else 'Residential' }}</span>
+                        </div>
                     </div>
                 </div>
-
+                
+                <!-- Description -->
                 {% if project.description %}
                 <div class="section">
                     <h3 class="section-title">📝 Project Description</h3>
-                    <p class="description-text">{{ project.description }}</p>
+                    <p style="color: #666; line-height: 1.8;">{{ project.description }}</p>
                 </div>
                 {% endif %}
-
-                <!-- ══════════════════════════════════════════════ -->
-                <!-- ── OWNER'S BUDGET ESTIMATION BLOCK ──────────── -->
-                <!-- ══════════════════════════════════════════════ -->
-                {% set estimation = project.get('estimation', {}) %}
-                {% set budget     = (project.budget_range or 'medium') | lower %}
-                {% set scope      = project.estimate_scope or 'material_only' %}
-                {% set sqf        = project.square_feet | float or 1 %}
-
-                {% if estimation %}
-                {% set costs = estimation.get('costs', {}) %}
-                {% set tc    = costs.get(budget, costs.get('medium', {})) %}
-
-                <div class="section">
-                    <h3 class="section-title">💰 Owner's Budget Estimation</h3>
-
-                    <!-- Three tier cards -->
-                    <div class="est-tier-grid">
-                        {% for tk, tl in [('low','Budget'), ('medium','Standard'), ('high','Premium')] %}
-                        {% set t  = costs.get(tk, {}) %}
-                        {% set tv = t.get('total_cost', 0) %}
-                        <div class="est-tier {% if tk == budget %}active{% endif %}">
-                            <div class="est-tier-label">{{ tl }}</div>
-                            <div class="est-tier-total">
-                                {% if tv >= 10000000 %}₹{{ "%.2f"|format(tv/10000000) }} Cr
-                                {% elif tv >= 100000  %}₹{{ "%.1f"|format(tv/100000)  }} L
-                                {% else %}₹{{ "{:,.0f}".format(tv) }}{% endif %}
-                            </div>
-                            <div class="est-tier-sqft">₹{{ "{:,.0f}".format((tv / sqf) | round) }}/sqft</div>
-                            {% if tk == budget %}
-                            <div class="est-tier-chosen">Owner's Choice ✓</div>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                    </div>
-
-                    <!-- Chosen tier breakdown -->
-                    {% set mat_cost = tc.get('material_cost', 0) %}
-                    {% set lab_cost = tc.get('labor_cost', 0) %}
-                    {% set oth_cost = tc.get('other_costs', 0) %}
-                    {% set tot_cost = tc.get('total_cost', 0) %}
-
-                    <div class="est-breakdown">
-                        <div class="est-breakdown-title">
-                            {{ {'low':'Budget','medium':'Standard','high':'Premium'}.get(budget,'Standard') }} Tier Breakdown
-                            &nbsp;·&nbsp;
-                            {% if scope == 'material_and_labour' %}Material + Labour{% else %}Material Only{% endif %}
-                        </div>
-                        <div class="est-breakdown-grid {% if scope == 'material_and_labour' %}three-col{% endif %}">
-                            <div class="est-breakdown-item">
-                                <div class="est-breakdown-item-label">MATERIALS</div>
-                                <div class="est-breakdown-item-value">₹{{ "{:,.0f}".format(mat_cost) }}</div>
-                            </div>
-                            {% if scope == 'material_and_labour' %}
-                            <div class="est-breakdown-item">
-                                <div class="est-breakdown-item-label">LABOUR</div>
-                                <div class="est-breakdown-item-value">₹{{ "{:,.0f}".format(lab_cost) }}</div>
-                            </div>
-                            {% endif %}
-                            <div class="est-breakdown-item">
-                                <div class="est-breakdown-item-label">OTHER / CONTINGENCY</div>
-                                <div class="est-breakdown-item-value">₹{{ "{:,.0f}".format(oth_cost) }}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stage-wise mini bar chart -->
-                    {% set stg = tc.get('stage_breakdown', {}) %}
-                    {% if stg %}
-                    {% set stage_labels = {
-                        'foundation':'Foundation', 'walls':'Walls',
-                        'flooring':'Flooring & Slab', 'roofing':'Roofing',
-                        'plumbing':'Plumbing', 'electrical':'Electrical',
-                        'finishing':'Finishing', 'carpentry':'Carpentry',
-                        'exterior':'Exterior', 'miscellaneous':'Miscellaneous'
-                    } %}
-                    {% set max_c = stg.values() | list | max if stg else 1 %}
-
-                    <div class="est-stage-heading">
-                        Stage-wise Cost Breakdown
-                    </div>
-
-                    {% for sk, sl in stage_labels.items() %}
-                    {% set sc = stg.get(sk, 0) %}
-                    {% if sc > 0 %}
-                    {% set bp = ((sc / max_c) * 100) | round | int %}
-                    <div class="est-stage-row">
-                        <span class="est-stage-name">{{ sl }}</span>
-                        <div class="est-stage-bar-wrap">
-                            <div class="est-stage-bar" data-width="{{ bp }}"></div>
-                        </div>
-                        <span class="est-stage-cost">
-                            {% if sc >= 100000 %}₹{{ "%.1f"|format(sc/100000) }}L
-                            {% else %}₹{{ "{:,.0f}".format(sc) }}{% endif %}
-                        </span>
-                    </div>
-                    {% endif %}
-                    {% endfor %}
-                    {% endif %}
-
-                    <!-- Timeline hint -->
-                    {% set timeline = estimation.get('timeline', {}) %}
-                    {% if timeline.get('total_days', 0) > 0 %}
-                    <div class="est-timeline-hint">
-                        <span class="est-timeline-hint-icon">⏱️</span>
-                        <div>
-                            <div class="est-timeline-hint-label">Owner's System Timeline Estimate</div>
-                            <div class="est-timeline-hint-value">
-                                {{ timeline.get('total_days', 0) | int }} days
-                                <span class="est-timeline-hint-sub">
-                                    (≈ {{ ((timeline.get('total_days', 0)) / 30) | round(1) }} months)
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <!-- Bidding tip -->
-                    <div class="est-tip">
-                        <strong>💡 Bidding Tip:</strong> These figures are auto-generated system estimates for the owner's
-                        reference — not the owner's confirmed budget. Submit a bid that reflects your
-                        <em>actual</em> costs, expertise, and realistic timeline. Quality and reliability
-                        often win over the lowest price.
-                    </div>
-                </div>
-                {% endif %}
-                <!-- ── END BUDGET ESTIMATION BLOCK ── -->
-
-                <!-- ── PROJECT OWNER ── -->
+                
+                <!-- Owner Info -->
                 <div class="section">
                     <h3 class="section-title">👤 Project Owner</h3>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Name</span>
                             <span class="info-value">{{ project.user_name or 'N/A' }}</span>
                         </div>
-                        <a href="{{ url_for('contractor.user_profile', user_id=project.user_id) }}" class="btn btn-outline" style="width: auto; margin: 0; padding: 10px 20px;">View Profile</a>
+                        <div style="margin-top: 15px;">
+                         <a href="{{ url_for('contractor.user_profile', user_id=project.user_id) }}" class="btn btn-outline">
+                             View Profile
+                         </a>
+                        </div>
                     </div>
                 </div>
-
+                
+                <!-- Existing Bid Info -->
                 {% if project.has_bid and project.existing_bid %}
                 <div class="section">
                     <h3 class="section-title">📋 Your Submitted Bid</h3>
                     <div class="info-grid">
-                        <div class="info-item"><span class="info-label">Total Cost</span><span class="info-value">₹{{ "{:,.0f}".format(project.existing_bid.total_cost) }}</span></div>
-                        <div class="info-item"><span class="info-label">Duration</span><span class="info-value">{{ project.existing_bid.duration_days }} days</span></div>
-                        <div class="info-item"><span class="info-label">Status</span><span class="info-value">{{ project.existing_bid.status.title() }}</span></div>
-                        <div class="info-item"><span class="info-label">Submitted</span><span class="info-value">{{ project.existing_bid.created_at.strftime('%d %b %Y') if project.existing_bid.created_at else 'N/A' }}</span></div>
+                        <div class="info-item">
+                            <span class="info-label">Total Cost</span>
+                            <span class="info-value">₹{{ "{:,.0f}".format(project.existing_bid.total_cost) }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Duration</span>
+                            <span class="info-value">{{ project.existing_bid.duration_days }} days</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status</span>
+                            <span class="info-value">{{ project.existing_bid.status.title() }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Submitted</span>
+                            <span class="info-value">{{ project.existing_bid.created_at.strftime('%d %b %Y') if project.existing_bid.created_at else 'N/A' }}</span>
+                        </div>
                     </div>
                 </div>
                 {% endif %}
-
-            </div><!-- end left col -->
-
-            <!-- ── RIGHT SIDEBAR ── -->
+            </div>
+            
+            <!-- Sidebar -->
             <div>
-                <div class="budget-strip">
-                    <div class="label">Budget Range</div>
-                    <div class="value">{{ project.budget_range.title() if project.budget_range else 'Medium' }}</div>
+                <!-- Budget Card -->
+                <div class="budget-card">
+                    <div class="budget-label">Budget Range</div>
+                    <div class="budget-value">{{ project.budget_range.title() if project.budget_range else 'Medium' }}</div>
                 </div>
-
+                
+                <!-- Actions -->
                 <div class="section">
+                    
                     {% if project.has_bid %}
                         {% if project.existing_bid.status == 'pending' %}
-                            <a href="{{ url_for('contractor.edit_bid', bid_id=project.existing_bid.id) }}" class="btn btn-primary">✏️ Edit Your Bid</a>
-                            <a href="{{ url_for('contractor.my_bids') }}" class="btn btn-success">View My Bids</a>
+                            <a href="{{ url_for('contractor.edit_bid', bid_id=project.existing_bid.id) }}" class="btn btn-primary">
+                                ✏️ Edit Your Bid
+                            </a>
+                            <a href="{{ url_for('contractor.my_bids') }}" class="btn btn-success">
+                                View My Bids
+                            </a>
                         {% elif project.existing_bid.status == 'accepted' %}
                             <button class="btn btn-success">✅ Bid Accepted!</button>
-                            <a href="{{ url_for('contractor.my_projects') }}" class="btn btn-primary">Go to My Projects</a>
+                            <a href="{{ url_for('contractor.my_projects') }}" class="btn btn-primary">
+                                Go to My Projects
+                            </a>
                         {% else %}
                             <button class="btn btn-disabled" disabled>❌ Bid Rejected</button>
-                            <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-primary">Browse Other Projects</a>
+                            <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-primary">
+                                Browse Other Projects
+                            </a>
                         {% endif %}
                     {% else %}
-                        <a href="{{ url_for('contractor.submit_bid', project_id=project.id) }}" class="btn btn-primary">📝 Submit Your Bid</a>
-                        <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-outline">Back to Projects</a>
+                        <a href="{{ url_for('contractor.submit_bid', project_id=project.id) }}" class="btn btn-primary">
+                            📝 Submit Your Bid
+                        </a>
+                        <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-success">
+                            Back to Projects
+                        </a>
                     {% endif %}
                 </div>
-
+                
+                <!-- Project Stats -->
                 <div class="section">
                     <h3 class="section-title">📊 Quick Stats</h3>
-                    <div class="big-stat">
-                        <div class="val">{{ project.square_feet }}</div>
-                        <div class="lbl">Total Square Feet</div>
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="font-size: 40px; color: #f5576c; font-weight: bold; margin-bottom: 10px;">
+                            {{ project.square_feet }}
+                        </div>
+                        <div style="color: #666; font-size: 14px;">Total Square Feet</div>
                     </div>
-                    <div class="stats-mini">
-                        <div class="mini-stat"><div class="val">{{ project.rooms }}</div><div class="lbl">Rooms</div></div>
-                        <div class="mini-stat"><div class="val">{{ project.floors }}</div><div class="lbl">Floors</div></div>
-                        <div class="mini-stat"><div class="val">{{ project.bathrooms or 2 }}</div><div class="lbl">Baths</div></div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px;">
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #333;">{{ project.rooms }}</div>
+                            <div style="font-size: 12px; color: #666;">Rooms</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #333;">{{ project.floors }}</div>
+                            <div style="font-size: 12px; color: #666;">Floors</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #333;">{{ project.bathrooms or 2 }}</div>
+                            <div style="font-size: 12px; color: #666;">Baths</div>
+                        </div>
                     </div>
                 </div>
-            </div><!-- end right col -->
-
-        </div><!-- end two-column -->
+            </div>
+        </div>
     </div>
-
     <script>
-        // Apply stage bar widths from data attributes (avoids Jinja in CSS)
-        document.querySelectorAll('.est-stage-bar[data-width]').forEach(function(el) {
-            el.style.width = el.getAttribute('data-width') + '%';
-        });
-
-        function updateMessageBadge() {
-            fetch('/contractor/messages/unread-count')
-                .then(r => { if (!r.ok || !r.headers.get('content-type')?.includes('application/json')) return null; return r.json(); })
-                .then(data => {
-                    if (!data) return;
-                    const badge = document.getElementById('messagesBadge');
-                    if (!badge) return;
-                    badge.style.display = data.count > 0 ? 'flex' : 'none';
+        // Update message badge
+    function updateMessageBadge() {
+        fetch('/contractor/messages/unread-count')
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.getElementById('messagesBadge');
+                if (data.count > 0) {
                     badge.textContent = data.count;
-                }).catch(() => {});
-        }
-        updateMessageBadge();
-        setInterval(updateMessageBadge, 30000);
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error fetching unread count:', error));
+    }
+    
+    // Update badge on page load
+    updateMessageBadge();
+    
+    // Update badge every 30 seconds
+    setInterval(updateMessageBadge, 30000);
     </script>
 </body>
 </html>

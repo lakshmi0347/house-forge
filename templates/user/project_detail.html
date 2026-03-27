@@ -56,6 +56,7 @@
         .breakdown-item{background:var(--sand);border:1px solid var(--stone);border-radius:10px;padding:16px;text-align:center;}
         .breakdown-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
         .breakdown-value{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--text-primary);}
+        /* Hide labour breakdown item when scope=material_only */
         .labour-item.hidden{display:none;}
 
         /* AI RATIONALE BLOCK */
@@ -93,40 +94,18 @@
 
         /* SIDEBAR */
         .info-list{display:flex;flex-direction:column;}
-        .info-row{display:flex;justify-content:space-between;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--sand);}
+        .info-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--sand);}
         .info-row:last-child{border-bottom:none;}
-        .info-label{font-size:13px;color:var(--text-muted);font-weight:500;flex-shrink:0;margin-right:8px;}
-        .info-value{font-size:13px;font-weight:600;color:var(--text-primary);text-align:right;}
-
-        /* LOCATION SECTION IN SIDEBAR */
-        .location-block{background:var(--sand);border:1px solid var(--stone);border-radius:8px;padding:12px 14px;margin-bottom:2px;}
-        .location-block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:8px;}
-        .location-line{font-size:13px;color:var(--text-secondary);line-height:1.6;}
-        .location-line strong{color:var(--text-primary);font-weight:600;}
-
+        .info-label{font-size:13px;color:var(--text-muted);font-weight:500;}
+        .info-value{font-size:13px;font-weight:600;color:var(--text-primary);}
         .timeline-block{background:linear-gradient(135deg,var(--accent-light),#FEF3C7);border:1px solid rgba(181,128,79,0.2);border-radius:10px;padding:20px;text-align:center;}
         .timeline-num{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:var(--accent);line-height:1;}
         .timeline-sub{font-size:13px;color:var(--text-secondary);margin-top:4px;}
-
-        /* ACTION BUTTONS */
         .action-buttons{display:flex;flex-direction:column;gap:10px;}
         .btn-primary{padding:12px 18px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;text-align:center;transition:all 0.2s;display:block;font-family:'DM Sans',sans-serif;}
         .btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 14px rgba(181,128,79,0.3);}
         .btn-outline{padding:12px 18px;background:transparent;color:var(--accent);border:1.5px solid rgba(181,128,79,0.5);border-radius:8px;font-weight:600;font-size:14px;text-decoration:none;text-align:center;transition:all 0.2s;display:block;}
         .btn-outline:hover{background:var(--accent-light);border-color:var(--accent);}
-
-        /* Pay contractor button — gold fill */
-        .btn-pay-contractor{padding:12px 18px;background:#C9A84C;color:#0A0A0A;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;text-align:center;transition:all 0.2s;display:block;font-family:'DM Sans',sans-serif;}
-        .btn-pay-contractor:hover{background:#a8893a;transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,168,76,0.4);}
-
-        /* Contractor payment note */
-        .contractor-paid-note{display:block;padding:11px 16px;background:#D1FAE5;color:#065F46;border-radius:8px;font-weight:600;font-size:13px;text-align:center;border:1px solid #A7F3D0;}
-
-        /* Contractor info strip */
-        .contractor-strip{background:var(--sand);border:1px solid var(--stone);border-radius:10px;padding:14px 16px;margin-bottom:4px;}
-        .contractor-strip-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:6px;}
-        .contractor-strip-name{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:2px;}
-        .contractor-strip-sub{font-size:12px;color:var(--text-muted);}
 
         /* RATING MODAL */
         .modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,25,23,0.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
@@ -157,12 +136,14 @@
             <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('user.projects') }}">My Projects</a>
             <a href="{{ url_for('user.my_orders') }}">My Orders</a>
-            <a href="{{ url_for('payment.payment_history') }}">Payments</a>
             <a href="{{ url_for('user.messages') }}" style="position:relative;">
                 Messages
                 <span class="badge-notification" id="messagesBadge"></span>
             </a>
-            
+            <a href="{{ url_for('user.notifications') }}" style="position:relative;">
+                Notifications
+                <span class="badge-notification" id="notificationsBadge"></span>
+            </a>
             <a href="{{ url_for('user.profile') }}" style="padding:8px 10px;">
                 {% if user_profile_picture %}
                     <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
@@ -182,16 +163,17 @@
             <h1>{{ project.title }}</h1>
             <div class="divider"></div>
             <div class="project-meta">
-                <div class="meta-item">📍 {{ project.location or 'Location not set' }}</div>
+                <div class="meta-item">📍 {{ project.location }}</div>
                 <div class="meta-item">📅 Created: {{ project.created_at.strftime('%d %b %Y') if project.created_at else 'N/A' }}</div>
                 <span class="status-badge status-{{ project.status }}">{{ project.status.upper() }}</span>
-                {% set scope = project.estimate_scope or 'material_only' %}
+                {# estimate scope badge #}
+                {% set scope = estimation.get('estimate_scope', project.get('estimate_scope', 'material_only')) %}
                 <span class="scope-badge">
                     {% if scope == 'material_and_labour' %}👷 Material + Labour{% else %}📦 Material Only{% endif %}
                 </span>
-                {% set prop_type = project.property_type or 'residential' %}
+                {# property type #}
                 <span class="scope-badge" style="background:#E0F2FE;color:#0369A1;border-color:#BAE6FD;">
-                    {{ prop_type.title() }}
+                    {{ estimation.get('property_type', project.get('property_type','residential')).title() }}
                 </span>
             </div>
         </div>
@@ -199,13 +181,14 @@
         <div class="two-column">
             <!-- LEFT COLUMN -->
             <div>
-                {% set budget = (project.budget_range or 'medium') | lower %}
+                {# ── COST SUMMARY ── #}
+                {% set budget = project.budget_range | lower %}
                 {% set tc = estimation.costs.get(budget, estimation.costs.get('medium', {})) %}
-                {% set mat_cost   = tc.get('material_cost', 0) %}
-                {% set lab_cost   = tc.get('labor_cost',    0) %}
-                {% set oth_cost   = tc.get('other_costs',   0) %}
-                {% set total_cost = tc.get('total_cost',    0) %}
-                {% set scope      = project.estimate_scope or 'material_only' %}
+                {% set mat_cost  = tc.get('material_cost', 0) %}
+                {% set lab_cost  = tc.get('labor_cost',    0) %}
+                {% set oth_cost  = tc.get('other_costs',   0) %}
+                {% set total_cost= tc.get('total_cost',    0) %}
+                {% set scope     = estimation.get('estimate_scope', 'material_only') %}
 
                 <div class="cost-summary">
                     <div class="cost-label">
@@ -217,6 +200,7 @@
                             <div class="breakdown-label">Materials</div>
                             <div class="breakdown-value">₹{{ "{:,.0f}".format(mat_cost) }}</div>
                         </div>
+                        {# Labour: only shown when scope = material_and_labour #}
                         <div class="breakdown-item labour-item {% if scope != 'material_and_labour' %}hidden{% endif %}">
                             <div class="breakdown-label">Labour</div>
                             <div class="breakdown-value">₹{{ "{:,.0f}".format(lab_cost) }}</div>
@@ -228,6 +212,7 @@
                     </div>
                 </div>
 
+                {# ── AI RATIONALE ── #}
                 {% if estimation.get('ai_rationale') %}
                 <div class="ai-block">
                     <span class="ai-block-icon">🤖</span>
@@ -240,6 +225,7 @@
                 </div>
                 {% endif %}
 
+                {# ── STAGES & MATERIALS ── #}
                 <div class="card">
                     <div class="section-title">🏗️ Construction Stages &amp; Materials</div>
 
@@ -265,7 +251,7 @@
                                 <span class="stage-icon">{{ icon }}</span>
                                 <div>
                                     <div class="stage-name">{{ stage_name }}</div>
-                                    <div class="stage-meta-count">{{ stage_mats | length }} material{{ 's' if stage_mats | length != 1 else '' }}</div>
+                                    <div class="stage-meta-count">{{ stage_mats | length }} materials</div>
                                 </div>
                             </div>
                             <div style="display:flex;align-items:center;gap:14px;">
@@ -275,10 +261,13 @@
                         </div>
                         <div class="stage-content" id="stage-{{ stage_key }}">
                             <div class="materials-wrap">
-                                {% if stage_mats %}
                                 <table>
                                     <thead>
-                                        <tr><th>Material</th><th>Quantity</th><th>Unit</th></tr>
+                                        <tr>
+                                            <th>Material</th>
+                                            <th>Quantity</th>
+                                            <th>Unit</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
                                         {% for material, quantity in stage_mats.items() %}
@@ -301,15 +290,13 @@
                                         {% endfor %}
                                     </tbody>
                                 </table>
-                                {% else %}
-                                <p style="font-size:13px;color:var(--text-muted);padding:8px 0;">No materials calculated for this stage.</p>
-                                {% endif %}
                             </div>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
 
+                {# ── BUDGET COMPARISON ── #}
                 <div class="card">
                     <div class="section-title">💰 Budget Comparison</div>
                     <table>
@@ -346,86 +333,24 @@
                 <div class="card">
                     <div class="section-title">📋 Project Details</div>
                     <div class="info-list">
-                        <div class="info-row">
-                            <span class="info-label">Area</span>
-                            <span class="info-value">{{ project.square_feet }} sq ft</span>
-                        </div>
-                        {% if project.plot_area %}
-                        <div class="info-row">
-                            <span class="info-label">Plot Area</span>
-                            <span class="info-value">{{ project.plot_area }} sq ft</span>
-                        </div>
+                        <div class="info-row"><span class="info-label">Area</span><span class="info-value">{{ project.square_feet }} sq ft</span></div>
+                        {% if project.get('plot_area') %}
+                        <div class="info-row"><span class="info-label">Plot Area</span><span class="info-value">{{ project.plot_area }} sq ft</span></div>
                         {% endif %}
-                        <div class="info-row">
-                            <span class="info-label">Rooms</span>
-                            <span class="info-value">{{ project.rooms or project.villa_rooms or '—' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Floors</span>
-                            <span class="info-value">{{ project.floors or project.villa_floors or '—' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Bathrooms</span>
-                            <span class="info-value">{{ project.bathrooms or project.villa_bathrooms or '—' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Property Type</span>
-                            <span class="info-value">{{ (project.property_type or 'Residential').title() }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Estimate Scope</span>
+                        <div class="info-row"><span class="info-label">Rooms</span><span class="info-value">{{ project.rooms }}</span></div>
+                        <div class="info-row"><span class="info-label">Floors</span><span class="info-value">{{ project.floors }}</span></div>
+                        <div class="info-row"><span class="info-label">Bathrooms</span><span class="info-value">{{ project.bathrooms }}</span></div>
+                        <div class="info-row"><span class="info-label">Property Type</span><span class="info-value">{{ project.property_type.title() }}</span></div>
+                        <div class="info-row"><span class="info-label">Estimate Scope</span>
                             <span class="info-value">
-                                {% if (project.estimate_scope or '') == 'material_and_labour' %}Material + Labour{% else %}Material Only{% endif %}
+                                {% if project.get('estimate_scope') == 'material_and_labour' %}Material + Labour{% else %}Material Only{% endif %}
                             </span>
                         </div>
-                        <div class="info-row">
-                            <span class="info-label">Budget Range</span>
-                            <span class="info-value">{{ {'low':'Budget','medium':'Standard','high':'Premium'}.get((project.budget_range or 'medium')|lower, (project.budget_range or 'Medium').title()) }}</span>
-                        </div>
-                    </div>
-
-                    <div style="margin-top:16px;">
-                        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:10px;">📍 Location</div>
-                        <div class="location-block">
-                            <div class="location-line">
-                                {% if project.location_address %}<strong>{{ project.location_address }}</strong><br>{% endif %}
-                                {% if project.location_place %}{{ project.location_place }}{% if project.location_district %}, {{ project.location_district }}{% endif %}<br>
-                                {% elif project.location_district %}{{ project.location_district }}<br>{% endif %}
-                                {% if project.location_state %}{{ project.location_state }}{% if project.location_pin %} — {{ project.location_pin }}{% endif %}
-                                {% elif project.location_pin %}PIN: {{ project.location_pin }}{% endif %}
-                                {% if not project.location_address and not project.location_place and not project.location_state %}{{ project.location or 'Location not available' }}{% endif %}
-                            </div>
+                        <div class="info-row"><span class="info-label">Budget Range</span>
+                            <span class="info-value">{{ {'low':'Budget','medium':'Standard','high':'Premium'}.get(project.budget_range|lower, project.budget_range.title()) }}</span>
                         </div>
                     </div>
                 </div>
-
-                <!-- Contractor Info (when assigned) -->
-                {% if project.contractor_id %}
-                <div class="card">
-                    <div class="section-title">🔨 Assigned Contractor</div>
-                    <div class="contractor-strip">
-                        <div class="contractor-strip-label">Contractor</div>
-                        <div class="contractor-strip-name">{{ project.contractor_name or '—' }}</div>
-                        {% if project.contractor_company %}
-                        <div class="contractor-strip-sub">{{ project.contractor_company }}</div>
-                        {% endif %}
-                    </div>
-                    {% if project.agreed_cost %}
-                    <div class="info-list" style="margin-top:12px;">
-                        <div class="info-row">
-                            <span class="info-label">Agreed Cost</span>
-                            <span class="info-value">₹{{ "{:,.0f}".format(project.agreed_cost) }}</span>
-                        </div>
-                        {% if project.agreed_duration %}
-                        <div class="info-row">
-                            <span class="info-label">Duration</span>
-                            <span class="info-value">{{ project.agreed_duration }} days</span>
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                </div>
-                {% endif %}
 
                 <!-- Timeline -->
                 <div class="card">
@@ -435,19 +360,14 @@
                         <div class="timeline-sub">Days · ≈ {{ ((estimation.timeline.get('total_days', 0)) / 30) | round(1) }} months</div>
                     </div>
                     <div class="info-list" style="margin-top:14px;">
-                        {% for stage_key, stage_name in [
-                            ('foundation','Foundation'),('walls','Walls'),
-                            ('flooring','Flooring'),('roofing','Roofing'),
-                            ('plumbing','Plumbing'),('electrical','Electrical'),
-                            ('finishing','Finishing'),('carpentry','Carpentry'),
-                            ('exterior','Exterior')] %}
-                        {% set days = estimation.timeline.get(stage_key, 0) | int %}
-                        {% if days > 0 %}
+                        {% for stage_key, stage_name in [('foundation','Foundation'),('walls','Walls'),
+                            ('flooring','Flooring'),('roofing','Roofing'),('plumbing','Plumbing'),
+                            ('electrical','Electrical'),('finishing','Finishing'),
+                            ('carpentry','Carpentry'),('exterior','Exterior')] %}
                         <div class="info-row">
                             <span class="info-label">{{ stage_name }}</span>
-                            <span class="info-value">{{ days }} days</span>
+                            <span class="info-value">{{ estimation.timeline.get(stage_key, 0) | int }} days</span>
                         </div>
-                        {% endif %}
                         {% endfor %}
                     </div>
                 </div>
@@ -456,33 +376,20 @@
                 <div class="card">
                     <div class="section-title">⚡ Actions</div>
                     <div class="action-buttons">
-                        <a href="{{ url_for('viewer.building_3d_view', project_id=project.id) }}" class="btn-primary" target="_blank">🏗️ View 3D Model</a>
+                       
                         <a href="{{ url_for('user.download_pdf', project_id=project.id) }}" class="btn-primary">📄 Download PDF</a>
                         <a href="{{ url_for('user.project_bids', project_id=project.id) }}" class="btn-primary">📋 View Bids</a>
                         <a href="{{ url_for('user.find_contractors') }}" class="btn-outline">🔨 Find Contractors</a>
                         <a href="{{ url_for('user.order_materials', project_id=project.id) }}" class="btn-outline">📦 Order Materials</a>
                         <a href="{{ url_for('user.edit_project', project_id=project.id) }}" class="btn-outline">✏️ Edit Project</a>
-
-                        {# ── PAY CONTRACTOR (COD) ── show only when contractor is assigned #}
-                        {% if project.contractor_id %}
-                            {% if project.contractor_payment_status == 'paid' %}
-                                <span class="contractor-paid-note">✅ Contractor Paid</span>
-                                <a href="{{ url_for('payment.contractor_receipt', project_id=project.id) }}" class="btn-outline" style="text-align:center;">🧾 Payment Receipt</a>
-                            {% elif project.contractor_payment_status == 'cod_confirmed' %}
-                                <span class="contractor-paid-note" style="background:#FBF3E0;color:#856404;border-color:#F0D9A0;">💵 COD Confirmed · Pending cash handover</span>
-                                <a href="{{ url_for('payment.contractor_receipt', project_id=project.id) }}" class="btn-outline" style="text-align:center;">🧾 Payment Receipt</a>
-                            {% else %}
-                                <a href="{{ url_for('payment.pay_contractor', project_id=project.id) }}" class="btn-pay-contractor">💳 Pay Contractor (COD)</a>
-                            {% endif %}
-                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {# ── RATING MODAL ── #}
-    {% if project.status == 'completed' and not project.reviewed and project.contractor_id %}
+    <!-- Rating Modal -->
+    {% if project.status == 'completed' and not project.get('reviewed', False) and project.get('contractor_id') %}
     <div id="ratingModal" class="modal-overlay">
         <div class="modal-box">
             <h2>⭐ Rate Your Contractor</h2>
@@ -513,7 +420,10 @@
             const content = document.getElementById('stage-' + key);
             const header  = content.previousElementSibling;
             document.querySelectorAll('.stage-content').forEach(el => {
-                if (el.id !== 'stage-' + key) { el.classList.remove('active'); el.previousElementSibling.classList.remove('active'); }
+                if (el.id !== 'stage-' + key) {
+                    el.classList.remove('active');
+                    el.previousElementSibling.classList.remove('active');
+                }
             });
             content.classList.toggle('active');
             header.classList.toggle('active');
@@ -524,20 +434,30 @@
         document.querySelectorAll('.star').forEach(star => {
             star.addEventListener('mouseenter', function() {
                 const r = parseInt(this.dataset.rating);
-                document.querySelectorAll('.star').forEach((s,i) => s.style.color = i < r ? '#F59E0B' : 'var(--stone)');
+                document.querySelectorAll('.star').forEach((s,i) =>
+                    s.style.color = i < r ? '#F59E0B' : 'var(--stone)');
             });
             star.addEventListener('mouseleave', () => {
-                document.querySelectorAll('.star').forEach((s,i) => s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
+                document.querySelectorAll('.star').forEach((s,i) =>
+                    s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
             });
             star.addEventListener('click', function() {
                 selectedRating = parseInt(this.dataset.rating);
                 document.getElementById('ratingValue').value = selectedRating;
-                document.querySelectorAll('.star').forEach((s,i) => s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
+                document.querySelectorAll('.star').forEach((s,i) =>
+                    s.style.color = i < selectedRating ? '#F59E0B' : 'var(--stone)');
             });
         });
 
-        window.addEventListener('load', () => { const m = document.getElementById('ratingModal'); if (m) m.classList.add('show'); });
-        function closeRatingModal() { const m = document.getElementById('ratingModal'); if (m) m.classList.remove('show'); }
+        window.addEventListener('load', () => {
+            const modal = document.getElementById('ratingModal');
+            if (modal) modal.classList.add('show');
+        });
+
+        function closeRatingModal() {
+            const modal = document.getElementById('ratingModal');
+            if (modal) modal.classList.remove('show');
+        }
 
         const ratingForm = document.getElementById('ratingForm');
         if (ratingForm) {

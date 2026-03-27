@@ -3,502 +3,1119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Details - House-Forge</title>
+    <title>{{ project.title }} — Project Details · House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --cream: #F0F4F8;
+            --warm-white: #FFFFFF;
+            --sand: #E8EEF4;
+            --stone: #C8D8E8;
+            --accent: #1B4F72;
+            --accent-dark: #0E2F44;
+            --accent-light: #D6E8F5;
+            --accent-mid: #2E86C1;
+            --text-primary: #0D1B2A;
+            --text-secondary: #2C4A6E;
+            --text-muted: #6B8CAE;
+            --border: rgba(27,79,114,0.15);
+            --shadow-sm: 0 1px 3px rgba(13,27,42,0.06), 0 1px 2px rgba(13,27,42,0.04);
+            --shadow-md: 0 4px 16px rgba(13,27,42,0.08), 0 2px 6px rgba(13,27,42,0.05);
+            --shadow-lg: 0 12px 40px rgba(13,27,42,0.12);
+            --gold: #C9A84C;
+            --gold-light: #FBF3E0;
+            --green: #16A34A;
+            --green-light: #DCFCE7;
         }
-        
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-        }
-        
-        .navbar {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .navbar-brand {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .navbar-menu {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        
-        .navbar-menu a {
-            color: white;
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            transition: background 0.3s;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            min-height: 100vh;
+            color: var(--text-primary);
             position: relative;
         }
-        
-        .navbar-menu a:hover {
-            background: rgba(255,255,255,0.2);
+
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background: url('/static/images/house.jpg') no-repeat center / cover;
+            opacity: 0.05; z-index: 0; pointer-events: none;
         }
 
+        /* ─── NAVBAR ─── */
+        .navbar {
+            background: var(--warm-white);
+            border-bottom: 1px solid var(--stone);
+            padding: 0 40px; height: 68px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px; font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .navbar-menu { display: flex; align-items: center; gap: 4px; }
+        .navbar-menu a {
+            color: var(--text-secondary); text-decoration: none;
+            padding: 8px 14px; border-radius: 8px;
+            font-size: 14px; font-weight: 500;
+            transition: all 0.2s; position: relative;
+        }
+        .navbar-menu a:hover { color: var(--accent); background: var(--accent-light); }
         .badge-notification {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ff3b30;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: bold;
+            position: absolute; top: 2px; right: 2px;
+            background: #DC2626; color: white;
+            border-radius: 50%; width: 18px; height: 18px;
+            display: none; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 700;
+            border: 2px solid var(--warm-white);
+        }
+        .profile-pic { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); }
+        .profile-placeholder {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--accent-light); color: var(--accent);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 14px; border: 2px solid var(--stone);
+        }
+        .logout-link { color: var(--text-muted) !important; font-size: 13px !important; }
+
+        /* ─── LAYOUT ─── */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+        /* ─── HERO ─── */
+        .hero {
+            background: linear-gradient(135deg, #0D1B2A 0%, #1B4F72 50%, #0D1B2A 100%);
+            padding: 44px 40px 52px;
+            text-align: center; position: relative; overflow: hidden;
+            animation: fadeDown 0.45s ease both;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+            width: 480px; height: 480px;
+            background: radial-gradient(circle, rgba(27,79,114,0.35) 0%, transparent 65%);
             pointer-events: none;
         }
+        .hero::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(200,216,232,0.3), transparent);
+        }
 
-        .profile-pic {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid white;
-            cursor: pointer;
-            transition: transform 0.3s;
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px; padding: 5px 14px;
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.8px; color: rgba(255,255,255,0.65);
+            margin-bottom: 16px;
         }
-        
-        .profile-pic:hover {
-            transform: scale(1.1);
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px; font-weight: 800;
+            color: #E8F4FF; margin-bottom: 8px; letter-spacing: -0.5px;
         }
-        
-        .profile-placeholder {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: white;
-            color: #667eea;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-            border: 2px solid white;
-            cursor: pointer;
-            transition: transform 0.3s;
+
+        .hero-sub { color: rgba(232,244,255,0.55); font-size: 14px; margin-bottom: 20px; }
+
+        .hero-divider {
+            width: 44px; height: 3px;
+            background: linear-gradient(90deg, var(--accent-mid), #60A5FA);
+            border-radius: 2px; margin: 0 auto 20px;
         }
-        
-        .profile-placeholder:hover {
-            transform: scale(1.1);
+
+        .hero-badges { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .hero-badge {
+            background: rgba(232,244,255,0.1); border: 1px solid rgba(232,244,255,0.18);
+            color: rgba(232,244,255,0.8);
+            padding: 5px 14px; border-radius: 20px;
+            font-size: 11px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 5px;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
+        .hero-badge.warn {
+            background: rgba(245,158,11,0.2); border-color: rgba(245,158,11,0.35);
+            color: #FDE68A;
         }
-        
-        .back-link {
-            color: #f5576c;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 20px;
-            font-weight: 600;
+        .hero-badge.success {
+            background: rgba(22,163,74,0.2); border-color: rgba(22,163,74,0.35);
+            color: #86EFAC;
         }
-        
-        .back-link:hover {
-            text-decoration: underline;
+
+        /* ─── DISCLAIMER ─── */
+        .disclaimer {
+            background: #FFFBEB;
+            border-bottom: 1px solid #FDE68A;
+            padding: 9px 24px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-size: 12px; color: #92400E; font-weight: 500;
         }
-        
-        .page-header {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+
+        /* ─── COST TIER STRIP ─── */
+        .tier-strip {
+            background: var(--warm-white);
+            border-bottom: 1px solid var(--stone);
         }
-        
-        .project-title {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 15px;
+        .tier-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
         }
-        
-        .project-meta {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-            color: #666;
+        .tier-block {
+            padding: 24px 28px; text-align: center;
+            border-right: 1px solid var(--stone);
+            position: relative; cursor: default;
         }
-        
-        .two-column {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 30px;
+        .tier-block:last-child { border-right: none; }
+        .tier-block.active { background: var(--accent); }
+        .tier-block.active::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+            background: var(--accent-dark);
         }
-        
-        .section {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        .tier-icon-wrap {
+            width: 36px; height: 36px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 10px;
+            background: var(--sand); color: var(--text-muted);
+            transition: all 0.2s;
         }
-        
-        .section-title {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-            font-weight: 600;
+        .tier-block.active .tier-icon-wrap { background: rgba(255,255,255,0.15); color: white; }
+        .tier-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 6px; }
+        .tier-block.active .tier-lbl { color: rgba(255,255,255,0.65); }
+        .tier-total { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--text-primary); line-height: 1; margin-bottom: 6px; }
+        .tier-block.active .tier-total { color: white; }
+        .tier-det { font-size: 12px; color: var(--text-muted); line-height: 1.8; }
+        .tier-block.active .tier-det { color: rgba(255,255,255,0.6); }
+        .tier-sqft { margin-top: 8px; font-size: 11px; font-weight: 700; color: var(--accent-mid); background: var(--accent-light); padding: 2px 10px; border-radius: 20px; display: inline-block; }
+        .tier-block.active .tier-sqft { background: rgba(255,255,255,0.15); color: white; }
+        .tier-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; background: var(--gold); color: #0A0A0A; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 4px; }
+
+        /* ─── WRAP ─── */
+        .wrap {
+            max-width: 1200px; margin: 28px auto 60px;
+            padding: 0 24px;
+            display: grid; grid-template-columns: 1fr 320px;
+            gap: 20px; align-items: start;
+            position: relative; z-index: 1;
+            animation: fadeUp 0.45s 0.1s ease both;
         }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+        @media (max-width: 900px) {
+            .wrap { grid-template-columns: 1fr; }
+            .tier-inner { grid-template-columns: 1fr; }
+            .tier-block { border-right: none; border-bottom: 1px solid var(--stone); }
+            .tier-block:last-child { border-bottom: none; }
         }
-        
-        .info-item {
-            display: flex;
-            flex-direction: column;
+
+        /* ─── CARD ─── */
+        .card {
+            background: var(--warm-white);
+            border: 1px solid var(--stone);
+            border-radius: 16px; padding: 26px 30px;
+            margin-bottom: 18px; box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s;
         }
-        
-        .info-label {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 5px;
-            font-weight: 600;
+        .card:hover { box-shadow: var(--shadow-md); }
+
+        .sec-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 17px; font-weight: 700; color: var(--text-primary);
+            margin-bottom: 18px; padding-bottom: 13px;
+            border-bottom: 1px solid var(--sand);
+            display: flex; align-items: center; gap: 10px;
         }
-        
-        .info-value {
-            font-size: 16px;
-            color: #333;
-            font-weight: 500;
+        .sec-title svg { color: var(--accent); flex-shrink: 0; }
+        .sec-badge {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            background: var(--accent-light); color: var(--accent);
+            padding: 3px 9px; border-radius: 20px;
+            border: 1px solid rgba(27,79,114,0.2);
+            margin-left: auto; flex-shrink: 0;
         }
-        
-        .budget-card {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 20px;
+
+        /* ─── METRICS ROW ─── */
+        .metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 18px; }
+        @media (max-width:600px) { .metrics { grid-template-columns: 1fr 1fr; } }
+        .metric {
+            background: var(--warm-white); border: 1px solid var(--stone);
+            border-radius: 14px; padding: 18px 14px; text-align: center;
+            box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s;
+            position: relative; overflow: hidden;
         }
-        
-        .budget-label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 10px;
+        .metric:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+        .metric::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-mid));
+            transform: scaleX(0); transform-origin: left; transition: transform 0.25s;
         }
-        
-        .budget-value {
-            font-size: 32px;
-            font-weight: bold;
+        .metric:hover::after { transform: scaleX(1); }
+        .m-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+        .m-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+        .m-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 5px; }
+
+        /* ─── AI BLOCK ─── */
+        .ai-blk {
+            background: linear-gradient(90deg, #EFF6FF, #F0F9FF);
+            border: 1px solid #BFDBFE; border-radius: 12px;
+            padding: 14px 18px; margin-bottom: 18px;
+            display: flex; gap: 12px;
         }
-        
-        .btn {
-            padding: 14px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            font-size: 15px;
-            display: block;
-            width: 100%;
-            margin-bottom: 10px;
+        .ai-ico { width: 30px; height: 30px; border-radius: 8px; background: #2563EB; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+        .ai-ttl { font-size: 11px; font-weight: 700; color: #1E40AF; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ai-txt { font-size: 13px; color: #1D4ED8; line-height: 1.6; }
+
+        /* ─── KEY MATERIALS CHIPS ─── */
+        .hgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+        @media(max-width:600px) { .hgrid { grid-template-columns: 1fr 1fr; } }
+        .hchip {
+            background: var(--sand); border: 1px solid var(--stone);
+            border-radius: 10px; padding: 12px 13px;
+            display: flex; align-items: center; gap: 10px;
+            transition: border-color 0.2s, background 0.2s;
         }
-        
+        .hchip:hover { border-color: var(--accent); background: var(--accent-light); }
+        .hc-ico { width: 28px; height: 28px; border-radius: 7px; background: var(--warm-white); color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .hc-qty { font-size: 13px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+        .hc-lbl { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+        /* ─── PROPERTY TYPE BANNER ─── */
+        .prop-ban {
+            border-radius: 12px; padding: 14px 18px; margin-bottom: 18px;
+            display: flex; align-items: center; gap: 14px;
+            border: 1px solid var(--stone);
+        }
+        .prop-ban.residential { background: var(--sand); }
+        .prop-ban.villa       { background: #FEF3C7; border-color: #FDE68A; }
+        .prop-ban.apartment   { background: var(--accent-light); border-color: var(--stone); }
+        .pb-ico { width: 42px; height: 42px; border-radius: 11px; background: var(--warm-white); color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+        .prop-ban.villa .pb-ico       { color: #92400E; }
+        .prop-ban.apartment .pb-ico   { color: var(--accent); }
+        .pb-h   { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+        .pb-sub { font-size: 12px; color: var(--text-muted); }
+
+        /* ─── STAGE ACCORDION ─── */
+        .sacc {
+            border: 1.5px solid var(--stone); border-radius: 10px;
+            overflow: hidden; margin-bottom: 8px;
+            transition: border-color 0.2s;
+        }
+        .sacc:hover { border-color: rgba(27,79,114,0.4); }
+        .sacc.expanded { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(27,79,114,0.10); }
+        .sh {
+            padding: 13px 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--sand); transition: background 0.2s; user-select: none;
+        }
+        .sh:hover { background: var(--accent-light); }
+        .sh.open  { background: var(--accent); }
+        .sh-l { display: flex; align-items: center; gap: 10px; }
+        .sh-ico { width: 30px; height: 30px; border-radius: 7px; background: var(--warm-white); color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+        .sh.open .sh-ico { background: rgba(255,255,255,0.18); color: white; }
+        .sh-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+        .sh.open .sh-name { color: white; }
+        .sh-sub  { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+        .sh.open .sh-sub  { color: rgba(255,255,255,0.6); }
+        .sh-r { display: flex; align-items: center; gap: 10px; }
+        .sh-bw { width: 60px; height: 4px; background: rgba(0,0,0,0.08); border-radius: 2px; overflow: hidden; }
+        .sh-bar { height: 100%; border-radius: 2px; background: var(--accent-mid); }
+        .sh.open .sh-bar { background: rgba(255,255,255,0.5); }
+        .sh-cost { font-size: 13px; font-weight: 700; color: var(--accent-mid); min-width: 64px; text-align: right; }
+        .sh.open .sh-cost { color: white; }
+        .sh-arr { width: 20px; height: 20px; border-radius: 50%; background: rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center; transition: transform 0.3s; }
+        .sh.open .sh-arr { transform: rotate(180deg); background: rgba(255,255,255,0.18); color: white; }
+        .sb { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .sb.open { max-height: 1600px; }
+        .mat-wrap { padding: 14px 18px 18px; }
+        .mat-tbl { width: 100%; border-collapse: collapse; }
+        .mat-tbl th { padding: 8px 12px; text-align: left; background: var(--sand); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); }
+        .mat-tbl th:first-child { border-radius: 6px 0 0 6px; }
+        .mat-tbl th:last-child  { border-radius: 0 6px 6px 0; }
+        .mat-tbl td { padding: 9px 12px; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--sand); }
+        .mat-tbl tr:last-child td { border-bottom: none; }
+        .mat-tbl tr:hover td { background: var(--cream); }
+        .mat-qty  { font-weight: 700; color: var(--text-primary); }
+        .mat-unit { font-size: 11px; color: var(--text-muted); }
+
+        /* ─── BUDGET TABLE ─── */
+        .btbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .btbl th { padding: 9px 13px; text-align: left; background: var(--sand); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); }
+        .btbl th:first-child { border-radius: 6px 0 0 6px; }
+        .btbl th:last-child  { border-radius: 0 6px 6px 0; }
+        .btbl td { padding: 9px 13px; color: var(--text-secondary); border-bottom: 1px solid var(--sand); }
+        .btbl tr:last-child td { border-bottom: none; }
+        .btbl tr.sel td { background: var(--accent-light); font-weight: 700; color: var(--text-primary); }
+        .btbl td.amt { font-weight: 700; color: var(--text-primary); }
+
+        /* ─── CONSTRUCTION SPEC TABLE ─── */
+        .spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        @media(max-width:600px) { .spec-grid { grid-template-columns: 1fr; } }
+        .spec-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 9px 12px; background: var(--sand); border-radius: 8px; gap: 10px; }
+        .spec-lbl { font-size: 12px; color: var(--text-muted); font-weight: 500; flex-shrink: 0; }
+        .spec-val { font-size: 12px; font-weight: 700; color: var(--text-primary); text-align: right; }
+
+        /* ─── TIMELINE CARD ─── */
+        .tl-wrap { background: linear-gradient(135deg, var(--accent-light), #DBEAFE); border: 1px solid var(--stone); border-radius: 12px; padding: 20px 22px; display: flex; align-items: flex-start; gap: 20px; }
+        .tl-big-wrap { text-align: center; flex-shrink: 0; }
+        .tl-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 4px; }
+        .tl-num { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 700; color: var(--accent); line-height: 1; }
+        .tl-sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .tl-stages { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; }
+        .tl-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); padding: 3px 0; border-bottom: 1px solid rgba(27,79,114,0.1); }
+        .tl-row:last-child { border-bottom: none; }
+        .tl-d { font-weight: 700; color: var(--text-primary); }
+
+        /* ─── SIDEBAR ─── */
+        .scard { background: var(--warm-white); border: 1px solid var(--stone); border-radius: 16px; padding: 22px 24px; margin-bottom: 16px; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s; }
+        .scard:hover { box-shadow: var(--shadow-md); }
+        .stitle { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--sand); display: flex; align-items: center; gap: 8px; }
+        .stitle svg { color: var(--accent); }
+        .irow { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--sand); gap: 8px; }
+        .irow:last-child { border-bottom: none; }
+        .ilbl { font-size: 12px; color: var(--text-muted); font-weight: 500; flex-shrink: 0; }
+        .ival { font-size: 12px; font-weight: 700; color: var(--text-primary); text-align: right; }
+
+        /* sidebar mini bars */
+        .sml { display: flex; flex-direction: column; }
+        .smr { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--sand); }
+        .smr:last-child { border-bottom: none; }
+        .sm-lbl { font-size: 11px; color: var(--text-secondary); flex: 0 0 76px; font-weight: 500; }
+        .sm-bw  { flex: 1; height: 4px; background: var(--sand); border-radius: 2px; overflow: hidden; }
+        .sm-bar { height: 100%; border-radius: 2px; background: var(--accent-mid); }
+        .sm-amt { font-size: 11px; font-weight: 700; color: var(--text-primary); width: 54px; text-align: right; flex-shrink: 0; }
+
+        /* bid banner */
+        .bid-banner {
+            background: linear-gradient(90deg, var(--green-light), #F0FDF4);
+            border: 1.5px solid #86EFAC; border-radius: 12px;
+            padding: 14px 18px; margin-bottom: 16px;
+            display: flex; gap: 12px; align-items: flex-start;
+        }
+        .bid-banner-ico { font-size: 24px; flex-shrink: 0; }
+        .bid-banner-ttl { font-size: 12px; font-weight: 700; color: var(--green); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+        .bid-banner-txt { font-size: 13px; color: #166534; line-height: 1.5; }
+
+        .already-bid {
+            background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: 12px;
+            padding: 14px 18px; margin-bottom: 16px;
+            font-size: 13px; color: #92400E; font-weight: 500;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        /* Action buttons */
         .btn-primary {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
+            display: block; width: 100%; padding: 13px 18px;
+            background: var(--accent); color: white; border: none;
+            border-radius: 10px; font-weight: 700; font-size: 14px;
+            text-decoration: none; text-align: center;
+            transition: all 0.2s; cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            margin-bottom: 10px;
         }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 5px 18px rgba(27,79,114,0.35); }
+        .btn-outline {
+            display: block; width: 100%; padding: 11px 18px;
+            background: transparent; color: var(--accent);
+            border: 1.5px solid rgba(27,79,114,0.3); border-radius: 10px;
+            font-weight: 600; font-size: 14px;
+            text-decoration: none; text-align: center;
+            transition: all 0.2s; margin-bottom: 10px;
         }
-        
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background: #218838;
-        }
-        
+        .btn-outline:hover { background: var(--accent-light); border-color: var(--accent); }
         .btn-disabled {
-            background: #e0e0e0;
-            color: #999;
-            cursor: not-allowed;
+            display: block; width: 100%; padding: 13px 18px;
+            background: var(--sand); color: var(--text-muted);
+            border: 1.5px solid var(--stone); border-radius: 10px;
+            font-weight: 600; font-size: 14px;
+            text-align: center; cursor: not-allowed; margin-bottom: 10px;
         }
-        
-        .alert {
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+
+        /* scope badge */
+        .scope-pill {
+            display: inline-block; padding: 4px 12px; border-radius: 20px;
+            font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
         }
-        
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-        
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        
-        @media (max-width: 1024px) {
-            .two-column {
-                grid-template-columns: 1fr;
-            }
+        .scope-mat  { background: var(--gold-light); color: #92400E; }
+        .scope-full { background: var(--green-light); color: var(--green); }
+
+        /* status */
+        .status-pill { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+        .status-planning  { background: #FEF3C7; color: #92400E; }
+        .status-active    { background: #DBEAFE; color: #1E40AF; }
+        .status-completed { background: var(--green-light); color: var(--green); }
+
+        /* ─── ALERTS ─── */
+        .alert { padding: 13px 18px; border-radius: 10px; margin-bottom: 16px; font-size: 14px; font-weight: 500; }
+        .alert-success { background: var(--green-light); color: #065F46; border: 1px solid #6EE7B7; }
+        .alert-error   { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+
+        /* ─── ANIMATIONS ─── */
+        @keyframes fadeDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp   { from { opacity: 0; transform: translateY(14px);  } to { opacity: 1; transform: translateY(0); } }
+
+        @media(max-width:768px) {
+            .navbar { padding: 0 16px; }
+            .hero { padding: 32px 20px 40px; }
+            .hero h1 { font-size: 24px; }
+            .wrap { padding: 0 16px; }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="navbar-brand">🔨 House-Forge Contractor</div>
-        <div class="navbar-menu">
-            <a href="{{ url_for('contractor.dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('contractor.browse_projects') }}">Browse Projects</a>
-            <a href="{{ url_for('contractor.my_bids') }}">My Bids</a>
-            <a href="{{ url_for('contractor.messages') }}" style="position: relative;">
-        Messages
-        <span class="badge-notification" id="messagesBadge" style="display: none;">0</span>
-    </a>
-            <a href="{{ url_for('contractor.profile') }}">
-                {% if contractor_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ contractor_profile_picture }}" 
-                         alt="Profile" 
-                         class="profile-pic">
-                {% else %}
-                    <div class="profile-placeholder">
-                        {{ current_user.name[0].upper() if current_user.name else 'U' }}
-                    </div>
-                {% endif %}
-            </a>
-            <a href="{{ url_for('auth.logout') }}">Logout</a>
-        </div>
-    </nav>
-    
-    <div class="container">
-        <a href="{{ url_for('contractor.browse_projects') }}" class="back-link">
-            ← Back to Projects
+
+<!-- ─── NAVBAR ─── -->
+<nav class="navbar">
+    <a href="{{ url_for('contractor.dashboard') }}" class="navbar-brand">🔨 House-Forge</a>
+    <div class="navbar-menu">
+        <a href="{{ url_for('contractor.dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('contractor.browse_projects') }}">Browse</a>
+        <a href="{{ url_for('contractor.my_bids') }}">My Bids</a>
+        <a href="{{ url_for('contractor.my_projects') }}">My Projects</a>
+        <a href="{{ url_for('contractor.messages') }}" style="position:relative;">
+            Messages
+            <span class="badge-notification" id="messagesBadge">0</span>
         </a>
-        
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="project-title">{{ project.title }}</h1>
-            <div class="project-meta">
-                <span>📍 {{ project.location or 'Location not specified' }}</span>
-                <span>📏 {{ project.square_feet }} sq ft</span>
-                <span>🚪 {{ project.rooms }} Rooms</span>
-                <span>🏢 {{ project.floors }} Floors</span>
+        <a href="{{ url_for('contractor.profile') }}" style="padding:8px 10px;">
+            {% if contractor_profile_picture %}
+                <img src="/static/uploads/profiles/{{ contractor_profile_picture }}" alt="Profile" class="profile-pic">
+            {% else %}
+                <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'C' }}</div>
+            {% endif %}
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="logout-link">Logout</a>
+    </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<div class="hero">
+    <div class="hero-eyebrow">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Project Details
+    </div>
+    <h1>{{ project.title }}</h1>
+    <div class="hero-divider"></div>
+    <p class="hero-sub">📍 {{ project.location }} &nbsp;·&nbsp; {{ project.square_feet | int }} sq ft &nbsp;·&nbsp; {{ (project.property_type or 'residential') | title }}</p>
+    <div class="hero-badges">
+        <span class="hero-badge">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            {{ project.floors or 1 }} Floor{{ 's' if (project.floors or 1) > 1 else '' }}
+        </span>
+        <span class="hero-badge">{{ project.rooms }} Rooms</span>
+        <span class="hero-badge">{{ project.bathrooms or 2 }} Baths</span>
+        <span class="hero-badge">{{ project.budget_range | title }} Budget</span>
+        {% if estimation.get('ai_success') %}
+            <span class="hero-badge success">AI-refined estimate</span>
+        {% else %}
+            <span class="hero-badge warn">Base rate estimate</span>
+        {% endif %}
+        {% if project.has_bid %}
+            <span class="hero-badge" style="background:rgba(22,163,74,0.2);border-color:rgba(22,163,74,0.35);color:#86EFAC;">✓ Bid Submitted</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ─── DISCLAIMER ─── -->
+{% if estimation %}
+<div class="disclaimer">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Estimation reflects March 2026 Indian market averages{% if estimation.get('ai_success') %}, refined by AI for this location and spec{% endif %}. Use as a reference when preparing your bid.
+</div>
+{% endif %}
+
+<!-- ─── COST TIER STRIP ─── -->
+{% if estimation and estimation.get('costs') %}
+{% set budget = (project.budget_range or 'medium') | lower %}
+{% set sqf    = project.square_feet | float or 1 %}
+<div class="tier-strip">
+    <div class="tier-inner">
+        {% for tk, tsvg, tl in [
+            ('low',    '<circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/>', 'Budget'),
+            ('medium', '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',                                                                'Standard'),
+            ('high',   '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',                                                 'Premium')
+        ] %}
+        {% set tc = estimation.costs.get(tk, {}) %}
+        {% set tv = tc.get('total_cost', 0) %}
+        <div class="tier-block {% if tk == budget %}active{% endif %}">
+            {% if tk == budget %}<div class="tier-badge">Owner's Choice</div>{% endif %}
+            <div class="tier-icon-wrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ tsvg | safe }}</svg>
+            </div>
+            <div class="tier-lbl">{{ tl }}</div>
+            <div class="tier-total">
+                {% if tv >= 10000000 %}₹{{ "%.2f"|format(tv/10000000) }} Cr
+                {% elif tv >= 100000  %}₹{{ "%.1f"|format(tv/100000)  }} L
+                {% else %}₹{{ "{:,.0f}".format(tv) }}{% endif %}
+            </div>
+            <div class="tier-det">
+                Materials: ₹{{ "{:,.0f}".format(tc.get('material_cost',0)) }}<br>
+                Labour: ₹{{ "{:,.0f}".format(tc.get('labor_cost',0)) }}<br>
+                Other: ₹{{ "{:,.0f}".format(tc.get('other_costs',0)) }}
+            </div>
+            <span class="tier-sqft">₹{{ "{:,.0f}".format((tv / sqf) | round) }}/sqft</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- ─── MAIN BODY ─── -->
+<div class="wrap">
+    <!-- LEFT COLUMN -->
+    <div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}{% endif %}
+        {% endwith %}
+
+        <!-- Property type banner -->
+        {% set prop_type = project.property_type or 'residential' %}
+        <div class="prop-ban {{ prop_type }}">
+            <div class="pb-ico">
+                {% if prop_type == 'villa' %}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" y1="22" x2="9" y2="12"/><line x1="15" y1="22" x2="15" y2="12"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+                {% elif prop_type == 'apartment' %}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+                {% else %}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                {% endif %}
+            </div>
+            <div>
+                <div class="pb-h">
+                    {% if prop_type == 'villa' %}Villa Construction{% elif prop_type == 'apartment' %}Apartment Building{% else %}Residential Construction{% endif %}
+                </div>
+                <div class="pb-sub">
+                    {{ project.floors or 1 }} floor(s) · {{ project.rooms }} rooms · {{ project.bathrooms or 2 }} bathrooms · {{ (project.estimate_scope or 'material_only').replace('_',' ').title() }}
+                </div>
+            </div>
+            <div style="margin-left:auto;">
+                <span class="status-pill status-{{ project.status or 'planning' }}">{{ (project.status or 'planning').upper() }}</span>
             </div>
         </div>
-        
-        <!-- Status Messages -->
-        {% if project.has_bid %}
-        <div class="alert alert-info">
-            ✓ You have already submitted a bid for this project.
+
+        <!-- Key metrics (only if estimation exists) -->
+        {% if estimation and estimation.get('costs') %}
+        {% set budget = (project.budget_range or 'medium') | lower %}
+        {% set sel = estimation.costs.get(budget, estimation.costs.get('medium', {})) %}
+        {% set tot = sel.get('total_cost', 0) %}
+        {% set sqf = project.square_feet | float or 1 %}
+        <div class="metrics">
+            <div class="metric">
+                <div class="m-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                <div class="m-val">
+                    {% if tot >= 10000000 %}₹{{ "%.1f"|format(tot/10000000) }}Cr
+                    {% elif tot >= 100000  %}₹{{ "%.1f"|format(tot/100000)  }}L
+                    {% else %}₹{{ "{:,.0f}".format(tot) }}{% endif %}
+                </div>
+                <div class="m-lbl">Total Est. Cost</div>
+            </div>
+            <div class="metric">
+                <div class="m-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/></svg></div>
+                <div class="m-val">₹{{ "{:,.0f}".format((tot / sqf) | round) }}</div>
+                <div class="m-lbl">Per Sq Ft</div>
+            </div>
+            <div class="metric">
+                <div class="m-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                <div class="m-val">{{ estimation.timeline.get('total_days', 0) | int }}</div>
+                <div class="m-lbl">Days to Build</div>
+            </div>
+            <div class="metric">
+                <div class="m-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+                <div class="m-val">{{ estimation.total_materials_count }}+</div>
+                <div class="m-lbl">Material Items</div>
+            </div>
+        </div>
+
+        <!-- AI rationale -->
+        {% if estimation.get('ai_rationale') %}
+        <div class="ai-blk">
+            <div class="ai-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+            <div>
+                <div class="ai-ttl">{% if estimation.get('ai_success') %}AI-Refined Estimate{% else %}Base Rate Estimate{% endif %}</div>
+                <div class="ai-txt">{{ estimation.ai_rationale }}</div>
+            </div>
         </div>
         {% endif %}
-        
-        <div class="two-column">
-            <!-- Main Content -->
-            <div>
-                <!-- Project Details -->
-                <div class="section">
-                    <h3 class="section-title">📋 Project Details</h3>
-                    
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Total Area</span>
-                            <span class="info-value">{{ project.square_feet }} sq ft</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Location</span>
-                            <span class="info-value">{{ project.location or 'Not specified' }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Number of Rooms</span>
-                            <span class="info-value">{{ project.rooms }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Number of Floors</span>
-                            <span class="info-value">{{ project.floors }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Bathrooms</span>
-                            <span class="info-value">{{ project.bathrooms or 2 }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Property Type</span>
-                            <span class="info-value">{{ project.property_type.title() if project.property_type else 'Residential' }}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Description -->
-                {% if project.description %}
-                <div class="section">
-                    <h3 class="section-title">📝 Project Description</h3>
-                    <p style="color: #666; line-height: 1.8;">{{ project.description }}</p>
+
+        <!-- Key material highlights -->
+        {% set fm = estimation.materials %}
+        {% set cement_total = (
+            (fm.get('foundation',{}).get('cement_bags',0) or 0) +
+            (fm.get('walls',     {}).get('cement_bags',0) or 0) +
+            (fm.get('flooring',  {}).get('cement_bags',0) or 0) +
+            (fm.get('roofing',   {}).get('cement_bags',0) or 0)
+        ) | round | int %}
+        {% set steel_total = (
+            (fm.get('foundation',{}).get('steel_kg',0) or 0) +
+            (fm.get('flooring',  {}).get('steel_kg',0) or 0) +
+            (fm.get('roofing',   {}).get('steel_kg',0) or 0)
+        ) | round | int %}
+        <div class="card">
+            <div class="sec-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Key Material Quantities
+                <span class="sec-badge">Quick Reference</span>
+            </div>
+            <div class="hgrid">
+                {% if cement_total > 0 %}
+                <div class="hchip">
+                    <div class="hc-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+                    <div><div class="hc-qty">{{ "{:,}".format(cement_total) }}</div><div class="hc-lbl">Cement Bags (50 kg)</div></div>
                 </div>
                 {% endif %}
-                
-                <!-- Owner Info -->
-                <div class="section">
-                    <h3 class="section-title">👤 Project Owner</h3>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Name</span>
-                            <span class="info-value">{{ project.user_name or 'N/A' }}</span>
-                        </div>
-                        <div style="margin-top: 15px;">
-                         <a href="{{ url_for('contractor.user_profile', user_id=project.user_id) }}" class="btn btn-outline">
-                             View Profile
-                         </a>
-                        </div>
-                    </div>
+                {% if steel_total > 0 %}
+                <div class="hchip">
+                    <div class="hc-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                    <div><div class="hc-qty">{{ "{:,}".format(steel_total) }} kg</div><div class="hc-lbl">TMT Steel</div></div>
                 </div>
-                
-                <!-- Existing Bid Info -->
-                {% if project.has_bid and project.existing_bid %}
-                <div class="section">
-                    <h3 class="section-title">📋 Your Submitted Bid</h3>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Total Cost</span>
-                            <span class="info-value">₹{{ "{:,.0f}".format(project.existing_bid.total_cost) }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Duration</span>
-                            <span class="info-value">{{ project.existing_bid.duration_days }} days</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Status</span>
-                            <span class="info-value">{{ project.existing_bid.status.title() }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Submitted</span>
-                            <span class="info-value">{{ project.existing_bid.created_at.strftime('%d %b %Y') if project.existing_bid.created_at else 'N/A' }}</span>
-                        </div>
-                    </div>
+                {% endif %}
+                {% if fm.get('walls',{}).get('bricks_or_blocks',0) %}
+                <div class="hchip">
+                    <div class="hc-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
+                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('walls',{}).get('bricks_or_blocks',0) | int) }}</div><div class="hc-lbl">Bricks / Blocks</div></div>
+                </div>
+                {% endif %}
+                {% if fm.get('flooring',{}).get('floor_tiles_sqft',0) %}
+                <div class="hchip">
+                    <div class="hc-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/></svg></div>
+                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('flooring',{}).get('floor_tiles_sqft',0)|round|int) }} sqft</div><div class="hc-lbl">Floor Tiles</div></div>
+                </div>
+                {% endif %}
+                {% if fm.get('finishing',{}).get('interior_paint_liters',0) %}
+                <div class="hchip">
+                    <div class="hc-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('finishing',{}).get('interior_paint_liters',0)|round|int) }} L</div><div class="hc-lbl">Interior Paint</div></div>
+                </div>
+                {% endif %}
+                {% if fm.get('plumbing',{}).get('toilets',0) %}
+                <div class="hchip">
+                    <div class="hc-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3a2 2 0 0 0-2 2v4a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6V5a2 2 0 0 0-2-2H5z"/></svg></div>
+                    <div><div class="hc-qty">{{ fm.get('plumbing',{}).get('toilets',0) }} sets</div><div class="hc-lbl">Sanitary Sets</div></div>
+                </div>
+                {% endif %}
+                {% if fm.get('electrical',{}).get('wiring_meters',0) %}
+                <div class="hchip">
+                    <div class="hc-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('electrical',{}).get('wiring_meters',0)|round|int) }} m</div><div class="hc-lbl">Electrical Wire</div></div>
+                </div>
+                {% endif %}
+                {% if fm.get('plumbing',{}).get('sump_liters',0) %}
+                <div class="hchip">
+                    <div class="hc-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('plumbing',{}).get('sump_liters',0)|int) }} L</div><div class="hc-lbl">Sump Capacity</div></div>
                 </div>
                 {% endif %}
             </div>
-            
-            <!-- Sidebar -->
-            <div>
-                <!-- Budget Card -->
-                <div class="budget-card">
-                    <div class="budget-label">Budget Range</div>
-                    <div class="budget-value">{{ project.budget_range.title() if project.budget_range else 'Medium' }}</div>
-                </div>
-                
-                <!-- Actions -->
-                <div class="section">
-                    
-                    {% if project.has_bid %}
-                        {% if project.existing_bid.status == 'pending' %}
-                            <a href="{{ url_for('contractor.edit_bid', bid_id=project.existing_bid.id) }}" class="btn btn-primary">
-                                ✏️ Edit Your Bid
-                            </a>
-                            <a href="{{ url_for('contractor.my_bids') }}" class="btn btn-success">
-                                View My Bids
-                            </a>
-                        {% elif project.existing_bid.status == 'accepted' %}
-                            <button class="btn btn-success">✅ Bid Accepted!</button>
-                            <a href="{{ url_for('contractor.my_projects') }}" class="btn btn-primary">
-                                Go to My Projects
-                            </a>
-                        {% else %}
-                            <button class="btn btn-disabled" disabled>❌ Bid Rejected</button>
-                            <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-primary">
-                                Browse Other Projects
-                            </a>
+        </div>
+
+        <!-- Construction Specifications -->
+        <div class="card">
+            <div class="sec-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                Construction Specifications
+                <span class="sec-badge">Owner's Design Choices</span>
+            </div>
+            <div class="spec-grid">
+                {% if project.structure_type or estimation.get('form',{}) %}
+                    {% set f = estimation.get('form', project) %}
+                    {% for label, key in [
+                        ('Structure Type',      'structure_type'),
+                        ('Concrete Grade',      'concrete_grade'),
+                        ('Steel Grade',         'steel_grade'),
+                        ('Slab Thickness',      'slab_thickness'),
+                        ('Ceiling Height',      'ceiling_height'),
+                        ('Foundation Type',     'foundation_type'),
+                        ('Foundation Depth',    'foundation_depth'),
+                        ('Soil Condition',      'soil_condition'),
+                        ('Wall Material',       'wall_material'),
+                        ('Wall Thickness',      'wall_thickness'),
+                        ('Flooring Type',       'flooring_type'),
+                        ('Internal Paint',      'internal_paint_quality'),
+                        ('External Paint',      'external_paint_quality'),
+                        ('Roof Waterproofing',  'roof_waterproofing'),
+                        ('Plaster Type',        'plaster_type'),
+                        ('Door Material',       'door_material'),
+                        ('Window Material',     'window_material'),
+                        ('Pipe Material',       'pipe_material'),
+                        ('Sanitary Grade',      'sanitary_grade'),
+                        ('False Ceiling',       'false_ceiling_yn'),
+                        ('Kitchen Type',        'kitchen_type'),
+                        ('Anti-Termite',        'anti_termite'),
+                        ('Staircase Type',      'staircase_type'),
+                        ('Wiring Type',         'wiring_type'),
+                        ('Inverter Wiring',     'inverter_wiring'),
+                    ] %}
+                        {% set v = project.get(key) or (project.estimation or {}).get(key) %}
+                        {% if not v %}{% set v = '' %}{% endif %}
+                        {% if v %}
+                        <div class="spec-row">
+                            <span class="spec-lbl">{{ label }}</span>
+                            <span class="spec-val">{{ v | replace('_', ' ') | title }}</span>
+                        </div>
                         {% endif %}
-                    {% else %}
-                        <a href="{{ url_for('contractor.submit_bid', project_id=project.id) }}" class="btn btn-primary">
-                            📝 Submit Your Bid
-                        </a>
-                        <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-success">
-                            Back to Projects
-                        </a>
-                    {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <!-- Fallback: show what we have -->
+                    {% for label, val in [
+                        ('Built-up Area', (project.square_feet | string) + ' sq ft'),
+                        ('Plot Area',     (project.plot_area | string + ' sq ft') if project.plot_area else None),
+                        ('Rooms',         project.rooms | string),
+                        ('Floors',        project.floors | string),
+                        ('Bathrooms',     (project.bathrooms or 2) | string),
+                        ('Property Type', (project.property_type or 'residential') | title),
+                        ('Budget Range',  (project.budget_range or 'medium') | title),
+                        ('Estimate Scope',(project.estimate_scope or 'material_only').replace('_',' ').title()),
+                    ] %}
+                        {% if val %}
+                        <div class="spec-row">
+                            <span class="spec-lbl">{{ label }}</span>
+                            <span class="spec-val">{{ val }}</span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Stages & Bill of Quantities -->
+        {% set stage_defs = [
+            ('foundation',   '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',                                                                                                   'Foundation',      'Footings, concrete, waterproofing'),
+            ('walls',        '<rect x="2" y="3" width="20" height="14" rx="2"/>',                                                                                                              'Masonry & Walls', 'Bricks/blocks, plaster, doors, windows'),
+            ('flooring',     '<path d="M3 3h18v18H3z"/>',                                                                                                                                      'Flooring & Slab', 'Slab, steel, floor tiles'),
+            ('roofing',      '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',                                                                                                   'Roofing',         'Roof slab, staircase, waterproofing'),
+            ('plumbing',     '<path d="M12 2v20M2 12h20"/>',                                                                                                                                   'Plumbing',        'Pipes, sanitary ware, storage'),
+            ('electrical',   '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',                                                                                                     'Electrical',      'Wiring, switchboards, earthing'),
+            ('finishing',    '<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>',                                                                       'Finishing',       'Paint, primer, false ceiling'),
+            ('carpentry',    '<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>',                                                                                                       'Carpentry',       'Kitchen, wardrobes, furniture'),
+            ('exterior',     '<circle cx="12" cy="12" r="10"/>',                                                                                                                               'Exterior',        'Car porch, garden, boundary wall'),
+            ('miscellaneous','<circle cx="12" cy="12" r="3"/>',                                                                                                                                'Miscellaneous',   'Safety, binding wire, contingency'),
+        ] %}
+
+        {% set stg = sel.get('stage_breakdown', {}) %}
+        {% set max_c = stg.values() | list | max if stg else 1 %}
+
+        <div class="card">
+            <div class="sec-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                Stages &amp; Bill of Quantities
+                <span class="sec-badge">{{ budget | title }} Budget</span>
+            </div>
+
+            {% for sk, ssvg, sname, sdesc in stage_defs %}
+            {% set sc = stg.get(sk, 0) %}
+            {% set sm = estimation.materials.get(sk, {}) %}
+            {% set bp = ((sc / max_c) * 100) | round | int if max_c > 0 else 0 %}
+            <div class="sacc" id="sacc-{{ sk }}">
+                <div class="sh" id="sh-{{ sk }}" onclick="tog('{{ sk }}')">
+                    <div class="sh-l">
+                        <div class="sh-ico">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ ssvg | safe }}</svg>
+                        </div>
+                        <div>
+                            <div class="sh-name">{{ sname }}</div>
+                            <div class="sh-sub">{{ sdesc }} · {{ sm | length }} items</div>
+                        </div>
+                    </div>
+                    <div class="sh-r">
+                        <div class="sh-bw"><div class="sh-bar" data-w="{{ bp }}"></div></div>
+                        <div class="sh-cost">
+                            {% if sc >= 100000 %}₹{{ "%.1f"|format(sc/100000) }}L
+                            {% else %}₹{{ "{:,.0f}".format(sc) }}{% endif %}
+                        </div>
+                        <div class="sh-arr">
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </div>
+                    </div>
                 </div>
-                
-                <!-- Project Stats -->
-                <div class="section">
-                    <h3 class="section-title">📊 Quick Stats</h3>
-                    <div style="text-align: center; padding: 20px 0;">
-                        <div style="font-size: 40px; color: #f5576c; font-weight: bold; margin-bottom: 10px;">
-                            {{ project.square_feet }}
-                        </div>
-                        <div style="color: #666; font-size: 14px;">Total Square Feet</div>
+                <div class="sb" id="sb-{{ sk }}">
+                    <div class="mat-wrap">
+                        {% if sm %}
+                        <table class="mat-tbl">
+                            <thead><tr><th>Material</th><th>Quantity</th><th>Unit</th></tr></thead>
+                            <tbody>
+                                {% for mn, qty in sm.items() %}
+                                {% if qty is number and qty > 0 %}
+                                <tr>
+                                    <td>{{ mn.replace('_',' ').title() }}</td>
+                                    <td><span class="mat-qty">{{ "{:,.0f}".format(qty) }}</span></td>
+                                    <td><span class="mat-unit">
+                                        {% if 'bags' in mn %}bags (50 kg)
+                                        {% elif mn.endswith('_kg') or '_kg' in mn %}kg
+                                        {% elif 'cuft' in mn %}cu ft
+                                        {% elif 'sqft' in mn %}sq ft
+                                        {% elif 'meters' in mn %}m
+                                        {% elif 'liters' in mn %}litres
+                                        {% elif 'sheets' in mn %}sheets
+                                        {% elif 'blocks' in mn or 'bricks' in mn %}nos
+                                        {% else %}nos{% endif %}
+                                    </span></td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p style="font-size:13px;color:var(--text-muted);padding:4px 0;">No materials listed for this stage.</p>
+                        {% endif %}
                     </div>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px;">
-                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                            <div style="font-size: 24px; font-weight: bold; color: #333;">{{ project.rooms }}</div>
-                            <div style="font-size: 12px; color: #666;">Rooms</div>
-                        </div>
-                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                            <div style="font-size: 24px; font-weight: bold; color: #333;">{{ project.floors }}</div>
-                            <div style="font-size: 12px; color: #666;">Floors</div>
-                        </div>
-                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                            <div style="font-size: 24px; font-weight: bold; color: #333;">{{ project.bathrooms or 2 }}</div>
-                            <div style="font-size: 12px; color: #666;">Baths</div>
-                        </div>
-                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Budget Comparison -->
+        <div class="card">
+            <div class="sec-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                All Budget Tiers Compared
+            </div>
+            <table class="btbl">
+                <thead>
+                    <tr><th>Tier</th><th>Materials</th><th>Labour</th><th>Other</th><th>Total</th><th>₹/sqft</th></tr>
+                </thead>
+                <tbody>
+                    {% for tk, tl in [('low','Budget'),('medium','Standard'),('high','Premium')] %}
+                    {% set t = estimation.costs.get(tk, {}) %}
+                    {% set tv = t.get('total_cost', 0) %}
+                    <tr {% if tk == budget %}class="sel"{% endif %}>
+                        <td>{{ tl }}{% if tk == budget %} ★{% endif %}</td>
+                        <td class="amt">₹{{ "{:,.0f}".format(t.get('material_cost',0)) }}</td>
+                        <td>₹{{ "{:,.0f}".format(t.get('labor_cost',0)) }}</td>
+                        <td>₹{{ "{:,.0f}".format(t.get('other_costs',0)) }}</td>
+                        <td class="amt">
+                            {% if tv >= 10000000 %}₹{{ "%.2f"|format(tv/10000000) }} Cr
+                            {% elif tv >= 100000  %}₹{{ "%.1f"|format(tv/100000) }} L
+                            {% else %}₹{{ "{:,.0f}".format(tv) }}{% endif %}
+                        </td>
+                        <td>₹{{ "{:,.0f}".format((tv / sqf) | round) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Timeline -->
+        <div class="card">
+            <div class="sec-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Construction Timeline
+            </div>
+            <div class="tl-wrap">
+                <div class="tl-big-wrap">
+                    <div class="tl-lbl">Total Duration</div>
+                    <div class="tl-num">{{ estimation.timeline.get('total_days', 0) | int }}</div>
+                    <div class="tl-sub">≈ {{ ((estimation.timeline.get('total_days', 0)) / 30) | round(1) }} months</div>
+                </div>
+                <div class="tl-stages">
+                    {% for sk, sn in [('foundation','Foundation'),('walls','Walls'),('flooring','Flooring'),('roofing','Roofing'),('plumbing','Plumbing'),('electrical','Electrical'),('finishing','Finishing'),('carpentry','Carpentry'),('exterior','Exterior')] %}
+                    {% set d = estimation.timeline.get(sk, 0) | int %}
+                    {% if d > 0 %}
+                    <div class="tl-row"><span>{{ sn }}</span><span class="tl-d">{{ d }}d</span></div>
+                    {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>
-    </div>
-    <script>
-        // Update message badge
+        {% endif %}{# end if estimation #}
+
+        {% if not estimation or not estimation.get('costs') %}
+        <!-- No estimation available -->
+        <div class="card" style="text-align:center;padding:40px 30px;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 16px;display:block;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <p style="color:var(--text-muted);font-size:14px;">No detailed estimation has been generated for this project yet.<br>The owner may still be configuring project details.</p>
+        </div>
+        {% endif %}
+
+    </div><!-- end left column -->
+
+    <!-- SIDEBAR -->
+    <div>
+
+        <!-- Bid action -->
+        {% if project.has_bid %}
+        <div class="already-bid">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            You've already submitted a bid for this project.
+        </div>
+        {% if project.existing_bid %}
+        <div class="scard">
+            <div class="stitle">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                Your Bid
+            </div>
+            {% set eb = project.existing_bid %}
+            <div class="irow"><span class="ilbl">Total Bid</span><span class="ival">₹{{ "{:,.0f}".format(eb.get('total_cost', 0)) }}</span></div>
+            <div class="irow"><span class="ilbl">Duration</span><span class="ival">{{ eb.get('duration_days', '—') }} months</span></div>
+            <div class="irow"><span class="ilbl">Status</span><span class="ival">{{ eb.get('status', 'pending') | title }}</span></div>
+            {% if eb.get('status') == 'pending' %}
+            <a href="{{ url_for('contractor.edit_bid', bid_id=eb.id) }}" class="btn-outline" style="margin-top:14px;">Edit My Bid</a>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="bid-banner">
+            <span class="bid-banner-ico">💡</span>
+            <div>
+                <div class="bid-banner-ttl">Ready to Bid?</div>
+                <div class="bid-banner-txt">Review the full estimate above, then submit a competitive bid. The owner will compare all submissions.</div>
+            </div>
+        </div>
+        {% if current_user.verified %}
+        <a href="{{ url_for('contractor.submit_bid', project_id=project.id) }}" class="btn-primary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Submit Your Bid
+        </a>
+        {% else %}
+        <div class="btn-disabled">Only Verified Contractors Can Bid</div>
+        {% endif %}
+        {% endif %}
+
+        <a href="{{ url_for('contractor.browse_projects') }}" class="btn-outline">← Back to Projects</a>
+
+        <!-- Project info -->
+        <div class="scard">
+            <div class="stitle">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Project Info
+            </div>
+            <div class="irow"><span class="ilbl">Area</span><span class="ival">{{ project.square_feet | int }} sq ft</span></div>
+            {% if project.plot_area %}<div class="irow"><span class="ilbl">Plot</span><span class="ival">{{ project.plot_area | int }} sq ft</span></div>{% endif %}
+            <div class="irow"><span class="ilbl">Rooms</span><span class="ival">{{ project.rooms }}</span></div>
+            <div class="irow"><span class="ilbl">Floors</span><span class="ival">{{ project.floors }}</span></div>
+            <div class="irow"><span class="ilbl">Bathrooms</span><span class="ival">{{ project.bathrooms or 2 }}</span></div>
+            <div class="irow"><span class="ilbl">Type</span><span class="ival">{{ (project.property_type or 'residential') | title }}</span></div>
+            <div class="irow"><span class="ilbl">Scope</span><span class="ival">
+                <span class="scope-pill {% if (project.estimate_scope or '') == 'material_and_labour' %}scope-full{% else %}scope-mat{% endif %}">
+                    {% if (project.estimate_scope or '') == 'material_and_labour' %}Mat + Labour{% else %}Mat Only{% endif %}
+                </span>
+            </span></div>
+            <div class="irow"><span class="ilbl">Budget</span><span class="ival">{{ (project.budget_range or 'medium') | title }}</span></div>
+            <div class="irow"><span class="ilbl">Status</span><span class="ival"><span class="status-pill status-{{ project.status or 'planning' }}">{{ (project.status or 'planning').upper() }}</span></span></div>
+            {% if project.location %}
+            <div style="margin-top:12px;padding:10px 12px;background:var(--sand);border-radius:8px;">
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:5px;">📍 Location</div>
+                <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">{{ project.location }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Stage cost mini chart -->
+        {% if estimation and estimation.get('costs') %}
+        {% set stg = sel.get('stage_breakdown', {}) %}
+        {% set mx  = stg.values() | list | max if stg else 1 %}
+        <div class="scard">
+            <div class="stitle">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Cost by Stage
+            </div>
+            <div class="sml">
+                {% for sk, _, sname, _ in stage_defs %}
+                {% set c = stg.get(sk, 0) %}
+                {% if c > 0 %}
+                <div class="smr">
+                    <span class="sm-lbl">{{ sname.split('&')[0].strip() }}</span>
+                    <div class="sm-bw"><div class="sm-bar" data-w="{{ ((c/mx)*100)|round|int }}"></div></div>
+                    <span class="sm-amt">{% if c >= 100000 %}₹{{ "%.1f"|format(c/100000) }}L{% else %}₹{{ "{:,.0f}".format(c) }}{% endif %}</span>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Per-sqft rates card -->
+        <div class="scard">
+            <div class="stitle">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/></svg>
+                Rate Comparison (₹/sqft)
+            </div>
+            <div class="sml">
+                {% for tk, tl in [('low','Budget'),('medium','Standard'),('high','Premium')] %}
+                {% set t  = estimation.costs.get(tk, {}) %}
+                {% set tv = t.get('total_cost', 0) %}
+                {% set rate = (tv / sqf) | round | int %}
+                {% set max_rate = (estimation.costs.get('high',{}).get('total_cost',1) / sqf) | round | int %}
+                <div class="smr">
+                    <span class="sm-lbl{% if tk == budget %} selected{% endif %}" {% if tk == budget %}style="font-weight:700;color:var(--text-primary)"{% endif %}>{{ tl }}</span>
+                    <div class="sm-bw"><div class="sm-bar" data-w="{{ ((rate / max_rate) * 100) | round | int if max_rate > 0 else 0 }}"></div></div>
+                    <span class="sm-amt">₹{{ "{:,}".format(rate) }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:10px;padding-top:10px;border-top:1px solid var(--sand);">★ Highlighted tier = owner's selection</div>
+        </div>
+        {% endif %}
+
+        <!-- Project description -->
+        {% if project.description %}
+        <div class="scard">
+            <div class="stitle">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>
+                Owner's Notes
+            </div>
+            <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">{{ project.description }}</p>
+        </div>
+        {% endif %}
+
+    </div><!-- end sidebar -->
+</div>
+
+<script>
+    function tog(key) {
+        const b = document.getElementById('sb-' + key);
+        const h = document.getElementById('sh-' + key);
+        const a = document.getElementById('sacc-' + key);
+        if (!b || !h) return;
+        const wasOpen = b.classList.contains('open');
+        document.querySelectorAll('.sb').forEach(el   => el.classList.remove('open'));
+        document.querySelectorAll('.sh').forEach(el   => el.classList.remove('open'));
+        document.querySelectorAll('.sacc').forEach(el => el.classList.remove('expanded'));
+        if (!wasOpen) {
+            b.classList.add('open');
+            h.classList.add('open');
+            if (a) a.classList.add('expanded');
+            setTimeout(() => {
+                const rect = b.getBoundingClientRect();
+                if (rect.top < 0 || rect.bottom > window.innerHeight) {
+                    b.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 60);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Apply data-w widths to all progress bars
+        document.querySelectorAll('[data-w]').forEach(el => {
+            el.style.width = el.getAttribute('data-w') + '%';
+        });
+
+        // Open first non-empty stage
+        const stages = ['foundation','walls','flooring','roofing','plumbing','electrical','finishing','carpentry','exterior','miscellaneous'];
+        for (const sk of stages) {
+            const el = document.getElementById('sb-' + sk);
+            if (el) { tog(sk); break; }
+        }
+    });
+
     function updateMessageBadge() {
         fetch('/contractor/messages/unread-count')
-            .then(response => response.json())
+            .then(r => { if (!r.ok) return null; return r.headers.get('content-type')?.includes('application/json') ? r.json() : null; })
             .then(data => {
-                const badge = document.getElementById('messagesBadge');
-                if (data.count > 0) {
-                    badge.textContent = data.count;
-                    badge.style.display = 'flex';
-                } else {
-                    badge.style.display = 'none';
-                }
-            })
-            .catch(error => console.error('Error fetching unread count:', error));
+                if (!data) return;
+                const b = document.getElementById('messagesBadge');
+                if (!b) return;
+                if (data.count > 0) { b.textContent = data.count; b.style.display = 'flex'; }
+                else { b.style.display = 'none'; }
+            }).catch(() => {});
     }
-    
-    // Update badge on page load
     updateMessageBadge();
-    
-    // Update badge every 30 seconds
     setInterval(updateMessageBadge, 30000);
-    </script>
+</script>
 </body>
 </html>

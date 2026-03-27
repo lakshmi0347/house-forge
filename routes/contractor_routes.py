@@ -325,40 +325,69 @@ def my_projects():
     
     return render_template('contractor/active_projects.html', projects=projects)
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PATCH: replace the existing view_project() function in routes/contractor_routes.py
+# with this version. It now forwards the full `estimation` dict to the template.
+# ─────────────────────────────────────────────────────────────────────────────
+
 @contractor_bp.route('/project/<project_id>/view')
 @login_required
 def view_project(project_id):
-    """View project details before bidding"""
+    """View full project details (including estimation) before bidding"""
     db = get_db()
-    
+
     try:
         project_doc = db.collection('projects').document(project_id).get()
-        
+
         if not project_doc.exists:
             flash('Project not found', 'error')
             return redirect(url_for('contractor.browse_projects'))
-        
+
         project_data = project_doc.to_dict()
         project_data['id'] = project_id
-        
-        # Get user info
+
+        # ── Owner contact ──────────────────────────────────────────────────
         user_doc = db.collection('users').document(project_data.get('user_id')).get()
         if user_doc.exists:
-            project_data['user_name'] = user_doc.to_dict().get('name', 'Unknown')
-            project_data['user_phone'] = user_doc.to_dict().get('phone', 'N/A')
-            project_data['user_email'] = user_doc.to_dict().get('email', 'N/A')
-        
-        # Check if contractor already bid
-        existing_bid = list(db.collection('bids').where('project_id', '==', project_id).where('contractor_id', '==', current_user.id).limit(1).stream())
-        project_data['has_bid'] = len(existing_bid) > 0
-        
+            u = user_doc.to_dict()
+            project_data['user_name']  = u.get('name',  'Unknown')
+            project_data['user_phone'] = u.get('phone', 'N/A')
+            project_data['user_email'] = u.get('email', 'N/A')
+
+        # ── Already bid? ───────────────────────────────────────────────────
+        existing_bid_docs = list(
+            db.collection('bids')
+              .where('project_id',    '==', project_id)
+              .where('contractor_id', '==', current_user.id)
+              .limit(1)
+              .stream()
+        )
+        project_data['has_bid'] = len(existing_bid_docs) > 0
+
         if project_data['has_bid']:
-            bid_doc = existing_bid[0]
-            project_data['existing_bid'] = bid_doc.to_dict()
+            bid_doc = existing_bid_docs[0]
+            project_data['existing_bid']       = bid_doc.to_dict()
             project_data['existing_bid']['id'] = bid_doc.id
-        
-        return render_template('contractor/view_project_detail.html', project=project_data)
-        
+
+        # ── Contractor profile picture (for navbar) ────────────────────────
+        contractor_profile_picture = None
+        try:
+            con_doc = db.collection('contractors').document(current_user.id).get()
+            if con_doc.exists:
+                contractor_profile_picture = con_doc.to_dict().get('profile_picture')
+        except Exception:
+            pass
+
+        # ── Full estimation data ───────────────────────────────────────────
+        estimation = project_data.get('estimation', {})
+
+        return render_template(
+            'contractor/view_project_detail.html',
+            project=project_data,
+            estimation=estimation,
+            contractor_profile_picture=contractor_profile_picture,
+        )
+
     except Exception as e:
         flash(f'Error loading project: {str(e)}', 'error')
         return redirect(url_for('contractor.browse_projects'))

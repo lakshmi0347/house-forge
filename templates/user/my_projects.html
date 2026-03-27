@@ -116,10 +116,10 @@
                     <div class="detail-item">💰 {{ project.budget_range.title() }}</div>
                 </div>
                 <div class="project-footer">
-                    <div class="project-date">Created: {{ project.created_at.strftime('%d %b %Y') if project.created_at else 'N/A' }}</div>
+                    <div class="project-date">Created: {{ project.created_at.strftime('%d %b %Y') if project.created_at and project.created_at is not string else 'N/A' }}</div>
                     <div class="project-actions">
                         <a href="{{ url_for('user.view_project', project_id=project.id) }}" class="btn-view">View</a>
-                        <button onclick="confirmDelete('{{ project.id }}','{{ project.title }}')" class="btn-del">🗑️</button>
+                        <button type="button" onclick="confirmDelete('{{ project.id }}','{{ project.title }}')" class="btn-del">🗑️</button>
                     </div>
                 </div>
             </div>

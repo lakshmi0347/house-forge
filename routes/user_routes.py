@@ -294,10 +294,9 @@ def create_project():
 
         doc_ref    = db.collection('projects').add(project_data)
         project_id = doc_ref[1].id
-        project_data['id'] = project_id
 
-        return render_template('user/project_created.html',
-                               project=project_data, estimation=estimation, project_id=project_id)
+        # ✅ PRG: redirect instead of render — prevents duplicate on back/refresh
+        return redirect(url_for('user.view_project', project_id=project_id))
 
     return render_template('user/create_project.html', user_profile_picture=user_profile_picture)
 

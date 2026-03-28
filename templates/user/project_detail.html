@@ -305,6 +305,68 @@
         .modal-submit:hover { background: var(--accent-dark); }
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Locked ordering button */
+.btn-locked {
+    opacity: 0.55;
+    cursor: not-allowed !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    text-align: center;
+}
+.lock-reason {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.locked-action-wrap { width: 100%; }
+ 
+.btn-complete {
+    width: 100%;
+    padding: 12px 18px;
+    background: linear-gradient(135deg, #16A34A, #15803D);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 2px 8px rgba(22,163,74,0.25);
+}
+.btn-complete:hover {
+    background: linear-gradient(135deg, #15803D, #166534);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(22,163,74,0.35);
+}
+.btn-complete:disabled {
+    background: #9CA3AF;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+ 
+.completed-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: #D1FAE5;
+    color: #065F46;
+    border: 1px solid #6EE7B7;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
     </style>
 </head>
 
@@ -1115,18 +1177,88 @@
 
                 <!-- Actions -->
                 <div class="card">
-                    <div class="section-title" style="font-size:15px;">⚡ Actions</div>
-                    <div class="action-buttons">
-                        <a href="{{ url_for('user.download_pdf', project_id=project.id) }}" class="btn-primary">📄 Download PDF</a>
-                        <a href="{{ url_for('user.project_bids', project_id=project.id) }}" class="btn-primary">📋 View Bids</a>
-                        <a href="{{ url_for('user.find_contractors') }}" class="btn-outline">🔨 Find Contractors</a>
-                        <a href="{{ url_for('user.order_materials', project_id=project.id) }}" class="btn-outline">📦 Order Materials</a>
-                        <a href="{{ url_for('user.edit_project', project_id=project.id) }}" class="btn-outline">✏️ Edit Project</a>
-                        {% if project.status == 'active' %}
-                        <button onclick="completeProject()" class="btn-outline" style="cursor:pointer;font-family:'DM Sans',sans-serif;">✅ Mark Completed</button>
-                        {% endif %}
-                    </div>
-                </div>
+    <div class="section-title" style="font-size:15px;">⚡ Actions</div>
+ 
+    {% set is_completed    = project.status == 'completed' %}
+    {% set has_contractor  = project.get('contractor_id') %}
+    {% set ordering_locked = is_completed or has_contractor or project.get('ordering_locked') %}
+ 
+    <div class="action-buttons">
+ 
+        <!-- PDF — always available -->
+        <a href="{{ url_for('user.download_pdf', project_id=project.id) }}"
+           class="btn-primary">
+            📄 Download PDF
+        </a>
+ 
+        <!-- View Bids — always available -->
+        <a href="{{ url_for('user.project_bids', project_id=project.id) }}"
+           class="btn-primary">
+            📋 View Bids
+        </a>
+ 
+        <!-- Find Contractors — hide once completed or contractor assigned -->
+        {% if not is_completed and not has_contractor %}
+        <a href="{{ url_for('user.find_contractors') }}" class="btn-outline">
+            🔨 Find Contractors
+        </a>
+        {% endif %}
+ 
+        <!-- Order Materials — blocked when locked -->
+        {% if ordering_locked %}
+        <div class="locked-action-wrap"
+             title="{% if is_completed %}Project is completed{% elif has_contractor %}Contractor is managing materials{% endif %}">
+            <button class="btn-outline btn-locked" disabled>
+                🔒 Order Materials
+                <span class="lock-reason">
+                    {% if is_completed %}Project completed
+                    {% elif has_contractor %}Contractor assigned
+                    {% endif %}
+                </span>
+            </button>
+        </div>
+        {% else %}
+        <a href="{{ url_for('user.order_materials', project_id=project.id) }}"
+           class="btn-outline">
+            📦 Order Materials
+        </a>
+        {% endif %}
+ 
+        <!-- Edit Project — hide when completed -->
+        {% if not is_completed %}
+        <a href="{{ url_for('user.edit_project', project_id=project.id) }}"
+           class="btn-outline">
+            ✏️ Edit Project
+        </a>
+        {% endif %}
+ 
+        <!-- ✅ Mark as Completed — shown for ALL non-completed projects
+             regardless of whether a contractor is assigned or not.
+             The JS confirm message adapts based on context.           -->
+        {% if not is_completed %}
+        <button
+            onclick="completeProject()"
+            class="btn-complete"
+            id="completeBtn"
+            data-has-contractor="{{ 'true' if has_contractor else 'false' }}">
+            ✅ Mark as Completed
+        </button>
+        {% endif %}
+ 
+        <!-- Already completed pill -->
+        {% if is_completed %}
+        <div class="completed-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Project Completed
+        </div>
+        {% endif %}
+ 
+    </div>
+</div>
             </div>
         </div>
     </div>
@@ -1175,11 +1307,42 @@
 
         // ── Complete project ─────────────────────────────────────────────────
         function completeProject() {
-            if (!confirm('Mark this project as completed?')) return;
+            const hasContractor = document.getElementById('completeBtn')
+                                    ?.dataset.hasContractor === 'true';
+            const msg = hasContractor
+                ? 'Mark this project as completed?\n\n' +
+                  '• Your contractor will be notified.\n' +
+                  '• Any remaining pending bids will be rejected.\n' +
+                  '• Material ordering will be disabled.\n\n' +
+                  'This action cannot be undone.'
+                : 'Mark this project as completed?\n\n' +
+                  '• All open bids will be automatically rejected.\n' +
+                  '• Material ordering will be disabled for this project.\n\n' +
+                  'This action cannot be undone.';
+ 
+            if (!confirm(msg)) return;
+ 
+            const btn = document.getElementById('completeBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Completing…';
+ 
             fetch('/user/project/{{ project.id }}/complete', { method: 'POST' })
                 .then(r => r.json())
-                .then(d => { if (d.success) location.reload(); else alert(d.message); })
-                .catch(() => alert('An error occurred'));
+                .then(d => {
+                    if (d.success) {
+                        btn.textContent = '✅ Done!';
+                        setTimeout(() => location.reload(), 900);
+                    } else {
+                        alert('Error: ' + d.message);
+                        btn.disabled = false;
+                        btn.textContent = '✅ Mark as Completed';
+                    }
+                })
+                .catch(() => {
+                    alert('An error occurred. Please try again.');
+                    btn.disabled = false;
+                    btn.textContent = '✅ Mark as Completed';
+                });
         }
 
         // ── Rating modal ─────────────────────────────────────────────────────

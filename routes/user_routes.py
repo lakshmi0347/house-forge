@@ -712,61 +712,70 @@ def project_bids(project_id):
 @user_bp.route('/bid/<bid_id>/accept', methods=['POST'])
 @login_required
 def accept_bid(bid_id):
-    """Accept a bid and assign contractor to project"""
-    db = get_db()  # ← ADD THIS LINE
+    """Accept a bid and assign contractor to project."""
+    db = get_db()
     if not db:
         flash('Database connection error', 'error')
         return redirect(url_for('user.projects'))
-    
+ 
     try:
         bid_doc = db.collection('bids').document(bid_id).get()
-        
+ 
         if not bid_doc.exists:
             flash('Bid not found', 'error')
             return redirect(url_for('user.projects'))
-        
+ 
         bid_data = bid_doc.to_dict()
-        
-        # Get project to verify ownership
-        project_doc = db.collection('projects').document(bid_data.get('project_id')).get()
+ 
+        project_doc  = db.collection('projects').document(bid_data.get('project_id')).get()
         project_data = project_doc.to_dict()
-        
+ 
         if project_data.get('user_id') != current_user.id:
             flash('Access denied', 'error')
             return redirect(url_for('user.projects'))
-        
-        # Update bid status to accepted
+ 
+        # Accept this bid
         db.collection('bids').document(bid_id).update({
-            'status': 'accepted',
+            'status':      'accepted',
             'accepted_at': datetime.now(),
-            'updated_at': datetime.now()
+            'updated_at':  datetime.now(),
         })
-        
-        # Reject all other bids for this project
-        other_bids = db.collection('bids').where('project_id', '==', bid_data.get('project_id')).stream()
+ 
+        # Reject all other pending bids for this project
+        other_bids = db.collection('bids') \
+                       .where('project_id', '==', bid_data.get('project_id')) \
+                       .stream()
         for other_bid in other_bids:
-            if other_bid.id != bid_id and other_bid.to_dict().get('status') == 'pending':
+            if (other_bid.id != bid_id
+                    and other_bid.to_dict().get('status') == 'pending'):
                 db.collection('bids').document(other_bid.id).update({
-                    'status': 'rejected',
+                    'status':      'rejected',
                     'rejected_at': datetime.now(),
-                    'updated_at': datetime.now()
+                    'updated_at':  datetime.now(),
                 })
-        
-        # Update project with contractor info and change status to active
+ 
+        # Update project — mark active, assign contractor, lock ordering & bidding
         db.collection('projects').document(bid_data.get('project_id')).update({
-            'contractor_id': bid_data.get('contractor_id'),
-            'contractor_name': bid_data.get('contractor_name'),
+            'contractor_id':      bid_data.get('contractor_id'),
+            'contractor_name':    bid_data.get('contractor_name'),
             'contractor_company': bid_data.get('contractor_company'),
-            'agreed_cost': bid_data.get('total_cost'),
-            'agreed_duration': bid_data.get('duration_days'),
-            'status': 'active',
-            'started_at': datetime.now(),
-            'updated_at': datetime.now()
+            'agreed_cost':        bid_data.get('total_cost'),
+            'agreed_duration':    bid_data.get('duration_days'),
+            'status':             'active',
+            'started_at':         datetime.now(),
+            'updated_at':         datetime.now(),
+            # ── NEW: lock ordering; contractor handles materials now ──
+            'ordering_locked':    True,
+            'bidding_closed':     True,
         })
-        
-        flash('Bid accepted! Contractor has been assigned to your project.', 'success')
+ 
+        flash(
+            'Bid accepted! Contractor has been assigned to your project. '
+            'Material orders are now managed by your contractor.',
+            'success',
+        )
         return redirect(url_for('user.project_bids', project_id=bid_data.get('project_id')))
-        
+ 
     except Exception as e:
         flash(f'Error accepting bid: {str(e)}', 'error')
         return redirect(url_for('user.projects'))
@@ -990,56 +999,73 @@ def browse_materials():
 @user_bp.route('/project/<project_id>/order-materials')
 @login_required
 def order_materials(project_id):
-    """Order materials for a specific project"""
+    """Order materials for a specific project — blocked when project
+    is completed OR when a contractor bid has been accepted."""
     db = get_db()
     if not db:
         flash('Database connection error', 'error')
         return redirect(url_for('user.projects'))
-    
+ 
     try:
-        # Get project
         project_doc = db.collection('projects').document(project_id).get()
-        
+ 
         if not project_doc.exists:
             flash('Project not found', 'error')
             return redirect(url_for('user.projects'))
-        
+ 
         project_data = project_doc.to_dict()
-        
+ 
         # Check ownership
         if project_data.get('user_id') != current_user.id:
             flash('Access denied', 'error')
             return redirect(url_for('user.projects'))
-        
+ 
+        # ── BLOCK 1: project completed ────────────────────────────────
+        if project_data.get('status') == 'completed' or project_data.get('ordering_locked'):
+            flash(
+                'Material ordering is not available for completed projects.',
+                'error'
+            )
+            return redirect(url_for('user.view_project', project_id=project_id))
+ 
+        # ── BLOCK 2: contractor bid accepted (project is active) ──────
+        if project_data.get('contractor_id'):
+            flash(
+                'A contractor has been assigned to this project. '
+                'Please coordinate material orders directly with your contractor.',
+                'warning'
+            )
+            return redirect(url_for('user.view_project', project_id=project_id))
+ 
         project_data['id'] = project_id
-        
+ 
         # Get all materials
         materials_ref = db.collection('materials').stream()
         materials = []
-        
         for doc in materials_ref:
             material_data = doc.to_dict()
             material_data['id'] = doc.id
-            
-            # Get supplier info
+ 
             supplier_id = material_data.get('supplier_id')
             if supplier_id:
                 supplier_doc = db.collection('suppliers').document(supplier_id).get()
                 if supplier_doc.exists:
                     supplier_data = supplier_doc.to_dict()
-                    material_data['supplier_name'] = supplier_data.get('company_name') or supplier_data.get('name')
-            
+                    material_data['supplier_name'] = (
+                        supplier_data.get('company_name') or supplier_data.get('name')
+                    )
             materials.append(material_data)
-        
-        # Get project's estimated materials
+ 
         estimation = project_data.get('estimation', {})
         estimated_materials = estimation.get('materials', {})
-        
-        return render_template('user/order_materials.html', 
-                             project=project_data, 
-                             materials=materials,
-                             estimated_materials=estimated_materials)
-        
+ 
+        return render_template(
+            'user/order_materials.html',
+            project=project_data,
+            materials=materials,
+            estimated_materials=estimated_materials,
+        )
+ 
     except Exception as e:
         flash(f'Error: {str(e)}', 'error')
         return redirect(url_for('user.projects'))
@@ -1058,25 +1084,39 @@ def create_order():
         material_ids = request.form.getlist('material_ids[]')
         quantities   = request.form.getlist('quantities[]')
  
-        # Delivery address fields (set on the order_materials page)
         delivery_address  = request.form.get('delivery_address', '').strip()
         delivery_district = request.form.get('delivery_district', '').strip()
         delivery_pin      = request.form.get('delivery_pin', '').strip()
         delivery_state    = request.form.get('delivery_state', '').strip()
         delivery_landmark = request.form.get('delivery_landmark', '').strip()
  
-        print("=" * 60)
-        print("ORDER CREATION — INSTANT CHECKOUT FLOW")
-        print(f"Project ID : {project_id}")
-        print(f"Materials  : {material_ids}")
-        print(f"Quantities : {quantities}")
-        print(f"Delivery   : {delivery_address}, {delivery_district}, {delivery_pin}")
-        print("=" * 60)
- 
         if not material_ids or not quantities:
             return jsonify({'success': False, 'message': 'No materials selected'}), 400
  
-        # ── Build items & group by supplier ───────────────────────────────────
+        # ── SERVER-SIDE GUARD ─────────────────────────────────────────
+        if project_id:
+            project_doc = db.collection('projects').document(project_id).get()
+            if project_doc.exists:
+                project_data = project_doc.to_dict()
+ 
+                # Block if completed / locked
+                if project_data.get('status') == 'completed' or project_data.get('ordering_locked'):
+                    return jsonify({
+                        'success': False,
+                        'message': 'Cannot place orders for a completed project.',
+                    }), 403
+ 
+                # Block if contractor assigned
+                if project_data.get('contractor_id'):
+                    return jsonify({
+                        'success': False,
+                        'message': (
+                            'A contractor is assigned to this project. '
+                            'Coordinate material orders with your contractor.'
+                        ),
+                    }), 403
+ 
+        # ── Build items & group by supplier ──────────────────────────
         total_cost   = 0
         order_items  = []
         supplier_ids = set()
@@ -1096,16 +1136,19 @@ def create_order():
                 'unit':           material_data.get('unit'),
                 'price_per_unit': material_data.get('price'),
                 'total':          item_cost,
-                'supplier_id':    material_data.get('supplier_id')
+                'supplier_id':    material_data.get('supplier_id'),
             })
             total_cost += item_cost
             supplier_ids.add(material_data.get('supplier_id'))
  
-        # ── Get project info ──────────────────────────────────────────────────
-        project_doc  = db.collection('projects').document(project_id).get()
-        project_data = project_doc.to_dict() if project_doc.exists else {}
+        # Get project info (already fetched above if project_id present)
+        if project_id:
+            project_doc  = db.collection('projects').document(project_id).get()
+            project_data = project_doc.to_dict() if project_doc.exists else {}
+        else:
+            project_data = {}
  
-        # ── Create one order per supplier ─────────────────────────────────────
+        # ── Create one order per supplier ─────────────────────────────
         created_order_ids = []
         for supplier_id in supplier_ids:
             if not supplier_id:
@@ -1119,7 +1162,6 @@ def create_order():
             supplier_data = supplier_doc.to_dict() if supplier_doc.exists else {}
  
             supplier_order = {
-                # Core
                 'user_id':        current_user.id,
                 'user_name':      current_user.name,
                 'user_email':     current_user.email if hasattr(current_user, 'email') else '',
@@ -1129,52 +1171,36 @@ def create_order():
                 'supplier_name':  supplier_data.get('company_name') or supplier_data.get('name', 'Supplier'),
                 'items':          supplier_items,
                 'total':          supplier_total,
- 
-                # ── INSTANT PROCESSING — no accept step ──
                 'status':         'processing',
- 
-                # Payment fields (filled later on checkout page)
                 'payment_status': 'pending',
                 'payment_method': None,
                 'receipt_number': None,
- 
-                # Delivery address (captured from order_materials form)
                 'delivery_address':  delivery_address,
                 'delivery_district': delivery_district,
                 'delivery_pin':      delivery_pin,
                 'delivery_state':    delivery_state,
                 'delivery_landmark': delivery_landmark,
- 
                 'created_at': datetime.now(),
-                'updated_at': datetime.now()
+                'updated_at': datetime.now(),
             }
  
             order_ref = db.collection('orders').add(supplier_order)
             new_id    = order_ref[1].id
             created_order_ids.append(new_id)
-            print(f"✅ Order created instantly: {new_id} (supplier: {supplier_data.get('company_name','?')})")
  
-        print(f"✅ {len(created_order_ids)} order(s) created — redirecting to checkout")
-        print("=" * 60)
- 
-        # ── Redirect to checkout ──────────────────────────────────────────────
-        # If single supplier → go straight to checkout for that order.
-        # If multiple suppliers → go to my_orders where each order has a
-        #   "Confirm Payment" button linking to its own checkout page.
         if len(created_order_ids) == 1:
             checkout_url = url_for('payment.checkout', order_id=created_order_ids[0])
         else:
             checkout_url = url_for('user.my_orders')
  
         return jsonify({
-            'success':     True,
-            'message':     f'{len(created_order_ids)} order(s) placed! Proceeding to payment…',
-            'order_ids':   created_order_ids,
-            'redirect_url': checkout_url   # ← frontend should redirect here
+            'success':      True,
+            'message':      f'{len(created_order_ids)} order(s) placed! Proceeding to payment…',
+            'order_ids':    created_order_ids,
+            'redirect_url': checkout_url,
         })
  
     except Exception as e:
-        print(f"❌ Error creating order: {str(e)}")
         import traceback; traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
     
@@ -2063,33 +2089,61 @@ def messages_unread_count():
 @user_bp.route('/project/<project_id>/complete', methods=['POST'])
 @login_required
 def complete_project(project_id):
-    """Mark project as completed"""
+    """
+    Mark a project as completed.
+    Side-effects:
+      • status        → 'completed'
+      • ordering_locked → True   (blocks material orders)
+      • bidding_closed  → True   (hides project from contractors)
+    """
     db = get_db()
     if not db:
         return jsonify({'success': False, 'message': 'Database connection error'}), 500
-    
+ 
     try:
         project_ref = db.collection('projects').document(project_id)
         project_doc = project_ref.get()
-        
+ 
         if not project_doc.exists:
             return jsonify({'success': False, 'message': 'Project not found'}), 404
-        
+ 
         project_data = project_doc.to_dict()
-        
+ 
         # Verify ownership
         if project_data.get('user_id') != current_user.id:
             return jsonify({'success': False, 'message': 'Access denied'}), 403
-        
-        # Update project status
+ 
+        # Idempotency guard
+        if project_data.get('status') == 'completed':
+            return jsonify({'success': False, 'message': 'Project is already marked as completed'}), 400
+ 
         project_ref.update({
-            'status': 'completed',
-            'completed_at': datetime.now(),
-            'updated_at': datetime.now()
+            'status':          'completed',
+            'completed_at':    datetime.now(),
+            'updated_at':      datetime.now(),
+            # ── NEW: lock ordering and bidding ────────────────────────
+            'ordering_locked': True,   # blocks /order/create
+            'bidding_closed':  True,   # hides from contractor browse
         })
-        
+ 
+        # Reject any still-pending bids for this project
+        try:
+            pending_bids = db.collection('bids') \
+                             .where('project_id', '==', project_id) \
+                             .where('status', '==', 'pending') \
+                             .stream()
+            for bid in pending_bids:
+                db.collection('bids').document(bid.id).update({
+                    'status':      'rejected',
+                    'rejected_at': datetime.now(),
+                    'updated_at':  datetime.now(),
+                    'rejection_reason': 'Project marked as completed by owner',
+                })
+        except Exception as e:
+            print(f"⚠️  Could not auto-reject bids: {e}")
+ 
         return jsonify({'success': True, 'message': 'Project marked as completed!'})
-        
+ 
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500

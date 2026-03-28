@@ -1018,40 +1018,45 @@ function closeConfirmModal() {
 function submitOrder() {
     const ids = Object.keys(cart);
     if (ids.length === 0) return;
-
+ 
     const btn = document.getElementById('confirmBtn');
     btn.disabled = true;
     btn.classList.add('loading');
-
+ 
     const fd = new FormData();
     fd.append('project_id', '{{ project.id }}');
     ids.forEach(id => {
         fd.append('material_ids[]', id);
         fd.append('quantities[]', cart[id].qty);
     });
-
+ 
     // Append delivery address fields
     fd.append('delivery_address',  deliveryAddr.address);
     fd.append('delivery_district', deliveryAddr.district);
     fd.append('delivery_pin',      deliveryAddr.pin);
     fd.append('delivery_state',    deliveryAddr.state);
     fd.append('delivery_landmark', deliveryAddr.landmark);
-
+ 
     document.getElementById('loadingOverlay').classList.add('show');
-
-    fetch('{{ url_for("user.create_order") }}', { method:'POST', body:fd })
+ 
+    fetch('{{ url_for("user.create_order") }}', { method: 'POST', body: fd })
         .then(r => r.json())
         .then(data => {
             document.getElementById('loadingOverlay').classList.remove('show');
             closeConfirmModal();
             btn.disabled = false;
             btn.classList.remove('loading');
-
+ 
             if (data.success) {
                 document.getElementById('step2').className = 'step done';
                 document.getElementById('step3').className = 'step done';
-                showAlert(data.message + ' Redirecting to your orders…', 'success');
-                setTimeout(() => { window.location.href = '{{ url_for("user.my_orders") }}'; }, 1800);
+ 
+                // ── KEY CHANGE: follow the API's redirect_url ──────────────
+                // Single supplier  → checkout page  (/payment/checkout/<id>)
+                // Multi supplier   → my orders page (/user/my-orders)
+                const dest = data.redirect_url || '/user/my-orders';
+                showAlert('Order placed! Taking you to payment…', 'success');
+                setTimeout(() => { window.location.href = dest; }, 900);
             } else {
                 showAlert(data.message, 'error');
             }

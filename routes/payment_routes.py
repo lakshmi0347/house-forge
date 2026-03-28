@@ -5,7 +5,6 @@ from datetime import datetime
 import uuid
 
 payment_bp = Blueprint('payment', __name__)
-db = firestore.client()
 
 
 def get_db():
@@ -34,6 +33,9 @@ def _generate_receipt_number():
 
 
 def _create_notification(user_id, title, message, notif_type, link=None):
+    db = get_db()
+    if not db:
+        return
     try:
         db.collection('notifications').add({
             'user_id':    user_id,
@@ -49,15 +51,17 @@ def _create_notification(user_id, title, message, notif_type, link=None):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  MATERIAL ORDER PAYMENT
-#  Orders are INSTANT — no supplier acceptance required.
-#  Payment methods: COD or Card.
+#  INSTANT CHECKOUT PAGE
+#  Called immediately after order creation — user picks COD or card here.
 # ─────────────────────────────────────────────────────────────────────────────
 
-@payment_bp.route('/order/<order_id>/pay', methods=['GET'])
+@payment_bp.route('/checkout/<order_id>', methods=['GET'])
 @login_required
-def pay_order(order_id):
-    """Show payment selection page (COD / Card) for a material order."""
+def checkout(order_id):
+    """
+    Instant checkout page shown right after the user places a material order.
+    Works like Amazon/Flipkart — no waiting for supplier acceptance.
+    """
     db = get_db()
     if not db:
         flash('Database connection error', 'error')
@@ -69,29 +73,25 @@ def pay_order(order_id):
             flash('Order not found', 'error')
             return redirect(url_for('user.my_orders'))
 
-        order_data        = order_doc.to_dict()
-        order_data['id']  = order_id
+        order_data       = order_doc.to_dict()
+        order_data['id'] = order_id
 
         if order_data.get('user_id') != current_user.id:
             flash('Access denied', 'error')
             return redirect(url_for('user.my_orders'))
 
-        # Only processing orders can be paid
-        if order_data.get('status') not in ('processing', 'pending'):
-            flash('This order is not eligible for payment', 'error')
-            return redirect(url_for('user.my_orders'))
-
-        # Already paid → go to receipt
+        # If already paid redirect straight to receipt
         if order_data.get('payment_status') in ('paid', 'cod_confirmed', 'card_pending'):
             return redirect(url_for('payment.order_receipt', order_id=order_id))
 
+        # Normalise items key
         if 'items' in order_data:
             order_data['order_items'] = order_data['items']
 
         user_profile_picture = _get_profile_picture(db)
 
         return render_template(
-            'payment/pay_order.html',
+            'payment/checkout.html',
             order=order_data,
             user_profile_picture=user_profile_picture
         )
@@ -99,6 +99,17 @@ def pay_order(order_id):
     except Exception as e:
         flash(f'Error: {str(e)}', 'error')
         return redirect(url_for('user.my_orders'))
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  MATERIAL ORDER PAYMENT  (legacy pay_order kept for backwards compatibility)
+# ─────────────────────────────────────────────────────────────────────────────
+
+@payment_bp.route('/order/<order_id>/pay', methods=['GET'])
+@login_required
+def pay_order(order_id):
+    """Redirect to the new instant checkout page."""
+    return redirect(url_for('payment.checkout', order_id=order_id))
 
 
 # ── COD CONFIRMATION ────────────────────────────────────────────────────────
@@ -128,13 +139,25 @@ def confirm_order_cod(order_id):
 
         receipt_number = _generate_receipt_number()
 
+        # Delivery details sent from checkout page
+        data_body       = request.get_json(silent=True) or {}
+        delivery_date   = data_body.get('delivery_date', '')
+        delivery_slot   = data_body.get('delivery_slot', '')
+        delivery_phone  = data_body.get('delivery_phone', '')
+        delivery_notes  = data_body.get('delivery_notes', '')
+
         order_ref.update({
-            'payment_status':          'cod_confirmed',
-            'payment_method':          'cash_on_delivery',
-            'receipt_number':          receipt_number,
-            'payment_confirmed_at':    datetime.now(),
-            'status':                  'processing',
-            'updated_at':              datetime.now()
+            'payment_status':       'cod_confirmed',
+            'payment_method':       'cash_on_delivery',
+            'receipt_number':       receipt_number,
+            'payment_confirmed_at': datetime.now(),
+            'status':               'processing',
+            # delivery details
+            'delivery_date':        delivery_date,
+            'delivery_slot':        delivery_slot,
+            'delivery_phone':       delivery_phone,
+            'delivery_notes':       delivery_notes,
+            'updated_at':           datetime.now()
         })
 
         # Store payment record
@@ -158,9 +181,10 @@ def confirm_order_cod(order_id):
         if supplier_id:
             _create_notification(
                 supplier_id,
-                'COD Payment Confirmed',
-                f'{current_user.name} confirmed Cash on Delivery for Order #{order_id[:8]}. '
-                f'Amount: ₹{order_data.get("total", 0):,.0f}',
+                'New Order Received — COD',
+                f'{current_user.name} placed an order with Cash on Delivery. '
+                f'Amount: ₹{order_data.get("total", 0):,.0f}. '
+                f'Order #{order_id[:8].upper()}',
                 'payment',
                 f'/supplier/order/{order_id}'
             )
@@ -184,9 +208,8 @@ def confirm_order_cod(order_id):
 @login_required
 def declare_order_card(order_id):
     """
-    User declares they have paid via card.
+    User declares they have paid via card (demo/fake payment).
     Sets payment_status = 'card_pending' so the supplier can verify on delivery.
-    Accepts optional card_last4 and card_txn_id from the JSON body.
     """
     db = get_db()
     if not db:
@@ -207,10 +230,13 @@ def declare_order_card(order_id):
         if order_data.get('payment_status') in ('paid', 'cod_confirmed', 'card_pending'):
             return jsonify({'success': False, 'message': 'Payment already confirmed for this order'}), 400
 
-        # Pull optional card details from request body
         data        = request.get_json(silent=True) or {}
         card_last4  = (data.get('card_last4') or '').strip()
         card_txn_id = (data.get('card_txn_id') or '').strip()
+        delivery_date  = data.get('delivery_date', '')
+        delivery_slot  = data.get('delivery_slot', '')
+        delivery_phone = data.get('delivery_phone', '')
+        delivery_notes = data.get('delivery_notes', '')
 
         receipt_number = _generate_receipt_number()
 
@@ -220,6 +246,11 @@ def declare_order_card(order_id):
             'receipt_number':        receipt_number,
             'payment_declared_at':   datetime.now(),
             'status':                'processing',
+            # delivery details
+            'delivery_date':         delivery_date,
+            'delivery_slot':         delivery_slot,
+            'delivery_phone':        delivery_phone,
+            'delivery_notes':        delivery_notes,
             'updated_at':            datetime.now()
         }
         if card_last4:
@@ -254,7 +285,7 @@ def declare_order_card(order_id):
         supplier_id = order_data.get('supplier_id')
         if supplier_id:
             msg = (
-                f'{current_user.name} paid via card for Order #{order_id[:8]}. '
+                f'{current_user.name} paid via card for Order #{order_id[:8].upper()}. '
                 f'Amount: ₹{order_data.get("total", 0):,.0f}. '
             )
             if card_last4:
@@ -262,7 +293,7 @@ def declare_order_card(order_id):
             msg += 'Please verify on delivery.'
             _create_notification(
                 supplier_id,
-                'Card Payment Declared',
+                'New Order Received — Card Payment',
                 msg,
                 'payment',
                 f'/supplier/order/{order_id}'
@@ -270,7 +301,7 @@ def declare_order_card(order_id):
 
         return jsonify({
             'success':        True,
-            'message':        'Card payment recorded. Supplier will verify on delivery.',
+            'message':        'Card payment recorded successfully!',
             'receipt_number': receipt_number,
             'redirect_url':   url_for('payment.order_receipt', order_id=order_id)
         })
@@ -322,7 +353,7 @@ def order_receipt(order_id):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  CONTRACTOR PAYMENT  (COD)
+#  CONTRACTOR PAYMENT  (COD only)
 # ─────────────────────────────────────────────────────────────────────────────
 
 @payment_bp.route('/project/<project_id>/pay-contractor', methods=['GET'])
@@ -532,7 +563,7 @@ def payment_history():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  SUPPLIER: mark order as cash collected / card verified (delivery done)
+#  SUPPLIER: mark order as cash collected / card verified on delivery
 # ─────────────────────────────────────────────────────────────────────────────
 
 @payment_bp.route('/supplier/order/<order_id>/collect-cash', methods=['POST'])
@@ -575,14 +606,11 @@ def supplier_collect_cash(order_id):
         user_id = order_data.get('user_id')
         if user_id:
             method = order_data.get('payment_method', '')
-            if method == 'card':
-                method_label = 'Card payment verified'
-            else:
-                method_label = 'Cash collected'
+            method_label = 'Card payment verified' if method == 'card' else 'Cash collected'
             _create_notification(
                 user_id,
                 f'{method_label} — Order Complete',
-                f'Your order #{order_id[:8]} has been delivered and payment confirmed. '
+                f'Your order #{order_id[:8].upper()} has been delivered and payment confirmed. '
                 f'Amount: ₹{order_data.get("total", 0):,.0f}',
                 'payment',
                 '/user/my-orders'

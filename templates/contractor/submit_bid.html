@@ -4,450 +4,164 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Bid - House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --cream: #F0F4F8; --warm-white: #FFFFFF; --sand: #E8EEF4; --stone: #C8D8E8;
+            --accent: #1B4F72; --accent-dark: #0E2F44; --accent-light: #D6E8F5; --accent-mid: #2E86C1;
+            --text-primary: #0D1B2A; --text-secondary: #2C4A6E; --text-muted: #6B8CAE;
+            --shadow-sm: 0 1px 3px rgba(13,27,42,0.06); --shadow-md: 0 4px 16px rgba(13,27,42,0.08);
         }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-        }
-        
-        .navbar {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .navbar-brand {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .navbar-menu {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        
-        .navbar-menu a {
-            color: white;
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            transition: background 0.3s;
-            position: relative;
-        }
-        
-        .navbar-menu a:hover {
-            background: rgba(255,255,255,0.2);
-        }
-        
-        .badge-notification {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ff3b30;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: bold;
-            pointer-events: none;
-        }
-
-        .profile-pic {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid white;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        
-        .profile-pic:hover {
-            transform: scale(1.1);
-        }
-        
-        .profile-placeholder {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: white;
-            color: #667eea;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-            border: 2px solid white;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        
-        .profile-placeholder:hover {
-            transform: scale(1.1);
-        }
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-        
-        .back-link {
-            color: #f5576c;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-        
-        .back-link:hover {
-            text-decoration: underline;
-        }
-        
-        .page-header {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .page-title {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .two-column {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 30px;
-        }
-        
-        .section {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-        }
-        
-        .section-title {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-            font-weight: 600;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: border 0.3s;
-            font-family: inherit;
-        }
-        
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #f5576c;
-        }
-        
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        
-        .cost-breakdown {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .total-cost {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .total-label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-        
-        .total-amount {
-            font-size: 32px;
-            font-weight: bold;
-        }
-        
-        .info-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .info-row:last-child {
-            border-bottom: none;
-        }
-        
-        .info-label {
-            color: #666;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .info-value {
-            color: #333;
-        }
-        
-        .btn {
-            padding: 14px 30px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            width: 100%;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
-        }
-        
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
-            width: 100%;
-        }
-        
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-        
-        .form-actions {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .alert {
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-        
-        .helper-text {
-            font-size: 13px;
-            color: #666;
-            margin-top: 5px;
-        }
-        
-        @media (max-width: 1024px) {
-            .two-column {
-                grid-template-columns: 1fr;
-            }
-            
-            .cost-breakdown {
-                grid-template-columns: 1fr;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background-color: var(--cream); min-height: 100vh; color: var(--text-primary); }
+        body::before { content: ''; position: fixed; inset: 0; background: url('/static/images/house.jpg') no-repeat center center / cover; opacity: 0.06; z-index: 0; pointer-events: none; }
+        .navbar { background: var(--warm-white); border-bottom: 1px solid var(--stone); padding: 0 40px; height: 68px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
+        .navbar-brand { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .navbar-menu { display: flex; align-items: center; gap: 4px; }
+        .navbar-menu a { color: var(--text-secondary); text-decoration: none; padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .navbar-menu a:hover { color: var(--accent); background: var(--accent-light); }
+        .profile-pic { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); cursor: pointer; }
+        .profile-placeholder { width: 36px; height: 36px; border-radius: 50%; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; border: 2px solid var(--stone); cursor: pointer; }
+        .logout-link { color: var(--text-muted) !important; font-size: 13px !important; }
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 24px; position: relative; z-index: 1; }
+        .back-link { color: var(--accent); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+        .back-link:hover { color: var(--accent-dark); }
+        .page-banner { background: var(--warm-white); border: 1px solid var(--stone); border-radius: 16px; padding: 28px 36px; margin-bottom: 24px; box-shadow: var(--shadow-md); }
+        .page-banner h1 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+        .page-banner p { color: var(--text-secondary); font-size: 14px; }
+        .divider { width: 36px; height: 3px; background: var(--accent); border-radius: 2px; margin: 10px 0; }
+        .alert-warning { padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
+        .two-column { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start; }
+        .section { background: var(--warm-white); border: 1px solid var(--stone); padding: 28px 32px; border-radius: 16px; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+        .section-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--text-primary); margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--sand); }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; color: var(--text-secondary); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.4px; }
+        input, textarea { width: 100%; padding: 11px 14px; border: 1.5px solid var(--stone); border-radius: 8px; font-size: 14px; transition: border 0.2s; font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text-primary); }
+        input:focus, textarea:focus { outline: none; border-color: var(--accent); background: var(--warm-white); }
+        textarea { min-height: 120px; resize: vertical; }
+        .cost-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+        .total-strip { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-mid) 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 4px; }
+        .total-strip .label { font-size: 12px; opacity: 0.85; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .total-strip .amount { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; }
+        .helper-text { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .info-card { background: var(--sand); padding: 16px; border-radius: 10px; margin-bottom: 4px; }
+        .info-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--stone); align-items: center; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: var(--text-muted); font-weight: 600; font-size: 13px; }
+        .info-value { color: var(--text-primary); font-size: 13px; font-weight: 500; }
+        .form-actions { display: flex; gap: 12px; }
+        .btn { padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s; border: none; cursor: pointer; font-size: 14px; display: inline-block; font-family: 'DM Sans', sans-serif; text-align: center; }
+        .btn-primary { background: var(--accent); color: white; flex: 1; }
+        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(27,79,114,0.35); }
+        .btn-secondary { background: var(--sand); color: var(--text-secondary); border: 1.5px solid var(--stone); }
+        .btn-secondary:hover { background: var(--stone); }
+        .tips-list { list-style: none; }
+        .tips-list li { padding: 8px 0; border-bottom: 1px solid var(--sand); color: var(--text-secondary); font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .tips-list li:last-child { border-bottom: none; }
+        .tips-list li::before { content: '→'; color: var(--accent); font-weight: 700; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .page-banner { animation: fadeUp 0.4s ease both; }
+        .two-column { animation: fadeUp 0.4s 0.1s ease both; }
+        @media (max-width: 1024px) { .two-column { grid-template-columns: 1fr; } .cost-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .navbar { padding: 0 16px; } .container { padding: 0 16px; } }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
-        <div class="navbar-brand">🔨 House-Forge Contractor</div>
+        <a href="{{ url_for('contractor.dashboard') }}" class="navbar-brand">🔨 House-Forge</a>
         <div class="navbar-menu">
             <a href="{{ url_for('contractor.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('contractor.browse_projects') }}">Browse Projects</a>
             <a href="{{ url_for('contractor.my_bids') }}">My Bids</a>
-            <a href="{{ url_for('contractor.profile') }}">
+            <a href="{{ url_for('contractor.profile') }}" style="padding: 8px 10px;">
                 {% if contractor_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ contractor_profile_picture }}" 
-                         alt="Profile" 
-                         class="profile-pic">
+                    <img src="/static/uploads/profiles/{{ contractor_profile_picture }}" alt="Profile" class="profile-pic">
                 {% else %}
-                    <div class="profile-placeholder">
-                        {{ current_user.name[0].upper() if current_user.name else 'U' }}
-                    </div>
+                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
                 {% endif %}
             </a>
-            <a href="{{ url_for('auth.logout') }}">Logout</a>
+            <a href="{{ url_for('auth.logout') }}" class="logout-link">Logout</a>
         </div>
     </nav>
-    
+
     <div class="container">
-        <a href="{{ url_for('contractor.browse_projects') }}" class="back-link">
-            ← Back to Projects
-        </a>
-        
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">📝 Submit Your Bid</h1>
-            <p style="color: #666;">Project: <strong>{{ project.title }}</strong></p>
+        <a href="{{ url_for('contractor.browse_projects') }}" class="back-link">← Back to Projects</a>
+
+        <div class="page-banner">
+            <h1>📝 Submit Your Bid</h1>
+            <div class="divider"></div>
+            <p>Project: <strong>{{ project.title }}</strong></p>
         </div>
-        
-        <div class="alert alert-warning">
+
+        <div class="alert-warning">
             <strong>⚠️ Important:</strong> Make sure your bid is competitive and realistic. Once submitted, the project owner will review it along with other bids.
         </div>
-        
+
         <form method="POST" id="bidForm">
             <div class="two-column">
-                <!-- Main Form -->
                 <div>
-                    <!-- Cost Breakdown -->
                     <div class="section">
                         <h3 class="section-title">💰 Cost Breakdown</h3>
-                        
-                        <div class="cost-breakdown">
+                        <div class="cost-grid">
                             <div class="form-group">
                                 <label for="material_cost">Material Cost (₹)</label>
-                                <input type="number" id="material_cost" name="material_cost" 
-                                       min="0" step="0.01" value="0" required>
+                                <input type="number" id="material_cost" name="material_cost" min="0" step="0.01" value="0" required>
                             </div>
-                            
                             <div class="form-group">
                                 <label for="labor_cost">Labor Cost (₹)</label>
-                                <input type="number" id="labor_cost" name="labor_cost" 
-                                       min="0" step="0.01" value="0" required>
+                                <input type="number" id="labor_cost" name="labor_cost" min="0" step="0.01" value="0" required>
                             </div>
-                            
                             <div class="form-group">
                                 <label for="other_cost">Other Costs (₹)</label>
-                                <input type="number" id="other_cost" name="other_cost" 
-                                       min="0" step="0.01" value="0" required>
+                                <input type="number" id="other_cost" name="other_cost" min="0" step="0.01" value="0" required>
                                 <div class="helper-text">Permits, inspections, overhead, etc.</div>
                             </div>
                         </div>
-                        
-                        <div class="total-cost">
-                            <div class="total-label">Total Bid Amount</div>
-                            <div class="total-amount" id="totalAmount">₹0</div>
+                        <div class="total-strip">
+                            <div class="label">Total Bid Amount</div>
+                            <div class="amount" id="totalAmount">₹0</div>
                         </div>
-                        
                         <input type="hidden" id="total_cost" name="total_cost" value="0">
                     </div>
-                    
-                    <!-- Timeline -->
+
                     <div class="section">
                         <h3 class="section-title">⏱️ Timeline</h3>
-                        
                         <div class="form-group">
                             <label for="duration_days">Estimated Duration (Months)</label>
-                            <input type="number" id="duration_days" name="duration_days" 
-                                   min="1" required placeholder="e.g., 90">
+                            <input type="number" id="duration_days" name="duration_days" min="1" required placeholder="e.g., 6">
                             <div class="helper-text">Total months from start to completion</div>
                         </div>
                     </div>
-                    
-                    <!-- Proposal -->
+
                     <div class="section">
                         <h3 class="section-title">📋 Your Proposal</h3>
-                        
                         <div class="form-group">
                             <label for="proposal">Detailed Proposal</label>
-                            <textarea id="proposal" name="proposal" required 
-                                      placeholder="Explain your approach, experience with similar projects, what makes your bid competitive, timeline breakdown, etc."></textarea>
-                            <div class="helper-text">Provide details about your approach and why you're the best choice</div>
+                            <textarea id="proposal" name="proposal" required placeholder="Explain your approach, experience with similar projects, what makes your bid competitive, timeline breakdown, etc."></textarea>
                         </div>
                     </div>
-                    
-                    <!-- Actions -->
+
                     <div class="form-actions">
                         <a href="{{ url_for('contractor.browse_projects') }}" class="btn btn-secondary">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Submit Bid</button>
+                        <button type="submit" class="btn btn-primary">Submit Bid →</button>
                     </div>
                 </div>
-                
-                <!-- Sidebar - Project Info -->
+
                 <div>
                     <div class="section">
                         <h3 class="section-title">📋 Project Details</h3>
-                        
                         <div class="info-card">
-                            <div class="info-row">
-                                <span class="info-label">Area</span>
-                                <span class="info-value">{{ project.square_feet }} sq ft</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Rooms</span>
-                                <span class="info-value">{{ project.rooms }}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Floors</span>
-                                <span class="info-value">{{ project.floors }}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Location</span>
-                                <span class="info-value">{{ project.location }}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Budget</span>
-                                <span class="info-value">{{ project.budget_range.title() }}</span>
-                            </div>
+                            <div class="info-row"><span class="info-label">Area</span><span class="info-value">{{ project.square_feet }} sq ft</span></div>
+                            <div class="info-row"><span class="info-label">Rooms</span><span class="info-value">{{ project.rooms }}</span></div>
+                            <div class="info-row"><span class="info-label">Floors</span><span class="info-value">{{ project.floors }}</span></div>
+                            <div class="info-row"><span class="info-label">Location</span><span class="info-value">{{ project.location }}</span></div>
+                            <div class="info-row"><span class="info-label">Budget</span><span class="info-value">{{ project.budget_range.title() }}</span></div>
                         </div>
                     </div>
-                    
-                    <div class="section" style="background: #fff9e6;">
+
+                    <div class="section" style="background: var(--sand);">
                         <h3 class="section-title">💡 Tips for Success</h3>
-                        <ul style="line-height: 2; color: #666; padding-left: 20px;">
+                        <ul class="tips-list">
                             <li>Be realistic with costs</li>
                             <li>Provide a detailed breakdown</li>
                             <li>Highlight your experience</li>
@@ -459,57 +173,26 @@
             </div>
         </form>
     </div>
-    
+
     <script>
-        // Calculate total cost
         function calculateTotal() {
-            const material = parseFloat(document.getElementById('material_cost').value) || 0;
-            const labor = parseFloat(document.getElementById('labor_cost').value) || 0;
-            const other = parseFloat(document.getElementById('other_cost').value) || 0;
-            
-            const total = material + labor + other;
-            
-            document.getElementById('totalAmount').textContent = '₹' + total.toLocaleString('en-IN', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-            
+            const m = parseFloat(document.getElementById('material_cost').value) || 0;
+            const l = parseFloat(document.getElementById('labor_cost').value) || 0;
+            const o = parseFloat(document.getElementById('other_cost').value) || 0;
+            const total = m + l + o;
+            document.getElementById('totalAmount').textContent = '₹' + total.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
             document.getElementById('total_cost').value = total;
         }
-        
-        // Add event listeners
-        document.getElementById('material_cost').addEventListener('input', calculateTotal);
-        document.getElementById('labor_cost').addEventListener('input', calculateTotal);
-        document.getElementById('other_cost').addEventListener('input', calculateTotal);
-        
-        // Form validation
+        ['material_cost', 'labor_cost', 'other_cost'].forEach(id => document.getElementById(id).addEventListener('input', calculateTotal));
         document.getElementById('bidForm').addEventListener('submit', function(e) {
-            const total = parseFloat(document.getElementById('total_cost').value);
-            
-            if (total <= 0) {
-                e.preventDefault();
-                alert('Please enter valid costs. Total bid amount must be greater than 0.');
-                return false;
+            if (parseFloat(document.getElementById('total_cost').value) <= 0) {
+                e.preventDefault(); alert('Please enter valid costs. Total bid amount must be greater than 0.'); return;
             }
-            
-            const duration = parseInt(document.getElementById('duration_days').value);
-            if (duration < 1) {
-                e.preventDefault();
-                alert('Duration must be at least 1 day.');
-                return false;
+            if (parseInt(document.getElementById('duration_days').value) < 1) {
+                e.preventDefault(); alert('Duration must be at least 1 month.'); return;
             }
-            
-            const proposal = document.getElementById('proposal').value.trim();
-            if (proposal.length < 50) {
-                e.preventDefault();
-                alert('Please provide a more detailed proposal (at least 50 characters).');
-                return false;
-            }
-            
-            return confirm('Are you sure you want to submit this bid? Make sure all details are correct.');
+            if (!confirm('Are you sure you want to submit this bid? Make sure all details are correct.')) e.preventDefault();
         });
-        
-        // Initial calculation
         calculateTotal();
     </script>
 </body>

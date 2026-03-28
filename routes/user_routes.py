@@ -260,7 +260,7 @@ def create_project():
     if request.method == 'POST':
         from services.calculation_service import calculate_materials_and_cost
 
-        # ── Core scalar fields (still kept for backwards-compat + DB storage) ──
+        # ── Core scalar fields ────────────────────────────────────────────────
         square_feet  = float(request.form.get('square_feet', 0) or 0)
         plot_area    = float(request.form.get('plot_area', 0) or 0)
         prop_type    = request.form.get('property_type', 'residential')
@@ -279,219 +279,217 @@ def create_project():
             floors    = int(request.form.get('floors') or 1)
             bathrooms = int(request.form.get('bathrooms') or 2)
 
-        # ── Full estimation with all form fields ──
+        # ── Full estimation with all form fields ──────────────────────────────
         estimation = calculate_materials_and_cost(
             square_feet  = square_feet,
             rooms        = rooms,
             floors       = floors,
             bathrooms    = bathrooms,
             budget_range = budget_range,
-            form         = request.form,          # ← NEW: pass full form
+            form         = request.form,
         )
 
-       
+        project_data = {
+            # ── Core ─────────────────────────────────────────────────────────
+            'user_id':        current_user.id,
+            'title':          request.form.get('title'),
+            'square_feet':    square_feet,
+            'plot_area':      plot_area,
+            'rooms':          rooms,
+            'floors':         floors,
+            'bathrooms':      bathrooms,
+            'location':       request.form.get('location'),
+            'property_type':  prop_type,
+            'budget_range':   budget_range,
+            'estimate_scope': request.form.get('estimate_scope', 'material_only'),
+            'description':    request.form.get('description'),
+            'status':         'planning',
+            'created_at':     datetime.now(),
+            'estimation':     estimation,
 
-project_data = {
-    # ── Core ──────────────────────────────────────────────────────────────────
-    'user_id':        current_user.id,
-    'title':          request.form.get('title'),
-    'square_feet':    square_feet,
-    'plot_area':      plot_area,
-    'rooms':          rooms,
-    'floors':         floors,
-    'bathrooms':      bathrooms,
-    'location':       request.form.get('location'),
-    'property_type':  prop_type,
-    'budget_range':   budget_range,
-    'estimate_scope': request.form.get('estimate_scope', 'material_only'),
-    'description':    request.form.get('description'),
-    'status':         'planning',
-    'created_at':     datetime.now(),
-    'estimation':     estimation,
+            # ── Location sub-fields ───────────────────────────────────────────
+            'location_state':    request.form.get('location_state', ''),
+            'location_district': request.form.get('location_district', ''),
+            'location_place':    request.form.get('location_place', ''),
+            'location_pin':      request.form.get('location_pin', ''),
+            'location_address':  request.form.get('location_address', ''),
 
-    # ── Location sub-fields ───────────────────────────────────────────────────
-    'location_state':    request.form.get('location_state', ''),
-    'location_district': request.form.get('location_district', ''),
-    'location_place':    request.form.get('location_place', ''),
-    'location_pin':      request.form.get('location_pin', ''),
-    'location_address':  request.form.get('location_address', ''),
+            # ── Structural ────────────────────────────────────────────────────
+            'structure_type':     request.form.get('structure_type', ''),
+            'concrete_grade':     request.form.get('concrete_grade', ''),
+            'steel_grade':        request.form.get('steel_grade', ''),
+            'slab_thickness':     request.form.get('slab_thickness', ''),
+            'ceiling_height':     request.form.get('ceiling_height', ''),
+            'soil_condition':     request.form.get('soil_condition', ''),
+            'foundation_type':    request.form.get('foundation_type', ''),
+            'foundation_depth':   request.form.get('foundation_depth', ''),
+            'anti_termite':       request.form.get('anti_termite', ''),
+            'staircase_type':     request.form.get('staircase_type', ''),
+            'roof_waterproofing': request.form.get('roof_waterproofing', ''),
 
-    # ── Structural ────────────────────────────────────────────────────────────
-    'structure_type':      request.form.get('structure_type', ''),
-    'concrete_grade':      request.form.get('concrete_grade', ''),
-    'steel_grade':         request.form.get('steel_grade', ''),
-    'slab_thickness':      request.form.get('slab_thickness', ''),
-    'ceiling_height':      request.form.get('ceiling_height', ''),
-    'soil_condition':      request.form.get('soil_condition', ''),
-    'foundation_type':     request.form.get('foundation_type', ''),
-    'foundation_depth':    request.form.get('foundation_depth', ''),
-    'anti_termite':        request.form.get('anti_termite', ''),
-    'staircase_type':      request.form.get('staircase_type', ''),
-    'roof_waterproofing':  request.form.get('roof_waterproofing', ''),
+            # ── Masonry & Openings ────────────────────────────────────────────
+            'wall_material':         request.form.get('wall_material', ''),
+            'wall_thickness':        request.form.get('wall_thickness', ''),
+            'inner_wall_thickness':  request.form.get('inner_wall_thickness', ''),
+            'num_doors':             request.form.get('num_doors', ''),
+            'num_windows':           request.form.get('num_windows', ''),
+            'plaster_type':          request.form.get('plaster_type', ''),
+            'external_plaster_type': request.form.get('external_plaster_type', ''),
+            'door_material':         request.form.get('door_material', ''),
+            'window_material':       request.form.get('window_material', ''),
 
-    # ── Masonry & Openings ────────────────────────────────────────────────────
-    'wall_material':         request.form.get('wall_material', ''),
-    'wall_thickness':        request.form.get('wall_thickness', ''),
-    'inner_wall_thickness':  request.form.get('inner_wall_thickness', ''),
-    'num_doors':             request.form.get('num_doors', ''),
-    'num_windows':           request.form.get('num_windows', ''),
-    'plaster_type':          request.form.get('plaster_type', ''),
-    'external_plaster_type': request.form.get('external_plaster_type', ''),
-    'door_material':         request.form.get('door_material', ''),
-    'window_material':       request.form.get('window_material', ''),
+            # ── Finishing & Interiors ─────────────────────────────────────────
+            'flooring_type':           request.form.get('flooring_type', ''),
+            'bathroom_wall_tile':      request.form.get('bathroom_wall_tile', ''),
+            'internal_paint_quality':  request.form.get('internal_paint_quality', ''),
+            'external_paint_quality':  request.form.get('external_paint_quality', ''),
+            'false_ceiling_yn':        request.form.get('false_ceiling_yn', 'no'),
+            'kitchen_type':            request.form.get('kitchen_type', ''),
+            'kitchen_platform_length': request.form.get('kitchen_platform_length', ''),
+            'kitchen_platform_stone':  request.form.get('kitchen_platform_stone', ''),
 
-    # ── Finishing & Interiors ─────────────────────────────────────────────────
-    'flooring_type':            request.form.get('flooring_type', ''),
-    'bathroom_wall_tile':       request.form.get('bathroom_wall_tile', ''),
-    'internal_paint_quality':   request.form.get('internal_paint_quality', ''),
-    'external_paint_quality':   request.form.get('external_paint_quality', ''),
-    'false_ceiling_yn':         request.form.get('false_ceiling_yn', 'no'),
-    'kitchen_type':             request.form.get('kitchen_type', ''),
-    'kitchen_platform_length':  request.form.get('kitchen_platform_length', ''),
-    'kitchen_platform_stone':   request.form.get('kitchen_platform_stone', ''),
+            # ── Plumbing & Sanitary ───────────────────────────────────────────
+            'pipe_material':  request.form.get('pipe_material', ''),
+            'num_taps':       request.form.get('num_taps', ''),
+            'num_showers':    request.form.get('num_showers', ''),
+            'num_geysers':    request.form.get('num_geysers', ''),
+            'sanitary_grade': request.form.get('sanitary_grade', ''),
 
-    # ── Plumbing & Sanitary ───────────────────────────────────────────────────
-    'pipe_material':  request.form.get('pipe_material', ''),
-    'num_taps':       request.form.get('num_taps', ''),
-    'num_showers':    request.form.get('num_showers', ''),
-    'num_geysers':    request.form.get('num_geysers', ''),
-    'sanitary_grade': request.form.get('sanitary_grade', ''),
+            # ── Electrical ────────────────────────────────────────────────────
+            'num_switchboards': request.form.get('num_switchboards', ''),
+            'num_ac_points':    request.form.get('num_ac_points', ''),
+            'wiring_type':      request.form.get('wiring_type', ''),
+            'inverter_wiring':  request.form.get('inverter_wiring', ''),
+            'earthing_system':  request.form.get('earthing_system', ''),
 
-    # ── Electrical ────────────────────────────────────────────────────────────
-    'num_switchboards':  request.form.get('num_switchboards', ''),
-    'num_ac_points':     request.form.get('num_ac_points', ''),
-    'wiring_type':       request.form.get('wiring_type', ''),
-    'inverter_wiring':   request.form.get('inverter_wiring', ''),
-    'earthing_system':   request.form.get('earthing_system', ''),
+            # ── External Add-ons ──────────────────────────────────────────────
+            'car_porch_size':         request.form.get('car_porch_size', ''),
+            'car_porch_sqft':         request.form.get('car_porch_sqft', ''),
+            'garden_sqft':            request.form.get('garden_sqft', ''),
+            'boundary_rft':           request.form.get('boundary_rft', ''),
+            'boundary_finish':        request.form.get('boundary_finish', ''),
+            'sump_capacity':          request.form.get('sump_capacity', ''),
+            'overhead_tank_capacity': request.form.get('overhead_tank_capacity', ''),
 
-    # ── External Add-ons ──────────────────────────────────────────────────────
-    'car_porch_size':          request.form.get('car_porch_size', ''),
-    'car_porch_sqft':          request.form.get('car_porch_sqft', ''),
-    'garden_sqft':             request.form.get('garden_sqft', ''),
-    'boundary_rft':            request.form.get('boundary_rft', ''),
-    'boundary_finish':         request.form.get('boundary_finish', ''),
-    'sump_capacity':           request.form.get('sump_capacity', ''),
-    'overhead_tank_capacity':  request.form.get('overhead_tank_capacity', ''),
+            # ── Villa-specific ────────────────────────────────────────────────
+            'villa_roof_type':            request.form.get('villa_roof_type', ''),
+            'villa_ceiling_height':       request.form.get('villa_ceiling_height', ''),
+            'villa_staircase':            request.form.get('villa_staircase', ''),
+            'villa_concrete_grade':       request.form.get('villa_concrete_grade', ''),
+            'villa_steel_grade':          request.form.get('villa_steel_grade', ''),
+            'villa_slab_thickness':       request.form.get('villa_slab_thickness', ''),
+            'villa_soil_condition':       request.form.get('villa_soil_condition', ''),
+            'villa_foundation_type':      request.form.get('villa_foundation_type', ''),
+            'villa_foundation_depth':     request.form.get('villa_foundation_depth', ''),
+            'villa_anti_termite':         request.form.get('villa_anti_termite', ''),
+            'villa_roof_waterproofing':   request.form.get('villa_roof_waterproofing', ''),
+            'villa_wall_material':        request.form.get('villa_wall_material', ''),
+            'villa_wall_thickness':       request.form.get('villa_wall_thickness', ''),
+            'villa_inner_wall_thickness': request.form.get('villa_inner_wall_thickness', ''),
+            'villa_rooms':                request.form.get('villa_rooms', ''),
+            'villa_bathrooms':            request.form.get('villa_bathrooms', ''),
+            'villa_floors':               request.form.get('villa_floors', ''),
+            'villa_num_doors':            request.form.get('villa_num_doors', ''),
+            'villa_num_windows':          request.form.get('villa_num_windows', ''),
+            'villa_door_material':        request.form.get('villa_door_material', ''),
+            'villa_window_material':      request.form.get('villa_window_material', ''),
+            'villa_plaster_type':         request.form.get('villa_plaster_type', ''),
+            'villa_external_plaster_type':request.form.get('villa_external_plaster_type', ''),
+            'villa_flooring_grade':       request.form.get('villa_flooring_grade', ''),
+            'villa_flooring_coverage':    request.form.get('villa_flooring_coverage', ''),
+            'villa_internal_paint':       request.form.get('villa_internal_paint', ''),
+            'villa_external_paint':       request.form.get('villa_external_paint', ''),
+            'villa_false_ceiling':        request.form.get('villa_false_ceiling', 'no'),
+            'villa_cladding':             request.form.get('villa_cladding', ''),
+            'villa_bathroom_wall_tile':   request.form.get('villa_bathroom_wall_tile', ''),
+            'villa_pipe_material':        request.form.get('villa_pipe_material', ''),
+            'villa_sanitary_grade':       request.form.get('villa_sanitary_grade', ''),
+            'villa_num_taps':             request.form.get('villa_num_taps', ''),
+            'villa_num_showers':          request.form.get('villa_num_showers', ''),
+            'villa_num_geysers':          request.form.get('villa_num_geysers', ''),
+            'villa_num_switchboards':     request.form.get('villa_num_switchboards', ''),
+            'villa_num_ac_points':        request.form.get('villa_num_ac_points', ''),
+            'villa_wiring_type':          request.form.get('villa_wiring_type', ''),
+            'villa_inverter_wiring':      request.form.get('villa_inverter_wiring', ''),
+            'villa_earthing_system':      request.form.get('villa_earthing_system', ''),
+            'villa_boundary_rft':         request.form.get('villa_boundary_rft', ''),
+            'villa_boundary_height':      request.form.get('villa_boundary_height', ''),
+            'villa_boundary_finish':      request.form.get('villa_boundary_finish', ''),
+            'villa_gate_type':            request.form.get('villa_gate_type', ''),
+            'villa_garden_sqft':          request.form.get('villa_garden_sqft', ''),
+            'villa_landscaping_grade':    request.form.get('villa_landscaping_grade', ''),
+            'villa_driveway_sqft':        request.form.get('villa_driveway_sqft', ''),
+            'villa_driveway_finish':      request.form.get('villa_driveway_finish', ''),
+            'villa_car_porch_size':       request.form.get('villa_car_porch_size', ''),
+            'villa_car_porch_sqft':       request.form.get('villa_car_porch_sqft', ''),
+            'villa_car_porch_style':      request.form.get('villa_car_porch_style', ''),
+            'villa_porch_flooring':       request.form.get('villa_porch_flooring', ''),
+            'pool_length':                request.form.get('pool_length', ''),
+            'pool_width':                 request.form.get('pool_width', ''),
+            'pool_depth':                 request.form.get('pool_depth', ''),
+            'pool_finish':                request.form.get('pool_finish', ''),
+            'pool_deck':                  request.form.get('pool_deck', ''),
 
-    # ── Villa-specific ────────────────────────────────────────────────────────
-    'villa_roof_type':           request.form.get('villa_roof_type', ''),
-    'villa_ceiling_height':      request.form.get('villa_ceiling_height', ''),
-    'villa_staircase':           request.form.get('villa_staircase', ''),
-    'villa_concrete_grade':      request.form.get('villa_concrete_grade', ''),
-    'villa_steel_grade':         request.form.get('villa_steel_grade', ''),
-    'villa_slab_thickness':      request.form.get('villa_slab_thickness', ''),
-    'villa_soil_condition':      request.form.get('villa_soil_condition', ''),
-    'villa_foundation_type':     request.form.get('villa_foundation_type', ''),
-    'villa_foundation_depth':    request.form.get('villa_foundation_depth', ''),
-    'villa_anti_termite':        request.form.get('villa_anti_termite', ''),
-    'villa_roof_waterproofing':  request.form.get('villa_roof_waterproofing', ''),
-    'villa_wall_material':       request.form.get('villa_wall_material', ''),
-    'villa_wall_thickness':      request.form.get('villa_wall_thickness', ''),
-    'villa_inner_wall_thickness':request.form.get('villa_inner_wall_thickness', ''),
-    'villa_rooms':               request.form.get('villa_rooms', ''),
-    'villa_bathrooms':           request.form.get('villa_bathrooms', ''),
-    'villa_floors':              request.form.get('villa_floors', ''),
-    'villa_num_doors':           request.form.get('villa_num_doors', ''),
-    'villa_num_windows':         request.form.get('villa_num_windows', ''),
-    'villa_door_material':       request.form.get('villa_door_material', ''),
-    'villa_window_material':     request.form.get('villa_window_material', ''),
-    'villa_plaster_type':        request.form.get('villa_plaster_type', ''),
-    'villa_external_plaster_type':request.form.get('villa_external_plaster_type',''),
-    'villa_flooring_grade':      request.form.get('villa_flooring_grade', ''),
-    'villa_flooring_coverage':   request.form.get('villa_flooring_coverage', ''),
-    'villa_internal_paint':      request.form.get('villa_internal_paint', ''),
-    'villa_external_paint':      request.form.get('villa_external_paint', ''),
-    'villa_false_ceiling':       request.form.get('villa_false_ceiling', 'no'),
-    'villa_cladding':            request.form.get('villa_cladding', ''),
-    'villa_bathroom_wall_tile':  request.form.get('villa_bathroom_wall_tile', ''),
-    'villa_pipe_material':       request.form.get('villa_pipe_material', ''),
-    'villa_sanitary_grade':      request.form.get('villa_sanitary_grade', ''),
-    'villa_num_taps':            request.form.get('villa_num_taps', ''),
-    'villa_num_showers':         request.form.get('villa_num_showers', ''),
-    'villa_num_geysers':         request.form.get('villa_num_geysers', ''),
-    'villa_num_switchboards':    request.form.get('villa_num_switchboards', ''),
-    'villa_num_ac_points':       request.form.get('villa_num_ac_points', ''),
-    'villa_wiring_type':         request.form.get('villa_wiring_type', ''),
-    'villa_inverter_wiring':     request.form.get('villa_inverter_wiring', ''),
-    'villa_earthing_system':     request.form.get('villa_earthing_system', ''),
-    'villa_boundary_rft':        request.form.get('villa_boundary_rft', ''),
-    'villa_boundary_height':     request.form.get('villa_boundary_height', ''),
-    'villa_boundary_finish':     request.form.get('villa_boundary_finish', ''),
-    'villa_gate_type':           request.form.get('villa_gate_type', ''),
-    'villa_garden_sqft':         request.form.get('villa_garden_sqft', ''),
-    'villa_landscaping_grade':   request.form.get('villa_landscaping_grade', ''),
-    'villa_driveway_sqft':       request.form.get('villa_driveway_sqft', ''),
-    'villa_driveway_finish':     request.form.get('villa_driveway_finish', ''),
-    'villa_car_porch_size':      request.form.get('villa_car_porch_size', ''),
-    'villa_car_porch_sqft':      request.form.get('villa_car_porch_sqft', ''),
-    'villa_car_porch_style':     request.form.get('villa_car_porch_style', ''),
-    'villa_porch_flooring':      request.form.get('villa_porch_flooring', ''),
-    'pool_length':               request.form.get('pool_length', ''),
-    'pool_width':                request.form.get('pool_width', ''),
-    'pool_depth':                request.form.get('pool_depth', ''),
-    'pool_finish':               request.form.get('pool_finish', ''),
-    'pool_deck':                 request.form.get('pool_deck', ''),
+            # ── Apartment-specific ────────────────────────────────────────────
+            'apt_total_floors':       request.form.get('apt_total_floors', ''),
+            'apt_total_units':        request.form.get('apt_total_units', ''),
+            'apt_ceiling_height':     request.form.get('apt_ceiling_height', ''),
+            'apt_common_area_pct':    request.form.get('apt_common_area_pct', ''),
+            'apt_1bhk_count':         request.form.get('apt_1bhk_count', ''),
+            'apt_1bhk_size':          request.form.get('apt_1bhk_size', ''),
+            'apt_2bhk_count':         request.form.get('apt_2bhk_count', ''),
+            'apt_2bhk_size':          request.form.get('apt_2bhk_size', ''),
+            'apt_3bhk_count':         request.form.get('apt_3bhk_count', ''),
+            'apt_3bhk_size':          request.form.get('apt_3bhk_size', ''),
+            'apt_concrete_grade':     request.form.get('apt_concrete_grade', ''),
+            'apt_steel_grade':        request.form.get('apt_steel_grade', ''),
+            'apt_slab_thickness':     request.form.get('apt_slab_thickness', ''),
+            'apt_soil_condition':     request.form.get('apt_soil_condition', ''),
+            'apt_foundation_type':    request.form.get('apt_foundation_type', ''),
+            'apt_foundation_depth':   request.form.get('apt_foundation_depth', ''),
+            'apt_roof_waterproofing': request.form.get('apt_roof_waterproofing', ''),
+            'apt_anti_termite':       request.form.get('apt_anti_termite', ''),
+            'apt_staircases':         request.form.get('apt_staircases', ''),
+            'apt_staircase_type':     request.form.get('apt_staircase_type', ''),
+            'apt_wall_material':      request.form.get('apt_wall_material', ''),
+            'apt_wall_thickness':     request.form.get('apt_wall_thickness', ''),
+            'apt_partition_material': request.form.get('apt_partition_material', ''),
+            'apt_facade_type':        request.form.get('apt_facade_type', ''),
+            'apt_external_plaster':   request.form.get('apt_external_plaster', ''),
+            'apt_internal_plaster':   request.form.get('apt_internal_plaster', ''),
+            'apt_external_paint':     request.form.get('apt_external_paint', ''),
+            'apt_flooring_type':      request.form.get('apt_flooring_type', ''),
+            'apt_bathroom_tile':      request.form.get('apt_bathroom_tile', ''),
+            'apt_internal_paint':     request.form.get('apt_internal_paint', ''),
+            'apt_false_ceiling':      request.form.get('apt_false_ceiling', 'none'),
+            'apt_door_material':      request.form.get('apt_door_material', ''),
+            'apt_window_material':    request.form.get('apt_window_material', ''),
+            'apt_sanitary_grade':     request.form.get('apt_sanitary_grade', ''),
+            'apt_kitchen_type':       request.form.get('apt_kitchen_type', ''),
+            'apt_lifts':              request.form.get('apt_lifts', ''),
+            'apt_lift_capacity':      request.form.get('apt_lift_capacity', ''),
+            'apt_dg_backup':          request.form.get('apt_dg_backup', ''),
+            'apt_dg_kva':             request.form.get('apt_dg_kva', ''),
+            'apt_water_storage':      request.form.get('apt_water_storage', ''),
+            'apt_fire_spec':          request.form.get('apt_fire_spec', ''),
+            'apt_stp_type':           request.form.get('apt_stp_type', ''),
+            'apt_security_level':     request.form.get('apt_security_level', ''),
+            'apt_solar_kw':           request.form.get('apt_solar_kw', ''),
+            'apt_parking_type':       request.form.get('apt_parking_type', ''),
+            'apt_parking_slots':      request.form.get('apt_parking_slots', ''),
+            'apt_basement_depth':     request.form.get('apt_basement_depth', ''),
+            'apt_clubhouse':          request.form.get('apt_clubhouse', ''),
+            'apt_pool':               request.form.get('apt_pool', ''),
+            'apt_pool_finish':        request.form.get('apt_pool_finish', ''),
+            'apt_external_dev_sqft':  request.form.get('apt_external_dev_sqft', ''),
+            'apt_external_dev_grade': request.form.get('apt_external_dev_grade', ''),
+            'apt_common_flooring':    request.form.get('apt_common_flooring', ''),
+            'apt_common_paint':       request.form.get('apt_common_paint', ''),
+            'apt_common_ceiling':     request.form.get('apt_common_ceiling', ''),
+            'apt_lobby_wall_finish':  request.form.get('apt_lobby_wall_finish', ''),
+        }
 
-    # ── Apartment-specific ────────────────────────────────────────────────────
-    'apt_total_floors':       request.form.get('apt_total_floors', ''),
-    'apt_total_units':        request.form.get('apt_total_units', ''),
-    'apt_ceiling_height':     request.form.get('apt_ceiling_height', ''),
-    'apt_common_area_pct':    request.form.get('apt_common_area_pct', ''),
-    'apt_1bhk_count':         request.form.get('apt_1bhk_count', ''),
-    'apt_1bhk_size':          request.form.get('apt_1bhk_size', ''),
-    'apt_2bhk_count':         request.form.get('apt_2bhk_count', ''),
-    'apt_2bhk_size':          request.form.get('apt_2bhk_size', ''),
-    'apt_3bhk_count':         request.form.get('apt_3bhk_count', ''),
-    'apt_3bhk_size':          request.form.get('apt_3bhk_size', ''),
-    'apt_concrete_grade':     request.form.get('apt_concrete_grade', ''),
-    'apt_steel_grade':        request.form.get('apt_steel_grade', ''),
-    'apt_slab_thickness':     request.form.get('apt_slab_thickness', ''),
-    'apt_soil_condition':     request.form.get('apt_soil_condition', ''),
-    'apt_foundation_type':    request.form.get('apt_foundation_type', ''),
-    'apt_foundation_depth':   request.form.get('apt_foundation_depth', ''),
-    'apt_roof_waterproofing': request.form.get('apt_roof_waterproofing', ''),
-    'apt_anti_termite':       request.form.get('apt_anti_termite', ''),
-    'apt_staircases':         request.form.get('apt_staircases', ''),
-    'apt_staircase_type':     request.form.get('apt_staircase_type', ''),
-    'apt_wall_material':      request.form.get('apt_wall_material', ''),
-    'apt_wall_thickness':     request.form.get('apt_wall_thickness', ''),
-    'apt_partition_material': request.form.get('apt_partition_material', ''),
-    'apt_facade_type':        request.form.get('apt_facade_type', ''),
-    'apt_external_plaster':   request.form.get('apt_external_plaster', ''),
-    'apt_internal_plaster':   request.form.get('apt_internal_plaster', ''),
-    'apt_external_paint':     request.form.get('apt_external_paint', ''),
-    'apt_flooring_type':      request.form.get('apt_flooring_type', ''),
-    'apt_bathroom_tile':      request.form.get('apt_bathroom_tile', ''),
-    'apt_internal_paint':     request.form.get('apt_internal_paint', ''),
-    'apt_false_ceiling':      request.form.get('apt_false_ceiling', 'none'),
-    'apt_door_material':      request.form.get('apt_door_material', ''),
-    'apt_window_material':    request.form.get('apt_window_material', ''),
-    'apt_sanitary_grade':     request.form.get('apt_sanitary_grade', ''),
-    'apt_kitchen_type':       request.form.get('apt_kitchen_type', ''),
-    'apt_lifts':              request.form.get('apt_lifts', ''),
-    'apt_lift_capacity':      request.form.get('apt_lift_capacity', ''),
-    'apt_dg_backup':          request.form.get('apt_dg_backup', ''),
-    'apt_dg_kva':             request.form.get('apt_dg_kva', ''),
-    'apt_water_storage':      request.form.get('apt_water_storage', ''),
-    'apt_fire_spec':          request.form.get('apt_fire_spec', ''),
-    'apt_stp_type':           request.form.get('apt_stp_type', ''),
-    'apt_security_level':     request.form.get('apt_security_level', ''),
-    'apt_solar_kw':           request.form.get('apt_solar_kw', ''),
-    'apt_parking_type':       request.form.get('apt_parking_type', ''),
-    'apt_parking_slots':      request.form.get('apt_parking_slots', ''),
-    'apt_basement_depth':     request.form.get('apt_basement_depth', ''),
-    'apt_clubhouse':          request.form.get('apt_clubhouse', ''),
-    'apt_pool':               request.form.get('apt_pool', ''),
-    'apt_pool_finish':        request.form.get('apt_pool_finish', ''),
-    'apt_external_dev_sqft':  request.form.get('apt_external_dev_sqft', ''),
-    'apt_external_dev_grade': request.form.get('apt_external_dev_grade', ''),
-    'apt_common_flooring':    request.form.get('apt_common_flooring', ''),
-    'apt_common_paint':       request.form.get('apt_common_paint', ''),
-    'apt_common_ceiling':     request.form.get('apt_common_ceiling', ''),
-    'apt_lobby_wall_finish':  request.form.get('apt_lobby_wall_finish', ''),
-}
-
-    doc_ref    = db.collection('projects').add(project_data)
+        doc_ref    = db.collection('projects').add(project_data)
         project_id = doc_ref[1].id
         project_data['id'] = project_id
 
@@ -2316,3 +2314,80 @@ def create_notification(user_id, title, message, type, link=None):
     }
     
     db.collection('notifications').add(notification_data)
+
+@user_bp.route('/bids')
+@login_required
+def all_bids():
+    """View all bids across all of the user's projects"""
+    db = get_db()
+    if not db:
+        flash('Database connection error', 'error')
+        return redirect(url_for('user.dashboard'))
+
+    try:
+        # Get all user projects first
+        projects_ref = db.collection('projects').where('user_id', '==', current_user.id).stream()
+        projects_map = {}
+        for doc in projects_ref:
+            projects_map[doc.id] = doc.to_dict()
+            projects_map[doc.id]['id'] = doc.id
+
+        # Get all bids for those projects
+        all_bids = []
+        for project_id, project_data in projects_map.items():
+            bids_ref = db.collection('bids').where('project_id', '==', project_id).stream()
+            for doc in bids_ref:
+                bid = doc.to_dict()
+                bid['id'] = doc.id
+                bid['project_title'] = project_data.get('title', 'Untitled')
+                bid['project_id']    = project_id
+                all_bids.append(bid)
+
+        # Sort newest first
+        all_bids.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
+
+        stats = {
+            'total':    len(all_bids),
+            'pending':  len([b for b in all_bids if b.get('status') == 'pending']),
+            'accepted': len([b for b in all_bids if b.get('status') == 'accepted']),
+            'rejected': len([b for b in all_bids if b.get('status') == 'rejected']),
+        }
+
+        # Profile picture for navbar
+        user_profile_picture = None
+        try:
+            user_doc = db.collection('users').document(current_user.id).get()
+            if user_doc.exists:
+                user_profile_picture = user_doc.to_dict().get('profile_picture')
+        except Exception:
+            pass
+
+        return render_template('user/all_bids.html',
+                               bids=all_bids,
+                               stats=stats,
+                               user_profile_picture=user_profile_picture)
+
+    except Exception as e:
+        flash(f'Error loading bids: {str(e)}', 'error')
+        return redirect(url_for('user.dashboard'))
+
+@user_bp.route('/bids/pending-count')
+@login_required
+def bids_pending_count():
+    """Return count of pending bids across all user projects — used by navbar badge"""
+    db = get_db()
+    if not db:
+        return jsonify({'count': 0})
+    try:
+        projects_ref = db.collection('projects').where('user_id', '==', current_user.id).stream()
+        count = 0
+        for p_doc in projects_ref:
+            bids = db.collection('bids') \
+                     .where('project_id', '==', p_doc.id) \
+                     .where('status', '==', 'pending') \
+                     .stream()
+            count += sum(1 for _ in bids)
+        return jsonify({'count': count})
+    except Exception as e:
+        print(f"Error getting pending bid count: {e}")
+        return jsonify({'count': 0})

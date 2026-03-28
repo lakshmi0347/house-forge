@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bids - House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base:        #F2EDE4;
+            --bg-card:        #FAF7F2;
+            --bg-card2:       #F5F0E8;
+            --sand:           #EDE6DB;
+            --stone:          #D9CFC2;
+            --accent:         #C9A84C;
+            --accent-dark:    #a8893a;
+            --accent-light:   #FBF3E0;
+            --text-primary:   #1C1917;
+            --text-secondary: #5C4F43;
+            --text-muted:     #8C7E72;
+            --shadow-sm: 0 1px 3px rgba(28,25,23,0.07);
+            --shadow-md: 0 4px 18px rgba(28,25,23,0.09);
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg-base); min-height: 100vh; color: var(--text-primary); position: relative; }
+        body::before { content: ''; position: fixed; inset: 0; background: url('/static/images/house.jpg') no-repeat center / cover; opacity: 0.055; filter: saturate(0.2) sepia(0.3); z-index: 0; pointer-events: none; }
+
+        /* ── NAVBAR ── */
+        .navbar { background: rgba(250,247,242,0.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--stone); padding: 0 40px; height: 68px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
+        .navbar-brand { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .navbar-brand-icon { width: 34px; height: 34px; background: var(--accent); border-radius: 9px; display: flex; align-items: center; justify-content: center; color: #0A0A0A; }
+        .navbar-menu { display: flex; align-items: center; gap: 2px; }
+        .navbar-menu a { color: var(--text-secondary); text-decoration: none; padding: 8px 13px; border-radius: 8px; font-size: 14px; font-weight: 500; transition: color 0.2s, background 0.2s; display: flex; align-items: center; gap: 6px; position: relative; }
+        .navbar-menu a:hover, .navbar-menu a.nav-active { color: var(--accent); background: var(--accent-light); }
+        .badge-notification { position: absolute; top: 3px; right: 3px; background: #DC2626; color: white; border-radius: 50%; width: 16px; height: 16px; display: none; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; border: 2px solid var(--bg-card); }
+        .profile-pic { width: 33px; height: 33px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); }
+        .profile-placeholder { width: 33px; height: 33px; border-radius: 50%; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; border: 2px solid var(--stone); }
+        .nav-divider { width: 1px; height: 20px; background: var(--stone); margin: 0 4px; }
+        .logout-link { color: var(--text-muted) !important; padding: 8px 13px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 5px; transition: color 0.2s, background 0.2s; text-decoration: none; }
+        .logout-link:hover { color: #DC2626 !important; background: #FEF2F2; }
+
+        /* ── LAYOUT ── */
+        .container { max-width: 1100px; margin: 32px auto; padding: 0 24px; position: relative; z-index: 1; }
+
+        /* ── PAGE HEADER ── */
+        .page-header { background: var(--bg-card); border: 1px solid var(--stone); border-radius: 20px; padding: 32px 40px; margin-bottom: 22px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; animation: fadeUp 0.4s ease both; }
+        .page-header::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: linear-gradient(180deg, #C9A84C, #E8C97A); border-radius: 20px 0 0 20px; }
+        .page-header h1 { font-family: 'Playfair Display', serif; font-size: 27px; font-weight: 700; margin-bottom: 4px; }
+        .divider { width: 38px; height: 3px; background: var(--accent); border-radius: 2px; margin: 10px 0 14px; }
+        .page-header p { color: var(--text-secondary); font-size: 14px; }
+
+        /* ── STATS ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; animation: fadeUp 0.4s 0.08s ease both; }
+        @media (max-width: 700px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--stone); border-radius: 14px; padding: 20px; text-align: center; box-shadow: var(--shadow-sm); transition: all 0.25s; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: rgba(201,168,76,0.4); }
+        .stat-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+        .stat-number { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+        .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); }
+
+        /* ── FILTER TABS ── */
+        .filter-tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; animation: fadeUp 0.4s 0.12s ease both; }
+        .tab { padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--stone); background: var(--bg-card); color: var(--text-secondary); transition: all 0.2s; }
+        .tab:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+        .tab.active { background: var(--accent); color: #0A0A0A; border-color: var(--accent); }
+
+        /* ── BID CARD ── */
+        .bid-card { background: var(--bg-card); border: 1px solid var(--stone); border-radius: 16px; padding: 26px 30px; margin-bottom: 16px; box-shadow: var(--shadow-sm); transition: all 0.25s; animation: fadeUp 0.4s 0.15s ease both; }
+        .bid-card:hover { box-shadow: var(--shadow-md); border-color: rgba(201,168,76,0.35); }
+        .bid-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 14px; }
+        .contractor-info { display: flex; align-items: center; gap: 14px; }
+        .contractor-avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--accent-light); border: 2px solid var(--stone); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .contractor-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+        .contractor-sub { font-size: 12px; color: var(--text-secondary); }
+        .contractor-rating { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+        /* Project tag on bid */
+        .project-tag { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; background: var(--sand); border: 1px solid var(--stone); border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--text-secondary); text-decoration: none; transition: all 0.2s; margin-bottom: 14px; }
+        .project-tag:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+
+        /* Status badges */
+        .status-badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; flex-shrink: 0; }
+        .status-pending  { background: #FEF3C7; color: #92400E; }
+        .status-accepted { background: #D1FAE5; color: #065F46; }
+        .status-rejected { background: #FEE2E2; color: #991B1B; }
+
+        /* Details grid */
+        .bid-details { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px 18px; background: var(--sand); border-radius: 10px; margin: 12px 0; }
+        @media (max-width: 600px) { .bid-details { grid-template-columns: repeat(2, 1fr); } }
+        .detail-item { text-align: center; }
+        .detail-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 5px; }
+        .detail-value { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+        .detail-value.accent { color: var(--accent); }
+
+        /* Proposal */
+        .bid-proposal { padding: 13px 15px; background: var(--bg-base); border: 1px solid var(--stone); border-radius: 8px; font-size: 13px; line-height: 1.65; color: var(--text-secondary); margin: 12px 0 8px; }
+        .bid-proposal strong { color: var(--text-primary); }
+        .bid-timestamp { font-size: 11px; color: var(--text-muted); margin-bottom: 14px; }
+
+        /* Actions */
+        .bid-actions { display: flex; gap: 10px; }
+        .btn-accept { flex: 1; padding: 10px 18px; background: var(--accent); color: #0A0A0A; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+        .btn-accept:hover { background: var(--accent-dark); transform: translateY(-1px); }
+        .btn-reject { flex: 1; padding: 10px 18px; background: transparent; color: #DC2626; border: 1.5px solid #FECACA; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+        .btn-reject:hover { background: #FEF2F2; }
+        .btn-view-project { padding: 10px 16px; background: var(--sand); color: var(--text-secondary); border: 1px solid var(--stone); border-radius: 8px; font-weight: 600; font-size: 13px; text-decoration: none; transition: all 0.2s; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-view-project:hover { background: var(--stone); }
+
+        /* Empty state */
+        .empty-state { text-align: center; padding: 64px 20px; background: var(--bg-card); border: 1px solid var(--stone); border-radius: 16px; }
+        .empty-icon { font-size: 56px; margin-bottom: 14px; opacity: 0.5; }
+        .empty-state h2 { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 8px; }
+        .empty-state p { color: var(--text-muted); font-size: 14px; }
+
+        /* Alerts */
+        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
+        .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+        .alert-error   { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">
+            <div class="navbar-brand-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            House-Forge
+        </a>
+        <div class="navbar-menu">
+            <a href="{{ url_for('user.dashboard') }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Dashboard
+            </a>
+            <a href="{{ url_for('user.projects') }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                My Projects
+            </a>
+            <a href="{{ url_for('user.all_bids') }}" class="nav-active">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                My Bids
+            </a>
+            <a href="{{ url_for('user.my_orders') }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                My Orders
+            </a>
+            <a href="{{ url_for('user.messages') }}" style="position:relative;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Messages
+                <span class="badge-notification" id="messagesBadge"></span>
+            </a>
+            <div class="nav-divider"></div>
+            <a href="{{ url_for('user.profile') }}" style="padding:8px 9px;">
+                {% if user_profile_picture %}
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
+                {% else %}
+                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('auth.logout') }}" class="logout-link">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>📋 My Bids</h1>
+            <div class="divider"></div>
+            <p>All contractor bids across your projects — review, accept or reject from here</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}{% endif %}
+        {% endwith %}
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-icon">📋</span>
+                <div class="stat-number">{{ stats.total }}</div>
+                <div class="stat-label">Total Bids</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">⏳</span>
+                <div class="stat-number">{{ stats.pending }}</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">✅</span>
+                <div class="stat-number">{{ stats.accepted }}</div>
+                <div class="stat-label">Accepted</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">❌</span>
+                <div class="stat-number">{{ stats.rejected }}</div>
+                <div class="stat-label">Rejected</div>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <div class="tab active" onclick="filterBids('all', this)">All ({{ stats.total }})</div>
+            <div class="tab" onclick="filterBids('pending', this)">⏳ Pending ({{ stats.pending }})</div>
+            <div class="tab" onclick="filterBids('accepted', this)">✅ Accepted ({{ stats.accepted }})</div>
+            <div class="tab" onclick="filterBids('rejected', this)">❌ Rejected ({{ stats.rejected }})</div>
+        </div>
+
+        <!-- Bids List -->
+        {% if bids %}
+            {% for bid in bids %}
+            <div class="bid-card" data-status="{{ bid.status }}">
+                <!-- Project Tag -->
+                <a href="{{ url_for('user.project_bids', project_id=bid.project_id) }}" class="project-tag">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    {{ bid.project_title }}
+                </a>
+
+                <div class="bid-header">
+                    <div class="contractor-info">
+                        <div class="contractor-avatar">🔨</div>
+                        <div>
+                            <div class="contractor-name">{{ bid.contractor_company or bid.contractor_name }}</div>
+                            <div class="contractor-sub">{{ bid.contractor_name if bid.contractor_company else 'Professional Contractor' }}</div>
+                            <div class="contractor-rating">⭐ {{ "%.1f"|format(bid.contractor_rating or 0) }} · {{ bid.contractor_experience or 0 }} yrs experience</div>
+                        </div>
+                    </div>
+                    <span class="status-badge status-{{ bid.status }}">
+                        {% if bid.status == 'pending' %}⏳ Pending
+                        {% elif bid.status == 'accepted' %}✅ Accepted
+                        {% else %}❌ Rejected{% endif %}
+                    </span>
+                </div>
+
+                <div class="bid-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Total Cost</div>
+                        <div class="detail-value accent">₹{{ "{:,.0f}".format(bid.total_cost or 0) }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Duration</div>
+                        <div class="detail-value">{{ bid.duration_days or '—' }} days</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Materials</div>
+                        <div class="detail-value">₹{{ "{:,.0f}".format(bid.material_cost or 0) }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Labour</div>
+                        <div class="detail-value">₹{{ "{:,.0f}".format(bid.labor_cost or 0) }}</div>
+                    </div>
+                </div>
+
+                {% if bid.get('proposal') %}
+                <div class="bid-proposal"><strong>Proposal:</strong><br>{{ bid.proposal }}</div>
+                {% endif %}
+                <div class="bid-timestamp">
+                    Submitted: {{ bid.created_at.strftime('%d %b %Y, %I:%M %p') if bid.created_at else 'N/A' }}
+                </div>
+
+                <div class="bid-actions">
+                    {% if bid.status == 'pending' %}
+                    <form method="POST" action="{{ url_for('user.accept_bid', bid_id=bid.id) }}" onsubmit="return confirm('Accept this bid? All other bids for this project will be rejected.');" style="flex:1;">
+                        <button type="submit" class="btn-accept" style="width:100%;">✅ Accept Bid</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('user.reject_bid', bid_id=bid.id) }}" onsubmit="return confirm('Reject this bid?');" style="flex:1;">
+                        <button type="submit" class="btn-reject" style="width:100%;">❌ Reject Bid</button>
+                    </form>
+                    {% endif %}
+                    <a href="{{ url_for('user.project_bids', project_id=bid.project_id) }}" class="btn-view-project">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        View in Project
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <h2>No Bids Yet</h2>
+                <p>No contractors have submitted bids on your projects yet.<br>Share your projects with contractors to receive bids.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // ── Filter tabs ───────────────────────────────────────────────────────
+        function filterBids(status, tabEl) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tabEl.classList.add('active');
+            document.querySelectorAll('.bid-card').forEach(card => {
+                card.style.display = (status === 'all' || card.dataset.status === status) ? '' : 'none';
+            });
+        }
+
+        // ── Navbar badges ─────────────────────────────────────────────────────
+        function updateBadge(url, id) {
+            fetch(url).then(r => {
+                if (!r.ok) return null;
+                return r.headers.get('content-type')?.includes('application/json') ? r.json() : null;
+            }).then(data => {
+                if (!data) return;
+                const b = document.getElementById(id);
+                if (!b) return;
+                b.style.display = data.count > 0 ? 'flex' : 'none';
+                if (data.count > 0) b.textContent = data.count;
+            }).catch(() => {});
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            updateBadge('/user/messages/unread-count', 'messagesBadge');
+        });
+        setInterval(() => updateBadge('/user/messages/unread-count', 'messagesBadge'), 30000);
+    </script>
+</body>
+</html>

@@ -616,6 +616,7 @@
     <div class="hero-icon-wrap">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
+    
     <h1>Estimation Complete</h1>
     <div class="hero-divider"></div>
     <p class="hero-sub">
@@ -653,7 +654,7 @@
 <div class="price-disclaimer">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     {% if estimation.get('ai_success') %}
-        <strong>AI-refined estimate</strong> — base rates are March 2026 market averages, adjusted by AI for your location &amp; spec. Actual quotes from contractors may vary ±10–20%.
+        <strong></strong> Base rates are March 2026 market averages, adjusted by AI for your location &amp; spec. Actual quotes from contractors may vary ±10–20%.
     {% else %}
         <strong>Base rate estimate</strong> — prices are March 2026 Indian market averages. AI refinement was unavailable. Actual quotes may vary ±15–20%. Always verify with local suppliers.
     {% endif %}
@@ -766,8 +767,8 @@
                 <div class="m-icon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
-                <div class="m-val">{{ estimation.timeline.get('total_days', 0) | int }}</div>
-                <div class="m-lbl">Days to Build</div>
+                <div class="m-val">{{ estimation.timeline.get('total_months', 0) | int }}</div>
+                <div class="m-lbl">Months to Build</div>
             </div>
             <div class="metric">
                 <div class="m-icon">

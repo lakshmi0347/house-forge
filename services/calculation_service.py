@@ -953,7 +953,7 @@ def _build_timeline(sqft, floors, rooms):
 # ─────────────────────────────────────────────────────────────────
 
 AI_FAILURE_RESULT = {
-    "rationale":  ("AI refinement unavailable — estimate uses base rate tables "
+    "rationale":  ("Estimate uses base rate tables "
                    "(March 2026 market prices). Rates may vary ±10–15% by location."),
     "confidence": 0,   # 0 signals failure to the template
 }

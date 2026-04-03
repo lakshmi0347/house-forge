@@ -41,7 +41,11 @@ def dashboard():
 
     projects_ref = db.collection('projects').where('user_id', '==', current_user.id).stream()
     projects = []
+    seen_ids = set()
     for doc in projects_ref:
+        if doc.id in seen_ids:
+            continue
+        seen_ids.add(doc.id)
         project_data = doc.to_dict()
         project_data['id'] = doc.id
         projects.append(project_data)
@@ -222,7 +226,11 @@ def projects():
     
     projects_ref = db.collection('projects').where('user_id', '==', current_user.id).stream()
     projects = []
+    seen_ids = set()
     for doc in projects_ref:
+        if doc.id in seen_ids:
+            continue
+        seen_ids.add(doc.id)
         project_data = doc.to_dict()
         project_data['id'] = doc.id
         print(f"📋 Found project: {project_data.get('title')} (ID: {doc.id})")

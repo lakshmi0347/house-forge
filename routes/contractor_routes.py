@@ -413,7 +413,7 @@ def submit_bid(project_id):
             
             # Get form data
             total_cost = float(request.form.get('total_cost'))
-            duration_days = int(request.form.get('duration_days'))
+            duration_months = int(request.form.get('duration_months'))
             proposal = request.form.get('proposal')
             material_cost = float(request.form.get('material_cost', 0))
             labor_cost = float(request.form.get('labor_cost', 0))
@@ -437,7 +437,7 @@ def submit_bid(project_id):
                 'material_cost': material_cost,
                 'labor_cost': labor_cost,
                 'other_cost': other_cost,
-                'duration_days': duration_days,
+                'duration_months': duration_months,
                 'proposal': proposal,
                 'status': 'pending',
                 'created_at': datetime.now(),

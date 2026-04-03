@@ -181,13 +181,13 @@
             box-shadow: var(--shadow-md);
         }
         .cost-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 6px; }
-        .cost-total { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 700; line-height: 1; margin-bottom: 20px; }
+        .cost-total { font-family: 'DM Sans', sans-serif; font-size: 44px; font-weight: 700; line-height: 1; margin-bottom: 20px; }
         .cost-total span { font-size: 22px; color: var(--accent); }
         .cost-breakdown { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
         @media (max-width: 600px) { .cost-breakdown { grid-template-columns: 1fr; } }
         .breakdown-item { background: var(--sand); border: 1px solid var(--stone); border-radius: 10px; padding: 16px; text-align: center; }
         .breakdown-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-        .breakdown-value { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; }
+        .breakdown-value { font-family: 'DM Sans', serif; font-size: 20px; font-weight: 700; }
         .labour-item.hidden { display: none; }
 
         /* ─── AI RATIONALE ─── */
@@ -621,7 +621,7 @@
                 </div>
 
                 {# ── AI RATIONALE ── #}
-                {% if estimation.get('ai_rationale') %}
+                {% if estimation.get('ai_rationale') and estimation.get('ai_success') %}
                 <div class="ai-block">
                     <span class="ai-block-icon">🤖</span>
                     <div class="ai-block-text">

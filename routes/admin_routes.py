@@ -18,6 +18,81 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
+# ── PROJECT CRUD ────────────────────────────────────────────────────────────
+
+@admin_bp.route('/projects')
+@login_required
+@admin_required
+def all_projects():
+    db = get_db()
+    projects = []
+    for doc in db.collection('projects').stream():
+        project_data = doc.to_dict()
+        project_data['id'] = doc.id
+        projects.append(project_data)
+    return render_template('admin/all_projects.html', projects=projects)
+
+
+@admin_bp.route('/projects/<project_id>')
+@login_required
+@admin_required
+def view_project(project_id):
+    """Admin view of a single project — mirrors user project detail."""
+    db = get_db()
+    doc = db.collection('projects').document(project_id).get()
+    if not doc.exists:
+        flash('Project not found.', 'error')
+        return redirect(url_for('admin.all_projects'))
+
+    project = doc.to_dict()
+    project['id'] = doc.id
+
+    # Load estimation (same collection used by user routes)
+    est_doc = db.collection('estimations').document(project_id).get()
+    if est_doc.exists:
+        estimation = est_doc.to_dict()
+    else:
+        # Fallback empty estimation so template never crashes
+        estimation = {
+            'costs': {'low': {}, 'medium': {}, 'high': {}},
+            'materials': {},
+            'timeline': {'total_days': 0},
+            'ai_success': False,
+            'ai_rationale': '',
+        }
+
+    return render_template(
+        'admin/project_detail.html',
+        project=project,
+        project_id=project_id,
+        estimation=estimation,
+    )
+
+
+@admin_bp.route('/projects/<project_id>/update', methods=['POST'])
+@login_required
+@admin_required
+def update_project(project_id):
+    db = get_db()
+    data = request.get_json()
+    data['updated_at'] = datetime.now()
+    data['updated_by'] = current_user.id
+    db.collection('projects').document(project_id).update(data)
+    return jsonify({'success': True})
+
+
+@admin_bp.route('/projects/<project_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_project(project_id):
+    db = get_db()
+    db.collection('projects').document(project_id).delete()
+    return jsonify({'success': True})
+
+
+# ── DASHBOARD ───────────────────────────────────────────────────────────────
+
 @admin_bp.route('/dashboard')
 @login_required
 @admin_required
@@ -27,28 +102,35 @@ def dashboard():
     contractors = list(db.collection('contractors').stream())
     suppliers = list(db.collection('suppliers').stream())
     pending_contractors = [c for c in contractors if not c.to_dict().get('verified', False)]
-    pending_suppliers = [s for s in suppliers if not s.to_dict().get('verified', False)]
+    pending_suppliers   = [s for s in suppliers   if not s.to_dict().get('verified', False)]
     projects = list(db.collection('projects').stream())
     active_projects = [p for p in projects if p.to_dict().get('status') == 'active']
     orders = list(db.collection('orders').stream())
-    total_revenue = sum(o.to_dict().get('total', 0) for o in orders if o.to_dict().get('status') == 'completed')
+    total_revenue = sum(
+        o.to_dict().get('total', 0)
+        for o in orders if o.to_dict().get('status') == 'completed'
+    )
     stats = {
-        'total_users': len(users),
-        'total_contractors': len(contractors),
-        'total_suppliers': len(suppliers),
+        'total_users':         len(users),
+        'total_contractors':   len(contractors),
+        'total_suppliers':     len(suppliers),
         'pending_verifications': len(pending_contractors) + len(pending_suppliers),
-        'total_projects': len(projects),
-        'active_projects': len(active_projects),
-        'total_revenue': total_revenue,
-        'total_platform_users': len(users) + len(contractors) + len(suppliers)
+        'total_projects':      len(projects),
+        'active_projects':     len(active_projects),
+        'total_revenue':       total_revenue,
+        'total_platform_users': len(users) + len(contractors) + len(suppliers),
     }
     recent_projects = projects[-5:] if len(projects) > 5 else projects
-    return render_template('admin/dashboard.html',
-                           stats=stats,
-                           pending_contractors=pending_contractors[:5],
-                           pending_suppliers=pending_suppliers[:5],
-                           recent_projects=recent_projects)
+    return render_template(
+        'admin/dashboard.html',
+        stats=stats,
+        pending_contractors=pending_contractors[:5],
+        pending_suppliers=pending_suppliers[:5],
+        recent_projects=recent_projects,
+    )
 
+
+# ── USER MANAGEMENT ─────────────────────────────────────────────────────────
 
 @admin_bp.route('/users')
 @login_required
@@ -60,7 +142,6 @@ def manage_users():
         user_data = doc.to_dict()
         user_data['id'] = doc.id
         user_data['type'] = 'user'
-        # FIX: Default verified=False so new users always need admin approval
         if 'verified' not in user_data:
             user_data['verified'] = False
         if 'active' not in user_data:
@@ -103,6 +184,8 @@ def manage_suppliers():
     return render_template('admin/manage_suppliers.html', suppliers=suppliers)
 
 
+# ── VERIFICATION ─────────────────────────────────────────────────────────────
+
 @admin_bp.route('/verify-contractor/<contractor_id>', methods=['POST'])
 @login_required
 @admin_required
@@ -112,7 +195,7 @@ def verify_contractor(contractor_id):
         db.collection('contractors').document(contractor_id).update({
             'verified': True,
             'verified_at': datetime.now(),
-            'verified_by': current_user.id
+            'verified_by': current_user.id,
         })
         flash('Contractor verified successfully!', 'success')
     except Exception as e:
@@ -129,7 +212,7 @@ def verify_supplier(supplier_id):
         db.collection('suppliers').document(supplier_id).update({
             'verified': True,
             'verified_at': datetime.now(),
-            'verified_by': current_user.id
+            'verified_by': current_user.id,
         })
         flash('Supplier verified successfully!', 'success')
     except Exception as e:
@@ -146,13 +229,15 @@ def verify_user(user_id):
         db.collection('users').document(user_id).update({
             'verified': True,
             'verified_at': datetime.now(),
-            'verified_by': current_user.id
+            'verified_by': current_user.id,
         })
         flash('User verified successfully!', 'success')
     except Exception as e:
         flash(f'Error verifying user: {str(e)}', 'error')
     return redirect(url_for('admin.manage_users'))
 
+
+# ── ACTIVATE / DEACTIVATE ────────────────────────────────────────────────────
 
 @admin_bp.route('/deactivate-user/<user_type>/<user_id>', methods=['POST'])
 @login_required
@@ -164,7 +249,7 @@ def deactivate_user(user_type, user_id):
         db.collection(collection).document(user_id).update({
             'active': False,
             'deactivated_at': datetime.now(),
-            'deactivated_by': current_user.id
+            'deactivated_by': current_user.id,
         })
         flash('User deactivated successfully!', 'success')
     except Exception as e:
@@ -181,7 +266,7 @@ def activate_user(user_type, user_id):
         collection = user_type + 's' if user_type != 'user' else 'users'
         db.collection(collection).document(user_id).update({
             'active': True,
-            'activated_at': datetime.now()
+            'activated_at': datetime.now(),
         })
         flash('User activated successfully!', 'success')
     except Exception as e:
@@ -189,35 +274,27 @@ def activate_user(user_type, user_id):
     return redirect(request.referrer or url_for('admin.dashboard'))
 
 
-@admin_bp.route('/projects')
-@login_required
-@admin_required
-def all_projects():
-    db = get_db()
-    projects = []
-    for doc in db.collection('projects').stream():
-        project_data = doc.to_dict()
-        project_data['id'] = doc.id
-        projects.append(project_data)
-    return render_template('admin/all_projects.html', projects=projects)
-
+# ── ANALYTICS ────────────────────────────────────────────────────────────────
 
 @admin_bp.route('/analytics')
 @login_required
 @admin_required
 def analytics():
     db = get_db()
-    users = list(db.collection('users').stream())
+    users       = list(db.collection('users').stream())
     contractors = list(db.collection('contractors').stream())
-    suppliers = list(db.collection('suppliers').stream())
-    projects = list(db.collection('projects').stream())
-    orders = list(db.collection('orders').stream())
+    suppliers   = list(db.collection('suppliers').stream())
+    projects    = list(db.collection('projects').stream())
+    orders      = list(db.collection('orders').stream())
     analytics_data = {
-        'user_growth': len(users),
+        'user_growth':       len(users),
         'contractor_growth': len(contractors),
-        'supplier_growth': len(suppliers),
+        'supplier_growth':   len(suppliers),
         'project_completion_rate': 0,
-        'total_revenue': sum(o.to_dict().get('total', 0) for o in orders if o.to_dict().get('status') == 'completed'),
-        'active_users': len([u for u in users if u.to_dict().get('active', True)])
+        'total_revenue': sum(
+            o.to_dict().get('total', 0)
+            for o in orders if o.to_dict().get('status') == 'completed'
+        ),
+        'active_users': len([u for u in users if u.to_dict().get('active', True)]),
     }
     return render_template('admin/analytics.html', analytics=analytics_data)

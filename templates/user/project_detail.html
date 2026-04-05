@@ -1170,7 +1170,7 @@
                         <div class="info-row"><span class="info-label">Name</span><span class="info-value">{{ project.get('contractor_name','—') }}</span></div>
                         <div class="info-row"><span class="info-label">Company</span><span class="info-value">{{ project.get('contractor_company','—') }}</span></div>
                         <div class="info-row"><span class="info-label">Agreed Cost</span><span class="info-value">₹{{ "{:,.0f}".format(project.get('agreed_cost',0)) }}</span></div>
-                        <div class="info-row"><span class="info-label">Duration</span><span class="info-value">{{ project.get('agreed_duration','—') }} days</span></div>
+                        <div class="info-row"><span class="info-label">Duration</span><span class="info-value">{{ project.get('agreed_duration','—') }} months</span></div>
                     </div>
                 </div>
                 {% endif %}
@@ -1224,26 +1224,33 @@
         </a>
         {% endif %}
  
-        <!-- Edit Project — hide when completed -->
-        {% if not is_completed %}
+        <!-- Edit Project — hide when completed, lock when contractor assigned -->
+        {% if not is_completed and not has_contractor %}
         <a href="{{ url_for('user.edit_project', project_id=project.id) }}"
            class="btn-outline">
             ✏️ Edit Project
         </a>
+        {% elif not is_completed and has_contractor %}
+        <div class="locked-action-wrap" title="A contractor is assigned — editing is locked">
+            <button class="btn-outline btn-locked" disabled>
+                🔒 Edit Project
+                <span class="lock-reason">Contractor assigned</span>
+            </button>
+        </div>
         {% endif %}
  
         <!-- ✅ Mark as Completed — shown for ALL non-completed projects
              regardless of whether a contractor is assigned or not.
              The JS confirm message adapts based on context.           -->
-        {% if not is_completed %}
-        <button
-            onclick="completeProject()"
-            class="btn-complete"
-            id="completeBtn"
-            data-has-contractor="{{ 'true' if has_contractor else 'false' }}">
-            ✅ Mark as Completed
-        </button>
-        {% endif %}
+        {% if not is_completed and not has_contractor %}
+<button
+    onclick="completeProject()"
+    class="btn-complete"
+    id="completeBtn"
+    data-has-contractor="false">
+    ✅ Mark as Completed
+</button>
+{% endif %}
  
         <!-- Already completed pill -->
         {% if is_completed %}

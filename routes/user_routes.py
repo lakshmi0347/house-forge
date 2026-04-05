@@ -50,8 +50,8 @@ def dashboard():
         project_data['id'] = doc.id
         projects.append(project_data)
 
-    estimates_ref = db.collection('estimates').where('user_id', '==', current_user.id).limit(5).stream()
-    estimates = [dict(**doc.to_dict(), id=doc.id) for doc in estimates_ref]
+    # ✅ Count projects that have an embedded estimation
+    estimates = [p for p in projects if p.get('estimation')]
 
     orders_ref = db.collection('orders').where('user_id', '==', current_user.id).limit(5).stream()
     orders = [dict(**doc.to_dict(), id=doc.id) for doc in orders_ref]
@@ -768,7 +768,7 @@ def accept_bid(bid_id):
             'contractor_name':    bid_data.get('contractor_name'),
             'contractor_company': bid_data.get('contractor_company'),
             'agreed_cost':        bid_data.get('total_cost'),
-            'agreed_duration':    bid_data.get('duration_days'),
+            'agreed_duration':    bid_data.get('duration_months'),
             'status':             'active',
             'started_at':         datetime.now(),
             'updated_at':         datetime.now(),
@@ -903,66 +903,289 @@ def view_supplier(supplier_id):
         return redirect(url_for('user.find_suppliers'))
 
 
+
 @user_bp.route('/project/<project_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_project(project_id):
-    """Edit an existing project"""
+    """Edit an existing project — full field set"""
     db = get_db()
     if not db:
         flash('Database connection error', 'error')
         return redirect(url_for('user.projects'))
-    
+
     try:
         project_doc = db.collection('projects').document(project_id).get()
-        
+
         if not project_doc.exists:
             flash('Project not found', 'error')
             return redirect(url_for('user.projects'))
-        
+
         project_data = project_doc.to_dict()
-        
+        project_data['id'] = project_id
+
         # Check ownership
         if project_data.get('user_id') != current_user.id:
             flash('Access denied', 'error')
             return redirect(url_for('user.projects'))
-        
+
+        # Profile picture for navbar
+        user_profile_picture = None
+        try:
+            user_doc = db.collection('users').document(current_user.id).get()
+            if user_doc.exists:
+                user_profile_picture = user_doc.to_dict().get('profile_picture')
+        except Exception:
+            pass
+
         if request.method == 'POST':
+            # Block edit if contractor assigned or completed
+            if project_data.get('contractor_id') or project_data.get('status') == 'completed':
+                flash('This project cannot be edited — a contractor has been assigned or the project is completed.', 'warning')
+                return redirect(url_for('user.view_project', project_id=project_id))
+
             from services.calculation_service import calculate_materials_and_cost
-            
-            square_feet = float(request.form.get('square_feet'))
-            rooms = int(request.form.get('rooms'))
-            floors = int(request.form.get('floors'))
-            bathrooms = int(request.form.get('bathrooms', 2))
-            budget_range = request.form.get('budget_range')
-            
-            # Recalculate estimation
+
+            prop_type    = request.form.get('property_type', 'residential')
+            square_feet  = float(request.form.get('square_feet') or 0)
+            budget_range = request.form.get('budget_range', 'medium')
+
+            # Rooms / floors / bathrooms differ by property type
+            if prop_type == 'apartment':
+                rooms     = int(request.form.get('apt_total_units') or 0)
+                floors    = int(request.form.get('apt_total_floors') or 1)
+                bathrooms = max(1, (int(request.form.get('apt_1bhk_count') or 0)
+                                  + int(request.form.get('apt_2bhk_count') or 0) * 2
+                                  + int(request.form.get('apt_3bhk_count') or 0) * 3)
+                              // max(rooms, 1))
+            else:
+                rooms     = int(request.form.get('rooms') or 1)
+                floors    = int(request.form.get('floors') or 1)
+                bathrooms = int(request.form.get('bathrooms') or 2)
+
+            # Recalculate estimation with full form data
             estimation = calculate_materials_and_cost(
-                square_feet, rooms, floors, bathrooms, budget_range
+                square_feet  = square_feet,
+                rooms        = rooms,
+                floors       = floors,
+                bathrooms    = bathrooms,
+                budget_range = budget_range,
+                form         = request.form,
             )
-            
-            # Update project data
+
+            def f(key, default=''):
+                return request.form.get(key, default)
+
             updated_data = {
-                'title': request.form.get('title'),
-                'square_feet': square_feet,
-                'rooms': rooms,
-                'floors': floors,
-                'bathrooms': bathrooms,
-                'location': request.form.get('location'),
-                'property_type': request.form.get('property_type', 'residential'),
-                'budget_range': budget_range,
-                'description': request.form.get('description'),
-                'estimation': estimation,
-                'updated_at': datetime.now()
+                # ── Core ─────────────────────────────────────────────────────
+                'title':          f('title'),
+                'square_feet':    square_feet,
+                'plot_area':      float(f('plot_area') or 0),
+                'rooms':          rooms,
+                'floors':         floors,
+                'bathrooms':      bathrooms,
+                'location':       f('location'),
+                'property_type':  prop_type,
+                'budget_range':   budget_range,
+                'estimate_scope': f('estimate_scope', 'material_only'),
+                'description':    f('description'),
+                'estimation':     estimation,
+                'updated_at':     datetime.now(),
+
+                # ── Location sub-fields ───────────────────────────────────────
+                'location_state':    f('location_state'),
+                'location_district': f('location_district'),
+                'location_place':    f('location_place'),
+                'location_pin':      f('location_pin'),
+                'location_address':  f('location_address'),
+
+                # ── Structural (residential) ──────────────────────────────────
+                'structure_type':     f('structure_type'),
+                'concrete_grade':     f('concrete_grade'),
+                'steel_grade':        f('steel_grade'),
+                'slab_thickness':     f('slab_thickness'),
+                'ceiling_height':     f('ceiling_height'),
+                'soil_condition':     f('soil_condition'),
+                'foundation_type':    f('foundation_type'),
+                'foundation_depth':   f('foundation_depth'),
+                'anti_termite':       f('anti_termite'),
+                'staircase_type':     f('staircase_type'),
+                'roof_waterproofing': f('roof_waterproofing'),
+
+                # ── Masonry & Openings ────────────────────────────────────────
+                'wall_material':         f('wall_material'),
+                'wall_thickness':        f('wall_thickness'),
+                'inner_wall_thickness':  f('inner_wall_thickness'),
+                'num_doors':             f('num_doors'),
+                'num_windows':           f('num_windows'),
+                'plaster_type':          f('plaster_type'),
+                'external_plaster_type': f('external_plaster_type'),
+                'door_material':         f('door_material'),
+                'window_material':       f('window_material'),
+
+                # ── Finishing & Interiors ─────────────────────────────────────
+                'flooring_type':           f('flooring_type'),
+                'bathroom_wall_tile':      f('bathroom_wall_tile'),
+                'internal_paint_quality':  f('internal_paint_quality'),
+                'external_paint_quality':  f('external_paint_quality'),
+                'false_ceiling_yn':        f('false_ceiling_yn', 'no'),
+                'kitchen_type':            f('kitchen_type'),
+                'kitchen_platform_length': f('kitchen_platform_length'),
+                'kitchen_platform_stone':  f('kitchen_platform_stone'),
+
+                # ── Plumbing & Sanitary ───────────────────────────────────────
+                'pipe_material':  f('pipe_material'),
+                'num_taps':       f('num_taps'),
+                'num_showers':    f('num_showers'),
+                'num_geysers':    f('num_geysers'),
+                'sanitary_grade': f('sanitary_grade'),
+
+                # ── Electrical ────────────────────────────────────────────────
+                'num_switchboards': f('num_switchboards'),
+                'num_ac_points':    f('num_ac_points'),
+                'wiring_type':      f('wiring_type'),
+                'inverter_wiring':  f('inverter_wiring'),
+                'earthing_system':  f('earthing_system'),
+
+                # ── External Add-ons ──────────────────────────────────────────
+                'car_porch_size':         f('car_porch_size'),
+                'car_porch_sqft':         f('car_porch_sqft'),
+                'garden_sqft':            f('garden_sqft'),
+                'boundary_rft':           f('boundary_rft'),
+                'boundary_finish':        f('boundary_finish'),
+                'sump_capacity':          f('sump_capacity'),
+                'overhead_tank_capacity': f('overhead_tank_capacity'),
+
+                # ── Villa-specific ────────────────────────────────────────────
+                'villa_roof_type':             f('villa_roof_type'),
+                'villa_ceiling_height':        f('villa_ceiling_height'),
+                'villa_staircase':             f('villa_staircase'),
+                'villa_concrete_grade':        f('villa_concrete_grade'),
+                'villa_steel_grade':           f('villa_steel_grade'),
+                'villa_slab_thickness':        f('villa_slab_thickness'),
+                'villa_soil_condition':        f('villa_soil_condition'),
+                'villa_foundation_type':       f('villa_foundation_type'),
+                'villa_foundation_depth':      f('villa_foundation_depth'),
+                'villa_anti_termite':          f('villa_anti_termite'),
+                'villa_roof_waterproofing':    f('villa_roof_waterproofing'),
+                'villa_wall_material':         f('villa_wall_material'),
+                'villa_wall_thickness':        f('villa_wall_thickness'),
+                'villa_inner_wall_thickness':  f('villa_inner_wall_thickness'),
+                'villa_rooms':                 f('villa_rooms'),
+                'villa_bathrooms':             f('villa_bathrooms'),
+                'villa_floors':                f('villa_floors'),
+                'villa_num_doors':             f('villa_num_doors'),
+                'villa_num_windows':           f('villa_num_windows'),
+                'villa_door_material':         f('villa_door_material'),
+                'villa_window_material':       f('villa_window_material'),
+                'villa_plaster_type':          f('villa_plaster_type'),
+                'villa_external_plaster_type': f('villa_external_plaster_type'),
+                'villa_flooring_grade':        f('villa_flooring_grade'),
+                'villa_flooring_coverage':     f('villa_flooring_coverage'),
+                'villa_internal_paint':        f('villa_internal_paint'),
+                'villa_external_paint':        f('villa_external_paint'),
+                'villa_false_ceiling':         f('villa_false_ceiling', 'no'),
+                'villa_cladding':              f('villa_cladding'),
+                'villa_bathroom_wall_tile':    f('villa_bathroom_wall_tile'),
+                'villa_pipe_material':         f('villa_pipe_material'),
+                'villa_sanitary_grade':        f('villa_sanitary_grade'),
+                'villa_num_taps':              f('villa_num_taps'),
+                'villa_num_showers':           f('villa_num_showers'),
+                'villa_num_geysers':           f('villa_num_geysers'),
+                'villa_num_switchboards':      f('villa_num_switchboards'),
+                'villa_num_ac_points':         f('villa_num_ac_points'),
+                'villa_wiring_type':           f('villa_wiring_type'),
+                'villa_inverter_wiring':       f('villa_inverter_wiring'),
+                'villa_earthing_system':       f('villa_earthing_system'),
+                'villa_boundary_rft':          f('villa_boundary_rft'),
+                'villa_boundary_height':       f('villa_boundary_height'),
+                'villa_boundary_finish':       f('villa_boundary_finish'),
+                'villa_gate_type':             f('villa_gate_type'),
+                'villa_garden_sqft':           f('villa_garden_sqft'),
+                'villa_landscaping_grade':     f('villa_landscaping_grade'),
+                'villa_driveway_sqft':         f('villa_driveway_sqft'),
+                'villa_driveway_finish':       f('villa_driveway_finish'),
+                'villa_car_porch_size':        f('villa_car_porch_size'),
+                'villa_car_porch_sqft':        f('villa_car_porch_sqft'),
+                'villa_car_porch_style':       f('villa_car_porch_style'),
+                'villa_porch_flooring':        f('villa_porch_flooring'),
+
+                # ── Apartment-specific ────────────────────────────────────────
+                'apt_total_floors':       f('apt_total_floors'),
+                'apt_total_units':        f('apt_total_units'),
+                'apt_ceiling_height':     f('apt_ceiling_height'),
+                'apt_common_area_pct':    f('apt_common_area_pct'),
+                'apt_1bhk_count':         f('apt_1bhk_count'),
+                'apt_1bhk_size':          f('apt_1bhk_size'),
+                'apt_2bhk_count':         f('apt_2bhk_count'),
+                'apt_2bhk_size':          f('apt_2bhk_size'),
+                'apt_3bhk_count':         f('apt_3bhk_count'),
+                'apt_3bhk_size':          f('apt_3bhk_size'),
+                'apt_concrete_grade':     f('apt_concrete_grade'),
+                'apt_steel_grade':        f('apt_steel_grade'),
+                'apt_slab_thickness':     f('apt_slab_thickness'),
+                'apt_soil_condition':     f('apt_soil_condition'),
+                'apt_foundation_type':    f('apt_foundation_type'),
+                'apt_foundation_depth':   f('apt_foundation_depth'),
+                'apt_roof_waterproofing': f('apt_roof_waterproofing'),
+                'apt_anti_termite':       f('apt_anti_termite'),
+                'apt_staircases':         f('apt_staircases'),
+                'apt_staircase_type':     f('apt_staircase_type'),
+                'apt_wall_material':      f('apt_wall_material'),
+                'apt_wall_thickness':     f('apt_wall_thickness'),
+                'apt_partition_material': f('apt_partition_material'),
+                'apt_facade_type':        f('apt_facade_type'),
+                'apt_external_plaster':   f('apt_external_plaster'),
+                'apt_internal_plaster':   f('apt_internal_plaster'),
+                'apt_external_paint':     f('apt_external_paint'),
+                'apt_flooring_type':      f('apt_flooring_type'),
+                'apt_bathroom_tile':      f('apt_bathroom_tile'),
+                'apt_internal_paint':     f('apt_internal_paint'),
+                'apt_false_ceiling':      f('apt_false_ceiling', 'none'),
+                'apt_door_material':      f('apt_door_material'),
+                'apt_window_material':    f('apt_window_material'),
+                'apt_sanitary_grade':     f('apt_sanitary_grade'),
+                'apt_kitchen_type':       f('apt_kitchen_type'),
+                'apt_lifts':              f('apt_lifts'),
+                'apt_lift_capacity':      f('apt_lift_capacity'),
+                'apt_dg_backup':          f('apt_dg_backup'),
+                'apt_dg_kva':             f('apt_dg_kva'),
+                'apt_water_storage':      f('apt_water_storage'),
+                'apt_fire_spec':          f('apt_fire_spec'),
+                'apt_stp_type':           f('apt_stp_type'),
+                'apt_security_level':     f('apt_security_level'),
+                'apt_solar_kw':           f('apt_solar_kw'),
+                'apt_parking_type':       f('apt_parking_type'),
+                'apt_parking_slots':      f('apt_parking_slots'),
+                'apt_basement_depth':     f('apt_basement_depth'),
+                'apt_clubhouse':          f('apt_clubhouse'),
+                'apt_pool':               f('apt_pool'),
+                'apt_pool_finish':        f('apt_pool_finish'),
+                'apt_external_dev_sqft':  f('apt_external_dev_sqft'),
+                'apt_external_dev_grade': f('apt_external_dev_grade'),
+                'apt_common_flooring':    f('apt_common_flooring'),
+                'apt_common_paint':       f('apt_common_paint'),
+                'apt_common_ceiling':     f('apt_common_ceiling'),
+                'apt_lobby_wall_finish':  f('apt_lobby_wall_finish'),
             }
-            
+
             db.collection('projects').document(project_id).update(updated_data)
             flash('Project updated successfully!', 'success')
             return redirect(url_for('user.view_project', project_id=project_id))
-        
-        # GET request - show edit form
-        project_data['id'] = project_id
-        return render_template('user/edit_project.html', project=project_data)
-        
+
+        # GET — block edit if contractor assigned or project completed
+        if project_data.get('contractor_id') or project_data.get('status') == 'completed':
+            flash(
+                'This project cannot be edited — a contractor has been assigned or the project is completed.',
+                'warning'
+            )
+            return redirect(url_for('user.view_project', project_id=project_id))
+
+        return render_template(
+            'user/edit_project.html',
+            project=project_data,
+            user_profile_picture=user_profile_picture,
+        )
+
     except Exception as e:
         flash(f'Error: {str(e)}', 'error')
         return redirect(url_for('user.projects'))
@@ -1219,30 +1442,47 @@ def my_orders():
     if not db:
         flash('Database connection error', 'error')
         return redirect(url_for('user.dashboard'))
-    
+ 
     try:
         orders_ref = db.collection('orders').where('user_id', '==', current_user.id).stream()
         orders = []
-        
+ 
         for doc in orders_ref:
             order_data = doc.to_dict()
             order_data['id'] = doc.id
+            # Normalise the items key so the template always finds `order_items`
             if 'items' in order_data:
                 order_data['order_items'] = order_data['items']
             orders.append(order_data)
-        
+ 
         orders.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
-        
+ 
+        # ── Attach the user's review (if any) to each completed order ──────
+        for order in orders:
+            order['review'] = None          # default: not reviewed
+            if order.get('status') == 'completed':
+                try:
+                    reviews = db.collection('supplier_reviews') \
+                                .where('order_id',  '==', order['id']) \
+                                .where('user_id',   '==', current_user.id) \
+                                .limit(1) \
+                                .stream()
+                    review_docs = list(reviews)
+                    if review_docs:
+                        order['review'] = review_docs[0].to_dict()
+                except Exception as e:
+                    print(f"Warning: could not fetch review for order {order['id']}: {e}")
+ 
         stats = {
-            'total': len(orders),
-            'pending': len([o for o in orders if o.get('status') == 'pending']),
-            'processing': len([o for o in orders if o.get('status') == 'processing']),
-            'completed': len([o for o in orders if o.get('status') == 'completed']),
-            'cancelled': len([o for o in orders if o.get('status') == 'cancelled']),
-            'total_spent': sum(o.get('total', 0) for o in orders if o.get('status') == 'completed')
+            'total':       len(orders),
+            'pending':     len([o for o in orders if o.get('status') == 'pending']),
+            'processing':  len([o for o in orders if o.get('status') == 'processing']),
+            'completed':   len([o for o in orders if o.get('status') == 'completed']),
+            'cancelled':   len([o for o in orders if o.get('status') == 'cancelled']),
+            'total_spent': sum(o.get('total', 0) for o in orders if o.get('status') == 'completed'),
         }
-
-        # ✅ FIX: fetch profile picture just like dashboard() does
+ 
+        # Profile picture for navbar
         user_profile_picture = None
         try:
             user_doc = db.collection('users').document(current_user.id).get()
@@ -1250,15 +1490,136 @@ def my_orders():
                 user_profile_picture = user_doc.to_dict().get('profile_picture')
         except Exception:
             pass
-        
+ 
         return render_template('user/my_orders.html',
                                orders=orders,
                                stats=stats,
-                               user_profile_picture=user_profile_picture)  # ✅ added
-        
+                               user_profile_picture=user_profile_picture)
+ 
     except Exception as e:
         flash(f'Error loading orders: {str(e)}', 'error')
         return redirect(url_for('user.dashboard'))
+    
+@user_bp.route('/orders/review', methods=['POST'])
+@login_required
+def submit_supplier_review():
+    """
+    Submit a review for a supplier after an order is delivered (completed).
+ 
+    Rules enforced server-side:
+      • The order must exist and belong to the current user.
+      • The order status must be 'completed'.
+      • Only one review is allowed per (user, order) pair.
+      • overall rating (1-5) is required; category sub-ratings are optional.
+ 
+    After saving the review the supplier's aggregate rating is recalculated
+    from all reviews in the supplier_reviews collection.
+    """
+    db = get_db()
+    if not db:
+        return jsonify({'success': False, 'message': 'Database connection error'}), 500
+ 
+    try:
+        order_id    = request.form.get('order_id', '').strip()
+        supplier_id = request.form.get('supplier_id', '').strip()
+        rating_raw  = request.form.get('rating', '0').strip()
+        review_text = request.form.get('text', '').strip()
+        recommend   = request.form.get('recommend', '0') == '1'
+ 
+        # Optional sub-ratings (0 means "not rated")
+        def safe_int(key, lo=0, hi=5):
+            try:
+                v = int(request.form.get(key, 0))
+                return max(lo, min(hi, v))
+            except (TypeError, ValueError):
+                return 0
+ 
+        cat_quality       = safe_int('quality',       1, 5)
+        cat_delivery      = safe_int('delivery',       1, 5)
+        cat_communication = safe_int('communication',  1, 5)
+        cat_pricing       = safe_int('pricing',        1, 5)
+ 
+        # ── Validate overall rating ──────────────────────────────────────────
+        try:
+            overall = int(float(rating_raw))
+        except (TypeError, ValueError):
+            overall = 0
+ 
+        if overall < 1 or overall > 5:
+            return jsonify({'success': False, 'message': 'Please select a rating between 1 and 5 stars.'}), 400
+ 
+        if not order_id or not supplier_id:
+            return jsonify({'success': False, 'message': 'Invalid request — order or supplier missing.'}), 400
+ 
+        # ── Verify order ownership and status ────────────────────────────────
+        order_doc = db.collection('orders').document(order_id).get()
+        if not order_doc.exists:
+            return jsonify({'success': False, 'message': 'Order not found.'}), 404
+ 
+        order_data = order_doc.to_dict()
+ 
+        if order_data.get('user_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied.'}), 403
+ 
+        if order_data.get('status') != 'completed':
+            return jsonify({'success': False, 'message': 'You can only review a delivered order.'}), 400
+ 
+        # ── Idempotency: one review per (user, order) ────────────────────────
+        existing = db.collection('supplier_reviews') \
+                     .where('order_id', '==', order_id) \
+                     .where('user_id', '==', current_user.id) \
+                     .limit(1) \
+                     .stream()
+        if list(existing):
+            return jsonify({'success': False, 'message': 'You have already reviewed this order.'}), 400
+ 
+        # ── Save the review ──────────────────────────────────────────────────
+        review_data = {
+            'order_id':          order_id,
+            'supplier_id':       supplier_id,
+            'user_id':           current_user.id,
+            'user_name':         current_user.name,
+            'project_id':        order_data.get('project_id', ''),
+            'project_title':     order_data.get('project_title', ''),
+            'rating':            overall,
+            'text':              review_text,
+            'recommend':         recommend,
+            # Category sub-ratings (0 = not given)
+            'cat_quality':       cat_quality,
+            'cat_delivery':      cat_delivery,
+            'cat_communication': cat_communication,
+            'cat_pricing':       cat_pricing,
+            'created_at':        datetime.now(),
+        }
+ 
+        db.collection('supplier_reviews').add(review_data)
+ 
+        # ── Recalculate supplier's aggregate rating ──────────────────────────
+        try:
+            all_reviews = list(
+                db.collection('supplier_reviews')
+                  .where('supplier_id', '==', supplier_id)
+                  .stream()
+            )
+            if all_reviews:
+                avg_rating = sum(r.to_dict().get('rating', 0) for r in all_reviews) / len(all_reviews)
+                db.collection('suppliers').document(supplier_id).update({
+                    'rating':        round(avg_rating, 1),
+                    'total_reviews': len(all_reviews),
+                    'updated_at':    datetime.now(),
+                })
+        except Exception as e:
+            # Non-fatal — log and continue
+            print(f"Warning: could not update supplier aggregate rating: {e}")
+ 
+        print(f"✅ Review submitted: order={order_id}, supplier={supplier_id}, "
+              f"user={current_user.id}, rating={overall}")
+ 
+        return jsonify({'success': True, 'message': 'Review submitted successfully!'})
+ 
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @user_bp.route('/supplier/<supplier_id>/contact')
 @login_required

@@ -4,215 +4,269 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ supplier.company_name or supplier.name }} - House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root{--cream:#FAF8F5;--warm-white:#FFFFFF;--sand:#F0EBE3;--stone:#E2D9CE;--accent:#B5804F;--accent-dark:#8C5E35;--accent-light:#F7EDE2;--text-primary:#1C1917;--text-secondary:#6B5E52;--text-muted:#9C8E84;--shadow-sm:0 1px 3px rgba(28,25,23,0.06);--shadow-md:0 4px 16px rgba(28,25,23,0.08);--shadow-lg:0 12px 40px rgba(28,25,23,0.10);}
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;color:var(--text-primary);position:relative;}
-        body::before{content:'';position:fixed;inset:0;background:url('/static/images/house.jpg') no-repeat center/cover;opacity:0.08;z-index:0;pointer-events:none;}
+        :root{--bg:#F0EBE1;--sand:#E8DFD0;--stone:#D4C8B8;--accent:#B8864E;--accent2:#D4A96A;--accent-dark:#96693A;--accent-light:#FBF3E4;--text-primary:#1A1612;--text-secondary:#4A3F35;--text-muted:#8A7A6E;}
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Outfit',sans-serif;background-color:var(--bg);min-height:100vh;color:var(--text-primary);overflow-x:hidden;}
+        body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:url('/static/images/house.jpg') no-repeat center center/cover;opacity:0.28;filter:saturate(0.3) sepia(0.85) hue-rotate(-15deg) brightness(0.95);}
+        body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 100% 100% at 50% 50%,rgba(184,134,78,0.12) 0%,rgba(240,235,225,0.0) 55%,rgba(240,235,225,0.45) 100%);}
+        .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(184,134,78,0.045) 1px,transparent 1px),linear-gradient(90deg,rgba(184,134,78,0.045) 1px,transparent 1px);background-size:48px 48px;}
+        .bg-warm{position:fixed;inset:0;z-index:0;pointer-events:none;background:rgba(184,134,78,0.10);mix-blend-mode:multiply;}
 
-        /* NAVBAR */
-        .navbar{background:var(--warm-white);border-bottom:1px solid var(--stone);padding:0 40px;height:68px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
-        .navbar-brand{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:10px;text-decoration:none;}
-        .navbar-menu{display:flex;align-items:center;gap:4px;}
-        .navbar-menu a{color:var(--text-secondary);text-decoration:none;padding:8px 14px;border-radius:8px;font-size:14px;font-weight:500;transition:all 0.2s;}
-        .navbar-menu a:hover{color:var(--accent);background:var(--accent-light);}
-        .profile-pic{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--stone);}
-        .profile-placeholder{width:36px;height:36px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;border:2px solid var(--stone);}
+        .navbar{background:rgba(250,246,239,0.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--stone);padding:0 44px;height:66px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 1px 0 rgba(184,134,78,0.12),0 4px 20px rgba(28,22,18,0.05);}
+        .navbar-brand{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:11px;text-decoration:none;letter-spacing:0.3px;}
+        .navbar-brand-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 2px 10px rgba(184,134,78,0.35);}
+        .navbar-menu{display:flex;align-items:center;gap:2px;}
+        .navbar-menu a{color:var(--text-secondary);text-decoration:none;padding:7px 12px;border-radius:9px;font-size:13.5px;font-weight:500;transition:color .2s,background .2s;display:flex;align-items:center;gap:6px;}
+        .navbar-menu a:hover,.navbar-menu a.nav-active{color:var(--accent);background:var(--accent-light);}
+        .profile-pic{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--stone);display:block;}
+        .profile-placeholder{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent-light),#fdecc8);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;border:2px solid var(--stone);}
+        .nav-divider{width:1px;height:20px;background:var(--stone);margin:0 5px;}
+        .logout-link{color:var(--text-muted)!important;text-decoration:none;padding:7px 12px;border-radius:9px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:5px;transition:color .2s,background .2s;}
+        .logout-link:hover{color:#DC2626!important;background:#FEF2F2;}
 
-        /* LAYOUT */
-        .container{max-width:1100px;margin:36px auto;padding:0 24px;position:relative;z-index:1;}
-        .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-size:14px;font-weight:600;text-decoration:none;margin-bottom:22px;transition:gap 0.2s;}
-        .back-link:hover{gap:10px;}
+        .container{max-width:1100px;margin:0 auto;padding:32px 24px;position:relative;z-index:1;}
+        .back-link{display:inline-flex;align-items:center;gap:7px;color:var(--accent);text-decoration:none;font-weight:600;font-size:13px;margin-bottom:22px;padding:7px 14px;background:var(--accent-light);border:1px solid rgba(184,134,78,0.25);border-radius:9px;transition:all .2s;}
+        .back-link:hover{background:rgba(184,134,78,0.18);transform:translateX(-3px);}
 
         /* PROFILE HEADER */
-        .profile-header{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:32px 40px;margin-bottom:20px;box-shadow:var(--shadow-md);position:relative;overflow:hidden;}
-        .profile-header::before{content:'';position:absolute;top:-50px;right:-50px;width:220px;height:220px;background:radial-gradient(circle,var(--accent-light),transparent 70%);pointer-events:none;}
-        .header-content{display:flex;gap:28px;align-items:flex-start;position:relative;z-index:1;}
-        .supplier-avatar{width:100px;height:100px;border-radius:50%;background:var(--accent-light);border:3px solid var(--stone);display:flex;align-items:center;justify-content:center;font-size:44px;flex-shrink:0;}
-        .supplier-info{flex:1;}
-        .supplier-name{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--text-primary);margin-bottom:4px;}
-        .supplier-company{font-size:15px;font-weight:600;color:var(--accent);margin-bottom:4px;}
-        .supplier-type{font-size:13px;color:var(--text-muted);margin-bottom:14px;}
-        .divider{width:36px;height:3px;background:var(--accent);border-radius:2px;margin:10px 0 14px;}
+        .profile-header{background:rgba(250,244,234,0.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(212,186,150,0.55);border-radius:22px;margin-bottom:20px;overflow:hidden;display:grid;grid-template-columns:1fr auto;position:relative;box-shadow:0 4px 32px rgba(150,105,58,0.10),inset 0 1px 0 rgba(255,248,235,0.7);animation:slideUp .55s cubic-bezier(.22,1,.36,1) both;}
+        .profile-header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:22px 0 0 22px;}
+        .header-left{padding:36px 40px;display:flex;gap:28px;align-items:flex-start;}
+        .header-right{background:linear-gradient(135deg,rgba(251,243,228,0.72),rgba(253,236,200,0.68));border-left:1px solid rgba(212,186,150,0.4);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:200px;padding:32px 36px;position:relative;overflow:hidden;}
+        .header-right::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(184,134,78,0.08) 1px,transparent 1px),linear-gradient(90deg,rgba(184,134,78,0.08) 1px,transparent 1px);background-size:20px 20px;}
+        .header-right-inner{position:relative;z-index:1;text-align:center;}
+        .hr-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(150,105,58,0.7);margin-bottom:3px;}
+        .hr-value{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--accent-dark);}
+        .hr-divider{width:36px;height:1px;background:rgba(184,134,78,0.3);margin:10px auto;}
+        .hr-status--verified{color:#065F46;}
+        .hr-status--pending{color:var(--accent-dark);}
 
-        /* BADGES */
-        .badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
-        .badge{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:0.3px;}
-        .badge-verified{background:#D1FAE5;color:#065F46;border:1px solid #A7F3D0;}
-
-        /* RATING */
-        .rating-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
-        .stars{font-size:20px;color:#F59E0B;letter-spacing:2px;}
-        .rating-val{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--text-primary);}
-        .rating-sub{font-size:13px;color:var(--text-muted);}
-
-        /* STATS ROW */
-        .stats-row{display:flex;gap:28px;}
-        .stat-box{text-align:center;}
-        .stat-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--accent);line-height:1;margin-bottom:3px;}
-        .stat-lbl{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.6px;}
+        .entity-avatar{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--accent-light),#fdecc8);border:2px solid rgba(212,186,150,0.6);display:flex;align-items:center;justify-content:center;font-size:42px;flex-shrink:0;box-shadow:0 4px 20px rgba(184,134,78,0.2);}
+        .entity-info{flex:1;}
+        .entity-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+        .entity-eyebrow::before{content:'';width:18px;height:1.5px;background:var(--accent);display:inline-block;}
+        .entity-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--text-primary);margin-bottom:4px;line-height:1.15;}
+        .entity-company{font-size:15px;color:var(--accent);font-weight:600;margin-bottom:6px;}
+        .entity-type-badge{font-size:11px;color:var(--accent-dark);font-weight:600;background:rgba(184,134,78,0.12);display:inline-block;padding:4px 12px;border-radius:20px;border:1px solid rgba(184,134,78,0.22);margin-bottom:14px;}
+        .badge-verified{display:inline-flex;align-items:center;gap:5px;background:#D1FAE5;color:#065F46;padding:5px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px;}
+        .rating-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+        .stars{color:#F59E0B;font-size:18px;letter-spacing:2px;}
+        .rating-val{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--text-primary);}
+        .rating-sub{color:var(--text-muted);font-size:12px;}
+        .stats-row{display:flex;gap:14px;}
+        .stat-box{text-align:center;padding:12px 16px;background:rgba(244,238,227,0.6);border:1px solid rgba(212,186,150,0.4);border-radius:14px;min-width:68px;}
+        .stat-num{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--accent);display:block;line-height:1;}
+        .stat-lbl{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.7px;margin-top:4px;display:block;}
 
         /* CARDS */
-        .card{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:28px 32px;margin-bottom:20px;box-shadow:var(--shadow-sm);}
-        .section-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--text-primary);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--sand);}
-        .about-text{font-size:14px;color:var(--text-secondary);line-height:1.75;}
+        .card{background:rgba(250,244,234,0.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(212,186,150,0.48);border-radius:18px;padding:28px 32px;margin-bottom:18px;box-shadow:0 2px 24px rgba(150,105,58,0.08),inset 0 1px 0 rgba(255,248,235,0.65);animation:slideUp .55s .1s cubic-bezier(.22,1,.36,1) both;position:relative;overflow:hidden;}
+        .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--accent),var(--accent2));transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.22,1,.36,1);border-radius:18px 18px 0 0;}
+        .card:hover::before{transform:scaleX(1);}
+        .card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--sand);display:flex;align-items:center;gap:9px;}
+        .card-title-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));flex-shrink:0;}
 
         /* INFO GRID */
-        .info-grid{display:grid;gap:10px;}
-        .info-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--sand);border:1px solid var(--stone);border-radius:8px;}
-        .info-label{font-size:13px;color:var(--text-muted);font-weight:600;}
-        .info-value{font-size:13px;font-weight:600;color:var(--text-primary);}
+        .info-grid{display:grid;gap:8px;}
+        .info-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(244,238,227,0.6);border:1px solid rgba(212,186,150,0.35);border-radius:10px;transition:all .2s;}
+        .info-item:hover{background:rgba(251,243,228,0.8);border-color:rgba(184,134,78,0.3);}
+        .info-label{font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;}
+        .info-value{font-size:13.5px;font-weight:600;color:var(--text-primary);}
+
+        .about-text{color:var(--text-secondary);line-height:1.8;font-size:14px;}
 
         /* CONTACT BUTTON */
-        .btn-primary{display:inline-block;padding:12px 28px;background:var(--accent);color:white;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;transition:all 0.2s;}
-        .btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 14px rgba(181,128,79,0.3);}
+        .btn-primary{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;text-decoration:none;border-radius:9px;font-weight:600;font-size:14px;font-family:'Outfit',sans-serif;transition:all .2s;box-shadow:0 2px 12px rgba(184,134,78,0.3);}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(184,134,78,0.4);}
 
         /* MATERIALS GRID */
-        .materials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
-        .material-card{border:1.5px solid var(--stone);background:var(--cream);padding:20px;border-radius:12px;transition:all 0.25s;}
-        .material-card:hover{border-color:var(--accent);background:var(--accent-light);transform:translateY(-3px);box-shadow:var(--shadow-md);}
-        .material-name{font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:4px;}
-        .material-category{font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px;}
-        .material-price{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--accent);}
-        .material-price span{font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text-muted);font-weight:500;}
-        .material-stock{margin-top:10px;padding-top:10px;border-top:1px solid var(--stone);font-size:13px;color:var(--text-secondary);}
-        .material-desc{font-size:12px;color:var(--text-muted);margin-top:8px;line-height:1.5;}
+        .materials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+        .material-card{border:1px solid rgba(212,186,150,0.42);background:rgba(244,238,227,0.65);padding:20px;border-radius:14px;transition:all .3s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;}
+        .material-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.22,1,.36,1);border-radius:14px 14px 0 0;}
+        .material-card:hover{border-color:rgba(184,134,78,0.55);background:rgba(251,243,228,0.85);transform:translateY(-4px);box-shadow:0 8px 24px rgba(150,105,58,0.14);}
+        .material-card:hover::before{transform:scaleX(1);}
+        .material-name{font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:3px;}
+        .material-category{font-size:10px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;}
+        .material-price{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--accent);}
+        .material-price span{font-size:13px;font-family:'Outfit',sans-serif;color:var(--text-muted);font-weight:500;}
+        .material-stock{margin-top:10px;padding-top:10px;border-top:1px solid rgba(212,186,150,0.4);font-size:12.5px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;}
+        .material-desc{font-size:12px;color:var(--text-muted);margin-top:8px;line-height:1.55;}
 
         /* EMPTY STATE */
         .empty-state{text-align:center;padding:50px 20px;}
-        .empty-icon{font-size:52px;opacity:0.4;margin-bottom:12px;}
+        .empty-icon{width:64px;height:64px;background:var(--sand);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--text-muted);border:1px solid var(--stone);}
         .empty-state p{font-size:14px;color:var(--text-muted);}
 
-        @media(max-width:768px){
-            .header-content{flex-direction:column;align-items:center;text-align:center;}
-            .stats-row{justify-content:center;}
-            .badges{justify-content:center;}
-            .rating-row{justify-content:center;}
-        }
+        /* TIP */
+        .tip-card{background:var(--accent-light);border:1px solid rgba(184,134,78,0.25);border-radius:14px;padding:16px 18px;margin-bottom:0;display:flex;gap:12px;align-items:flex-start;}
+        .tip-icon{width:32px;height:32px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;color:white;}
+        .tip-text{font-size:12.5px;color:var(--text-secondary);line-height:1.55;}
+        .tip-text strong{display:block;font-size:13px;color:var(--accent-dark);margin-bottom:3px;font-weight:600;}
 
-        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-        .profile-header{animation:fadeUp 0.5s ease both;}
-        .card{animation:fadeUp 0.5s 0.1s ease both;}
+        @keyframes slideUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+        @media(max-width:900px){.profile-header{grid-template-columns:1fr;}.header-right{display:none;}.header-left{flex-direction:column;align-items:center;text-align:center;}.entity-eyebrow{justify-content:center;}.rating-row{justify-content:center;}.stats-row{justify-content:center;}}
+        @media(max-width:768px){.navbar{padding:0 20px;}.container{padding:20px 16px;}.header-left{padding:24px;}.card{padding:20px;}.materials-grid{grid-template-columns:1fr;}}
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">🏗️ House-Forge</a>
-        <div class="navbar-menu">
-            <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('user.projects') }}">My Projects</a>
-            <a href="{{ url_for('user.find_suppliers') }}">Suppliers</a>
-            <a href="{{ url_for('user.profile') }}" style="padding:8px 10px;">
-                {% if user_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
-                {% else %}
-                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
-                {% endif %}
-            </a>
-            <a href="{{ url_for('auth.logout') }}" style="color:var(--text-muted);font-size:13px;">Logout</a>
+<div class="bg-grid"></div>
+<div class="bg-warm"></div>
+
+<nav class="navbar">
+    <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">
+        <div class="navbar-brand-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
-    </nav>
-
-    <div class="container">
-        <a href="{{ url_for('user.find_suppliers') }}" class="back-link">← Back to Suppliers</a>
-
-        <!-- Profile Header -->
-        <div class="profile-header">
-            <div class="header-content">
-                <div class="supplier-avatar">📦</div>
-                <div class="supplier-info">
-                    <h1 class="supplier-name">{{ supplier.name }}</h1>
-                    {% if supplier.company_name %}
-                    <div class="supplier-company">{{ supplier.company_name }}</div>
-                    {% endif %}
-                    <div class="supplier-type">{{ supplier.business_type.title() if supplier.business_type else 'Material Supplier' }}</div>
-                    <div class="divider"></div>
-
-                    <div class="badges">
-                        {% if supplier.verified %}
-                        <span class="badge badge-verified">✓ Verified Supplier</span>
-                        {% endif %}
-                    </div>
-
-                    <div class="rating-row">
-                        <span class="stars">
-                            {% set rating = supplier.rating or 0 %}
-                            {% for i in range(5) %}{% if i < rating %}★{% else %}☆{% endif %}{% endfor %}
-                        </span>
-                        <span class="rating-val">{{ "%.1f"|format(supplier.rating or 0) }}</span>
-                        <span class="rating-sub">· {{ supplier.total_orders or 0 }} orders</span>
-                    </div>
-
-                    <div class="stats-row">
-                        <div class="stat-box">
-                            <div class="stat-num">{{ materials|length }}</div>
-                            <div class="stat-lbl">Materials</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-num">{{ supplier.total_orders or 0 }}</div>
-                            <div class="stat-lbl">Orders</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-num">{{ supplier.years_in_business or 0 }}</div>
-                            <div class="stat-lbl">Yrs Active</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- About -->
-        {% if supplier.bio %}
-        <div class="card">
-            <div class="section-title">📝 About</div>
-            <p class="about-text">{{ supplier.bio }}</p>
-        </div>
-        {% endif %}
-
-        <!-- Business Details -->
-        <div class="card">
-            <div class="section-title">📋 Business Details</div>
-            <div class="info-grid">
-                <div class="info-item"><span class="info-label">Company</span><span class="info-value">{{ supplier.company_name or 'N/A' }}</span></div>
-                <div class="info-item"><span class="info-label">Business Type</span><span class="info-value">{{ supplier.business_type.title() if supplier.business_type else 'N/A' }}</span></div>
-                <div class="info-item"><span class="info-label">Location</span><span class="info-value">{{ supplier.location or 'Not specified' }}</span></div>
-                <div class="info-item"><span class="info-label">GST Number</span><span class="info-value">{{ supplier.gst_number or 'Not provided' }}</span></div>
-                <div class="info-item"><span class="info-label">Phone</span><span class="info-value">{{ supplier.phone or 'Contact for details' }}</span></div>
-                <div class="info-item"><span class="info-label">Email</span><span class="info-value">{{ supplier.email or 'Contact for details' }}</span></div>
-            </div>
-        </div>
-
-        <!-- Contact -->
-        <div class="card">
-            <div class="section-title">📞 Contact Supplier</div>
-            <a href="{{ url_for('user.contact_supplier', supplier_id=supplier.id) }}" class="btn-primary">Get Contact Information →</a>
-        </div>
-
-        <!-- Materials -->
-        <div class="card">
-            <div class="section-title">📦 Materials Offered</div>
-            {% if materials %}
-            <div class="materials-grid">
-                {% for material in materials %}
-                <div class="material-card">
-                    <div class="material-name">{{ material.name }}</div>
-                    <div class="material-category">{{ material.category }}</div>
-                    <div class="material-price">₹{{ "{:,.0f}".format(material.price) }} <span>/ {{ material.unit }}</span></div>
-                    <div class="material-stock">📦 Available: {{ material.quantity }} {{ material.unit }}</div>
-                    {% if material.description %}
-                    <div class="material-desc">{{ material.description[:80] }}{% if material.description|length > 80 %}…{% endif %}</div>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
+        House-Forge
+    </a>
+    <div class="navbar-menu">
+        <a href="{{ url_for('user.dashboard') }}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+        </a>
+        <a href="{{ url_for('user.projects') }}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Projects
+        </a>
+        <a href="{{ url_for('user.find_suppliers') }}" class="nav-active">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            Suppliers
+        </a>
+        <div class="nav-divider"></div>
+        <a href="{{ url_for('user.profile') }}" style="padding:7px 9px;">
+            {% if user_profile_picture %}
+                <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
             {% else %}
-            <div class="empty-state">
-                <div class="empty-icon">📦</div>
-                <p>No materials listed yet</p>
-            </div>
+                <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
             {% endif %}
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="logout-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Logout
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <a href="{{ url_for('user.find_suppliers') }}" class="back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Suppliers
+    </a>
+
+    <!-- PROFILE HEADER -->
+    <div class="profile-header">
+        <div class="header-left">
+            <div class="entity-avatar">📦</div>
+            <div class="entity-info">
+                <div class="entity-eyebrow">Material Supplier</div>
+                <div class="entity-name">{{ supplier.name }}</div>
+                {% if supplier.company_name %}<div class="entity-company">{{ supplier.company_name }}</div>{% endif %}
+                <span class="entity-type-badge">{{ supplier.business_type.title() if supplier.business_type else 'Material Supplier' }}</span>
+                {% if supplier.verified %}
+                <div>
+                    <span class="badge-verified">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Verified Supplier
+                    </span>
+                </div>
+                {% endif %}
+                <div class="rating-row">
+                    <span class="stars">{% set rating=supplier.rating or 0 %}{% for i in range(5) %}{% if i<rating %}★{% else %}☆{% endif %}{% endfor %}</span>
+                    <span class="rating-val">{{ "%.1f"|format(supplier.rating or 0) }}</span>
+                    <span class="rating-sub">· {{ supplier.total_orders or 0 }} orders</span>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-box"><span class="stat-num">{{ materials|length }}</span><span class="stat-lbl">Materials</span></div>
+                    <div class="stat-box"><span class="stat-num">{{ supplier.total_orders or 0 }}</span><span class="stat-lbl">Orders</span></div>
+                    <div class="stat-box"><span class="stat-num">{{ supplier.years_in_business or 0 }}</span><span class="stat-lbl">Yrs Active</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-right-inner">
+                <div class="hr-label">GST Number</div>
+                <div class="hr-value" style="font-size:14px;letter-spacing:.5px;">{{ supplier.gst_number or '—' }}</div>
+                <div class="hr-divider"></div>
+                <div class="hr-label">Business Type</div>
+                <div class="hr-value" style="font-size:16px;">{{ supplier.business_type.title() if supplier.business_type else '—' }}</div>
+                <div class="hr-divider"></div>
+                <div class="hr-label">Verified Status</div>
+                <div class="hr-value hr-status {% if supplier.verified %}hr-status--verified{% else %}hr-status--pending{% endif %}" style="font-size:15px;">{{ 'Active ✓' if supplier.verified else 'Pending' }}</div>
+            </div>
         </div>
     </div>
+
+    <!-- ABOUT -->
+    {% if supplier.bio %}
+    <div class="card">
+        <div class="card-title"><span class="card-title-dot"></span> About</div>
+        <p class="about-text">{{ supplier.bio }}</p>
+    </div>
+    {% endif %}
+
+    <!-- BUSINESS DETAILS -->
+    <div class="card">
+        <div class="card-title"><span class="card-title-dot"></span> Business Details</div>
+        <div class="info-grid">
+            <div class="info-item"><span class="info-label">Company</span><span class="info-value">{{ supplier.company_name or 'N/A' }}</span></div>
+            <div class="info-item"><span class="info-label">Business Type</span><span class="info-value">{{ supplier.business_type.title() if supplier.business_type else 'N/A' }}</span></div>
+            <div class="info-item"><span class="info-label">Location</span><span class="info-value">{{ supplier.location or 'Not specified' }}</span></div>
+            <div class="info-item"><span class="info-label">GST Number</span><span class="info-value">{{ supplier.gst_number or 'Not provided' }}</span></div>
+            <div class="info-item"><span class="info-label">Phone</span><span class="info-value">{{ supplier.phone or 'Contact for details' }}</span></div>
+            <div class="info-item"><span class="info-label">Email</span><span class="info-value">{{ supplier.email or 'Contact for details' }}</span></div>
+        </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="card">
+        <div class="card-title"><span class="card-title-dot"></span> Contact Supplier</div>
+        <a href="{{ url_for('user.contact_supplier', supplier_id=supplier.id) }}" class="btn-primary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.77 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.87a16 16 0 0 0 6.14 6.14l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Get Contact Information
+        </a>
+    </div>
+
+    <!-- MATERIALS -->
+    <div class="card">
+        <div class="card-title"><span class="card-title-dot"></span> Materials Offered</div>
+        {% if materials %}
+        <div class="materials-grid">
+            {% for material in materials %}
+            <div class="material-card">
+                <div class="material-name">{{ material.name }}</div>
+                <div class="material-category">{{ material.category }}</div>
+                <div class="material-price">₹{{ "{:,.0f}".format(material.price) }} <span>/ {{ material.unit }}</span></div>
+                <div class="material-stock">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    Available: {{ material.quantity }} {{ material.unit }}
+                </div>
+                {% if material.description %}
+                <div class="material-desc">{{ material.description[:80] }}{% if material.description|length > 80 %}…{% endif %}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <p>No materials listed yet</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- TIP -->
+    <div class="tip-card">
+        <div class="tip-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="tip-text">
+            <strong>Pro Tip</strong>
+            Mention your project's square footage and scope before ordering — it helps the supplier recommend the right quantities and give faster quotes.
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -313,17 +313,30 @@ def browse_projects():
 @contractor_bp.route('/my-projects')
 @login_required
 def my_projects():
-    """View contractor's active projects"""
     db = get_db()
-    
     projects_ref = db.collection('projects').where('contractor_id', '==', current_user.id).stream()
     projects = []
+    completed_projects = []
     for doc in projects_ref:
         project_data = doc.to_dict()
         project_data['id'] = doc.id
-        projects.append(project_data)
-    
-    return render_template('contractor/active_projects.html', projects=projects)
+        if project_data.get('status') == 'completed':
+            completed_projects.append(project_data)
+        else:
+            projects.append(project_data)
+
+    contractor_profile_picture = None
+    try:
+        con_doc = db.collection('contractors').document(current_user.id).get()
+        if con_doc.exists:
+            contractor_profile_picture = con_doc.to_dict().get('profile_picture')
+    except Exception:
+        pass
+
+    return render_template('contractor/active_projects.html',
+                           projects=projects,
+                           completed_projects=completed_projects,
+                           contractor_profile_picture=contractor_profile_picture)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PATCH: replace the existing view_project() function in routes/contractor_routes.py

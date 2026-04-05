@@ -3,161 +3,506 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Bids - House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Project Bids — House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root{--cream:#FAF8F5;--warm-white:#FFFFFF;--sand:#F0EBE3;--stone:#E2D9CE;--accent:#B5804F;--accent-dark:#8C5E35;--accent-light:#F7EDE2;--text-primary:#1C1917;--text-secondary:#6B5E52;--text-muted:#9C8E84;--shadow-sm:0 1px 3px rgba(28,25,23,0.06);--shadow-md:0 4px 16px rgba(28,25,23,0.08);}
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;color:var(--text-primary);position:relative;}
-        body::before{content:'';position:fixed;inset:0;background:url('/static/images/house.jpg') no-repeat center/cover;opacity:0.08;z-index:0;pointer-events:none;}
+        :root {
+            --bg:           #F0EBE1;
+            --bg-card:      #FAF6EF;
+            --bg-card2:     #F4EEE3;
+            --sand:         #E8DFD0;
+            --stone:        #D4C8B8;
+            --accent:       #B8864E;
+            --accent2:      #D4A96A;
+            --accent-dark:  #96693A;
+            --accent-light: #FBF3E4;
+            --text-primary: #1A1612;
+            --text-secondary:#4A3F35;
+            --text-muted:   #8A7A6E;
+            --green:        #065F46;
+            --green-bg:     #D1FAE5;
+            --red:          #991B1B;
+            --red-bg:       #FEE2E2;
+            --blue:         #1E40AF;
+            --blue-bg:      #DBEAFE;
+        }
 
-        /* NAVBAR */
-        .navbar{background:var(--warm-white);border-bottom:1px solid var(--stone);padding:0 40px;height:68px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);}
-        .navbar-brand{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:10px;text-decoration:none;}
-        .navbar-menu{display:flex;align-items:center;gap:4px;}
-        .navbar-menu a{color:var(--text-secondary);text-decoration:none;padding:8px 14px;border-radius:8px;font-size:14px;font-weight:500;transition:all 0.2s;}
-        .navbar-menu a:hover{color:var(--accent);background:var(--accent-light);}
-        .profile-pic{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--stone);}
-        .profile-placeholder{width:36px;height:36px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;border:2px solid var(--stone);}
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-        /* LAYOUT */
-        .container{max-width:1060px;margin:36px auto;padding:0 24px;position:relative;z-index:1;}
-        .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-size:14px;font-weight:600;text-decoration:none;margin-bottom:20px;transition:gap 0.2s;}
-        .back-link:hover{gap:10px;}
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
 
-        /* PAGE HEADER */
-        .page-header{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:30px 40px;margin-bottom:24px;box-shadow:var(--shadow-md);}
-        .page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--text-primary);margin-bottom:8px;}
-        .project-meta{display:flex;gap:20px;color:var(--text-muted);font-size:13px;flex-wrap:wrap;}
-        .project-meta span{display:flex;align-items:center;gap:5px;}
-        .divider{width:40px;height:3px;background:var(--accent);border-radius:2px;margin:10px 0 14px;}
+        /* ── LAYERED BACKGROUND ── */
+        body::before {
+            content: '';
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: url('/static/images/Home.jpg') no-repeat center center / cover;
+            opacity: 0.28;
+            filter: saturate(0.3) sepia(0.85) hue-rotate(-15deg) brightness(0.95);
+        }
+        body::after {
+            content: '';
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: radial-gradient(ellipse 100% 100% at 50% 50%,
+                rgba(184,134,78,0.12) 0%,
+                rgba(240,235,225,0.0) 55%,
+                rgba(240,235,225,0.45) 100%);
+        }
+        .bg-grid {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(184,134,78,0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(184,134,78,0.045) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+        .bg-warm {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: rgba(184,134,78,0.10);
+            mix-blend-mode: multiply;
+        }
 
-        /* STATS */
-        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
-        @media(max-width:768px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
-        .stat-card{background:var(--warm-white);border:1px solid var(--stone);border-radius:14px;padding:22px;box-shadow:var(--shadow-sm);transition:all 0.25s;text-align:center;}
-        .stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--accent);}
-        .stat-icon{font-size:26px;margin-bottom:8px;display:block;}
-        .stat-number{font-family:'Playfair Display',serif;font-size:34px;font-weight:700;color:var(--text-primary);line-height:1;margin-bottom:4px;}
-        .stat-label{color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;}
+        /* ── NAVBAR ── */
+        .navbar {
+            background: rgba(250,246,239,0.94);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--stone);
+            padding: 0 44px;
+            height: 66px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 1px 0 rgba(184,134,78,0.12), 0 4px 20px rgba(28,22,18,0.05);
+        }
+        .navbar-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px; font-weight: 700;
+            color: var(--text-primary);
+            display: flex; align-items: center; gap: 11px;
+            text-decoration: none; letter-spacing: 0.3px;
+        }
+        .navbar-brand-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(184,134,78,0.35);
+            position: relative; overflow: hidden;
+        }
+        .navbar-brand-icon::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent);
+        }
+        .navbar-menu { display: flex; align-items: center; gap: 2px; }
+        .navbar-menu a {
+            color: var(--text-secondary); text-decoration: none;
+            padding: 7px 12px; border-radius: 9px;
+            font-size: 13.5px; font-weight: 500;
+            transition: color 0.2s, background 0.2s;
+        }
+        .navbar-menu a:hover, .navbar-menu a.nav-active {
+            color: var(--accent); background: var(--accent-light);
+        }
+        .profile-pic { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); display: block; }
+        .profile-placeholder {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
+            color: var(--accent); display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 13px; border: 2px solid var(--stone);
+        }
+        .nav-divider { width: 1px; height: 20px; background: var(--stone); margin: 0 5px; }
+        .logout-link {
+            color: var(--text-muted) !important; text-decoration: none;
+            padding: 7px 12px; border-radius: 9px;
+            font-size: 13px; font-weight: 500;
+            display: inline-flex; align-items: center; gap: 5px;
+            transition: color 0.2s, background 0.2s;
+        }
+        .logout-link:hover { color: #DC2626 !important; background: #FEF2F2; }
 
-        /* ALERTS */
-        .alert{padding:13px 16px;border-radius:8px;margin-bottom:18px;font-size:14px;}
-        .alert-success{background:#D1FAE5;color:#065F46;border:1px solid #A7F3D0;}
-        .alert-error{background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;}
+        /* ── LAYOUT ── */
+        .container { max-width: 1060px; margin: 0 auto; padding: 32px 24px 72px; position: relative; z-index: 1; }
 
-        /* BID CARD */
-        .bid-card{background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;padding:28px;margin-bottom:18px;box-shadow:var(--shadow-sm);transition:all 0.25s;}
-        .bid-card:hover{box-shadow:var(--shadow-md);border-color:rgba(181,128,79,0.3);}
-        .bid-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;}
-        .contractor-info{display:flex;align-items:center;gap:14px;}
-        .contractor-avatar{width:52px;height:52px;border-radius:50%;background:var(--accent-light);border:2px solid var(--stone);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
-        .contractor-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--text-primary);margin-bottom:3px;}
-        .contractor-sub{font-size:13px;color:var(--text-secondary);}
-        .contractor-rating{font-size:12px;color:var(--text-muted);margin-top:3px;}
+        /* ── BACK LINK ── */
+        .back-link {
+            display: inline-flex; align-items: center; gap: 7px;
+            color: var(--accent); font-size: 13.5px; font-weight: 600;
+            text-decoration: none; margin-bottom: 20px;
+            padding: 7px 14px; border-radius: 9px;
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(184,134,78,0.2);
+            transition: all 0.2s;
+        }
+        .back-link:hover { background: var(--accent-light); gap: 11px; border-color: rgba(184,134,78,0.4); }
 
-        /* STATUS BADGES */
-        .status-badge{display:inline-block;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
-        .status-pending{background:#FEF3C7;color:#92400E;}
-        .status-accepted{background:#D1FAE5;color:#065F46;}
-        .status-rejected{background:#FEE2E2;color:#991B1B;}
+        /* ── PAGE BANNER ── */
+        .page-banner {
+            background: rgba(250,244,234,0.82);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(212,186,150,0.55);
+            border-radius: 22px;
+            padding: 32px 40px;
+            margin-bottom: 22px;
+            position: relative; overflow: hidden;
+            box-shadow: 0 4px 32px rgba(150,105,58,0.10), inset 0 1px 0 rgba(255,248,235,0.7);
+            animation: slideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .page-banner::before {
+            content: '';
+            position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+            background: linear-gradient(180deg, var(--accent), var(--accent2));
+            border-radius: 22px 0 0 22px;
+        }
+        .banner-eyebrow {
+            font-size: 11px; font-weight: 600; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--accent);
+            margin-bottom: 8px; display: flex; align-items: center; gap: 7px;
+        }
+        .banner-eyebrow::before {
+            content: ''; width: 22px; height: 1.5px;
+            background: var(--accent); display: inline-block;
+        }
+        .page-banner h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 30px; font-weight: 700;
+            color: var(--text-primary); margin-bottom: 10px; line-height: 1.15;
+        }
+        .project-meta {
+            display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 0;
+        }
+        .meta-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 13px;
+            background: rgba(255,255,255,0.55);
+            border: 1px solid rgba(212,186,150,0.4);
+            border-radius: 20px;
+            font-size: 12.5px; font-weight: 500; color: var(--text-secondary);
+        }
 
-        /* BID DETAILS GRID */
-        .bid-details{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:18px 20px;background:var(--sand);border-radius:10px;margin:18px 0;}
-        @media(max-width:600px){.bid-details{grid-template-columns:repeat(2,1fr);}}
-        .detail-item{text-align:center;}
-        .detail-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
-        .detail-value{font-size:17px;font-weight:700;color:var(--text-primary);}
-        .detail-value.accent{color:var(--accent);}
+        /* ── STATS ── */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+            margin-bottom: 22px;
+            animation: slideUp 0.55s 0.08s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        @media(max-width:700px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
 
-        /* PROPOSAL */
-        .bid-proposal{padding:14px 16px;background:var(--cream);border:1px solid var(--stone);border-radius:8px;font-size:14px;line-height:1.65;color:var(--text-secondary);margin:14px 0;}
-        .bid-proposal strong{color:var(--text-primary);}
-        .bid-timestamp{font-size:11px;color:var(--text-muted);margin-top:8px;}
+        .stat-card {
+            background: rgba(250,244,234,0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(212,186,150,0.45);
+            border-radius: 18px; padding: 22px 18px;
+            text-align: center;
+            box-shadow: 0 2px 20px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.6);
+            transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s, border-color 0.3s, background 0.3s;
+            position: relative; overflow: hidden; cursor: default;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            transform: scaleX(0); transform-origin: left;
+            transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
+            border-radius: 18px 18px 0 0;
+        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(150,105,58,0.16); border-color: rgba(184,134,78,0.55); background: rgba(252,247,238,0.88); }
+        .stat-card:hover::before { transform: scaleX(1); }
+        .stat-icon-wrap {
+            width: 42px; height: 42px;
+            background: var(--accent-light);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 14px; color: var(--accent);
+            border: 1px solid rgba(184,134,78,0.2);
+            font-size: 19px;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .stat-card:hover .stat-icon-wrap {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: white; transform: scale(1.08) rotate(-4deg);
+        }
+        .stat-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px; font-weight: 700;
+            color: var(--text-primary); line-height: 1; margin-bottom: 5px;
+        }
+        .stat-label {
+            color: var(--text-muted); font-size: 10.5px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
 
-        /* BID ACTIONS */
-        .bid-actions{display:flex;gap:10px;margin-top:16px;}
-        .btn-accept{flex:1;padding:11px 20px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
-        .btn-accept:hover{background:var(--accent-dark);transform:translateY(-1px);}
-        .btn-reject{flex:1;padding:11px 20px;background:transparent;color:#DC2626;border:1.5px solid #FECACA;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
-        .btn-reject:hover{background:#FEE2E2;}
-        .btn-view{padding:11px 20px;background:var(--sand);color:var(--text-secondary);border:1px solid var(--stone);border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;transition:all 0.2s;white-space:nowrap;}
-        .btn-view:hover{background:var(--stone);}
+        /* ── ALERTS ── */
+        .alert {
+            padding: 12px 18px; border-radius: 10px;
+            margin-bottom: 16px; font-size: 13.5px;
+            backdrop-filter: blur(10px);
+        }
+        .alert-success { background: rgba(209,250,229,0.85); color: #065F46; border: 1px solid #A7F3D0; }
+        .alert-error   { background: rgba(254,226,226,0.85); color: #991B1B; border: 1px solid #FECACA; }
 
-        /* EMPTY STATE */
-        .empty-state{text-align:center;padding:60px 20px;background:var(--warm-white);border:1px solid var(--stone);border-radius:16px;}
-        .empty-icon{font-size:56px;margin-bottom:16px;opacity:0.5;}
-        .empty-state h2{font-family:'Playfair Display',serif;font-size:20px;color:var(--text-primary);margin-bottom:8px;}
-        .empty-state p{color:var(--text-muted);font-size:14px;}
+        /* ── BID CARD ── */
+        .bid-card {
+            background: rgba(255,255,255,0.70);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255,255,255,0.80);
+            border-radius: 18px; margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 32px rgba(150,105,58,0.10), inset 0 1px 0 rgba(255,255,255,0.95);
+            transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s, border-color 0.3s, background 0.3s;
+        }
+        .bid-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.88); box-shadow: 0 12px 40px rgba(150,105,58,0.14); border-color: rgba(184,134,78,0.30); }
 
-        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-        .page-header{animation:fadeUp 0.5s ease both;}
-        .stats-grid{animation:fadeUp 0.5s 0.1s ease both;}
-        .bid-card{animation:fadeUp 0.5s 0.15s ease both;}
+        /* status top stripe */
+        .bid-stripe { height: 3.5px; }
+        .stripe-pending  { background: linear-gradient(90deg, #D97706, #FDE68A); }
+        .stripe-accepted { background: linear-gradient(90deg, #059669, #6EE7B7); }
+        .stripe-rejected { background: linear-gradient(90deg, #DC2626, #FCA5A5); }
+
+        .bid-body { padding: 22px 26px; }
+
+        .bid-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 18px; gap: 16px;
+        }
+        .contractor-info { display: flex; align-items: center; gap: 14px; }
+        .contractor-avatar {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
+            border: 2px solid rgba(184,134,78,0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .contractor-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px;
+        }
+        .contractor-sub  { font-size: 12.5px; color: var(--text-secondary); }
+        .contractor-rating { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+
+        /* ── STATUS BADGES ── */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 5px 14px; border-radius: 20px;
+            font-size: 10.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+            flex-shrink: 0;
+        }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .status-pending  { background: #FEF3C7; color: #92400E; }
+        .status-pending .status-dot  { background: #D97706; }
+        .status-accepted { background: var(--green-bg); color: var(--green); }
+        .status-accepted .status-dot { background: #10B981; }
+        .status-rejected { background: var(--red-bg); color: var(--red); }
+        .status-rejected .status-dot { background: #EF4444; }
+
+        /* ── BID DETAILS GRID ── */
+        .bid-details {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+            padding: 16px 18px;
+            background: rgba(232,223,208,0.35);
+            border: 1px solid rgba(212,186,150,0.22);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        @media(max-width:600px) { .bid-details { grid-template-columns: repeat(2,1fr); } }
+        .detail-item { text-align: center; }
+        .detail-label {
+            font-size: 10px; color: var(--text-muted); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+        }
+        .detail-value { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+        .detail-value.accent { color: var(--accent-dark); }
+
+        /* ── PROPOSAL ── */
+        .bid-proposal {
+            padding: 14px 16px;
+            background: rgba(251,243,228,0.55);
+            border: 1px solid rgba(184,134,78,0.2);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 10px 10px 0;
+            font-size: 13.5px; line-height: 1.65; color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+        .bid-proposal strong { color: var(--text-primary); font-weight: 600; }
+        .bid-timestamp { font-size: 11.5px; color: var(--text-muted); margin-bottom: 14px; }
+
+        /* ── BID ACTIONS ── */
+        .bid-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-accept {
+            flex: 1; padding: 11px 20px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff; border: none; border-radius: 10px;
+            font-weight: 700; font-size: 13px; cursor: pointer;
+            transition: all 0.2s; font-family: 'Outfit', sans-serif;
+            box-shadow: 0 3px 12px rgba(184,134,78,0.3);
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-accept:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(184,134,78,0.42); }
+        .btn-reject {
+            flex: 1; padding: 11px 20px;
+            background: transparent; color: var(--red);
+            border: 1.5px solid #FECACA; border-radius: 10px;
+            font-weight: 600; font-size: 13px; cursor: pointer;
+            transition: all 0.2s; font-family: 'Outfit', sans-serif;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-reject:hover { background: var(--red-bg); border-color: #FCA5A5; transform: translateY(-1px); }
+        .btn-view {
+            padding: 11px 20px;
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(10px);
+            color: var(--text-secondary);
+            border: 1px solid rgba(212,186,150,0.4);
+            border-radius: 10px; font-weight: 600; font-size: 13px;
+            text-decoration: none; transition: all 0.2s; white-space: nowrap;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-view:hover { background: var(--accent-light); border-color: rgba(184,134,78,0.5); color: var(--accent-dark); }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            background: rgba(255,255,255,0.70);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255,255,255,0.80);
+            border-radius: 18px; padding: 72px 24px;
+            text-align: center;
+            box-shadow: 0 4px 32px rgba(150,105,58,0.10);
+        }
+        .empty-icon {
+            width: 64px; height: 64px;
+            background: var(--sand); border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 18px; color: var(--text-muted);
+            border: 1px solid var(--stone); font-size: 28px;
+        }
+        .empty-state h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px; font-weight: 700;
+            color: var(--text-primary); margin-bottom: 8px;
+        }
+        .empty-state p { font-size: 14px; color: var(--text-secondary); }
+
+        /* ── ANIMATIONS ── */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:768px) {
+            .navbar { padding: 0 18px; }
+            .container { padding: 20px 14px 56px; }
+            .page-banner { padding: 22px 22px; }
+            .page-banner h1 { font-size: 24px; }
+            .bid-body { padding: 16px 18px; }
+            .bid-header { flex-direction: column; gap: 10px; }
+            .bid-actions { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">🏗️ House-Forge</a>
-        <div class="navbar-menu">
-            <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('user.projects') }}">My Projects</a>
-            <a href="{{ url_for('user.messages') }}" style="position: relative;">
-                Messages
-                <span class="badge-notification" id="messagesBadge"></span>
-            </a>
-            
-            <a href="{{ url_for('user.profile') }}" style="padding:8px 10px;">
-                {% if user_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
-                {% else %}
-                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
-                {% endif %}
-            </a>
-            <a href="{{ url_for('auth.logout') }}" style="color:var(--text-muted);font-size:13px;">Logout</a>
+
+<div class="bg-grid"></div>
+<div class="bg-warm"></div>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+    <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">
+        <div class="navbar-brand-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
-    </nav>
+        House-Forge
+    </a>
+    <div class="navbar-menu">
+        <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('user.projects') }}">My Projects</a>
+        <a href="{{ url_for('user.messages') }}" style="position:relative;">
+            Messages
+            <span class="badge-notification" id="messagesBadge" style="position:absolute;top:2px;right:2px;background:#DC2626;color:#fff;border-radius:50%;width:15px;height:15px;display:none;align-items:center;justify-content:center;font-size:8px;font-weight:700;border:2px solid var(--bg-card);"></span>
+        </a>
+        <div class="nav-divider"></div>
+        <a href="{{ url_for('user.profile') }}" style="padding:7px 9px;">
+            {% if user_profile_picture %}
+                <img src="/static/uploads/profiles/{{ user_profile_picture }}" class="profile-pic" alt="Profile">
+            {% else %}
+                <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
+            {% endif %}
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="logout-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Logout
+        </a>
+    </div>
+</nav>
 
-    <div class="container">
-        <a href="{{ url_for('user.view_project', project_id=project.id) }}" class="back-link">← Back to Project</a>
+<!-- ── MAIN ── -->
+<div class="container">
 
-        <div class="page-header">
-            <h1>📋 Bids for {{ project.title }}</h1>
-            <div class="divider"></div>
-            <div class="project-meta">
-                <span>📏 {{ project.square_feet }} sq ft</span>
-                <span>📍 {{ project.location }}</span>
-                <span>💰 {{ project.budget_range.title() }} Budget</span>
-            </div>
+    <a href="{{ url_for('user.view_project', project_id=project.id) }}" class="back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Project
+    </a>
+
+    <!-- PAGE BANNER -->
+    <div class="page-banner">
+        <div class="banner-eyebrow">Bid Management</div>
+        <h1>📋 Bids for {{ project.title }}</h1>
+        <div class="project-meta">
+            <span class="meta-chip">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                {{ project.square_feet }} sq ft
+            </span>
+            <span class="meta-chip">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ project.location }}
+            </span>
+            <span class="meta-chip">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                {{ project.budget_range.title() }} Budget
+            </span>
         </div>
+    </div>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}{% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}{% endif %}
-        {% endwith %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}{% endif %}
+    {% endwith %}
 
-        <div class="stats-grid">
-            <div class="stat-card"><span class="stat-icon">📋</span><div class="stat-number">{{ stats.total }}</div><div class="stat-label">Total Bids</div></div>
-            <div class="stat-card"><span class="stat-icon">⏳</span><div class="stat-number">{{ stats.pending }}</div><div class="stat-label">Pending</div></div>
-            <div class="stat-card"><span class="stat-icon">✅</span><div class="stat-number">{{ stats.accepted }}</div><div class="stat-label">Accepted</div></div>
-            <div class="stat-card"><span class="stat-icon">❌</span><div class="stat-number">{{ stats.rejected }}</div><div class="stat-label">Rejected</div></div>
-        </div>
+    
 
-        {% if bids %}
-            {% for bid in bids %}
-            <div class="bid-card">
+    <!-- BID CARDS -->
+    {% if bids %}
+        {% for bid in bids %}
+        <div class="bid-card">
+
+            <div class="bid-stripe stripe-{{ bid.status }}"></div>
+
+            <div class="bid-body">
+
                 <div class="bid-header">
                     <div class="contractor-info">
                         <div class="contractor-avatar">🔨</div>
                         <div>
                             <div class="contractor-name">{{ bid.contractor_company or bid.contractor_name }}</div>
                             <div class="contractor-sub">{{ bid.contractor_name if bid.contractor_company else 'Professional Contractor' }}</div>
-                            <div class="contractor-rating">⭐ {{ "%.1f"|format(bid.contractor_rating or 0) }} · {{ bid.contractor_experience or 0 }} yrs experience</div>
+                            <div class="contractor-rating">
+                                ⭐ {{ "%.1f"|format(bid.contractor_rating or 0) }} · {{ bid.contractor_experience or 0 }} yrs experience
+                            </div>
                         </div>
                     </div>
                     <span class="status-badge status-{{ bid.status }}">
-                        {% if bid.status == 'pending' %}⏳ Pending{% elif bid.status == 'accepted' %}✅ Accepted{% else %}❌ Rejected{% endif %}
+                        <span class="status-dot"></span>
+                        {% if bid.status == 'pending' %}Pending
+                        {% elif bid.status == 'accepted' %}Accepted
+                        {% else %}Rejected
+                        {% endif %}
                     </span>
                 </div>
 
@@ -180,29 +525,82 @@
                     </div>
                 </div>
 
-                <div class="bid-proposal"><strong>Proposal:</strong><br>{{ bid.proposal }}</div>
-                <div class="bid-timestamp">Submitted: {{ bid.created_at.strftime('%d %b %Y, %I:%M %p') if bid.created_at else 'N/A' }}</div>
+                <div class="bid-proposal">
+                    <strong>Proposal</strong><br>{{ bid.proposal }}
+                </div>
+                <div class="bid-timestamp">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Submitted {{ bid.created_at.strftime('%d %b %Y, %I:%M %p') if bid.created_at else 'N/A' }}
+                </div>
 
                 {% if bid.status == 'pending' %}
                 <div class="bid-actions">
-                    <form method="POST" action="{{ url_for('user.accept_bid', bid_id=bid.id) }}" onsubmit="return confirm('Accept this bid?');" style="flex:1;">
-                        <button type="submit" class="btn-accept" style="width:100%;">✅ Accept Bid</button>
+                    <form method="POST" action="{{ url_for('user.accept_bid', bid_id=bid.id) }}" onsubmit="return confirm('Accept this bid?');" style="flex:1;display:flex;">
+                        <button type="submit" class="btn-accept" style="width:100%;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Accept Bid
+                        </button>
                     </form>
-                    <form method="POST" action="{{ url_for('user.reject_bid', bid_id=bid.id) }}" onsubmit="return confirm('Reject this bid?');" style="flex:1;">
-                        <button type="submit" class="btn-reject" style="width:100%;">❌ Reject Bid</button>
+                    <form method="POST" action="{{ url_for('user.reject_bid', bid_id=bid.id) }}" onsubmit="return confirm('Reject this bid?');" style="flex:1;display:flex;">
+                        <button type="submit" class="btn-reject" style="width:100%;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            Reject Bid
+                        </button>
                     </form>
-                    <a href="{{ url_for('user.view_contractor', contractor_id=bid.contractor_id) }}" class="btn-view">View Profile</a>
+                    <a href="{{ url_for('user.view_contractor', contractor_id=bid.contractor_id) }}" class="btn-view">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        View Profile
+                    </a>
                 </div>
                 {% endif %}
+
             </div>
-            {% endfor %}
-        {% else %}
-            <div class="empty-state">
-                <div class="empty-icon">📋</div>
-                <h2>No Bids Yet</h2>
-                <p>No contractors have submitted bids for this project yet.</p>
-            </div>
-        {% endif %}
+        </div>
+        {% endfor %}
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h2>No Bids Yet</h2>
+        <p>No contractors have submitted bids for this project yet.</p>
     </div>
+    {% endif %}
+
+</div>
+
+<script>
+/* Staggered bid card entrance */
+document.querySelectorAll('.bid-card').forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(18px)';
+    card.style.transition = 'none';
+    setTimeout(() => {
+        card.style.transition = 'opacity 0.45s cubic-bezier(0.22,1,0.36,1), transform 0.45s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s, border-color 0.3s, background 0.3s';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 100 + i * 75);
+});
+
+/* Stat cards staggered entrance */
+document.querySelectorAll('.stat-card').forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(14px)';
+    setTimeout(() => {
+        card.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1), border-color 0.25s, background 0.25s, box-shadow 0.3s';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 200 + i * 60);
+});
+
+/* Message badge */
+fetch('/user/messages/unread-count')
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+        if (!data) return;
+        const badge = document.getElementById('messagesBadge');
+        if (badge && data.count > 0) { badge.textContent = data.count; badge.style.display = 'flex'; }
+    }).catch(() => {});
+</script>
+
 </body>
 </html>

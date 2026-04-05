@@ -383,16 +383,15 @@
                     <span class="total-value">₹{{ "{:,.0f}".format(order.total) }}</span>
                 </div>
                 
-                {% if order.status == 'pending' %}
                 <div class="order-actions">
-                    <button class="btn btn-success" onclick="acceptOrder('{{ order.id }}')">✅ Accept Order</button>
-                    <button class="btn btn-outline" onclick="rejectOrder('{{ order.id }}')">❌ Reject</button>
-                </div>
-                {% elif order.status == 'processing' %}
-                <div class="order-actions">
-                    <button class="btn btn-success" onclick="completeOrder('{{ order.id }}')">✅ Mark as Completed</button>
-                </div>
-                {% endif %}
+    <a href="/supplier/order/{{ order.id }}" class="btn btn-outline" style="flex:1;text-align:center;text-decoration:none;">🔍 View Details</a>
+    {% if order.status == 'pending' %}
+        <button class="btn btn-success" onclick="acceptOrder('{{ order.id }}')">✅ Accept</button>
+        <button class="btn btn-outline" style="color:#dc3545;border-color:#dc3545;" onclick="rejectOrder('{{ order.id }}')">❌</button>
+    {% elif order.status == 'processing' %}
+        <button class="btn btn-success" onclick="completeOrder('{{ order.id }}')">✅ Complete</button>
+    {% endif %}
+</div>
             </div>
             {% endfor %}
         {% else %}

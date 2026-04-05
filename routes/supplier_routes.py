@@ -68,20 +68,27 @@ def inventory():
 @supplier_bp.route('/orders')
 @login_required
 def orders():
-    """View all orders"""
-    orders_ref = db.collection('orders').where('supplier_id', '==', current_user.id).stream()
-    orders_list = []
-    for doc in orders_ref:
-        order_data = doc.to_dict()
-        order_data['id'] = doc.id
-        
-        # Convert items to order_items to avoid conflict with dict.items() method
-        if 'items' in order_data:
-            order_data['order_items'] = order_data['items']
-        
-        orders_list.append(order_data)
-    
-    return render_template('supplier/orders.html', orders=orders_list)
+        orders_ref = db.collection('orders').where('supplier_id', '==', current_user.id).stream()
+        orders_list = []
+        for doc in orders_ref:
+            order_data = doc.to_dict()
+            order_data['id'] = doc.id
+            if 'items' in order_data:
+                order_data['order_items'] = order_data['items']
+            orders_list.append(order_data)
+ 
+        # Get profile picture
+        supplier_profile_picture = None
+        try:
+            sup_doc = db.collection('suppliers').document(current_user.id).get()
+            if sup_doc.exists:
+                supplier_profile_picture = sup_doc.to_dict().get('profile_picture')
+        except Exception:
+            pass
+ 
+        return render_template('supplier/orders.html',
+                               orders=orders_list,
+                               supplier_profile_picture=supplier_profile_picture)
 
 @supplier_bp.route('/add-material', methods=['GET', 'POST'])
 @login_required
@@ -478,6 +485,139 @@ def complete_order(order_id):
         print(f"Error completing order: {str(e)}")
         import traceback
         traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+    
+
+@supplier_bp.route('/order/<order_id>')
+@login_required
+def order_detail(order_id):
+    """View detailed order info — customer details, items, delivery, reviews."""
+    try:
+        order_ref = db.collection('orders').document(order_id)
+        order_doc = order_ref.get()
+
+        if not order_doc.exists:
+            flash('Order not found', 'error')
+            return redirect(url_for('supplier.orders'))
+
+        order_data = order_doc.to_dict()
+        order_data['id'] = order_id
+
+        if order_data.get('supplier_id') != current_user.id:
+            flash('Access denied', 'error')
+            return redirect(url_for('supplier.orders'))
+
+        # Normalise items
+        if 'items' in order_data:
+            order_data['order_items'] = order_data['items']
+
+        # Fetch customer / user info
+        user_data = {}
+        user_id = order_data.get('user_id')
+        if user_id:
+            user_doc = db.collection('users').document(user_id).get()
+            if user_doc.exists:
+                user_data = user_doc.to_dict()
+
+        # Fetch reviews for this order (or supplier + user pair)
+        reviews = []
+        try:
+            # Try order-scoped review first
+            reviews_ref = db.collection('reviews') \
+                .where('order_id', '==', order_id) \
+                .stream()
+            for rdoc in reviews_ref:
+                r = rdoc.to_dict()
+                r['id'] = rdoc.id
+                reviews.append(r)
+
+            # If none, broaden to supplier reviews from this user
+            if not reviews and user_id:
+                reviews_ref2 = db.collection('reviews') \
+                    .where('supplier_id', '==', current_user.id) \
+                    .where('user_id', '==', user_id) \
+                    .stream()
+                for rdoc in reviews_ref2:
+                    r = rdoc.to_dict()
+                    r['id'] = rdoc.id
+                    reviews.append(r)
+        except Exception as e:
+            print(f"Reviews fetch error: {e}")
+
+        # Supplier profile picture
+        supplier_profile_picture = None
+        try:
+            sup_doc = db.collection('suppliers').document(current_user.id).get()
+            if sup_doc.exists:
+                supplier_profile_picture = sup_doc.to_dict().get('profile_picture')
+        except Exception:
+            pass
+
+        return render_template(
+            'supplier/order_detail.html',
+            order=order_data,
+            user=user_data,
+            reviews=reviews,
+            supplier_profile_picture=supplier_profile_picture
+        )
+
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('supplier.orders'))
+
+
+@supplier_bp.route('/order/<order_id>/mark-collected', methods=['POST'])
+@login_required
+def mark_collected(order_id):
+    """Supplier confirms cash/card collected — marks order paid & completed."""
+    try:
+        order_ref = db.collection('orders').document(order_id)
+        order_doc = order_ref.get()
+
+        if not order_doc.exists:
+            return jsonify({'success': False, 'message': 'Order not found'}), 404
+
+        order_data = order_doc.to_dict()
+
+        if order_data.get('supplier_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+
+        if order_data.get('payment_status') == 'paid':
+            return jsonify({'success': False, 'message': 'Already marked as paid'}), 400
+
+        order_ref.update({
+            'payment_status':    'paid',
+            'cash_collected_at': datetime.now(),
+            'status':            'completed',
+            'updated_at':        datetime.now()
+        })
+
+        # Update payment record
+        payments_ref = db.collection('payments').where('order_id', '==', order_id).stream()
+        for pdoc in payments_ref:
+            db.collection('payments').document(pdoc.id).update({'status': 'paid'})
+
+        # Notify user
+        user_id = order_data.get('user_id')
+        if user_id:
+            method = order_data.get('payment_method', '')
+            label  = 'Card payment verified' if method == 'card' else 'Cash collected'
+            db.collection('notifications').add({
+                'user_id':    user_id,
+                'title':      f'{label} — Order Complete',
+                'message':    f'Your order #{order_id[:8].upper()} has been delivered and payment confirmed. '
+                              f'Amount: ₹{order_data.get("total", 0):,.0f}',
+                'type':       'payment',
+                'link':       '/user/my-orders',
+                'read':       False,
+                'created_at': datetime.now()
+            })
+
+        return jsonify({'success': True, 'message': 'Order marked as paid and completed!'})
+
+    except Exception as e:
+        import traceback; traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 # ======================== MESSAGING ROUTES ========================

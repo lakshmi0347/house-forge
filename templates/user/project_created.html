@@ -695,6 +695,26 @@
     </div>
 </div>
 
+{# ─── TIMELINE HELPER ─── 
+   Resolve duration from whichever key the calculation service returns.
+   Priority: total_days → compute months  |  total_months → compute days
+   Falls back to 0 if both are absent.
+#}
+{% set _raw_days   = estimation.timeline.get('total_days', 0)   | float %}
+{% set _raw_months = estimation.timeline.get('total_months', 0) | float %}
+
+{# Prefer total_days if present and non-zero, otherwise derive from total_months #}
+{% if _raw_days > 0 %}
+    {% set tl_days   = _raw_days | round | int %}
+    {% set tl_months = (_raw_days / 30) | round(1) %}
+{% elif _raw_months > 0 %}
+    {% set tl_days   = (_raw_months * 30) | round | int %}
+    {% set tl_months = _raw_months | round(1) %}
+{% else %}
+    {% set tl_days   = 0 %}
+    {% set tl_months = 0 %}
+{% endif %}
+
 <!-- ─── STAGE DEFINITIONS ─── -->
 {% set stage_defs = [
     ('foundation',    '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',                                                                  'Foundation',        'Footings, anti-termite, waterproofing, concrete'),
@@ -767,7 +787,14 @@
                 <div class="m-icon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
-                <div class="m-val">{{ estimation.timeline.get('total_months', 0) | int }}</div>
+                {# FIX: Show months prominently, derived robustly from whichever key exists #}
+                <div class="m-val">
+                    {% if tl_months > 0 %}
+                        {{ tl_months }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
                 <div class="m-lbl">Months to Build</div>
             </div>
             <div class="metric">
@@ -1036,14 +1063,27 @@
             <div class="tl-card">
                 <div class="tl-number-wrap">
                     <div class="tl-lbl">Total Duration</div>
-                    <div class="tl-big">{{ estimation.timeline.get('total_days',0) | int }}</div>
-                    <div class="tl-sub">≈ {{ ((estimation.timeline.get('total_days',0)) / 30) | round(1) }} months</div>
+                    {# FIX: Show days if available, otherwise derive from months #}
+                    <div class="tl-big">{{ tl_days if tl_days > 0 else '—' }}</div>
+                    <div class="tl-sub">
+                        {% if tl_days > 0 %}
+                            ≈ {{ tl_months }} months
+                        {% elif tl_months > 0 %}
+                            {{ tl_months }} months
+                        {% else %}
+                            Duration not calculated
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="tl-stages">
                     {% for sk, sn in [('foundation','Foundation'),('walls','Walls'),('flooring','Flooring'),('roofing','Roofing'),('plumbing','Plumbing'),('electrical','Electrical'),('finishing','Finishing'),('carpentry','Carpentry'),('exterior','Exterior')] %}
-                    {% set d = estimation.timeline.get(sk, 0) | int %}
-                    {% if d > 0 %}
-                    <div class="tl-row"><span>{{ sn }}</span><span class="tl-row-d">{{ d }}d</span></div>
+                    {# FIX: Check both 'Xdays' and 'X' key patterns for stage durations #}
+                    {% set d_days = estimation.timeline.get(sk, 0) | int %}
+                    {% set d_months = estimation.timeline.get(sk ~ '_months', 0) %}
+                    {% if d_days > 0 %}
+                    <div class="tl-row"><span>{{ sn }}</span><span class="tl-row-d">{{ d_days }}d</span></div>
+                    {% elif d_months > 0 %}
+                    <div class="tl-row"><span>{{ sn }}</span><span class="tl-row-d">{{ d_months }}mo</span></div>
                     {% endif %}
                     {% endfor %}
                 </div>
@@ -1115,6 +1155,18 @@
             <div class="irow"><span class="ilbl">Floors</span><span class="ival">{{ project.floors }}</span></div>
             <div class="irow"><span class="ilbl">Bathrooms</span><span class="ival">{{ project.bathrooms }}</span></div>
             <div class="irow"><span class="ilbl">Budget</span><span class="ival">{{ {'low':'Budget','medium':'Standard','high':'Premium'}.get(budget, budget | title) }}</span></div>
+            {# FIX: Show duration in sidebar robustly #}
+            <div class="irow">
+                <span class="ilbl">Duration</span>
+                <span class="ival">
+                    {% if tl_months > 0 %}
+                        {{ tl_months }} months
+                        {% if tl_days > 0 %}({{ tl_days }} days){% endif %}
+                    {% else %}
+                        —
+                    {% endif %}
+                </span>
+            </div>
             <div class="loc-b">
                 <div class="loc-bl">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -1169,11 +1221,11 @@
 
 <script>
     function tog(key) {
-        const b = document.getElementById('sb-' + key);
-        const h = document.getElementById('sh-' + key);
-        const a = document.getElementById('sacc-' + key);
+        var b = document.getElementById('sb-' + key);
+        var h = document.getElementById('sh-' + key);
+        var a = document.getElementById('sacc-' + key);
         if (!b || !h) return;
-        const wasOpen = b.classList.contains('open');
+        var wasOpen = b.classList.contains('open');
         document.querySelectorAll('.sb').forEach(function(el)   { el.classList.remove('open'); });
         document.querySelectorAll('.sh').forEach(function(el)   { el.classList.remove('open'); });
         document.querySelectorAll('.sacc').forEach(function(el) { el.classList.remove('expanded'); });

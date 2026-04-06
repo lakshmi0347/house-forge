@@ -173,7 +173,9 @@
         <div class="section">
             <div class="section-header"><h2 class="section-title">⚡ Quick Actions</h2></div>
             <div class="actions-row">
-                <button class="btn btn-primary" onclick="alert('Edit profile feature coming soon!')">✏️ Edit Profile</button>
+                <a href="{{ url_for('contractor.edit_profile') }}" class="btn btn-primary">
+    ✏️ Edit Profile
+</a>
                 <button class="btn btn-outline" onclick="alert('Upload documents feature coming soon!')">📄 Upload Documents</button>
                 <button class="btn btn-outline" onclick="alert('Change password feature coming soon!')">🔒 Change Password</button>
             </div>

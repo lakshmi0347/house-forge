@@ -926,3 +926,49 @@ def user_profile(user_id):
         traceback.print_exc()
         flash('Error loading user profile', 'error')
         return redirect(url_for('contractor.dashboard'))
+    
+@contractor_bp.route('/edit-profile')
+@login_required
+def edit_profile():
+    """Edit contractor profile page"""
+    db = get_db()
+    
+    try:
+        contractor_ref = db.collection('contractors').document(current_user.id)
+        contractor_doc = contractor_ref.get()
+        
+        if not contractor_doc.exists:
+            flash('Contractor profile not found', 'error')
+            return redirect(url_for('contractor.profile'))
+        
+        contractor_data = contractor_doc.to_dict()
+        
+        # Convert Firebase datetime to string
+        if 'created_at' in contractor_data and contractor_data['created_at']:
+            try:
+                contractor_data['created_at'] = contractor_data['created_at'].strftime('%Y-%m-%d')
+            except:
+                contractor_data['created_at'] = 'N/A'
+        
+        # Set defaults
+        contractor_data.setdefault('name', '')
+        contractor_data.setdefault('email', '')
+        contractor_data.setdefault('company_name', '')
+        contractor_data.setdefault('phone', '')
+        contractor_data.setdefault('location', '')
+        contractor_data.setdefault('bio', '')
+        contractor_data.setdefault('license_number', '')
+        contractor_data.setdefault('specializations', [])
+        contractor_data.setdefault('years_experience', 0)
+        contractor_data.setdefault('profile_picture', '')
+        
+        contractor_profile_picture = contractor_data.get('profile_picture')
+        
+        return render_template('contractor/edit_profile.html',
+                             contractor_data=contractor_data,
+                             contractor_profile_picture=contractor_profile_picture)
+    
+    except Exception as e:
+        print(f"Error loading edit profile: {e}")
+        flash('An error occurred while loading your profile', 'error')
+        return redirect(url_for('contractor.profile'))

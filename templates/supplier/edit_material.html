@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Material — House-Forge Supplier</title>
+    <title>Edit Material — House-Forge Supplier</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -107,7 +107,6 @@
             position: relative; z-index: 1;
         }
 
-        /* ── BREADCRUMB ── */
         .breadcrumb {
             display: flex; align-items: center; gap: 8px;
             font-size: 13px; color: var(--text3);
@@ -117,7 +116,6 @@
         .breadcrumb a { color: var(--text2); text-decoration: none; transition: color .2s; }
         .breadcrumb a:hover { color: var(--accent); }
 
-        /* ── PAGE HEADER ── */
         .page-header {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -136,19 +134,23 @@
 
         .page-sub { font-size: 13px; color: var(--text3); }
 
-        /* ── ALERTS ── */
         .alert {
             padding: 13px 18px;
             border-radius: 10px;
             margin-bottom: 16px;
             font-size: 13.5px;
-            animation: fadeUp .3s ease both;
         }
 
-        .alert-success { background: var(--green-dim); color: var(--green); border: 1px solid rgba(16,185,129,.3); }
-        .alert-error   { background: var(--red-dim);   color: var(--red);   border: 1px solid rgba(239,68,68,.3); }
+        .alert-success {
+            background: var(--green-dim);
+            color: var(--green);
+        }
 
-        /* ── FORM CARD ── */
+        .alert-error {
+            background: var(--red-dim);
+            color: var(--red);
+        }
+
         .form-card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -175,6 +177,7 @@
         .icon-blue   { background: var(--blue-dim); }
         .icon-green  { background: var(--green-dim); }
         .icon-gold   { background: var(--gold-dim); }
+        .icon-purple { background: rgba(124,58,237,0.12); }
 
         .card-head-title {
             font-size: 12px; font-weight: 700;
@@ -234,7 +237,56 @@
 
         @media(max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
 
-        /* ── FORM ACTIONS ── */
+        .image-upload-container {
+            border: 2px dashed var(--border2);
+            border-radius: 10px;
+            padding: 28px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            background: var(--surface2);
+        }
+
+        .image-upload-container:hover {
+            border-color: var(--accent);
+            background: var(--blue-dim);
+        }
+
+        .upload-area { pointer-events: none; }
+
+        .upload-icon { font-size: 36px; margin-bottom: 10px; }
+        .upload-text { color: var(--text2); font-size: 13px; margin-bottom: 6px; font-weight: 500; }
+        .upload-hint { font-size: 11px; color: var(--text3); }
+
+        .image-preview-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-top: 14px;
+        }
+
+        .image-preview-wrapper img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .remove-image-btn:hover { background: #d63333; }
+
         .form-actions {
             display: flex; gap: 12px;
             margin-top: 28px;
@@ -260,67 +312,13 @@
         }
         .btn-outline:hover { background: var(--surface2); color: var(--text); }
 
+        .btn-danger {
+            background: var(--red-dim); color: var(--red);
+            border: 1px solid rgba(239,68,68,.3);
+        }
+        .btn-danger:hover { background: var(--red); color: white; }
+
         @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
-
-    .image-upload-container {
-        border: 2px dashed var(--border2);
-        border-radius: 10px;
-        padding: 28px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.25s;
-        background: var(--surface2);
-    }
-
-    .image-upload-container:hover {
-        border-color: var(--accent);
-        background: var(--blue-dim);
-    }
-
-    .upload-area {
-        pointer-events: none;
-    }
-
-    .upload-icon {
-        font-size: 36px;
-        margin-bottom: 10px;
-    }
-
-    .upload-text {
-        color: var(--text2);
-        font-size: 13px;
-        margin-bottom: 6px;
-        font-weight: 500;
-    }
-
-    .upload-hint {
-        font-size: 11px;
-        color: var(--text3);
-    }
-
-    .image-preview-wrapper {
-        position: relative;
-        display: inline-block;
-    }
-
-    .remove-image-btn {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        background: var(--red);
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .remove-image-btn:hover {
-        background: #d63333;
-    }
     </style>
 </head>
 <body>
@@ -355,163 +353,159 @@
             Inventory
         </a>
         <span>/</span>
-        <span>Add Material</span>
+        <span>Edit Material</span>
     </div>
 
     <div class="page-header">
-        <div class="page-title">➕ Add New Material</div>
-        <div class="page-sub">List a new material for customers to discover and purchase</div>
+        <div class="page-title">✏️ Edit Material</div>
+        <div class="page-sub">Update material details and pricing</div>
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
+                <div class="alert {% if category == 'success' %}alert-success{% else %}alert-error{% endif %}">{{ message }}</div>
             {% endfor %}
         {% endif %}
     {% endwith %}
 
-    <form method="POST" action="{{ url_for('supplier.add_material') }}" id="materialForm" enctype="multipart/form-data">
+    <form method="POST" action="{{ url_for('supplier.edit_material', material_id=material.id) }}" id="materialForm" enctype="multipart/form-data">
 
-    <!-- Basic Info -->
-    <div class="form-card" style="animation-delay:.05s">
-        <div class="form-card-head">
-            <div class="card-icon icon-blue">📋</div>
-            <span class="card-head-title">Basic Information</span>
-        </div>
-        <div class="form-body">
-            <div class="form-group">
-                <label for="name">Material Name <span class="required">*</span></label>
-                <input type="text" id="name" name="name" required placeholder="e.g., Portland Cement">
-                <div class="input-hint">Enter the full name of the material</div>
+        <!-- Basic Info -->
+        <div class="form-card" style="animation-delay:.05s">
+            <div class="form-card-head">
+                <div class="card-icon icon-blue">📋</div>
+                <span class="card-head-title">Basic Information</span>
             </div>
-            <div class="form-group">
-                <label for="category">Category <span class="required">*</span></label>
-                <select id="category" name="category" required>
-                    <option value="">Select Category</option>
-                    <option value="cement">Cement</option>
-                    <option value="steel">Steel</option>
-                    <option value="bricks">Bricks</option>
-                    <option value="sand">Sand</option>
-                    <option value="aggregate">Aggregate</option>
-                    <option value="wood">Wood</option>
-                    <option value="tiles">Tiles</option>
-                    <option value="paint">Paint</option>
-                    <option value="electrical">Electrical</option>
-                    <option value="plumbing">Plumbing</option>
-                    <option value="hardware">Hardware</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-        </div>
-    </div>
-
-    <!-- Material Image -->
-    <div class="form-card" style="animation-delay:.08s">
-        <div class="form-card-head">
-            <div class="card-icon icon-purple">🖼️</div>
-            <span class="card-head-title">Material Image</span>
-        </div>
-        <div class="form-body">
-            <div class="form-group">
-                <label for="material_image">Upload Image</label>
-                <div class="image-upload-container" id="imageUploadContainer">
-                    <div class="upload-area">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">Click to upload image</div>
-                        <div class="upload-hint">PNG, JPG, GIF, WebP — max 5 MB</div>
-                    </div>
-                    <input type="file" id="material_image" name="material_image" accept="image/*" style="display:none;">
-                </div>
-                <div id="imagePreview" style="display:none; margin-top: 14px;">
-                    <div class="image-preview-wrapper">
-                        <img id="previewImage" src="" alt="Preview" style="max-width: 100%; max-height: 200px; border-radius: 10px;">
-                        <button type="button" class="remove-image-btn" onclick="removeImage()">✕ Remove</button>
-                    </div>
-                </div>
-                <div class="input-hint">Optional: Add a photo of the material</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pricing & Stock -->
-    <div class="form-card" style="animation-delay:.1s">
-        <div class="form-card-head">
-            <div class="card-icon icon-gold">💰</div>
-            <span class="card-head-title">Pricing & Stock</span>
-        </div>
-        <div class="form-body">
-            <div class="form-grid">
+            <div class="form-body">
                 <div class="form-group">
-                    <label for="price">Price (₹) <span class="required">*</span></label>
-                    <input type="number" id="price" name="price" required min="0" step="0.01" placeholder="0.00">
-                    <div class="input-hint">Price per unit</div>
+                    <label for="name">Material Name <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required placeholder="e.g., Portland Cement" value="{{ material.name }}">
+                    <div class="input-hint">Enter the full name of the material</div>
                 </div>
                 <div class="form-group">
-                    <label for="unit">Unit <span class="required">*</span></label>
-                    <select id="unit" name="unit" required>
-                        <option value="">Select Unit</option>
-                        <option value="bag">Bag</option>
-                        <option value="kg">Kilogram (kg)</option>
-                        <option value="ton">Ton</option>
-                        <option value="piece">Piece</option>
-                        <option value="sqft">Square Feet</option>
-                        <option value="cuft">Cubic Feet</option>
-                        <option value="meter">Meter</option>
-                        <option value="liter">Liter</option>
-                        <option value="box">Box</option>
+                    <label for="category">Category <span class="required">*</span></label>
+                    <select id="category" name="category" required>
+                        <option value="">Select Category</option>
+                        <option value="cement" {% if material.category == 'cement' %}selected{% endif %}>Cement</option>
+                        <option value="steel" {% if material.category == 'steel' %}selected{% endif %}>Steel</option>
+                        <option value="bricks" {% if material.category == 'bricks' %}selected{% endif %}>Bricks</option>
+                        <option value="sand" {% if material.category == 'sand' %}selected{% endif %}>Sand</option>
+                        <option value="aggregate" {% if material.category == 'aggregate' %}selected{% endif %}>Aggregate</option>
+                        <option value="wood" {% if material.category == 'wood' %}selected{% endif %}>Wood</option>
+                        <option value="tiles" {% if material.category == 'tiles' %}selected{% endif %}>Tiles</option>
+                        <option value="paint" {% if material.category == 'paint' %}selected{% endif %}>Paint</option>
+                        <option value="electrical" {% if material.category == 'electrical' %}selected{% endif %}>Electrical</option>
+                        <option value="plumbing" {% if material.category == 'plumbing' %}selected{% endif %}>Plumbing</option>
+                        <option value="hardware" {% if material.category == 'hardware' %}selected{% endif %}>Hardware</option>
+                        <option value="other" {% if material.category == 'other' %}selected{% endif %}>Other</option>
                     </select>
                 </div>
+            </div>
+        </div>
+
+        <!-- Material Image -->
+        <div class="form-card" style="animation-delay:.08s">
+            <div class="form-card-head">
+                <div class="card-icon icon-purple">🖼️</div>
+                <span class="card-head-title">Material Image</span>
+            </div>
+            <div class="form-body">
                 <div class="form-group">
-                    <label for="quantity">Available Quantity <span class="required">*</span></label>
-                    <input type="number" id="quantity" name="quantity" required min="1" placeholder="0">
-                    <div class="input-hint">Stock available for sale</div>
-                </div>
-                <div class="form-group">
-                    <label for="min_order">Minimum Order</label>
-                    <input type="number" id="min_order" name="min_order" min="1" placeholder="1">
-                    <div class="input-hint">Minimum quantity per order (optional)</div>
+                    <label for="material_image">Upload Image</label>
+                    <div class="image-upload-container" id="imageUploadContainer">
+                        <div class="upload-area">
+                            <div class="upload-icon">📸</div>
+                            <div class="upload-text">Click to upload image</div>
+                            <div class="upload-hint">PNG, JPG, GIF, WebP — max 5 MB</div>
+                        </div>
+                        <input type="file" id="material_image" name="material_image" accept="image/*" style="display:none;">
+                    </div>
+                    {% if material.image %}
+                    <div id="imagePreview" style="margin-top: 14px;">
+                        <div class="image-preview-wrapper">
+                            <img id="previewImage" src="{{ url_for('static', filename='uploads/materials/' + material.image) }}" alt="Current image">
+                            <button type="button" class="remove-image-btn" onclick="removeImage()">✕ Remove</button>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div id="imagePreview" style="display:none; margin-top: 14px;">
+                        <div class="image-preview-wrapper">
+                            <img id="previewImage" src="" alt="Preview" style="max-width: 100%; max-height: 200px; border-radius: 10px;">
+                            <button type="button" class="remove-image-btn" onclick="removeImage()">✕ Remove</button>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="input-hint">Optional: Update the material photo</div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Description -->
-    <div class="form-card" style="animation-delay:.15s">
-        <div class="form-card-head">
-            <div class="card-icon icon-green">📝</div>
-            <span class="card-head-title">Description</span>
-        </div>
-        <div class="form-body">
-            <div class="form-group">
-                <label for="description">Material Description</label>
-                <textarea id="description" name="description" placeholder="Describe the material — specifications, brand, quality grade, certifications, etc."></textarea>
-                <div class="input-hint">Detailed descriptions help customers make informed decisions</div>
+        <!-- Pricing & Stock -->
+        <div class="form-card" style="animation-delay:.1s">
+            <div class="form-card-head">
+                <div class="card-icon icon-gold">💰</div>
+                <span class="card-head-title">Pricing & Stock</span>
+            </div>
+            <div class="form-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="price">Price (₹) <span class="required">*</span></label>
+                        <input type="number" id="price" name="price" required min="0" step="0.01" placeholder="0.00" value="{{ material.price }}">
+                        <div class="input-hint">Price per unit</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="unit">Unit <span class="required">*</span></label>
+                        <select id="unit" name="unit" required>
+                            <option value="">Select Unit</option>
+                            <option value="bag" {% if material.unit == 'bag' %}selected{% endif %}>Bag</option>
+                            <option value="kg" {% if material.unit == 'kg' %}selected{% endif %}>Kilogram (kg)</option>
+                            <option value="ton" {% if material.unit == 'ton' %}selected{% endif %}>Ton</option>
+                            <option value="piece" {% if material.unit == 'piece' %}selected{% endif %}>Piece</option>
+                            <option value="sqft" {% if material.unit == 'sqft' %}selected{% endif %}>Square Feet</option>
+                            <option value="cuft" {% if material.unit == 'cuft' %}selected{% endif %}>Cubic Feet</option>
+                            <option value="meter" {% if material.unit == 'meter' %}selected{% endif %}>Meter</option>
+                            <option value="liter" {% if material.unit == 'liter' %}selected{% endif %}>Liter</option>
+                            <option value="box" {% if material.unit == 'box' %}selected{% endif %}>Box</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Available Quantity <span class="required">*</span></label>
+                        <input type="number" id="quantity" name="quantity" required min="1" placeholder="0" value="{{ material.quantity }}">
+                        <div class="input-hint">Stock available for sale</div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Actions -->
-    <div class="form-actions">
-        <a href="{{ url_for('supplier.inventory') }}" class="btn btn-outline">Cancel</a>
-        <button type="submit" class="btn btn-blue">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Add Material
-        </button>
-    </div>
-</form>
+        <!-- Description -->
+        <div class="form-card" style="animation-delay:.15s">
+            <div class="form-card-head">
+                <div class="card-icon icon-green">📝</div>
+                <span class="card-head-title">Description</span>
+            </div>
+            <div class="form-body">
+                <div class="form-group">
+                    <label for="description">Material Description</label>
+                    <textarea id="description" name="description" placeholder="Describe the material — specifications, brand, quality grade, certifications, etc.">{{ material.description or '' }}</textarea>
+                    <div class="input-hint">Detailed descriptions help customers make informed decisions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+            <a href="{{ url_for('supplier.inventory') }}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-blue">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Save Changes
+            </button>
+        </div>
+    </form>
 
 </div>
 
 <script>
-    document.getElementById('materialForm').addEventListener('submit', function(e) {
-        const price = parseFloat(document.getElementById('price').value);
-        const quantity = parseInt(document.getElementById('quantity').value);
-        if (price <= 0) { e.preventDefault(); alert('Price must be greater than 0'); return false; }
-        if (quantity < 1) { e.preventDefault(); alert('Quantity must be at least 1'); return false; }
-    });
-
-     // Image upload handling
     const imageUploadContainer = document.getElementById('imageUploadContainer');
     const materialImageInput = document.getElementById('material_image');
     const imagePreview = document.getElementById('imagePreview');
@@ -523,7 +517,7 @@
         const file = e.target.files[0];
         if (!file) return;
 
-        const maxSize = 5 * 1024 * 1024; // 5MB
+        const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
             alert('File size must be less than 5 MB');
             materialImageInput.value = '';
@@ -544,7 +538,6 @@
         previewImage.src = '';
     }
 
-    // Form validation
     document.getElementById('materialForm').addEventListener('submit', function(e) {
         const price = parseFloat(document.getElementById('price').value);
         const quantity = parseInt(document.getElementById('quantity').value);

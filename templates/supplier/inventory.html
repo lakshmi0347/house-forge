@@ -461,13 +461,20 @@
         <div class="materials-grid">
             {% for material in materials %}
             <div class="material-card" data-animation-index="{{ loop.index0 }}">
-                <div class="material-card-head">
-                    <div>
-                        <div class="material-name">{{ material.name }}</div>
-                        <div class="material-category">{{ material.category }}</div>
-                    </div>
-                    <div class="material-icon-wrap">📦</div>
-                </div>
+    <div class="material-card-head">
+        <div>
+            <div class="material-name">{{ material.name }}</div>
+            <div class="material-category">{{ material.category }}</div>
+        </div>
+        <div class="material-icon-wrap">
+            {% if material.image %}
+                <img src="{{ url_for('static', filename='uploads/materials/' + material.image) }}" 
+                     alt="{{ material.name }}" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+            {% else %}
+                📦
+            {% endif %}
+        </div>
+    </div>
                 <div class="material-body">
                     <div class="price-tag">
                         <div class="price-value">₹{{ "{:,.0f}".format(material.price) }}</div>
@@ -521,13 +528,26 @@
 
 <script>
     function editMaterial(id) {
-        alert('Edit material feature coming soon! Material ID: ' + id);
+        window.location.href = `/supplier/edit-material/${id}`;
     }
 
     function deleteMaterial(id) {
-        if (confirm('Are you sure you want to delete this material?')) {
-            alert('Delete functionality coming soon! Material ID: ' + id);
-        }
+        if (!confirm('Are you sure you want to delete this material? This cannot be undone.')) return;
+        
+        fetch(`/supplier/delete-material/${id}`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(err => {
+                alert('Failed to delete material');
+                console.error(err);
+            });
     }
 </script>
 </body>

@@ -810,3 +810,92 @@ def messages_unread_count():
     except Exception as e:
         print(f"Error getting unread count: {str(e)}")
         return jsonify({'count': 0})
+    
+# Add these routes to supplier_routes.py
+
+@supplier_bp.route('/edit-material/<material_id>', methods=['GET', 'POST'])
+@login_required
+def edit_material(material_id):
+    """Edit existing material"""
+    material_ref = db.collection('materials').document(material_id)
+    material_doc = material_ref.get()
+    
+    if not material_doc.exists:
+        flash('Material not found', 'error')
+        return redirect(url_for('supplier.inventory'))
+    
+    material_data = material_doc.to_dict()
+    
+    # Verify ownership
+    if material_data.get('supplier_id') != current_user.id:
+        flash('Access denied', 'error')
+        return redirect(url_for('supplier.inventory'))
+    
+    if request.method == 'POST':
+        # Handle image upload if provided
+        image_filename = material_data.get('image')
+        
+        if 'material_image' in request.files:
+            file = request.files['material_image']
+            if file.filename != '':
+                allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+                file_ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+                
+                if file_ext in allowed_extensions:
+                    filename = secure_filename(f"material_{material_id}_{int(datetime.now().timestamp())}.{file_ext}")
+                    upload_folder = os.path.join('static', 'uploads', 'materials')
+                    os.makedirs(upload_folder, exist_ok=True)
+                    filepath = os.path.join(upload_folder, filename)
+                    file.save(filepath)
+                    image_filename = filename
+        
+        # Update material
+        material_ref.update({
+            'name': request.form.get('name'),
+            'category': request.form.get('category'),
+            'price': float(request.form.get('price')),
+            'unit': request.form.get('unit'),
+            'quantity': int(request.form.get('quantity')),
+            'description': request.form.get('description'),
+            'image': image_filename,
+            'updated_at': datetime.now()
+        })
+        
+        flash('Material updated successfully!', 'success')
+        return redirect(url_for('supplier.inventory'))
+    
+    material_data['id'] = material_id
+    return render_template('supplier/edit_material.html', material=material_data)
+
+
+@supplier_bp.route('/delete-material/<material_id>', methods=['POST'])
+@login_required
+def delete_material(material_id):
+    """Delete a material"""
+    try:
+        material_ref = db.collection('materials').document(material_id)
+        material_doc = material_ref.get()
+        
+        if not material_doc.exists:
+            return jsonify({'success': False, 'message': 'Material not found'}), 404
+        
+        material_data = material_doc.to_dict()
+        
+        if material_data.get('supplier_id') != current_user.id:
+            return jsonify({'success': False, 'message': 'Access denied'}), 403
+        
+        # Delete image if exists
+        if material_data.get('image'):
+            try:
+                image_path = os.path.join('static', 'uploads', 'materials', material_data['image'])
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+            except Exception as e:
+                print(f"Error deleting image: {e}")
+        
+        material_ref.delete()
+        return jsonify({'success': True, 'message': 'Material deleted successfully'})
+    
+    except Exception as e:
+        print(f"Error deleting material: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500

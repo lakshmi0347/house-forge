@@ -368,31 +368,6 @@ def activate_user(user_type, user_id):
     return redirect(request.referrer or url_for('admin.dashboard'))
 
 
-# ── ANALYTICS ────────────────────────────────────────────────────────────────
-
-@admin_bp.route('/analytics')
-@login_required
-@admin_required
-def analytics():
-    db = get_db()
-    users       = list(db.collection('users').stream())
-    contractors = list(db.collection('contractors').stream())
-    suppliers   = list(db.collection('suppliers').stream())
-    projects    = list(db.collection('projects').stream())
-    orders      = list(db.collection('orders').stream())
-    analytics_data = {
-        'user_growth':       len(users),
-        'contractor_growth': len(contractors),
-        'supplier_growth':   len(suppliers),
-        'project_completion_rate': 0,
-        'total_revenue': sum(
-            o.to_dict().get('total', 0)
-            for o in orders if o.to_dict().get('status') == 'completed'
-        ),
-        'active_users': len([u for u in users if u.to_dict().get('active', True)]),
-    }
-    return render_template('admin/analytics.html', analytics=analytics_data)
-
 @admin_bp.route('/users/<user_id>/profile')
 @login_required
 @admin_required
@@ -457,3 +432,143 @@ def view_user_profile(user_id):
         orders=orders,
         stats=stats,
     )
+
+# ── ORDERS MANAGEMENT ────────────────────────────────────────────────────────
+
+@admin_bp.route('/orders')
+@login_required
+@admin_required
+def all_orders():
+    db = get_db()
+
+    # Pre-fetch users and suppliers into caches
+    user_cache = {}
+    try:
+        for doc in db.collection('users').stream():
+            udata = doc.to_dict()
+            user_cache[doc.id] = {'name': udata.get('name', ''), 'email': udata.get('email', '')}
+    except Exception as e:
+        print(f'[all_orders] could not cache users: {e}')
+
+    supplier_cache = {}
+    try:
+        for doc in db.collection('suppliers').stream():
+            sdata = doc.to_dict()
+            supplier_cache[doc.id] = {'name': sdata.get('company_name') or sdata.get('name', ''), 'email': sdata.get('email', '')}
+    except Exception as e:
+        print(f'[all_orders] could not cache suppliers: {e}')
+
+    orders = []
+    for doc in db.collection('orders').stream():
+        order_data = doc.to_dict()
+        order_data['id'] = doc.id
+
+        # Resolve user name
+        if not order_data.get('user_name'):
+            uid = order_data.get('user_id', '')
+            ucache = user_cache.get(uid, {})
+            order_data['user_name'] = ucache.get('name', '—')
+            order_data['user_email'] = ucache.get('email', '')
+
+        # Resolve supplier name
+        if not order_data.get('supplier_name'):
+            sid = order_data.get('supplier_id', '')
+            scache = supplier_cache.get(sid, {})
+            order_data['supplier_name'] = scache.get('name', '—')
+
+        orders.append(order_data)
+
+    # Sort newest first
+    orders.sort(key=lambda x: x.get('created_at') or datetime.min, reverse=True)
+
+    # Stats
+    stats = {
+        'total':      len(orders),
+        'pending':    sum(1 for o in orders if o.get('status') == 'pending'),
+        'processing': sum(1 for o in orders if o.get('status') == 'processing'),
+        'completed':  sum(1 for o in orders if o.get('status') == 'completed'),
+        'cancelled':  sum(1 for o in orders if o.get('status') == 'cancelled'),
+        'total_revenue': sum(
+            o.get('total', 0) for o in orders if o.get('status') == 'completed'
+        ),
+    }
+
+    return render_template('admin/all_orders.html', orders=orders, stats=stats)
+
+
+@admin_bp.route('/orders/<order_id>')
+@login_required
+@admin_required
+def view_order(order_id):
+    """Admin detail view for a single order."""
+    db = get_db()
+    doc = db.collection('orders').document(order_id).get()
+    if not doc.exists:
+        flash('Order not found.', 'error')
+        return redirect(url_for('admin.all_orders'))
+
+    order = doc.to_dict()
+    order['id'] = doc.id
+
+    # Fetch user details
+    user = {}
+    if order.get('user_id'):
+        try:
+            u = db.collection('users').document(order['user_id']).get()
+            if u.exists:
+                user = u.to_dict()
+                user['id'] = u.id
+        except Exception as e:
+            print(f'[admin view_order] user fetch error: {e}')
+
+    # Fetch supplier details
+    supplier = {}
+    if order.get('supplier_id'):
+        try:
+            s = db.collection('suppliers').document(order['supplier_id']).get()
+            if s.exists:
+                supplier = s.to_dict()
+                supplier['id'] = s.id
+        except Exception as e:
+            print(f'[admin view_order] supplier fetch error: {e}')
+
+    # Fetch linked project
+    project = {}
+    if order.get('project_id'):
+        try:
+            p = db.collection('projects').document(order['project_id']).get()
+            if p.exists:
+                project = p.to_dict()
+                project['id'] = p.id
+        except Exception as e:
+            print(f'[admin view_order] project fetch error: {e}')
+
+    return render_template(
+        'admin/order_detail.html',
+        order=order,
+        order_id=order_id,
+        user=user,
+        supplier=supplier,
+        project=project,
+    )
+
+
+@admin_bp.route('/orders/<order_id>/update', methods=['POST'])
+@login_required
+@admin_required
+def update_order(order_id):
+    db = get_db()
+    data = request.get_json()
+    data['updated_at'] = datetime.now()
+    data['updated_by'] = current_user.id
+    db.collection('orders').document(order_id).update(data)
+    return jsonify({'success': True})
+
+
+@admin_bp.route('/orders/<order_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_order(order_id):
+    db = get_db()
+    db.collection('orders').document(order_id).delete()
+    return jsonify({'success': True})

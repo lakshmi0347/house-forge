@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Orders - House-Forge Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f0ede8;
+            --surface: #faf9f7;
+            --ink: #1a1814;
+            --ink-muted: #6b6560;
+            --accent: #c4622d;
+            --accent-light: #f5e6dc;
+            --border: #ddd9d3;
+            --sand: #ede6db;
+            --success: #2d7a4f;
+            --success-bg: #e8f5ee;
+            --warning: #b5760f;
+            --warning-bg: #fdf3dc;
+            --danger: #b5300f;
+            --danger-bg: #fde8e4;
+            --info: #1a5f8a;
+            --info-bg: #dceef7;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Mono', monospace;
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            background: var(--ink);
+            padding: 0 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 3px solid var(--accent);
+        }
+        .navbar-brand { font-family: 'Fraunces', serif; font-size: 20px; color: #fff; letter-spacing: 0.02em; }
+        .navbar-brand span { color: var(--accent); }
+        .navbar-menu { display: flex; gap: 6px; }
+        .navbar-menu a {
+            color: #aaa9a6; text-decoration: none;
+            padding: 6px 14px; border-radius: 4px;
+            font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+            transition: color 0.2s, background 0.2s;
+        }
+        .navbar-menu a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .navbar-menu a.active { color: var(--accent); }
+
+        /* ── LAYOUT ── */
+        .container { max-width: 1400px; margin: 0 auto; padding: 36px 24px; }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+        .page-title { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 700; line-height: 1; }
+        .page-subtitle { font-size: 12px; color: var(--ink-muted); margin-top: 6px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+        /* ── STATS ROW ── */
+        .stats-row { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+        .mini-stat {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 20px;
+            flex: 1; min-width: 130px; text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .mini-stat:hover { border-color: var(--accent); background: var(--accent-light); }
+        .mini-stat.active { border-color: var(--accent); background: var(--accent-light); }
+        .mini-stat .num { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 700; color: var(--accent); }
+        .mini-stat .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); margin-top: 2px; }
+        .mini-stat.revenue .num { font-size: 18px; }
+
+        /* ── FILTER BAR ── */
+        .filter-bar {
+            display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;
+        }
+        .search-box { flex: 1; min-width: 220px; position: relative; }
+        .search-box input {
+            width: 100%; padding: 10px 14px 10px 38px;
+            border: 1.5px solid var(--border); border-radius: 6px;
+            background: var(--surface); font-family: 'DM Mono', monospace;
+            font-size: 13px; color: var(--ink); outline: none; transition: border-color 0.2s;
+        }
+        .search-box input:focus { border-color: var(--accent); }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ink-muted); font-size: 14px; }
+        .filter-select {
+            padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 6px;
+            background: var(--surface); font-family: 'DM Mono', monospace;
+            font-size: 12px; color: var(--ink); cursor: pointer; outline: none; transition: border-color 0.2s;
+        }
+        .filter-select:focus { border-color: var(--accent); }
+
+        /* ── TABLE ── */
+        .table-wrap {
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: var(--ink); color: #fff; }
+        th {
+            padding: 14px 18px; text-align: left;
+            font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+            font-weight: 500; white-space: nowrap;
+        }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #f5f2ee; }
+        td { padding: 14px 18px; font-size: 13px; vertical-align: middle; }
+
+        .order-id-cell { font-family: 'Fraunces', serif; font-size: 14px; font-weight: 700; }
+        .order-sub { font-size: 10px; color: var(--ink-muted); margin-top: 2px; letter-spacing: 0.04em; }
+
+        /* ── BADGES ── */
+        .badge {
+            display: inline-block; padding: 4px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase;
+        }
+        .badge-pending    { background: var(--warning-bg); color: var(--warning); }
+        .badge-processing { background: var(--info-bg);    color: var(--info); }
+        .badge-completed  { background: var(--success-bg); color: var(--success); }
+        .badge-cancelled  { background: var(--danger-bg);  color: var(--danger); }
+        .badge-paid       { background: var(--success-bg); color: var(--success); }
+        .badge-unpaid     { background: var(--warning-bg); color: var(--warning); }
+        .badge-cod        { background: var(--accent-light); color: var(--accent); }
+
+        /* ── ACTIONS ── */
+        .actions { display: flex; gap: 6px; }
+        .btn {
+            padding: 6px 12px; border-radius: 5px;
+            font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+            letter-spacing: 0.04em; cursor: pointer; border: none;
+            transition: opacity 0.2s, transform 0.15s;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+        .btn-view   { background: var(--ink); color: #fff; }
+        .btn-edit   { background: var(--accent); color: #fff; }
+        .btn-delete { background: var(--danger-bg); color: var(--danger); border: 1px solid #f5c4bc; }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(26,24,20,0.6); z-index: 200;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(3px); animation: fadeIn 0.2s ease;
+        }
+        .modal-overlay.open { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: var(--surface); border-radius: 14px;
+            width: 90%; max-width: 640px; max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.25); animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header {
+            padding: 24px 28px 16px; border-bottom: 1.5px solid var(--border);
+            display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .modal-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; }
+        .modal-close {
+            background: none; border: none; font-size: 22px; cursor: pointer;
+            color: var(--ink-muted); line-height: 1; padding: 2px 6px; border-radius: 4px; transition: background 0.15s;
+        }
+        .modal-close:hover { background: var(--border); color: var(--ink); }
+        .modal-body { padding: 24px 28px; }
+        .modal-footer {
+            padding: 16px 28px 24px; display: flex; gap: 10px;
+            justify-content: flex-end; border-top: 1.5px solid var(--border);
+        }
+
+        /* ── DETAIL GRID ── */
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+        .detail-item label {
+            display: block; font-size: 10px; text-transform: uppercase;
+            letter-spacing: 0.1em; color: var(--ink-muted); margin-bottom: 4px;
+        }
+        .detail-item p { font-size: 14px; color: var(--ink); }
+
+        /* ── FORM ── */
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block; font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--ink-muted); margin-bottom: 6px;
+        }
+        .form-control {
+            width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+            border-radius: 7px; font-family: 'DM Mono', monospace; font-size: 13px;
+            color: var(--ink); background: var(--bg); outline: none; transition: border-color 0.2s;
+        }
+        .form-control:focus { border-color: var(--accent); }
+        .two-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        .btn-lg { padding: 10px 22px; font-size: 13px; border-radius: 7px; }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-secondary { background: var(--border); color: var(--ink); }
+        .btn-danger-solid { background: var(--danger); color: #fff; }
+
+        /* ── ITEMS TABLE (inside modal) ── */
+        .items-wrap { background: var(--bg); border-radius: 8px; padding: 12px; margin-top: 12px; }
+        .items-wrap table { margin: 0; }
+        .items-wrap th { background: var(--sand); color: var(--ink-muted); padding: 8px 12px; font-size: 10px; }
+        .items-wrap td { padding: 8px 12px; font-size: 12px; }
+
+        /* ── CONFIRM MODAL ── */
+        .confirm-modal { max-width: 400px; text-align: center; }
+        .confirm-icon { font-size: 48px; margin: 8px 0 16px; }
+        .confirm-msg { font-size: 14px; color: var(--ink-muted); margin-bottom: 4px; }
+        .confirm-name { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px;
+            background: var(--ink); color: #fff; padding: 14px 22px;
+            border-radius: 8px; font-size: 13px; z-index: 999;
+            opacity: 0; transform: translateY(12px);
+            transition: opacity 0.3s, transform 0.3s;
+            border-left: 4px solid var(--accent);
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        /* ── EMPTY ── */
+        .empty-state { padding: 60px 20px; text-align: center; color: var(--ink-muted); }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state p { font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-brand">⚙ House-<span>Forge</span> Admin</div>
+        <div class="navbar-menu">
+            <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin.manage_users') }}">Users</a>
+            <a href="{{ url_for('admin.manage_contractors') }}">Contractors</a>
+            <a href="{{ url_for('admin.manage_suppliers') }}">Suppliers</a>
+            <a href="{{ url_for('admin.all_projects') }}">Projects</a>
+            <a href="{{ url_for('admin.all_orders') }}" class="active">Orders</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <div class="page-header">
+            <div>
+                <div class="page-title">🛒 All Orders</div>
+                <div class="page-subtitle">View and manage every material order on the platform</div>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-row">
+            <div class="mini-stat active" id="statAll" onclick="filterTable('', this)">
+                <div class="num">{{ stats.total }}</div><div class="lbl">Total</div>
+            </div>
+            <div class="mini-stat" id="statPending" onclick="filterTable('pending', this)">
+                <div class="num">{{ stats.pending }}</div><div class="lbl">Pending</div>
+            </div>
+            <div class="mini-stat" id="statProcessing" onclick="filterTable('processing', this)">
+                <div class="num">{{ stats.processing }}</div><div class="lbl">Processing</div>
+            </div>
+            <div class="mini-stat" id="statCompleted" onclick="filterTable('completed', this)">
+                <div class="num">{{ stats.completed }}</div><div class="lbl">Completed</div>
+            </div>
+            <div class="mini-stat" id="statCancelled" onclick="filterTable('cancelled', this)">
+                <div class="num">{{ stats.cancelled }}</div><div class="lbl">Cancelled</div>
+            </div>
+            <div class="mini-stat revenue" style="cursor:default;">
+                <div class="num">₹{{ "{:,.0f}".format(stats.total_revenue) }}</div>
+                <div class="lbl">Revenue</div>
+            </div>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search by order ID, customer, supplier…" oninput="applySearch()">
+            </div>
+            <select class="filter-select" id="payFilter" onchange="applySearch()">
+                <option value="">All Payments</option>
+                <option value="paid">Paid</option>
+                <option value="cod_confirmed">COD Confirmed</option>
+                <option value="card_pending">Card Pending</option>
+                <option value="unpaid">Unpaid</option>
+            </select>
+            <select class="filter-select" id="sortFilter" onchange="applySearch()">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="highest">Highest Total</option>
+                <option value="lowest">Lowest Total</option>
+            </select>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-wrap">
+            <table id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Order</th>
+                        <th>Customer</th>
+                        <th>Supplier</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    {% for order in orders %}
+                    <tr data-status="{{ order.get('status','pending')|lower }}"
+                        data-payment="{{ order.get('payment_status','unpaid')|lower }}"
+                        data-total="{{ order.get('total', 0) }}"
+                        data-created="{{ order.get('created_at', '') }}"
+                        data-order="{{ order | tojson | e }}"
+                        data-id="{{ order.id }}">
+                        <td style="color:var(--ink-muted);font-size:12px">{{ loop.index }}</td>
+                        <td>
+                            <div class="order-id-cell">#{{ order.id[:8].upper() }}</div>
+                            <div class="order-sub">{{ order.get('project_title', '—') }}</div>
+                        </td>
+                        <td>
+                            <div>{{ order.get('user_name', '—') }}</div>
+                            <div class="order-sub">{{ order.get('user_email', '') }}</div>
+                        </td>
+                        <td>{{ order.get('supplier_name', '—') }}</td>
+                        <td style="color:var(--ink-muted);">
+                            {{ order.get('order_items', [])|length }} item(s)
+                        </td>
+                        <td style="font-weight:700;">₹{{ "{:,.0f}".format(order.get('total', 0)) }}</td>
+                        <td>
+                            {% set s = order.get('status','pending')|lower %}
+                            <span class="badge badge-{{ s }}">{{ s }}</span>
+                        </td>
+                        <td>
+                            {% set ps = order.get('payment_status','unpaid')|lower %}
+                            {% if ps == 'paid' %}
+                                <span class="badge badge-paid">✓ Paid</span>
+                            {% elif ps == 'cod_confirmed' %}
+                                <span class="badge badge-cod">COD</span>
+                            {% elif ps == 'card_pending' %}
+                                <span class="badge badge-processing">Card</span>
+                            {% else %}
+                                <span class="badge badge-unpaid">Unpaid</span>
+                            {% endif %}
+                        </td>
+                        <td style="font-size:12px;color:var(--ink-muted);">
+                            {{ order.get('created_at').strftime('%d %b %Y') if order.get('created_at') else '—' }}
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <a href="{{ url_for('admin.view_order', order_id=order.id) }}" class="btn btn-view">👁 View</a>
+                                <button class="btn btn-edit" onclick="openManage(this)">✏ Edit</button>
+                                <button class="btn btn-delete" onclick="openConfirm(this)">🗑</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="10"><div class="empty-state"><div class="icon">📭</div><p>No orders found.</p></div></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- ── MANAGE MODAL ── -->
+    <div class="modal-overlay" id="manageModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">✏ Edit Order</div>
+                <button class="modal-close" onclick="closeModal('manageModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="manageId">
+                <div class="two-grid">
+                    <div class="form-group">
+                        <label>Order Status</label>
+                        <select class="form-control" id="manageStatus">
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Status</label>
+                        <select class="form-control" id="managePayment">
+                            <option value="unpaid">Unpaid</option>
+                            <option value="cod_confirmed">COD Confirmed</option>
+                            <option value="card_pending">Card Pending</option>
+                            <option value="paid">Paid</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Admin Notes</label>
+                    <textarea class="form-control" id="manageNotes" rows="3" style="resize:vertical;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Order Items (read-only)</label>
+                    <div class="items-wrap" id="manageItemsWrap">
+                        <table>
+                            <thead><tr><th>Material</th><th>Qty</th><th>Unit</th><th>Total</th></tr></thead>
+                            <tbody id="manageItemsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-lg" onclick="closeModal('manageModal')">Cancel</button>
+                <button class="btn btn-primary btn-lg" onclick="saveManage()">💾 Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── CONFIRM DELETE MODAL ── -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal confirm-modal">
+            <div class="modal-body" style="padding:32px 28px 16px">
+                <div class="confirm-icon">🗑️</div>
+                <div class="confirm-name" id="confirmName">Order</div>
+                <div class="confirm-msg">This will permanently delete the order and all its data.</div>
+                <div class="confirm-msg" style="margin-top:4px;font-size:12px">This action cannot be undone.</div>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="confirmId">
+                <button class="btn btn-secondary btn-lg" onclick="closeModal('confirmModal')">Cancel</button>
+                <button class="btn btn-danger-solid btn-lg" onclick="deleteOrder()">Delete Order</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let activeStatus = '';
+
+        /* ── STAT CARD FILTER ── */
+        function filterTable(status, el) {
+            activeStatus = status;
+            document.querySelectorAll('.mini-stat').forEach(s => s.classList.remove('active'));
+            el.classList.add('active');
+            applySearch();
+        }
+
+        /* ── SEARCH + SORT ── */
+        function applySearch() {
+            const q   = document.getElementById('searchInput').value.toLowerCase();
+            const pay = document.getElementById('payFilter').value.toLowerCase();
+            const sort= document.getElementById('sortFilter').value;
+            const rows= Array.from(document.querySelectorAll('#tableBody tr[data-status]'));
+
+            rows.forEach(r => {
+                const text    = r.textContent.toLowerCase();
+                const status  = r.dataset.status;
+                const payment = r.dataset.payment;
+                const matchQ  = !q || text.includes(q);
+                const matchS  = !activeStatus || status === activeStatus;
+                const matchP  = !pay || payment === pay;
+                r.style.display = matchQ && matchS && matchP ? '' : 'none';
+            });
+
+            // Sort visible
+            const tbody  = document.getElementById('tableBody');
+            const visible= rows.filter(r => r.style.display !== 'none');
+            visible.sort((a, b) => {
+                if (sort === 'oldest')  return (a.dataset.created||'').localeCompare(b.dataset.created||'');
+                if (sort === 'highest') return parseFloat(b.dataset.total||0) - parseFloat(a.dataset.total||0);
+                if (sort === 'lowest')  return parseFloat(a.dataset.total||0) - parseFloat(b.dataset.total||0);
+                return (b.dataset.created||'').localeCompare(a.dataset.created||'');
+            });
+            visible.forEach(r => tbody.appendChild(r));
+        }
+
+        /* ── MODALS ── */
+        function openModal(id)  { document.getElementById(id).classList.add('open'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+        document.querySelectorAll('.modal-overlay').forEach(m => {
+            m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+        });
+
+        /* ── MANAGE ── */
+        function openManage(btn) {
+            const row = btn.closest('tr');
+            const d   = JSON.parse(row.dataset.order);
+            const id  = row.dataset.id;
+            document.getElementById('manageId').value = id;
+            document.getElementById('manageStatus').value  = (d.status || 'pending').toLowerCase();
+            document.getElementById('managePayment').value = (d.payment_status || 'unpaid').toLowerCase();
+            document.getElementById('manageNotes').value   = d.admin_notes || '';
+
+            // Populate items table
+            const tbody = document.getElementById('manageItemsBody');
+            tbody.innerHTML = '';
+            const items = d.order_items || [];
+            if (items.length) {
+                items.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item.material_name || '—'}</td>
+                        <td>${item.quantity || 0}</td>
+                        <td>${item.unit || ''}</td>
+                        <td>₹${Number(item.total||0).toLocaleString('en-IN')}</td>`;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="4" style="color:var(--ink-muted);font-style:italic;">No items</td></tr>';
+            }
+
+            openModal('manageModal');
+        }
+
+        function saveManage() {
+            const id = document.getElementById('manageId').value;
+            const payload = {
+                status:         document.getElementById('manageStatus').value,
+                payment_status: document.getElementById('managePayment').value,
+                admin_notes:    document.getElementById('manageNotes').value,
+            };
+            fetch(`/admin/orders/${id}/update`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(() => { closeModal('manageModal'); showToast('✅ Order updated'); setTimeout(() => location.reload(), 1200); })
+            .catch(() => { closeModal('manageModal'); showToast('✅ Saved (reload to sync)'); });
+        }
+
+        /* ── DELETE ── */
+        function openConfirm(btn) {
+            const row = btn.closest('tr');
+            const id  = row.dataset.id;
+            document.getElementById('confirmId').value = id;
+            document.getElementById('confirmName').textContent = `Order #${id.substring(0,8).toUpperCase()}`;
+            openModal('confirmModal');
+        }
+
+        function deleteOrder() {
+            const id = document.getElementById('confirmId').value;
+            fetch(`/admin/orders/${id}/delete`, { method: 'POST' })
+            .then(() => { closeModal('confirmModal'); showToast('🗑 Order deleted'); setTimeout(() => location.reload(), 1200); })
+            .catch(() => { closeModal('confirmModal'); showToast('🗑 Delete submitted'); });
+        }
+
+        /* ── TOAST ── */
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

@@ -26,11 +26,40 @@ def admin_required(f):
 @admin_required
 def all_projects():
     db = get_db()
+
+    # ── Pre-fetch all users into a dict — ONE read per user, not per project ──
+    user_cache = {}
+    try:
+        for doc in db.collection('users').stream():
+            udata = doc.to_dict()
+            user_cache[doc.id] = udata.get('name', '') or udata.get('email', '')
+    except Exception as e:
+        print(f'[all_projects] could not cache users: {e}')
+
     projects = []
     for doc in db.collection('projects').stream():
         project_data = doc.to_dict()
         project_data['id'] = doc.id
+
+        # ── Resolve owner name ────────────────────────────────────────────
+        if not project_data.get('owner_name') and not project_data.get('user_name'):
+            uid = project_data.get('user_id', '')
+            project_data['owner_name'] = user_cache.get(uid, '—')
+
+        # ── Derive display budget from embedded estimation ─────────────────
+        # Projects store budget_range ('low'/'medium'/'high') + nested estimation.
+        # The raw 'budget' field is rarely populated directly, so pull total_cost.
+        if not project_data.get('budget'):
+            estimation = project_data.get('estimation') or {}
+            costs = estimation.get('costs', {})
+            budget_tier = project_data.get('budget_range', 'medium')
+            tier_data = costs.get(budget_tier) or costs.get('medium') or {}
+            total = tier_data.get('total_cost', 0)
+            if total:
+                project_data['budget'] = total
+
         projects.append(project_data)
+
     return render_template('admin/all_projects.html', projects=projects)
 
 
@@ -48,19 +77,85 @@ def view_project(project_id):
     project = doc.to_dict()
     project['id'] = doc.id
 
-    # Load estimation (same collection used by user routes)
-    est_doc = db.collection('estimations').document(project_id).get()
-    if est_doc.exists:
-        estimation = est_doc.to_dict()
-    else:
-        # Fallback empty estimation so template never crashes
+    # ── Fetch owner name from users collection ────────────────────────────
+    user_id = project.get('user_id', '')
+    if user_id and not project.get('owner_name') and not project.get('user_name'):
+        try:
+            user_doc = db.collection('users').document(user_id).get()
+            if user_doc.exists:
+                udata = user_doc.to_dict()
+                project['owner_name'] = udata.get('name', '')
+                project['owner_email'] = udata.get('email', '')
+                project['owner_phone'] = udata.get('phone', '')
+        except Exception as e:
+            print(f'[admin view_project] could not fetch owner: {e}')
+
+    # ── Estimation is embedded in the project document (set by user routes) ─
+    estimation = project.get('estimation')
+
+    # ── Fallback: try separate estimations collection (legacy) ────────────
+    if not estimation:
+        try:
+            est_doc = db.collection('estimations').document(project_id).get()
+            if est_doc.exists:
+                estimation = est_doc.to_dict()
+        except Exception:
+            pass
+
+    # ── Final fallback: safe empty structure so template never crashes ─────
+    if not estimation:
         estimation = {
-            'costs': {'low': {}, 'medium': {}, 'high': {}},
-            'materials': {},
-            'timeline': {'total_days': 0},
+            'costs': {
+                'low':    {'material_cost': 0, 'labor_cost': 0, 'other_costs': 0, 'total_cost': 0, 'stage_breakdown': {}},
+                'medium': {'material_cost': 0, 'labor_cost': 0, 'other_costs': 0, 'total_cost': 0, 'stage_breakdown': {}},
+                'high':   {'material_cost': 0, 'labor_cost': 0, 'other_costs': 0, 'total_cost': 0, 'stage_breakdown': {}},
+            },
+            'materials': {
+                'foundation': {}, 'walls': {}, 'flooring': {}, 'roofing': {},
+                'plumbing': {}, 'electrical': {}, 'finishing': {}, 'carpentry': {},
+                'exterior': {}, 'miscellaneous': {},
+            },
+            'timeline': {
+                'total_days': 0,
+                'foundation': 0, 'walls': 0, 'flooring': 0, 'roofing': 0,
+                'plumbing': 0, 'electrical': 0, 'finishing': 0, 'carpentry': 0, 'exterior': 0,
+            },
             'ai_success': False,
             'ai_rationale': '',
+            'ai_confidence': 0,
+            'estimate_scope': project.get('estimate_scope', 'material_only'),
+            'property_type': project.get('property_type', 'residential'),
         }
+
+    # ── Ensure nested keys always exist so Jinja never KeyErrors ─────────
+    if 'costs' not in estimation:
+        estimation['costs'] = {
+            'low':    {'material_cost': 0, 'labor_cost': 0, 'other_costs': 0, 'total_cost': 0, 'stage_breakdown': {}},
+            'medium': {'material_cost': 0, 'labor_cost': 0, 'other_costs': 0, 'total_cost': 0, 'stage_breakdown': {}},
+            'high':   {'material_cost': 0, 'labor_cost': 0, 'other_costs': 0, 'total_cost': 0, 'stage_breakdown': {}},
+        }
+    for tier in ('low', 'medium', 'high'):
+        tier_data = estimation['costs'].setdefault(tier, {})
+        tier_data.setdefault('material_cost', 0)
+        tier_data.setdefault('labor_cost', 0)
+        tier_data.setdefault('other_costs', 0)
+        tier_data.setdefault('total_cost', 0)
+        tier_data.setdefault('stage_breakdown', {})
+
+    if 'materials' not in estimation or not estimation['materials']:
+        estimation['materials'] = {
+            'foundation': {}, 'walls': {}, 'flooring': {}, 'roofing': {},
+            'plumbing': {}, 'electrical': {}, 'finishing': {}, 'carpentry': {},
+            'exterior': {}, 'miscellaneous': {},
+        }
+
+    if 'timeline' not in estimation or not estimation['timeline']:
+        estimation['timeline'] = {
+            'total_days': 0,
+            'foundation': 0, 'walls': 0, 'flooring': 0, 'roofing': 0,
+            'plumbing': 0, 'electrical': 0, 'finishing': 0, 'carpentry': 0, 'exterior': 0,
+        }
+    estimation['timeline'].setdefault('total_days', 0)
 
     return render_template(
         'admin/project_detail.html',
@@ -68,7 +163,6 @@ def view_project(project_id):
         project_id=project_id,
         estimation=estimation,
     )
-
 
 @admin_bp.route('/projects/<project_id>/update', methods=['POST'])
 @login_required
@@ -298,3 +392,68 @@ def analytics():
         'active_users': len([u for u in users if u.to_dict().get('active', True)]),
     }
     return render_template('admin/analytics.html', analytics=analytics_data)
+
+@admin_bp.route('/users/<user_id>/profile')
+@login_required
+@admin_required
+def view_user_profile(user_id):
+    """Admin view of a specific user's full profile."""
+    db = get_db()
+
+    # Fetch user
+    user_doc = db.collection('users').document(user_id).get()
+    if not user_doc.exists:
+        flash('User not found.', 'error')
+        return redirect(url_for('admin.manage_users'))
+
+    user_data = user_doc.to_dict()
+    user_data['id'] = user_doc.id
+
+    # Fetch their projects
+    projects = []
+    try:
+        for doc in db.collection('projects').where('user_id', '==', user_id).stream():
+            pd = doc.to_dict()
+            pd['id'] = doc.id
+            # Derive budget from estimation
+            if not pd.get('budget'):
+                est = pd.get('estimation') or {}
+                costs = est.get('costs', {})
+                tier = pd.get('budget_range', 'medium')
+                tier_data = costs.get(tier) or costs.get('medium') or {}
+                total = tier_data.get('total_cost', 0)
+                if total:
+                    pd['budget'] = total
+            projects.append(pd)
+    except Exception as e:
+        print(f'[view_user_profile] could not fetch projects: {e}')
+
+    # Fetch their orders
+    orders = []
+    try:
+        for doc in db.collection('orders').where('user_id', '==', user_id).stream():
+            od = doc.to_dict()
+            od['id'] = doc.id
+            orders.append(od)
+    except Exception as e:
+        print(f'[view_user_profile] could not fetch orders: {e}')
+
+    orders.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
+    projects.sort(key=lambda x: x.get('created_at', datetime.min), reverse=True)
+
+    stats = {
+        'total_projects':  len(projects),
+        'active_projects': len([p for p in projects if p.get('status') == 'active']),
+        'completed_projects': len([p for p in projects if p.get('status') == 'completed']),
+        'total_orders':    len(orders),
+        'total_spent':     sum(o.get('total', 0) for o in orders if o.get('status') == 'completed'),
+    }
+
+    return render_template(
+        'admin/user_profile.html',
+        user=user_data,
+        user_id=user_id,
+        projects=projects,
+        orders=orders,
+        stats=stats,
+    )

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.get('name','User') }} — Admin · House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f0ede8; --surface: #faf9f7; --surface2: #f5f0e8;
+            --sand: #ede6db; --stone: #d9cfc2;
+            --ink: #1a1814; --ink-muted: #6b6560;
+            --accent: #c4622d; --accent-dk: #a24f22; --accent-lt: #f5e6dc;
+            --border: #ddd9d3;
+            --success: #2d7a4f; --success-bg: #e8f5ee;
+            --warning: #b5760f; --warning-bg: #fdf3dc;
+            --danger: #b5300f; --danger-bg: #fde8e4;
+            --info: #1a5f8a; --info-bg: #dceef7;
+            --admin: #5b21b6; --admin-bg: #ede9fe;
+            --shadow: 0 2px 14px rgba(26,24,20,0.08);
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+        .navbar {
+            background: var(--ink); padding: 0 36px;
+            display: flex; justify-content: space-between; align-items: center;
+            height: 60px; position: sticky; top: 0; z-index: 100;
+            border-bottom: 3px solid var(--accent);
+        }
+        .navbar-brand { font-family: 'Playfair Display', serif; font-size: 20px; color: #fff; }
+        .navbar-brand span { color: var(--accent); }
+        .navbar-menu { display: flex; gap: 4px; align-items: center; }
+        .navbar-menu a {
+            color: #aaa9a6; text-decoration: none; padding: 6px 14px; border-radius: 4px;
+            font-size: 12px; font-family: 'DM Mono', monospace;
+            letter-spacing: 0.07em; text-transform: uppercase;
+            transition: color 0.2s, background 0.2s;
+        }
+        .navbar-menu a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .navbar-menu a.active { color: var(--accent); }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--accent); font-size: 13px; font-weight: 600;
+            font-family: 'DM Mono', monospace; text-decoration: none;
+            margin-bottom: 22px; letter-spacing: 0.04em; transition: gap 0.2s;
+        }
+        .back-link:hover { gap: 10px; }
+
+        .admin-banner {
+            background: var(--admin-bg); border: 1.5px solid #c4b5fd;
+            border-radius: 10px; padding: 12px 20px; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; color: var(--admin); font-weight: 600;
+            font-family: 'DM Mono', monospace;
+        }
+
+        /* ── PROFILE HEADER ── */
+        .profile-header {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 32px 36px; margin-bottom: 24px;
+            box-shadow: var(--shadow); position: relative; overflow: hidden;
+            display: flex; align-items: center; gap: 28px;
+        }
+        .profile-header::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+            background: linear-gradient(180deg, var(--accent), #e8a060);
+            border-radius: 16px 0 0 16px;
+        }
+        .avatar {
+            width: 88px; height: 88px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--accent-lt), #fdecc8);
+            border: 3px solid rgba(196,98,45,0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 32px; font-weight: 700; color: var(--accent);
+            overflow: hidden;
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .profile-header-info { flex: 1; }
+        .profile-header-info h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px; font-weight: 700; margin-bottom: 6px;
+        }
+        .profile-meta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+        .meta-chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 12px; color: var(--ink-muted); padding: 3px 10px;
+            background: var(--sand); border-radius: 20px;
+            border: 1px solid var(--stone);
+        }
+
+        /* ── STATS ROW ── */
+        .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 24px; }
+        .stat-card {
+            background: var(--surface); border: 1.5px solid var(--border);
+            border-radius: 12px; padding: 18px 16px; text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .stat-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px; font-weight: 700; color: var(--accent); line-height: 1;
+        }
+        .stat-lbl {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+            color: var(--ink-muted); margin-top: 4px;
+            font-family: 'DM Mono', monospace;
+        }
+
+        /* ── TWO COL ── */
+        .two-col { display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; }
+        @media (max-width: 1024px) { .two-col { grid-template-columns: 1fr; } }
+
+        /* ── CARD ── */
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 26px 30px;
+            margin-bottom: 20px; box-shadow: var(--shadow);
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 16px; font-weight: 700; color: var(--ink);
+            margin-bottom: 16px; padding-bottom: 12px;
+            border-bottom: 1px solid var(--sand);
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        /* ── INFO ROWS ── */
+        .info-list { display: flex; flex-direction: column; }
+        .info-row {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--sand);
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { font-size: 12px; color: var(--ink-muted); font-weight: 500; }
+        .info-value { font-size: 13px; font-weight: 600; color: var(--ink); text-align: right; max-width: 65%; word-break: break-word; }
+
+        /* ── BADGE ── */
+        .badge {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.4px;
+            text-transform: uppercase; font-family: 'DM Mono', monospace;
+        }
+        .badge-active    { background: var(--success-bg); color: var(--success); }
+        .badge-planning  { background: #eee; color: #555; }
+        .badge-completed { background: var(--info-bg); color: var(--info); }
+        .badge-cancelled { background: var(--danger-bg); color: var(--danger); }
+        .badge-verified  { background: var(--success-bg); color: var(--success); }
+        .badge-unverified{ background: var(--warning-bg); color: var(--warning); }
+        .badge-active-acc{ background: var(--success-bg); color: var(--success); }
+        .badge-inactive  { background: var(--danger-bg); color: var(--danger); }
+
+        /* ── PROJECTS TABLE ── */
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: var(--ink); color: #fff; }
+        th {
+            padding: 11px 14px; text-align: left;
+            font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+            text-transform: uppercase; font-family: 'DM Mono', monospace;
+        }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: var(--sand); }
+        td { padding: 11px 14px; font-size: 13px; vertical-align: middle; }
+
+        .proj-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; }
+        .proj-id { font-size: 10px; color: var(--ink-muted); margin-top: 1px; }
+
+        .btn-sm {
+            padding: 5px 11px; border-radius: 5px;
+            font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+            cursor: pointer; border: none; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 4px;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .btn-sm:hover { opacity: 0.85; transform: translateY(-1px); }
+        .btn-view { background: var(--ink); color: #fff; }
+
+        .empty-row td {
+            text-align: center; padding: 32px; color: var(--ink-muted);
+            font-size: 13px; font-style: italic;
+        }
+
+        /* ── ADMIN ACTIONS ── */
+        .admin-actions { display: flex; flex-direction: column; gap: 10px; }
+        .btn-admin {
+            width: 100%; padding: 11px 16px; border-radius: 8px;
+            font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500;
+            letter-spacing: 0.05em; cursor: pointer; border: none;
+            text-decoration: none; display: flex; align-items: center;
+            justify-content: center; gap: 7px; transition: all 0.2s;
+        }
+        .btn-admin:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+        .btn-admin-success { background: var(--success-bg); color: var(--success); border: 1.5px solid #86efac; }
+        .btn-admin-success:hover { background: #d1fae5; }
+        .btn-admin-danger  { background: var(--danger-bg); color: var(--danger); border: 1.5px solid #fca5a5; }
+        .btn-admin-danger:hover  { background: #fee2e2; }
+        .btn-admin-outline { background: var(--surface); color: var(--ink); border: 1.5px solid var(--border); }
+        .btn-admin-outline:hover { background: var(--sand); }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; bottom: 28px; right: 28px;
+            background: var(--ink); color: #fff; padding: 12px 20px;
+            border-radius: 8px; font-size: 13px; font-family: 'DM Mono', monospace;
+            z-index: 999; opacity: 0; transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s; border-left: 4px solid var(--accent);
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 900px) { .stats-row { grid-template-columns: repeat(3,1fr); } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-brand">⚙ House-<span>Forge</span> Admin</div>
+        <div class="navbar-menu">
+            <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin.manage_users') }}" class="active">Users</a>
+            <a href="{{ url_for('admin.manage_contractors') }}">Contractors</a>
+            <a href="{{ url_for('admin.manage_suppliers') }}">Suppliers</a>
+            <a href="{{ url_for('admin.all_projects') }}">Projects</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="{{ url_for('admin.manage_users') }}" class="back-link">← Back to Users</a>
+
+        <div class="admin-banner">
+            🛡️ Admin View — Viewing user profile as an administrator
+        </div>
+
+        <!-- PROFILE HEADER -->
+        <div class="profile-header">
+            <div class="avatar">
+                {% if user.get('profile_picture') %}
+                    <img src="/static/uploads/profiles/{{ user.profile_picture }}" alt="">
+                {% else %}
+                    {{ user.get('name','?')[:2].upper() }}
+                {% endif %}
+            </div>
+            <div class="profile-header-info">
+                <h1>{{ user.get('name', 'Unknown User') }}</h1>
+                <div style="font-size:14px;color:var(--ink-muted);">{{ user.get('email','—') }}</div>
+                <div class="profile-meta">
+                    <span class="meta-chip">📱 {{ user.get('phone','—') }}</span>
+                    <span class="meta-chip">📍 {{ user.get('location','—') }}</span>
+                    <span class="badge {{ 'badge-verified' if user.get('verified') else 'badge-unverified' }}">
+                        {{ '✓ Verified' if user.get('verified') else '⏳ Unverified' }}
+                    </span>
+                    <span class="badge {{ 'badge-active-acc' if user.get('active', True) else 'badge-inactive' }}">
+                        {{ 'Active' if user.get('active', True) else 'Deactivated' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-num">{{ stats.total_projects }}</div>
+                <div class="stat-lbl">Projects</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num">{{ stats.active_projects }}</div>
+                <div class="stat-lbl">Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num">{{ stats.completed_projects }}</div>
+                <div class="stat-lbl">Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num">{{ stats.total_orders }}</div>
+                <div class="stat-lbl">Orders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" style="font-size:18px;">₹{{ "{:,.0f}".format(stats.total_spent) }}</div>
+                <div class="stat-lbl">Total Spent</div>
+            </div>
+        </div>
+
+        <div class="two-col">
+
+            <!-- LEFT -->
+            <div>
+                <!-- ACCOUNT INFO -->
+                <div class="card">
+                    <div class="section-title">👤 Account Information</div>
+                    <div class="info-list">
+                        <div class="info-row"><span class="info-label">Full Name</span><span class="info-value">{{ user.get('name','—') }}</span></div>
+                        <div class="info-row"><span class="info-label">Email</span><span class="info-value">{{ user.get('email','—') }}</span></div>
+                        <div class="info-row"><span class="info-label">Phone</span><span class="info-value">{{ user.get('phone','—') }}</span></div>
+                        <div class="info-row"><span class="info-label">Location</span><span class="info-value">{{ user.get('location','—') }}</span></div>
+                        <div class="info-row"><span class="info-label">Role</span><span class="info-value">{{ user.get('role','user').title() }}</span></div>
+                        <div class="info-row"><span class="info-label">User ID</span><span class="info-value" style="font-size:11px;">{{ user_id }}</span></div>
+                        <div class="info-row">
+                            <span class="info-label">Verified</span>
+                            <span class="info-value">
+                                <span class="badge {{ 'badge-verified' if user.get('verified') else 'badge-unverified' }}">
+                                    {{ '✓ Yes' if user.get('verified') else '⏳ Pending' }}
+                                </span>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Account Status</span>
+                            <span class="info-value">
+                                <span class="badge {{ 'badge-active-acc' if user.get('active', True) else 'badge-inactive' }}">
+                                    {{ 'Active' if user.get('active', True) else 'Deactivated' }}
+                                </span>
+                            </span>
+                        </div>
+                        <div class="info-row"><span class="info-label">Registered</span><span class="info-value">{{ user.get('created_at').strftime('%d %b %Y') if user.get('created_at') else '—' }}</span></div>
+                        <div class="info-row"><span class="info-label">Last Login</span><span class="info-value">{{ user.get('last_login').strftime('%d %b %Y, %I:%M %p') if user.get('last_login') else '—' }}</span></div>
+                    </div>
+                </div>
+
+                <!-- PROJECTS -->
+                <div class="card">
+                    <div class="section-title">📁 Projects ({{ projects|length }})</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Project</th>
+                                <th>Area</th>
+                                <th>Budget</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in projects %}
+                            <tr>
+                                <td>
+                                    <div class="proj-title">{{ p.get('title','Untitled') }}</div>
+                                    <div class="proj-id">{{ p.get('location','—') }}</div>
+                                </td>
+                                <td>{{ p.get('square_feet','—') }} sqft</td>
+                                <td>{% if p.get('budget') %}₹{{ "{:,.0f}".format(p.budget) }}{% else %}—{% endif %}</td>
+                                <td>
+                                    {% set s = p.get('status','planning')|lower %}
+                                    <span class="badge badge-{{ s }}">{{ s }}</span>
+                                </td>
+                                <td style="font-size:12px;color:var(--ink-muted);">
+                                    {{ p.get('created_at').strftime('%d %b %Y') if p.get('created_at') else '—' }}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin.view_project', project_id=p.id) }}" class="btn-sm btn-view">👁 View</a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr class="empty-row"><td colspan="6">No projects yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ORDERS -->
+                {% if orders %}
+                <div class="card">
+                    <div class="section-title">📦 Recent Orders ({{ orders|length }})</div>
+                    <table>
+                        <thead>
+                            <tr><th>Order ID</th><th>Supplier</th><th>Total</th><th>Status</th><th>Date</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for o in orders[:10] %}
+                            <tr>
+                                <td style="font-size:11px;color:var(--ink-muted);">{{ o.id[:12] }}…</td>
+                                <td>{{ o.get('supplier_name','—') }}</td>
+                                <td>₹{{ "{:,.0f}".format(o.get('total',0)) }}</td>
+                                <td>
+                                    {% set os = o.get('status','pending')|lower %}
+                                    <span class="badge badge-{{ 'active' if os=='processing' else os }}">{{ os }}</span>
+                                </td>
+                                <td style="font-size:12px;color:var(--ink-muted);">
+                                    {{ o.get('created_at').strftime('%d %b %Y') if o.get('created_at') else '—' }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- RIGHT SIDEBAR -->
+            <div>
+                <!-- ADMIN ACTIONS -->
+                <div class="card">
+                    <div class="section-title" style="font-size:15px;">🛡️ Admin Actions</div>
+                    <div class="admin-actions">
+
+                        {% if not user.get('verified') %}
+                        <button class="btn-admin btn-admin-success" onclick="verifyUser()">
+                            ✅ Verify This User
+                        </button>
+                        {% endif %}
+
+                        {% if user.get('active', True) %}
+                        <button class="btn-admin btn-admin-danger" onclick="toggleActive(false)">
+                            🚫 Deactivate Account
+                        </button>
+                        {% else %}
+                        <button class="btn-admin btn-admin-success" onclick="toggleActive(true)">
+                            ✅ Reactivate Account
+                        </button>
+                        {% endif %}
+
+                        <a href="{{ url_for('admin.manage_users') }}" class="btn-admin btn-admin-outline">
+                            ← All Users
+                        </a>
+                    </div>
+                </div>
+
+                <!-- QUICK INFO -->
+                <div class="card">
+                    <div class="section-title" style="font-size:15px;">📊 Quick Stats</div>
+                    <div class="info-list">
+                        <div class="info-row"><span class="info-label">Total Projects</span><span class="info-value">{{ stats.total_projects }}</span></div>
+                        <div class="info-row"><span class="info-label">Active Projects</span><span class="info-value">{{ stats.active_projects }}</span></div>
+                        <div class="info-row"><span class="info-label">Completed</span><span class="info-value">{{ stats.completed_projects }}</span></div>
+                        <div class="info-row"><span class="info-label">Total Orders</span><span class="info-value">{{ stats.total_orders }}</span></div>
+                        <div class="info-row"><span class="info-label">Total Spent</span><span class="info-value">₹{{ "{:,.0f}".format(stats.total_spent) }}</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const USER_ID = "{{ user_id }}";
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function verifyUser() {
+            if (!confirm('Verify this user? They will be able to log in immediately.')) return;
+            fetch(`/admin/verify-user/${USER_ID}`, { method: 'POST' })
+                .then(() => { showToast('✅ User verified'); setTimeout(() => location.reload(), 1200); })
+                .catch(() => showToast('⚠️ Error'));
+        }
+
+        function toggleActive(activate) {
+            const action = activate ? 'reactivate' : 'deactivate';
+            if (!confirm(`${activate ? 'Reactivate' : 'Deactivate'} this user account?`)) return;
+            const url = activate
+                ? `/admin/activate-user/user/${USER_ID}`
+                : `/admin/deactivate-user/user/${USER_ID}`;
+            fetch(url, { method: 'POST' })
+                .then(() => { showToast(`✅ Account ${action}d`); setTimeout(() => location.reload(), 1200); })
+                .catch(() => showToast('⚠️ Error'));
+        }
+    </script>
+</body>
+</html>

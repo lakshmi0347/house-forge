@@ -716,23 +716,82 @@
         </div>
 
         <!-- Page Header -->
-        {% set d = project %}
-        <div class="page-header">
-            <h1>{{ d.get('title', 'Untitled Project') }}</h1>
-            <div class="project-meta">
-                <div class="meta-item">📍 {{ d.get('location', '—') }}</div>
-                <div class="meta-item">📅 {{ d.get('created_at').strftime('%d %b %Y') if d.get('created_at') else '—' }}</div>
-                {% set s = d.get('status','pending')|lower %}
-                <span class="badge badge-{{ s }}">{{ s }}</span>
-                {% set scope = estimation.get('estimate_scope', d.get('estimate_scope','material_only')) %}
-                <span class="badge badge-scope">{% if scope == 'material_and_labour' %}👷 Material + Labour{% else %}📦 Material Only{% endif %}</span>
-                <span class="badge badge-type">{{ d.get('property_type','residential').title() }}</span>
-                <span class="badge badge-admin">👤 {{ d.get('owner_name', d.get('user_name','Unknown User')) }}</span>
-                {% if d.get('admin_notes') %}
-                <span class="badge" style="background:#fef9c3;color:#854d0e;">📌 Has Admin Notes</span>
+{% set d = project %}
+<div class="page-header">
+    <h1>{{ d.get('title', 'Untitled Project') }}</h1>
+    <div class="project-meta">
+        <div class="meta-item">📍 {{ d.get('location', '—') }}</div>
+        <div class="meta-item">📅 {{ d.get('created_at').strftime('%d %b %Y') if d.get('created_at') else '—' }}</div>
+        {% set s = d.get('status','pending')|lower %}
+        <span class="badge badge-{{ s }}">{{ s }}</span>
+        {% set scope = estimation.get('estimate_scope', d.get('estimate_scope','material_only')) %}
+        <span class="badge badge-scope">{% if scope == 'material_and_labour' %}👷 Material + Labour{% else %}📦 Material Only{% endif %}</span>
+        <span class="badge badge-type">{{ d.get('property_type','residential').title() }}</span>
+        {% if d.get('admin_notes') %}
+        <span class="badge" style="background:#fef9c3;color:#854d0e;">📌 Has Admin Notes</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Owner Info -->
+<div class="card">
+    <div class="section-title" style="font-size:15px;">👤 Owner Details</div>
+    <div class="info-list">
+        <div class="info-row">
+            <span class="info-label">Name</span>
+            <span class="info-value">
+                {% if d.get('user_id') %}
+                <a href="{{ url_for('admin.view_user_profile', user_id=d.get('user_id')) }}"
+                   style="color:var(--accent);text-decoration:none;font-weight:700;
+                          border-bottom:1px dashed rgba(196,98,45,0.4);transition:border-color 0.2s;"
+                   onmouseover="this.style.borderBottomStyle='solid'"
+                   onmouseout="this.style.borderBottomStyle='dashed'">
+                    {{ d.get('owner_name', d.get('user_name','—')) }} ↗
+                </a>
+                {% else %}
+                {{ d.get('owner_name', d.get('user_name','—')) }}
                 {% endif %}
-            </div>
+            </span>
         </div>
+        {% if d.get('owner_email') %}
+        <div class="info-row"><span class="info-label">Email</span><span class="info-value">{{ d.get('owner_email') }}</span></div>
+        {% endif %}
+        {% if d.get('owner_phone') %}
+        <div class="info-row"><span class="info-label">Phone</span><span class="info-value">{{ d.get('owner_phone') }}</span></div>
+        {% endif %}
+        <div class="info-row"><span class="info-label">User ID</span><span class="info-value" style="font-size:11px;word-break:break-all;">{{ d.get('user_id','—') }}</span></div>
+        <div class="info-row"><span class="info-label">Project ID</span><span class="info-value" style="font-size:11px;word-break:break-all;">{{ project_id }}</span></div>
+        <div class="info-row"><span class="info-label">Created</span><span class="info-value">{{ d.get('created_at').strftime('%d %b %Y') if d.get('created_at') else '—' }}</span></div>
+        <div class="info-row"><span class="info-label">Last Updated</span><span class="info-value">{{ d.get('updated_at').strftime('%d %b %Y') if d.get('updated_at') else '—' }}</span></div>
+        {% if d.get('updated_by') %}
+        <div class="info-row"><span class="info-label">Updated By</span><span class="info-value" style="font-size:11px;">Admin {{ d.get('updated_by') }}</span></div>
+        {% endif %}
+    </div>
+    {% if d.get('user_id') %}
+    <div style="margin-top:14px;">
+        <a href="{{ url_for('admin.view_user_profile', user_id=d.get('user_id')) }}"
+           style="display:flex;align-items:center;gap:10px;padding:10px 14px;
+                  background:var(--accent-lt);border:1px solid rgba(196,98,45,0.25);
+                  border-radius:9px;text-decoration:none;transition:background 0.2s;"
+           onmouseover="this.style.background='#eedad0'"
+           onmouseout="this.style.background='var(--accent-lt)'">
+            <!-- Avatar circle -->
+            <div style="width:36px;height:36px;border-radius:50%;
+                        background:linear-gradient(135deg,var(--accent),#e8a060);
+                        display:flex;align-items:center;justify-content:center;
+                        color:#fff;font-weight:700;font-size:14px;flex-shrink:0;">
+                {{ d.get('owner_name','?')[:1].upper() }}
+            </div>
+            <div>
+                <div style="font-size:13px;font-weight:700;color:var(--ink);">
+                    {{ d.get('owner_name', d.get('user_name','View Profile')) }}
+                </div>
+                <div style="font-size:11px;color:var(--ink-muted);">Click to view full profile →</div>
+            </div>
+        </a>
+    </div>
+    {% endif %}
+</div>
 
         <div class="two-col">
 

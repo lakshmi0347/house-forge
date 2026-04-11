@@ -50,9 +50,35 @@ def _create_notification(user_id, title, message, notif_type, link=None):
         print(f"Notification error: {e}")
 
 
+def _deduct_stock(db, order_items):
+    """
+    Reduce material stock for each item in a delivered order.
+    Silently logs errors — stock deduction is non-fatal.
+    """
+    if not order_items:
+        return
+    for item in order_items:
+        material_id = item.get('material_id')
+        qty         = int(item.get('quantity', 0))
+        if not material_id or qty <= 0:
+            continue
+        try:
+            mat_ref = db.collection('materials').document(material_id)
+            mat_doc = mat_ref.get()
+            if mat_doc.exists:
+                current_qty = int(mat_doc.to_dict().get('quantity', 0))
+                new_qty     = max(0, current_qty - qty)
+                mat_ref.update({
+                    'quantity':   new_qty,
+                    'updated_at': datetime.now()
+                })
+                print(f"✅ Stock updated: material={material_id} {current_qty} → {new_qty}")
+        except Exception as e:
+            print(f"⚠️  Stock deduction error for material {material_id}: {e}")
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 #  INSTANT CHECKOUT PAGE
-#  Called immediately after order creation — user picks COD or card here.
 # ─────────────────────────────────────────────────────────────────────────────
 
 @payment_bp.route('/checkout/<order_id>', methods=['GET'])
@@ -60,7 +86,6 @@ def _create_notification(user_id, title, message, notif_type, link=None):
 def checkout(order_id):
     """
     Instant checkout page shown right after the user places a material order.
-    Works like Amazon/Flipkart — no waiting for supplier acceptance.
     """
     db = get_db()
     if not db:
@@ -152,7 +177,6 @@ def confirm_order_cod(order_id):
             'receipt_number':       receipt_number,
             'payment_confirmed_at': datetime.now(),
             'status':               'processing',
-            # delivery details
             'delivery_date':        delivery_date,
             'delivery_slot':        delivery_slot,
             'delivery_phone':       delivery_phone,
@@ -246,7 +270,6 @@ def declare_order_card(order_id):
             'receipt_number':        receipt_number,
             'payment_declared_at':   datetime.now(),
             'status':                'processing',
-            # delivery details
             'delivery_date':         delivery_date,
             'delivery_slot':         delivery_slot,
             'delivery_phone':        delivery_phone,
@@ -564,12 +587,16 @@ def payment_history():
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  SUPPLIER: mark order as cash collected / card verified on delivery
+#  ✅ FIX: now also deducts material stock when payment is confirmed
 # ─────────────────────────────────────────────────────────────────────────────
 
 @payment_bp.route('/supplier/order/<order_id>/collect-cash', methods=['POST'])
 @login_required
 def supplier_collect_cash(order_id):
-    """Supplier marks cash collected or card payment verified on delivery."""
+    """
+    Supplier marks cash collected or card payment verified on delivery.
+    Also deducts stock for each delivered material item.
+    """
     db = get_db()
     if not db:
         return jsonify({'success': False, 'message': 'Database connection error'}), 500
@@ -589,12 +616,17 @@ def supplier_collect_cash(order_id):
         if order_data.get('payment_status') == 'paid':
             return jsonify({'success': False, 'message': 'Already marked as paid'}), 400
 
+        # Mark order as paid and completed
         order_ref.update({
             'payment_status':    'paid',
             'cash_collected_at': datetime.now(),
             'status':            'completed',
             'updated_at':        datetime.now()
         })
+
+        # ✅ Deduct stock for all delivered materials
+        order_items = order_data.get('items') or order_data.get('order_items') or []
+        _deduct_stock(db, order_items)
 
         # Update payment record status too
         payments_ref = db.collection('payments') \
@@ -603,6 +635,7 @@ def supplier_collect_cash(order_id):
         for pdoc in payments_ref:
             db.collection('payments').document(pdoc.id).update({'status': 'paid'})
 
+        # Notify customer
         user_id = order_data.get('user_id')
         if user_id:
             method = order_data.get('payment_method', '')

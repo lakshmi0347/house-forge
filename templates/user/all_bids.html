@@ -3,668 +3,745 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Bids - House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>My Bids — House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #F0EBE1;
-            --bg-card: #FAF6EF;
-            --bg-card2: #F4EEE3;
-            --sand: #E8DFD0;
-            --stone: #D4C8B8;
-            --accent: #B8864E;
-            --accent2: #D4A96A;
-            --accent-dark: #96693A;
-            --accent-light: #FBF3E4;
-            --accent-glow: rgba(184,134,78,0.18);
-            --text-primary: #1A1612;
-            --text-secondary: #4A3F35;
-            --text-muted: #8A7A6E;
-        }
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text-primary); overflow-x: hidden; }
+            --void:    #0C0B09;
+            --ink:     #141210;
+            --deep:    #1C1A16;
+            --surface: #242118;
+            --rim:     rgba(255,255,255,0.07);
+            --rim2:    rgba(255,255,255,0.04);
 
-        body::before {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: url('/static/images/house.jpg') no-repeat center center / cover;
-            opacity: 0.28;
-            filter: saturate(0.3) sepia(0.85) hue-rotate(-15deg) brightness(0.95);
+            --gold:    #D4924A;
+            --gold2:   #F0C07A;
+            --gold3:   #B8743A;
+            --glow:    rgba(212,146,74,0.22);
+            --soft:    rgba(212,146,74,0.10);
+
+            --white:   #FFFFFF;
+            --off:     #F2EDE6;
+            --fog:     rgba(242,237,230,0.55);
+            --ghost:   rgba(242,237,230,0.28);
+
+            --green:  #4CAF82; --green-bg: rgba(76,175,130,0.13);
+            --red:    #EF4444; --red-bg:   rgba(239,68,68,0.12);
+            --amber:  #D49440; --amber-bg: rgba(212,148,64,0.13);
+            --blue:   #4A8FD4; --blue-bg:  rgba(74,143,212,0.13);
         }
-        body::after {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: radial-gradient(ellipse 100% 100% at 50% 50%,
-                rgba(184,134,78,0.12) 0%,
-                rgba(240,235,225,0.0) 55%,
-                rgba(240,235,225,0.45) 100%);
-        }
-        .bg-grid {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background-image:
-                linear-gradient(rgba(184,134,78,0.045) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(184,134,78,0.045) 1px, transparent 1px);
-            background-size: 48px 48px;
-        }
-        .bg-warm {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: rgba(184,134,78,0.10);
-            mix-blend-mode: multiply;
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body {
+            font-family:'DM Sans',sans-serif;
+            background:var(--void);
+            color:var(--off);
+            min-height:100vh;
+            overflow-x:hidden;
+            -webkit-font-smoothing:antialiased;
         }
 
-        .navbar {
-            background: rgba(250,246,239,0.94); backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--stone);
-            padding: 0 44px; height: 66px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 1px 0 rgba(184,134,78,0.12), 0 4px 20px rgba(28,22,18,0.05);
+        /* ── NAV ── */
+        .nav {
+            position:fixed; top:0; left:0; right:0; z-index:300;
+            height:66px;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 52px;
+            background:rgba(12,11,9,0.85);
+            backdrop-filter:blur(22px);
+            -webkit-backdrop-filter:blur(22px);
+            border-bottom:1px solid var(--rim);
         }
-        .navbar-brand {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px; font-weight: 700; color: var(--text-primary);
-            display: flex; align-items: center; gap: 11px; text-decoration: none; letter-spacing: 0.3px;
+        .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+        .nav-logo-icon {
+            width:40px; height:40px; border-radius:9px;
+            border:1.5px solid var(--gold);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold); position:relative; overflow:hidden;
         }
-        .navbar-brand-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            color: #fff; box-shadow: 0 2px 10px rgba(184,134,78,0.35); position: relative; overflow: hidden;
+        .nav-logo-icon::before {
+            content:''; position:absolute; inset:0;
+            background:radial-gradient(circle at 30% 30%, rgba(212,146,74,0.18), transparent 70%);
         }
-        .navbar-brand-icon::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent); }
-        .navbar-menu { display: flex; align-items: center; gap: 2px; }
-        .navbar-menu a {
-            color: var(--text-secondary); text-decoration: none;
-            padding: 7px 12px; border-radius: 9px;
-            font-size: 13.5px; font-weight: 500;
-            transition: color 0.2s, background 0.2s;
-            display: flex; align-items: center; gap: 6px; position: relative;
+        .nav-logo-name {
+            font-family:'Syne',sans-serif;
+            font-size:18px; font-weight:800; color:var(--white); letter-spacing:-0.4px;
         }
-        .navbar-menu a:hover, .navbar-menu a.nav-active { color: var(--accent); background: var(--accent-light); }
-        .badge-notification {
-            position: absolute; top: 2px; right: 2px;
-            background: #DC2626; color: white; border-radius: 50%;
-            width: 15px; height: 15px; display: none;
-            align-items: center; justify-content: center;
-            font-size: 8px; font-weight: 700; border: 2px solid var(--bg-card);
-        }
-        .profile-pic { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); display: block; }
-        .profile-placeholder {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            color: var(--accent); display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 13px; border: 2px solid var(--stone);
-        }
-        .nav-divider { width: 1px; height: 20px; background: var(--stone); margin: 0 5px; }
-        .logout-link {
-            color: var(--text-muted) !important; text-decoration: none;
-            padding: 7px 12px; border-radius: 9px;
-            font-size: 13px; font-weight: 500;
-            display: inline-flex; align-items: center; gap: 5px;
-            transition: color 0.2s, background 0.2s;
-        }
-        .logout-link:hover { color: #DC2626 !important; background: #FEF2F2; }
+        .nav-logo-name b { color:var(--gold); font-weight:800; }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; position: relative; z-index: 1; }
+        .nav-center {
+            position:absolute; left:50%; transform:translateX(-50%);
+            display:flex; align-items:center; gap:2px;
+        }
+        .nlink {
+            display:flex; align-items:center; gap:6px;
+            padding:7px 16px; border-radius:8px;
+            text-decoration:none; font-size:13.5px; font-weight:500;
+            color:var(--ghost); transition:color .18s, background .18s;
+            position:relative; white-space:nowrap;
+        }
+        .nlink:hover { color:var(--off); background:var(--rim2); }
+        .nlink.active { color:var(--gold); }
+        .nlink.active::after {
+            content:''; position:absolute; bottom:-1px; left:16px; right:16px;
+            height:2px; background:var(--gold); border-radius:2px;
+            box-shadow:0 0 10px var(--glow);
+        }
+        .npip {
+            position:absolute; top:5px; right:5px;
+            width:6px; height:6px; border-radius:50%;
+            background:#EF4444; border:1.5px solid var(--void);
+            display:none;
+        }
+        .npip.amber { background:var(--amber); }
 
-        .page-header {
-            background: rgba(250,244,234,0.82);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.55);
-            border-radius: 22px; padding: 0;
-            margin-bottom: 24px;
-            overflow: hidden; display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: stretch;
-            box-shadow: 0 4px 32px rgba(150,105,58,0.10), inset 0 1px 0 rgba(255,248,235,0.7);
-            animation: slideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
-            position: relative;
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .nav-profile {
+            display:flex; align-items:center; gap:9px;
+            padding:5px 14px 5px 5px; border-radius:999px;
+            border:1px solid var(--rim); text-decoration:none;
+            transition:border-color .2s, background .2s;
         }
-        .page-header::before {
-            content: '';
-            position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-            background: linear-gradient(180deg, var(--accent), var(--accent2));
-            border-radius: 22px 0 0 22px;
+        .nav-profile:hover { border-color:var(--gold); background:var(--soft); }
+        .nav-av {
+            width:30px; height:30px; border-radius:50%;
+            background:var(--gold3); color:#fff;
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:700; flex-shrink:0;
         }
-        .header-left { padding: 34px 40px; }
-        .header-eyebrow {
-            font-size: 11px; font-weight: 600; letter-spacing: 2px;
-            text-transform: uppercase; color: var(--accent);
-            margin-bottom: 10px; display: flex; align-items: center; gap: 7px;
+        .nav-av img { width:30px; height:30px; border-radius:50%; object-fit:cover; display:block; }
+        .nav-uname { font-size:13px; font-weight:500; color:var(--off); }
+        .ndiv { width:1px; height:22px; background:var(--rim); }
+        .nav-out {
+            display:flex; align-items:center; gap:6px;
+            text-decoration:none; font-size:13px; font-weight:500;
+            color:var(--ghost); padding:7px 14px; border-radius:8px;
+            transition:color .18s, background .18s;
         }
-        .header-eyebrow::before { content: ''; width: 22px; height: 1.5px; background: var(--accent); display: inline-block; }
-        .header-left h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 32px; font-weight: 700; color: var(--text-primary);
-            line-height: 1.15; margin-bottom: 8px;
+        .nav-out:hover { color:#EF4444; background:rgba(239,68,68,0.08); }
+
+        /* ── SHELL ── */
+        .shell { padding-top:66px; }
+
+        /* ── HERO ── */
+        .hero { position:relative; height:400px; overflow:hidden; }
+        .hero-bg {
+            position:absolute; inset:0;
+            background:url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=80') center 40%/cover;
+            filter:brightness(0.30) saturate(0.60);
+            transform:scale(1.04);
+            animation:hzoom 14s ease-in-out infinite alternate;
         }
-        .header-left p { color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
-        .header-right {
-            background: linear-gradient(135deg, rgba(251,243,228,0.72) 0%, rgba(253,236,200,0.68) 100%);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-left: 1px solid rgba(212,186,150,0.4);
-            display: flex; align-items: center; justify-content: center;
-            padding: 28px 36px; position: relative; overflow: hidden;
+        @keyframes hzoom { from{transform:scale(1.04)} to{transform:scale(1.0)} }
+        .hero::before {
+            content:''; position:absolute; inset:0; z-index:1;
+            background:
+                linear-gradient(90deg,rgba(12,11,9,0.92) 0%,rgba(12,11,9,0.32) 55%,transparent 100%),
+                linear-gradient(0deg,rgba(12,11,9,0.96) 0%,transparent 50%);
         }
-        .header-right::before {
-            content: '';
-            position: absolute; inset: 0;
-            background-image: linear-gradient(rgba(184,134,78,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(184,134,78,0.08) 1px, transparent 1px);
-            background-size: 20px 20px;
+        .hero::after {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:3px; z-index:2;
+            background:linear-gradient(180deg,transparent,var(--gold),transparent);
         }
-        .header-bid-icon {
-            position: relative; z-index: 1;
-            width: 64px; height: 64px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 18px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 6px 24px rgba(184,134,78,0.35);
+        .hero-body {
+            position:absolute; inset:0; z-index:3;
+            display:flex; flex-direction:column; justify-content:flex-end;
+            padding:0 72px 48px;
+        }
+        .hero-tag {
+            display:inline-flex; align-items:center; gap:9px;
+            font-size:10px; font-weight:600; letter-spacing:3px;
+            text-transform:uppercase; color:var(--gold); margin-bottom:16px;
+        }
+        .hero-tag-ln { width:30px; height:1px; background:var(--gold); }
+        .hero-h1 {
+            font-family:'DM Serif Display',Georgia,serif;
+            font-size:52px; font-weight:400; line-height:1.06;
+            color:var(--white); letter-spacing:-1px; margin-bottom:14px;
+        }
+        .hero-h1 em { font-style:italic; color:var(--gold2); }
+        .hero-sub {
+            font-size:15px; color:rgba(242,237,230,0.45);
+            line-height:1.7; max-width:480px; font-weight:300;
         }
 
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr);
-            gap: 14px; margin-bottom: 24px;
+        /* Stats strip bottom-right */
+        .hero-stats {
+            position:absolute; bottom:0; right:0; z-index:3;
+            display:flex;
         }
-        .stat-card {
-            background: rgba(250,244,234,0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(212,186,150,0.45);
-            border-radius: 18px; padding: 22px 20px;
-            box-shadow: 0 2px 20px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.6);
-            transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s, border-color 0.3s, background 0.3s;
-            position: relative; overflow: hidden; cursor: default;
-            text-align: center;
+        .hstat {
+            padding:18px 28px;
+            background:rgba(12,11,9,0.82);
+            backdrop-filter:blur(16px);
+            border-top:1px solid var(--rim);
+            border-left:1px solid var(--rim);
+            text-align:center; min-width:100px;
         }
-        .stat-card:nth-child(1) { animation: slideUp 0.55s 0.08s cubic-bezier(0.22,1,0.36,1) both; }
-        .stat-card:nth-child(2) { animation: slideUp 0.55s 0.13s cubic-bezier(0.22,1,0.36,1) both; }
-        .stat-card:nth-child(3) { animation: slideUp 0.55s 0.18s cubic-bezier(0.22,1,0.36,1) both; }
-        .stat-card:nth-child(4) { animation: slideUp 0.55s 0.23s cubic-bezier(0.22,1,0.36,1) both; }
-        .stat-card::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            transform: scaleX(0); transform-origin: left;
-            transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
-            border-radius: 18px 18px 0 0;
+        .hstat-n {
+            font-family:'Syne',sans-serif;
+            font-size:28px; font-weight:800; color:var(--white); line-height:1; margin-bottom:4px;
         }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(150,105,58,0.16); border-color: rgba(184,134,78,0.55); background: rgba(252,247,238,0.88); }
-        .stat-card:hover::before { transform: scaleX(1); }
-        .stat-icon-wrap {
-            width: 40px; height: 40px;
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 14px; border: 1px solid rgba(184,134,78,0.2);
-            transition: all 0.25s;
-        }
-        .stat-card:hover .stat-icon-wrap { transform: scale(1.1) rotate(-4deg); }
-        .stat-icon-wrap.total  { background: var(--accent-light); color: var(--accent); }
-        .stat-icon-wrap.pending { background: #FEF3C7; color: #B45309; }
-        .stat-icon-wrap.accepted { background: #D1FAE5; color: #065F46; }
-        .stat-icon-wrap.rejected { background: #FEE2E2; color: #991B1B; }
-        .stat-number {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 36px; font-weight: 700; color: var(--text-primary);
-            line-height: 1; margin-bottom: 5px;
-        }
-        .stat-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+        .hstat-n.gold { color:var(--gold); }
+        .hstat-n.green { color:var(--green); }
+        .hstat-n.red { color:var(--red); }
+        .hstat-n.amber { color:var(--amber); }
+        .hstat-l { font-size:9.5px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; color:var(--ghost); }
 
-        .filter-bar {
-            display: flex; gap: 8px; margin-bottom: 22px;
-            flex-wrap: wrap; align-items: center;
-            animation: slideUp 0.55s 0.26s cubic-bezier(0.22,1,0.36,1) both;
-        }
-        .filter-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-right: 4px; }
-        .tab {
-            padding: 7px 18px; border-radius: 20px;
-            font-size: 13px; font-weight: 600; cursor: pointer;
-            border: 1px solid rgba(212,186,150,0.5);
-            background: rgba(250,244,234,0.72);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: var(--text-secondary);
-            transition: all 0.2s; font-family: 'Outfit', sans-serif;
-            display: flex; align-items: center; gap: 6px;
-            box-shadow: inset 0 1px 0 rgba(255,248,235,0.5);
-        }
-        .tab:hover { border-color: var(--accent); color: var(--accent); background: rgba(251,243,228,0.85); }
-        .tab.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(184,134,78,0.3); }
-        .tab-dot { width: 6px; height: 6px; border-radius: 50%; }
+        /* ── MAIN ── */
+        .main { padding:44px 72px 80px; display:flex; flex-direction:column; gap:32px; }
 
-        .alert { padding: 12px 18px; border-radius: 12px; margin-bottom: 16px; font-size: 13.5px; font-weight: 500; }
-        .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
-        .alert-error   { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+        .sec-lbl {
+            font-size:10px; font-weight:600; letter-spacing:2.5px;
+            text-transform:uppercase; color:var(--gold);
+            display:flex; align-items:center; gap:10px; margin-bottom:18px;
+        }
+        .sec-lbl::before { content:''; width:22px; height:1px; background:var(--gold); }
 
+        /* ── FILTER BAR ── */
+        .filter-row {
+            display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+        }
+        .filter-lbl {
+            font-size:10px; font-weight:700; letter-spacing:2px;
+            text-transform:uppercase; color:var(--ghost); margin-right:4px;
+        }
+        .ftab {
+            display:inline-flex; align-items:center; gap:7px;
+            padding:8px 20px; border-radius:999px;
+            font-size:12.5px; font-weight:600; cursor:pointer;
+            border:1px solid var(--rim); color:var(--ghost);
+            background:transparent;
+            transition:all .2s; font-family:'DM Sans',sans-serif;
+        }
+        .ftab:hover { border-color:var(--gold); color:var(--off); background:var(--soft); }
+        .ftab.active { background:var(--gold); color:var(--void); border-color:var(--gold); box-shadow:0 4px 18px var(--glow); }
+        .ftab-dot { width:6px; height:6px; border-radius:50%; }
+
+        /* ── ALERTS ── */
+        .alert {
+            padding:13px 20px; border-radius:12px; margin-bottom:8px;
+            font-size:13.5px; font-weight:500; display:flex; align-items:center; gap:10px;
+        }
+        .alert-success { background:var(--green-bg); color:var(--green); border:1px solid rgba(76,175,130,0.25); }
+        .alert-error   { background:var(--red-bg);   color:var(--red);   border:1px solid rgba(239,68,68,0.25); }
+
+        /* ── BID CARD ── */
         .bid-card {
-            background: rgba(250,244,234,0.78);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.48);
-            border-radius: 20px; padding: 28px 32px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 24px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.65);
-            transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
-            position: relative; overflow: hidden;
-            animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+            background:var(--deep);
+            border:1px solid var(--rim);
+            border-radius:20px;
+            overflow:hidden;
+            transition:border-color .3s, box-shadow .3s, transform .3s cubic-bezier(.22,1,.36,1);
+            position:relative;
+            animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;
         }
+        .bid-card:hover {
+            border-color:rgba(212,146,74,0.35);
+            box-shadow:0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,146,74,0.18);
+            transform:translateY(-3px);
+        }
+        /* Left gold bar */
         .bid-card::before {
-            content: '';
-            position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-            background: linear-gradient(180deg, var(--accent), var(--accent2));
-            transform: scaleY(0); transform-origin: top;
-            transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
-            border-radius: 3px 0 0 3px;
+            content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+            background:linear-gradient(180deg,transparent,var(--gold),transparent);
+            opacity:0; transition:opacity .3s;
         }
-        .bid-card:hover { box-shadow: 0 12px 40px rgba(150,105,58,0.16); border-color: rgba(184,134,78,0.55); background: rgba(252,247,238,0.88); }
-        .bid-card:hover::before { transform: scaleY(1); }
+        .bid-card:hover::before { opacity:1; }
+
+        /* Card image banner */
+        .bid-card-banner {
+            position:relative; height:120px; overflow:hidden;
+        }
+        .bid-card-banner-img {
+            position:absolute; inset:0; background-size:cover; background-position:center;
+            filter:brightness(0.38) saturate(0.55);
+            transition:filter .4s, transform .5s cubic-bezier(.22,1,.36,1);
+        }
+        .bid-card:hover .bid-card-banner-img { filter:brightness(0.28); transform:scale(1.05); }
+        .bid-card-banner::before {
+            content:''; position:absolute; inset:0; z-index:1;
+            background:linear-gradient(0deg,var(--deep) 0%,rgba(28,26,22,0.55) 60%,transparent 100%);
+        }
+        .bid-card-banner-overlay {
+            position:absolute; inset:0; z-index:2;
+            padding:14px 24px;
+            display:flex; align-items:flex-start; justify-content:space-between;
+        }
 
         .project-tag {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 5px 13px;
-            background: rgba(232,223,208,0.72);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(212,186,150,0.45);
-            border-radius: 20px; font-size: 11.5px; font-weight: 600;
-            color: var(--text-secondary); text-decoration: none;
-            transition: all 0.2s; margin-bottom: 16px;
-            box-shadow: inset 0 1px 0 rgba(255,248,235,0.4);
+            display:inline-flex; align-items:center; gap:6px;
+            padding:6px 14px; border-radius:999px;
+            font-size:11px; font-weight:600; letter-spacing:.3px;
+            color:var(--gold2); text-decoration:none;
+            background:rgba(12,11,9,0.6);
+            border:1px solid rgba(212,146,74,0.3);
+            backdrop-filter:blur(8px);
+            transition:all .2s;
         }
-        .project-tag:hover { background: rgba(251,243,228,0.88); border-color: var(--accent); color: var(--accent); }
-
-        .bid-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; gap: 14px; }
-        .contractor-info { display: flex; align-items: center; gap: 15px; }
-        .contractor-avatar {
-            width: 52px; height: 52px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            border: 2px solid rgba(184,134,78,0.3);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; color: var(--accent);
-        }
-        .contractor-name {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;
-        }
-        .contractor-sub { font-size: 12px; color: var(--text-secondary); margin-bottom: 3px; }
-        .contractor-rating { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
-        .star-icon { color: var(--accent2); }
+        .project-tag:hover { background:var(--gold); color:var(--void); border-color:var(--gold); }
 
         .status-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 5px 14px; border-radius: 20px;
-            font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
-            text-transform: uppercase; flex-shrink: 0;
+            display:inline-flex; align-items:center; gap:6px;
+            padding:5px 14px; border-radius:999px;
+            font-size:10px; font-weight:700; letter-spacing:.8px;
+            text-transform:uppercase; flex-shrink:0;
+            backdrop-filter:blur(8px);
+            background:rgba(12,11,9,0.6);
         }
-        .status-dot { width: 6px; height: 6px; border-radius: 50%; }
-        .status-pending  { background: #FEF3C7; color: #92400E; } .status-pending  .status-dot { background: #D97706; }
-        .status-accepted { background: #D1FAE5; color: #065F46; } .status-accepted .status-dot { background: #059669; }
-        .status-rejected { background: #FEE2E2; color: #991B1B; } .status-rejected .status-dot { background: #DC2626; }
+        .sdot { width:5px; height:5px; border-radius:50%; }
+        .s-pending  { color:var(--amber); border:1px solid rgba(212,148,64,0.35); }
+        .s-pending  .sdot { background:var(--amber); box-shadow:0 0 6px var(--amber); }
+        .s-accepted { color:var(--green); border:1px solid rgba(76,175,130,0.35); }
+        .s-accepted .sdot { background:var(--green); box-shadow:0 0 6px var(--green); }
+        .s-rejected { color:var(--red);   border:1px solid rgba(239,68,68,0.3); }
+        .s-rejected .sdot { background:var(--red);   box-shadow:0 0 6px var(--red); }
 
+        /* Card body */
+        .bid-body { padding:20px 28px 24px; }
+
+        .contractor-row {
+            display:flex; align-items:center; gap:16px; margin-bottom:20px;
+        }
+        .contractor-av {
+            width:52px; height:52px; border-radius:12px;
+            background:linear-gradient(135deg, #2a2318, #3a3020);
+            border:1px solid rgba(212,146,74,0.22);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold); flex-shrink:0;
+            text-decoration:none;
+            transition:border-color .2s, background .2s, transform .2s;
+        }
+        .contractor-av:hover { border-color:var(--gold); background:var(--soft); transform:scale(1.06); }
+        .contractor-info { flex:1; min-width:0; }
+        .contractor-name {
+            font-family:'DM Serif Display',serif;
+            font-size:18px; color:var(--white); line-height:1.2; margin-bottom:3px;
+        }
+        .contractor-sub { font-size:12px; color:var(--ghost); margin-bottom:4px; }
+        .contractor-rating {
+            font-size:12px; color:rgba(212,146,74,0.75);
+            display:flex; align-items:center; gap:5px;
+        }
+        .star { color:var(--gold2); }
+
+        /* Details grid */
         .bid-details {
-            display: grid; grid-template-columns: repeat(4, 1fr);
-            gap: 0; margin: 16px 0;
-            background: rgba(244,238,227,0.62);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(212,186,150,0.4); border-radius: 14px; overflow: hidden;
+            display:grid; grid-template-columns:repeat(4,1fr);
+            border:1px solid var(--rim); border-radius:14px; overflow:hidden;
+            margin-bottom:18px;
         }
-        .detail-item {
-            padding: 16px 18px; text-align: center;
-            border-right: 1px solid rgba(212,186,150,0.35); position: relative;
+        .detail-cell {
+            padding:16px 18px; text-align:center;
+            border-right:1px solid var(--rim);
+            position:relative;
         }
-        .detail-item:last-child { border-right: none; }
-        .detail-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 6px; }
-        .detail-value { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: var(--text-primary); line-height: 1; }
-        .detail-value.accent { color: var(--accent); }
+        .detail-cell:last-child { border-right:none; }
+        .detail-cell::before {
+            content:''; position:absolute; inset:0;
+            background:radial-gradient(circle at 50% 0%, rgba(212,146,74,0.06), transparent 65%);
+            opacity:0; transition:opacity .25s;
+        }
+        .bid-card:hover .detail-cell::before { opacity:1; }
+        .d-label {
+            font-size:9.5px; font-weight:600; letter-spacing:1px;
+            text-transform:uppercase; color:var(--ghost); margin-bottom:7px;
+        }
+        .d-value {
+            font-family:'DM Serif Display',serif;
+            font-size:21px; color:var(--white); line-height:1;
+        }
+        .d-value.gold { color:var(--gold); }
+        .d-unit { font-family:'DM Sans',sans-serif; font-size:11px; color:var(--ghost); margin-left:2px; }
 
+        /* Proposal */
         .bid-proposal {
-            padding: 14px 18px;
-            background: rgba(248,242,232,0.65);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(212,186,150,0.38); border-radius: 12px;
-            font-size: 13.5px; line-height: 1.65; color: var(--text-secondary);
-            margin: 14px 0 10px;
+            padding:14px 18px;
+            background:rgba(255,255,255,0.03);
+            border:1px solid var(--rim); border-radius:12px;
+            margin-bottom:16px;
         }
-        .bid-proposal-label {
-            font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 1px; color: var(--accent); margin-bottom: 6px;
-            display: flex; align-items: center; gap: 5px;
+        .proposal-lbl {
+            font-size:9px; font-weight:700; letter-spacing:2px;
+            text-transform:uppercase; color:var(--gold);
+            display:flex; align-items:center; gap:6px; margin-bottom:8px;
         }
-        .bid-timestamp { font-size: 11.5px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 5px; }
+        .proposal-text {
+            font-size:13.5px; line-height:1.7; color:var(--fog);
+            font-weight:300;
+        }
 
-        .bid-actions { display: flex; gap: 10px; }
+        .bid-timestamp {
+            font-size:11px; color:var(--ghost);
+            display:flex; align-items:center; gap:5px; margin-bottom:18px;
+        }
+
+        /* Actions */
+        .bid-actions { display:flex; gap:10px; }
         .btn {
-            padding: 10px 20px; border-radius: 10px;
-            font-weight: 600; font-size: 13px; cursor: pointer;
-            border: none; transition: all 0.2s;
-            font-family: 'Outfit', sans-serif;
-            display: inline-flex; align-items: center; gap: 7px;
-            text-decoration: none;
+            display:inline-flex; align-items:center; justify-content:center; gap:7px;
+            padding:11px 22px; border-radius:10px;
+            font-size:13px; font-weight:600; cursor:pointer;
+            border:none; transition:all .2s;
+            font-family:'DM Sans',sans-serif; text-decoration:none;
         }
         .btn-accept {
-            flex: 1; background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff; box-shadow: 0 2px 12px rgba(184,134,78,0.28);
-            justify-content: center;
+            flex:1;
+            background:var(--gold); color:var(--void);
+            box-shadow:0 4px 20px var(--glow);
         }
-        .btn-accept:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(184,134,78,0.4); }
+        .btn-accept:hover { background:var(--gold2); transform:translateY(-1px); box-shadow:0 8px 28px var(--glow); }
         .btn-reject {
-            flex: 1; background: transparent; color: #DC2626;
-            border: 1.5px solid #FECACA; justify-content: center;
+            flex:1;
+            background:transparent; color:var(--red);
+            border:1px solid rgba(239,68,68,0.28) !important;
         }
-        .btn-reject:hover { background: #FEF2F2; border-color: #FCA5A5; }
+        .btn-reject:hover { background:var(--red-bg); border-color:rgba(239,68,68,0.55) !important; }
         .btn-view {
-            padding: 10px 16px;
-            background: rgba(244,238,227,0.62);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            color: var(--text-secondary);
-            border: 1px solid rgba(212,186,150,0.45) !important;
-            white-space: nowrap;
+            padding:11px 18px;
+            background:transparent; color:var(--fog);
+            border:1px solid var(--rim) !important;
+            white-space:nowrap; flex-shrink:0;
         }
-        .btn-view:hover { background: rgba(250,244,234,0.85); color: var(--text-primary); }
+        .btn-view:hover { border-color:rgba(212,146,74,0.35) !important; color:var(--off); background:var(--soft); }
 
+        /* Status-tinted accepted/rejected card */
+        .bid-card[data-status="accepted"] { border-color:rgba(76,175,130,0.15); }
+        .bid-card[data-status="rejected"] { border-color:rgba(239,68,68,0.10); }
+
+        /* ── EMPTY STATE ── */
         .empty-state {
-            text-align: center; padding: 72px 20px;
-            background: rgba(250,244,234,0.78);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.48);
-            border-radius: 20px;
-            box-shadow: 0 2px 24px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.65);
+            display:flex; flex-direction:column; align-items:center;
+            background:var(--deep); border:1px solid var(--rim); border-radius:20px;
+            overflow:hidden;
         }
-        .empty-icon-wrap {
-            width: 72px; height: 72px;
-            background: var(--sand); border-radius: 20px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 18px; color: var(--text-muted);
-            border: 1px solid var(--stone);
+        .empty-img-wrap {
+            width:100%; height:220px;
+            background:url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=70') center/cover;
+            filter:brightness(0.28) saturate(0.5);
+            position:relative;
+        }
+        .empty-img-wrap::after {
+            content:''; position:absolute; inset:0;
+            background:linear-gradient(0deg,var(--deep) 0%, transparent 60%);
+        }
+        .empty-body { padding:36px 32px 48px; text-align:center; }
+        .empty-icon {
+            width:56px; height:56px; border-radius:14px;
+            background:var(--soft); border:1px solid rgba(212,146,74,0.25);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold); margin:0 auto 18px;
         }
         .empty-state h2 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px; font-weight: 700; margin-bottom: 10px;
+            font-family:'DM Serif Display',serif;
+            font-size:26px; color:var(--white); margin-bottom:10px;
         }
-        .empty-state p { color: var(--text-muted); font-size: 14px; line-height: 1.65; }
+        .empty-state p { color:var(--ghost); font-size:14px; line-height:1.7; max-width:340px; }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+        .fu { animation:fadeUp .6s cubic-bezier(.22,1,.36,1) both; }
+        .d1{animation-delay:.06s} .d2{animation-delay:.14s} .d3{animation-delay:.20s}
+
+        /* Banner images per index */
+        .banner-1 { background-image:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1200&q=70'); }
+        .banner-2 { background-image:url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=1200&q=70'); }
+        .banner-3 { background-image:url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=70'); }
+        .banner-4 { background-image:url('https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=1200&q=70'); }
+        .banner-5 { background-image:url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=70'); }
+        .banner-6 { background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=70'); }
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:1100px){
+            .bid-details{grid-template-columns:repeat(2,1fr);}
         }
-
-        @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2,1fr); } .page-header { grid-template-columns: 1fr; } .header-right { display: none; } }
-        @media (max-width: 600px) { .bid-details { grid-template-columns: repeat(2,1fr); } .bid-actions { flex-wrap: wrap; } .navbar { padding: 0 20px; } .container { padding: 20px 16px; } }
+        @media(max-width:900px){
+            .nav{padding:0 22px;} .nav-center{display:none;}
+            .main{padding:32px 22px 60px;}
+            .hero-body{padding:0 28px 40px;} .hero-h1{font-size:38px;}
+            .hero-stats{display:none;}
+        }
+        @media(max-width:600px){
+            .bid-details{grid-template-columns:repeat(2,1fr);}
+            .bid-actions{flex-wrap:wrap;}
+            .bid-card-banner{height:90px;}
+        }
     </style>
 </head>
 <body>
-<div class="bg-grid"></div>
-<div class="bg-warm"></div>
 
-    <nav class="navbar">
-        <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">
-            <div class="navbar-brand-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            </div>
-            House-Forge
+<!-- ── NAV ── -->
+<nav class="nav">
+    <a href="{{ url_for('user.dashboard') }}" class="nav-logo">
+        <div class="nav-logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <span class="nav-logo-name">House<b>-Forge</b></span>
+    </a>
+
+    <div class="nav-center">
+        <a href="{{ url_for('user.dashboard') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
         </a>
-        <div class="navbar-menu">
-            <a href="{{ url_for('user.dashboard') }}">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                Dashboard
-            </a>
-            <a href="{{ url_for('user.projects') }}">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                Projects
-            </a>
-            <a href="{{ url_for('user.all_bids') }}" class="nav-active">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                Bids
-            </a>
-            <a href="{{ url_for('user.my_orders') }}">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                Orders
-            </a>
-            <a href="{{ url_for('user.messages') }}" style="position:relative;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                Messages
-                <span class="badge-notification" id="messagesBadge"></span>
-            </a>
-            <div class="nav-divider"></div>
-            <a href="{{ url_for('user.profile') }}" style="padding:8px 9px;">
+        <a href="{{ url_for('user.projects') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Projects
+        </a>
+        <a href="{{ url_for('user.all_bids') }}" class="nlink active" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Bids
+            <span class="npip amber" id="bidsBadge"></span>
+        </a>
+        <a href="{{ url_for('user.my_orders') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Orders
+        </a>
+        <a href="{{ url_for('user.messages') }}" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Messages
+            <span class="npip" id="messagesBadge"></span>
+        </a>
+    </div>
+
+    <div class="nav-right">
+        <a href="{{ url_for('user.profile') }}" class="nav-profile">
+            <div class="nav-av">
                 {% if user_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile">
                 {% else %}
-                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
+                    {{ current_user.name[0].upper() if current_user.name else 'U' }}
                 {% endif %}
-            </a>
-            <a href="{{ url_for('auth.logout') }}" class="logout-link">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                Sign Out
-            </a>
-        </div>
-    </nav>
-
-    <div class="container">
-
-        <!-- PAGE HEADER -->
-        <div class="page-header">
-            <div class="header-left">
-                <div class="header-eyebrow">Contractor Bids</div>
-                <h1>My Bids</h1>
-                <p>Review all contractor bids across your projects — compare costs, timelines, and accept or reject from one place.</p>
             </div>
-            <div class="header-right">
-                <div class="header-bid-icon">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                </div>
-            </div>
+            <span class="nav-uname">{{ current_user.name }}</span>
+        </a>
+        <div class="ndiv"></div>
+        <a href="{{ url_for('auth.logout') }}" class="nav-out">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+        </a>
+    </div>
+</nav>
+
+<div class="shell">
+
+    <!-- ── HERO ── -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-body">
+            <div class="hero-tag"><span class="hero-tag-ln"></span> Contractor Bids</div>
+            <h1 class="hero-h1">My <em>Bids</em></h1>
+            <p class="hero-sub">Every bid across your projects in one place — compare costs, timelines, and make decisions with confidence.</p>
         </div>
+        <div class="hero-stats">
+            <div class="hstat"><div class="hstat-n gold">{{ stats.total }}</div><div class="hstat-l">Total Bids</div></div>
+            <div class="hstat"><div class="hstat-n amber">{{ stats.pending }}</div><div class="hstat-l">Pending</div></div>
+            <div class="hstat"><div class="hstat-n green">{{ stats.accepted }}</div><div class="hstat-l">Accepted</div></div>
+            <div class="hstat"><div class="hstat-n red">{{ stats.rejected }}</div><div class="hstat-l">Rejected</div></div>
+        </div>
+    </section>
+
+    <main class="main">
 
         <!-- ALERTS -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}{% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
+            <div class="alert alert-{{ category }}">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                {{ message }}
+            </div>
             {% endfor %}{% endif %}
         {% endwith %}
 
-        <!-- STATS -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon-wrap total">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <!-- FILTER -->
+        <div class="fu d1">
+            <div class="sec-lbl">Filter Bids</div>
+            <div class="filter-row">
+                <div class="ftab active" onclick="filterBids('all', this)">
+                    All &nbsp;<span style="opacity:.55;font-weight:400;">({{ stats.total }})</span>
                 </div>
-                <div class="stat-number">{{ stats.total }}</div>
-                <div class="stat-label">Total Bids</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon-wrap pending">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <div class="ftab" onclick="filterBids('pending', this)">
+                    <span class="ftab-dot" style="background:var(--amber);box-shadow:0 0 6px var(--amber);"></span>
+                    Pending &nbsp;<span style="opacity:.55;font-weight:400;">({{ stats.pending }})</span>
                 </div>
-                <div class="stat-number">{{ stats.pending }}</div>
-                <div class="stat-label">Pending</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon-wrap accepted">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <div class="ftab" onclick="filterBids('accepted', this)">
+                    <span class="ftab-dot" style="background:var(--green);box-shadow:0 0 6px var(--green);"></span>
+                    Accepted &nbsp;<span style="opacity:.55;font-weight:400;">({{ stats.accepted }})</span>
                 </div>
-                <div class="stat-number">{{ stats.accepted }}</div>
-                <div class="stat-label">Accepted</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon-wrap rejected">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <div class="ftab" onclick="filterBids('rejected', this)">
+                    <span class="ftab-dot" style="background:var(--red);box-shadow:0 0 6px var(--red);"></span>
+                    Rejected &nbsp;<span style="opacity:.55;font-weight:400;">({{ stats.rejected }})</span>
                 </div>
-                <div class="stat-number">{{ stats.rejected }}</div>
-                <div class="stat-label">Rejected</div>
             </div>
         </div>
 
-        <!-- FILTER TABS -->
-        <div class="filter-bar">
-            <span class="filter-label">Filter</span>
-            <div class="tab active" onclick="filterBids('all', this)">
-                All <span style="opacity:0.7;font-weight:400;">({{ stats.total }})</span>
-            </div>
-            <div class="tab" onclick="filterBids('pending', this)">
-                <span class="tab-dot" style="background:#D97706;"></span>
-                Pending <span style="opacity:0.7;font-weight:400;">({{ stats.pending }})</span>
-            </div>
-            <div class="tab" onclick="filterBids('accepted', this)">
-                <span class="tab-dot" style="background:#059669;"></span>
-                Accepted <span style="opacity:0.7;font-weight:400;">({{ stats.accepted }})</span>
-            </div>
-            <div class="tab" onclick="filterBids('rejected', this)">
-                <span class="tab-dot" style="background:#DC2626;"></span>
-                Rejected <span style="opacity:0.7;font-weight:400;">({{ stats.rejected }})</span>
-            </div>
-        </div>
-
-        <!-- BIDS LIST -->
+        <!-- BID CARDS -->
         {% if bids %}
             {% for bid in bids %}
-            <div class="bid-card" data-status="{{ bid.status }}" data-index="{{ loop.index0 }}">
+            {% set banner_idx = ((loop.index0 % 6) + 1) %}
+            <div class="bid-card fu" data-status="{{ bid.status }}" data-index="{{ loop.index0 }}">
 
-                <!-- ✅ CHANGED: now links to project detail instead of project bids -->
-                <a href="{{ url_for('user.view_project', project_id=bid.project_id) }}" class="project-tag">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                    {{ bid.project_title }}
-                </a>
+                <!-- Banner image -->
+                <div class="bid-card-banner">
+                    <div class="bid-card-banner-img banner-{{ banner_idx }}"></div>
+                    <div class="bid-card-banner-overlay">
+                        <a href="{{ url_for('user.view_project', project_id=bid.project_id) }}" class="project-tag">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                            {{ bid.project_title }}
+                        </a>
+                        <span class="status-badge s-{{ bid.status }}">
+                            <span class="sdot"></span>
+                            {% if bid.status == 'pending' %}Pending
+                            {% elif bid.status == 'accepted' %}Accepted
+                            {% else %}Rejected{% endif %}
+                        </span>
+                    </div>
+                </div>
 
-                <div class="bid-header">
-                    <div class="contractor-info">
-                        <a href="{{ url_for('user.view_contractor', contractor_id=bid.contractor_id) }}"
-   class="contractor-avatar"
-   title="View {{ bid.contractor_company or bid.contractor_name }}'s profile"
-   style="text-decoration:none; cursor:pointer; transition: transform 0.2s, box-shadow 0.2s;"
-   onmouseover="this.style.transform='scale(1.08)';this.style.boxShadow='0 4px 16px rgba(184,134,78,0.35)';"
-   onmouseout="this.style.transform='';this.style.boxShadow='';">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-</a>
-                        <div>
+                <!-- Card body -->
+                <div class="bid-body">
+
+                    <!-- Contractor -->
+                    <div class="contractor-row">
+                        <a href="{{ url_for('user.view_contractor', contractor_id=bid.contractor_id) }}" class="contractor-av" title="View contractor profile">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                        </a>
+                        <div class="contractor-info">
                             <div class="contractor-name">{{ bid.contractor_company or bid.contractor_name }}</div>
                             <div class="contractor-sub">{{ bid.contractor_name if bid.contractor_company else 'Professional Contractor' }}</div>
                             <div class="contractor-rating">
-                                <span class="star-icon">★</span>
-                                {{ "%.1f"|format(bid.contractor_rating or 0) }} &nbsp;·&nbsp; {{ bid.contractor_experience or 0 }} yrs experience
+                                <span class="star">★</span>
+                                {{ "%.1f"|format(bid.contractor_rating or 0) }}
+                                <span style="color:var(--ghost);">·</span>
+                                <span style="color:var(--ghost);">{{ bid.contractor_experience or 0 }} yrs experience</span>
                             </div>
                         </div>
                     </div>
-                    <span class="status-badge status-{{ bid.status }}">
-                        <span class="status-dot"></span>
-                        {% if bid.status == 'pending' %}Pending
-                        {% elif bid.status == 'accepted' %}Accepted
-                        {% else %}Rejected{% endif %}
-                    </span>
-                </div>
 
-                <div class="bid-details">
-                    <div class="detail-item">
-                        <div class="detail-label">Total Cost</div>
-                        <div class="detail-value accent">₹{{ "{:,.0f}".format(bid.total_cost or 0) }}</div>
+                    <!-- Cost grid -->
+                    <div class="bid-details">
+                        <div class="detail-cell">
+                            <div class="d-label">Total Cost</div>
+                            <div class="d-value gold">₹{{ "{:,.0f}".format(bid.total_cost or 0) }}</div>
+                        </div>
+                        <div class="detail-cell">
+                            <div class="d-label">Duration</div>
+                            <div class="d-value">{{ bid.duration_months or '—' }}<span class="d-unit">mo</span></div>
+                        </div>
+                        <div class="detail-cell">
+                            <div class="d-label">Materials</div>
+                            <div class="d-value">₹{{ "{:,.0f}".format(bid.material_cost or 0) }}</div>
+                        </div>
+                        <div class="detail-cell">
+                            <div class="d-label">Labour</div>
+                            <div class="d-value">₹{{ "{:,.0f}".format(bid.labor_cost or 0) }}</div>
+                        </div>
                     </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Duration</div>
-                        <div class="detail-value">{{ bid.duration_months or '—' }}<span style="font-family:'Outfit',sans-serif;font-size:12px;color:var(--text-muted);margin-left:3px;">mo</span></div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Materials</div>
-                        <div class="detail-value">₹{{ "{:,.0f}".format(bid.material_cost or 0) }}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Labour</div>
-                        <div class="detail-value">₹{{ "{:,.0f}".format(bid.labor_cost or 0) }}</div>
-                    </div>
-                </div>
 
-                {% if bid.get('proposal') %}
-                <div class="bid-proposal">
-                    <div class="bid-proposal-label">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                        Contractor Proposal
+                    <!-- Proposal -->
+                    {% if bid.get('proposal') %}
+                    <div class="bid-proposal">
+                        <div class="proposal-lbl">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            Contractor Proposal
+                        </div>
+                        <div class="proposal-text">{{ bid.proposal }}</div>
                     </div>
-                    {{ bid.proposal }}
-                </div>
-                {% endif %}
-
-                <div class="bid-timestamp">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    Submitted: {{ bid.created_at.strftime('%d %b %Y, %I:%M %p') if bid.created_at else 'N/A' }}
-                </div>
-
-                <div class="bid-actions">
-                    {% if bid.status == 'pending' %}
-                    <form method="POST" action="{{ url_for('user.accept_bid', bid_id=bid.id) }}" onsubmit="return confirm('Accept this bid? All other bids for this project will be rejected.');" style="flex:1;">
-                        <button type="submit" class="btn btn-accept" style="width:100%;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            Accept Bid
-                        </button>
-                    </form>
-                    <form method="POST" action="{{ url_for('user.reject_bid', bid_id=bid.id) }}" onsubmit="return confirm('Reject this bid?');" style="flex:1;">
-                        <button type="submit" class="btn btn-reject" style="width:100%;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                            Reject Bid
-                        </button>
-                    </form>
                     {% endif %}
-                </div>
 
+                    <!-- Timestamp -->
+                    <div class="bid-timestamp">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Submitted {{ bid.created_at.strftime('%d %b %Y, %I:%M %p') if bid.created_at else 'N/A' }}
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="bid-actions">
+                        {% if bid.status == 'pending' %}
+                        <form method="POST" action="{{ url_for('user.accept_bid', bid_id=bid.id) }}"
+                              onsubmit="return confirm('Accept this bid? All other bids for this project will be rejected.');"
+                              style="flex:1; display:flex;">
+                            <button type="submit" class="btn btn-accept" style="width:100%;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Accept Bid
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('user.reject_bid', bid_id=bid.id) }}"
+                              onsubmit="return confirm('Reject this bid?');"
+                              style="flex:1; display:flex;">
+                            <button type="submit" class="btn btn-reject" style="width:100%;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                Reject
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                </div><!-- /bid-body -->
             </div>
             {% endfor %}
 
         {% else %}
-        <div class="empty-state">
-            <div class="empty-icon-wrap">
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <div class="empty-state fu d2">
+            <div class="empty-img-wrap"></div>
+            <div class="empty-body">
+                <div class="empty-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <h2>No Bids Yet</h2>
+                <p>No contractors have submitted bids on your projects yet. Share your projects to start receiving bids.</p>
             </div>
-            <h2>No Bids Yet</h2>
-            <p>No contractors have submitted bids on your projects yet.<br>Share your projects with contractors to start receiving bids.</p>
         </div>
         {% endif %}
 
-    </div>
+    </main>
+</div>
 
-    <script>
-        function filterBids(status, tabEl) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            tabEl.classList.add('active');
-            document.querySelectorAll('.bid-card').forEach((card, i) => {
-                const show = status === 'all' || card.dataset.status === status;
-                if (show) {
-                    card.style.display = '';
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(14px)';
-                    setTimeout(() => {
-                        card.style.transition = 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1)';
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0)';
-                    }, i * 50);
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        function updateBadge(url, id) {
-            fetch(url).then(r => {
-                if (!r.ok) return null;
-                return r.headers.get('content-type')?.includes('application/json') ? r.json() : null;
-            }).then(data => {
-                if (!data) return;
-                const b = document.getElementById(id);
-                if (!b) return;
-                b.style.display = data.count > 0 ? 'flex' : 'none';
-                if (data.count > 0) b.textContent = data.count;
-            }).catch(() => {});
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            updateBadge('/user/messages/unread-count', 'messagesBadge');
-            document.querySelectorAll('.bid-card').forEach(card => {
-                const idx = parseInt(card.dataset.index || '0', 10);
-                card.style.animationDelay = (idx * 0.07) + 's';
-            });
+<script>
+    function filterBids(status, tabEl) {
+        document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+        tabEl.classList.add('active');
+        document.querySelectorAll('.bid-card').forEach((card, i) => {
+            const show = status === 'all' || card.dataset.status === status;
+            if (show) {
+                card.style.display = '';
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(16px)';
+                setTimeout(() => {
+                    card.style.transition = 'opacity .35s ease, transform .35s cubic-bezier(.22,1,.36,1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, i * 55);
+            } else {
+                card.style.display = 'none';
+            }
         });
-        setInterval(() => updateBadge('/user/messages/unread-count', 'messagesBadge'), 30000);
-    </script>
+    }
+
+    function updateBadge(ep, id) {
+        fetch(ep).then(r => {
+            if (!r.ok) return null;
+            return r.headers.get('content-type')?.includes('application/json') ? r.json() : null;
+        }).then(d => {
+            if (!d) return;
+            const b = document.getElementById(id);
+            if (!b) return;
+            b.style.display = d.count > 0 ? 'block' : 'none';
+        }).catch(() => {});
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateBadge('/user/messages/unread-count', 'messagesBadge');
+        updateBadge('/user/bids/pending-count', 'bidsBadge');
+        document.querySelectorAll('.bid-card').forEach(card => {
+            const idx = parseInt(card.dataset.index || '0', 10);
+            card.style.animationDelay = (idx * 0.07) + 's';
+        });
+    });
+    setInterval(() => {
+        updateBadge('/user/messages/unread-count', 'messagesBadge');
+        updateBadge('/user/bids/pending-count', 'bidsBadge');
+    }, 30000);
+</script>
 </body>
 </html>

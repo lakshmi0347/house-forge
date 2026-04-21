@@ -4,261 +4,282 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Project — House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg:           #F0EBE1;
-            --bg-card:      #FAF6EF;
-            --bg-card2:     #F4EEE3;
-            --sand:         #E8DFD0;
-            --stone:        #D4C8B8;
-            --accent:       #B8864E;
-            --accent2:      #D4A96A;
-            --accent-dark:  #96693A;
-            --accent-light: #FBF3E4;
-            --text-primary: #1A1612;
-            --text-secondary:#4A3F35;
-            --text-muted:   #8A7A6E;
-            --success:      #065F46;
-            --success-bg:   #D1FAE5;
-            --info:         #0369A1;
-            --info-bg:      #E0F2FE;
-            --blue:         #1E40AF;
-            --blue-light:   #DBEAFE;
-            --red:          #991B1B;
-            --red-bg:       #FEE2E2;
+            --void:    #0C0B09;
+            --ink:     #141210;
+            --deep:    #1C1A16;
+            --surface: #242118;
+            --rim:     rgba(255,255,255,0.07);
+            --rim2:    rgba(255,255,255,0.04);
+
+            --gold:    #D4924A;
+            --gold2:   #F0C07A;
+            --gold3:   #B8743A;
+            --glow:    rgba(212,146,74,0.22);
+            --soft:    rgba(212,146,74,0.10);
+            --accent-light: rgba(212,146,74,0.13);
+
+            --white:   #FFFFFF;
+            --off:     #F2EDE6;
+            --fog:     rgba(242,237,230,0.55);
+            --ghost:   rgba(242,237,230,0.28);
+            --muted:   rgba(242,237,230,0.45);
+
+            --green:  #4CAF82; --green-bg: rgba(76,175,130,0.13);
+            --blue:   #4A8FD4; --blue-bg:  rgba(74,143,212,0.13);
+            --amber:  #D49440; --amber-bg: rgba(212,148,64,0.13);
+            --red:    #EF4444; --red-bg:   rgba(239,68,68,0.13);
+
+            --card-bg:   rgba(28,26,22,0.85);
+            --card-border: rgba(255,255,255,0.08);
+            --input-bg:  rgba(36,33,24,0.9);
+            --input-border: rgba(212,146,74,0.22);
         }
 
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
 
         :focus-visible {
-            outline: 2.5px solid var(--accent);
+            outline: 2px solid var(--gold);
             outline-offset: 3px;
             border-radius: 4px;
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg);
+            font-family: 'DM Sans', sans-serif;
+            background: var(--void);
+            color: var(--off);
             min-height: 100vh;
-            color: var(--text-primary);
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ── LAYERED BACKGROUND (mirrors dashboard) ── */
+        /* ── BACKGROUND EFFECTS ── */
         body::before {
             content: '';
             position: fixed; inset: 0; z-index: 0; pointer-events: none;
             background: url('/static/images/Home.jpg') no-repeat center center / cover;
-            opacity: 0.28;
-            filter: saturate(0.3) sepia(0.85) hue-rotate(-15deg) brightness(0.95);
+            opacity: 0.06;
+            filter: saturate(0.2) sepia(1) brightness(0.4);
         }
-        body::after {
-            content: '';
+        .bg-noise {
             position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: radial-gradient(ellipse 100% 100% at 50% 50%,
-                rgba(184,134,78,0.12) 0%,
-                rgba(240,235,225,0.0) 55%,
-                rgba(240,235,225,0.45) 100%);
+            background-image:
+                radial-gradient(ellipse 80% 50% at 20% 20%, rgba(212,146,74,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 60% at 80% 80%, rgba(212,146,74,0.04) 0%, transparent 60%);
         }
         .bg-grid {
             position: fixed; inset: 0; z-index: 0; pointer-events: none;
             background-image:
-                linear-gradient(rgba(184,134,78,0.045) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(184,134,78,0.045) 1px, transparent 1px);
-            background-size: 48px 48px;
-        }
-        .bg-warm {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: rgba(184,134,78,0.10);
-            mix-blend-mode: multiply;
+                linear-gradient(rgba(212,146,74,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(212,146,74,0.03) 1px, transparent 1px);
+            background-size: 52px 52px;
         }
 
         /* ── SKIP LINK ── */
         .skip-link {
             position: absolute; top: -100%; left: 16px;
-            background: var(--accent); color: #fff;
+            background: var(--gold); color: var(--void);
             padding: 8px 16px; border-radius: 0 0 8px 8px;
             font-size: 14px; font-weight: 600; text-decoration: none;
-            z-index: 200; transition: top 0.2s;
+            z-index: 400; transition: top 0.2s;
         }
         .skip-link:focus { top: 0; }
 
-        /* ── NAVBAR ── */
-        .navbar {
-            background: rgba(250,246,239,0.94);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--stone);
-            padding: 0 44px; height: 66px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 1px 0 rgba(184,134,78,0.12), 0 4px 20px rgba(28,22,18,0.05);
+        /* ══════════════════════════════
+           NAVBAR — EXACT DASHBOARD STYLE
+        ══════════════════════════════ */
+        .nav {
+            position: sticky; top: 0; z-index: 300;
+            height: 66px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 52px;
+            background: rgba(12,11,9,0.88);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border-bottom: 1px solid var(--rim);
         }
-        .navbar-brand {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px; font-weight: 700;
-            color: var(--text-primary);
-            display: flex; align-items: center; gap: 11px;
-            text-decoration: none; letter-spacing: 0.3px;
-        }
-        .navbar-brand-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 10px;
+        .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .nav-logo-icon {
+            width: 40px; height: 40px; border-radius: 9px;
+            border: 1.5px solid var(--gold);
             display: flex; align-items: center; justify-content: center;
-            color: #fff;
-            box-shadow: 0 2px 10px rgba(184,134,78,0.35);
-            position: relative; overflow: hidden;
+            color: var(--gold); position: relative; overflow: hidden;
         }
-        .navbar-brand-icon::after {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent);
+        .nav-logo-icon::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(212,146,74,0.18), transparent 70%);
         }
-        .navbar-menu { display: flex; align-items: center; gap: 2px; }
-        .navbar-menu a {
-            color: var(--text-secondary); text-decoration: none;
-            padding: 7px 12px; border-radius: 9px;
-            font-size: 13.5px; font-weight: 500;
-            transition: color 0.2s, background 0.2s;
+        .nav-logo-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px; font-weight: 800; color: var(--white); letter-spacing: -0.4px;
+        }
+        .nav-logo-name b { color: var(--gold); font-weight: 800; }
+
+        .nav-center {
+            position: absolute; left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; gap: 2px;
+        }
+        .nlink {
             display: flex; align-items: center; gap: 6px;
-            position: relative;
+            padding: 7px 16px; border-radius: 8px;
+            text-decoration: none; font-size: 13.5px; font-weight: 500;
+            color: var(--ghost); transition: color .18s, background .18s;
+            position: relative; white-space: nowrap;
         }
-        .navbar-menu a:hover, .navbar-menu a.nav-active {
-            color: var(--accent); background: var(--accent-light);
+        .nlink:hover { color: var(--off); background: var(--rim2); }
+        .nlink.active { color: var(--gold); }
+        .nlink.active::after {
+            content: ''; position: absolute; bottom: -1px; left: 16px; right: 16px;
+            height: 2px; background: var(--gold); border-radius: 2px;
+            box-shadow: 0 0 10px var(--glow);
         }
-        .badge-notification {
-            position: absolute; top: 3px; right: 3px;
-            background: #DC2626; color: white;
-            border-radius: 50%; width: 15px; height: 15px;
-            display: none; align-items: center; justify-content: center;
-            font-size: 8px; font-weight: 700;
-            border: 2px solid var(--bg-card);
+        .npip {
+            position: absolute; top: 5px; right: 5px;
+            width: 6px; height: 6px; border-radius: 50%;
+            background: #EF4444; border: 1.5px solid var(--void);
+            display: none;
         }
-        .nav-icon-wrap { position: relative; padding: 7px 10px; }
-        .profile-pic {
-            width: 32px; height: 32px; border-radius: 50%;
-            object-fit: cover; border: 2px solid var(--stone); display: block;
-            transition: border-color 0.2s;
+        .npip.amber { background: var(--amber); }
+
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+        .nav-profile {
+            display: flex; align-items: center; gap: 9px;
+            padding: 5px 14px 5px 5px; border-radius: 999px;
+            border: 1px solid var(--rim); text-decoration: none;
+            transition: border-color .2s, background .2s;
         }
-        .profile-pic:hover { border-color: var(--accent); }
-        .profile-placeholder {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            color: var(--accent); display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 13px; border: 2px solid var(--stone);
-            transition: border-color 0.2s;
+        .nav-profile:hover { border-color: var(--gold); background: var(--soft); }
+        .nav-av {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: var(--gold3); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
         }
-        .profile-placeholder:hover { border-color: var(--accent); }
-        .nav-divider { width: 1px; height: 20px; background: var(--stone); margin: 0 5px; }
-        .logout-link {
-            color: var(--text-muted) !important; text-decoration: none;
-            padding: 7px 12px; border-radius: 9px;
-            font-size: 13px; font-weight: 500;
-            display: inline-flex; align-items: center; gap: 5px;
-            transition: color 0.2s, background 0.2s;
+        .nav-av img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; display: block; }
+        .nav-uname { font-size: 13px; font-weight: 500; color: var(--off); }
+        .ndiv { width: 1px; height: 22px; background: var(--rim); }
+        .nav-out {
+            display: flex; align-items: center; gap: 6px;
+            text-decoration: none; font-size: 13px; font-weight: 500;
+            color: var(--ghost); padding: 7px 14px; border-radius: 8px;
+            transition: color .18s, background .18s;
         }
-        .logout-link:hover { color: #DC2626 !important; background: #FEF2F2; }
+        .nav-out:hover { color: #EF4444; background: rgba(239,68,68,0.08); }
 
         /* ── LAYOUT ── */
         .container {
-            max-width: 960px; margin: 0 auto;
-            padding: 32px 24px 72px; position: relative; z-index: 1;
+            max-width: 980px; margin: 0 auto;
+            padding: 36px 28px 80px;
+            position: relative; z-index: 1;
         }
 
-        /* ── PAGE BANNER ── */
+        /* ── PAGE HEADER ── */
         .page-header {
-            background: rgba(250,244,234,0.82);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.55);
-            border-radius: 22px;
+            background: rgba(28,26,22,0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--rim);
+            border-radius: 20px;
             padding: 32px 40px;
-            margin-bottom: 22px;
+            margin-bottom: 24px;
             position: relative; overflow: hidden;
-            box-shadow: 0 4px 32px rgba(150,105,58,0.10), inset 0 1px 0 rgba(255,248,235,0.7);
+            box-shadow: 0 4px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
             animation: slideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
             display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;
         }
         .page-header::before {
             content: '';
-            position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-            background: linear-gradient(180deg, var(--accent), var(--accent2));
-            border-radius: 22px 0 0 22px;
+            position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+            background: linear-gradient(180deg, var(--gold), var(--gold2));
+            border-radius: 20px 0 0 20px;
+        }
+        .page-header::after {
+            content: '';
+            position: absolute; top: -60px; right: -60px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(212,146,74,0.10) 0%, transparent 70%);
+            pointer-events: none;
         }
         .page-header-text { position: relative; z-index: 1; }
         .banner-eyebrow {
-            font-size: 11px; font-weight: 600; letter-spacing: 2px;
-            text-transform: uppercase; color: var(--accent);
-            margin-bottom: 8px; display: flex; align-items: center; gap: 7px;
+            font-size: 10px; font-weight: 600; letter-spacing: 2.5px;
+            text-transform: uppercase; color: var(--gold);
+            margin-bottom: 10px; display: flex; align-items: center; gap: 9px;
         }
         .banner-eyebrow::before {
-            content: ''; width: 22px; height: 1.5px;
-            background: var(--accent); display: inline-block;
+            content: ''; width: 22px; height: 1px;
+            background: var(--gold); display: inline-block;
         }
         .page-header h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 28px; font-weight: 700;
-            color: var(--text-primary); margin-bottom: 6px; letter-spacing: -0.3px;
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 30px; font-weight: 400;
+            color: var(--white); margin-bottom: 6px; letter-spacing: -0.5px;
         }
-        .page-header p { color: var(--text-secondary); font-size: 13.5px; }
+        .page-header p { color: var(--muted); font-size: 13.5px; line-height: 1.6; }
         .divider {
-            width: 36px; height: 3px;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            border-radius: 2px; margin: 8px 0 10px;
+            width: 36px; height: 2px;
+            background: linear-gradient(90deg, var(--gold), var(--gold2));
+            border-radius: 2px; margin: 10px 0 12px;
         }
 
         /* ── FORM CARD ── */
         .form-card {
-            background: rgba(255,255,255,0.70);
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            border: 1px solid rgba(255,255,255,0.80);
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--card-border);
             border-radius: 18px; padding: 28px 34px;
             margin-bottom: 18px;
-            box-shadow: 0 4px 32px rgba(150,105,58,0.09), inset 0 1px 0 rgba(255,255,255,0.95);
-            transition: box-shadow 0.25s;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+            transition: box-shadow 0.25s, border-color 0.25s;
             animation: slideUp 0.45s 0.1s cubic-bezier(0.22,1,0.36,1) both;
         }
-        .form-card:hover { box-shadow: 0 8px 40px rgba(150,105,58,0.13); }
+        .form-card:hover {
+            box-shadow: 0 8px 48px rgba(0,0,0,0.45);
+            border-color: rgba(212,146,74,0.12);
+        }
 
         /* ── SECTION TITLE ── */
         .section-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 18px; font-weight: 700; color: var(--text-primary);
-            margin-bottom: 20px; padding-bottom: 14px;
-            border-bottom: 1px solid rgba(212,186,150,0.3);
+            font-family: 'DM Serif Display', serif;
+            font-size: 19px; font-weight: 400; color: var(--white);
+            margin-bottom: 22px; padding-bottom: 16px;
+            border-bottom: 1px solid var(--rim);
             display: flex; align-items: center; gap: 10px;
         }
         .section-badge {
-            font-family: 'Outfit', sans-serif;
-            font-size: 10px; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 0.8px;
-            background: var(--accent-light); color: var(--accent-dark);
-            padding: 3px 10px; border-radius: 20px;
-            border: 1px solid rgba(184,134,78,0.25);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 9.5px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1px;
+            background: var(--accent-light);
+            color: var(--gold2);
+            padding: 3px 10px; border-radius: 999px;
+            border: 1px solid rgba(212,146,74,0.25);
         }
 
         /* ── SUBSECTION ── */
-        .subsection { margin-bottom: 24px; }
+        .subsection { margin-bottom: 26px; }
         .subsection:last-child { margin-bottom: 0; }
         .subsection-header {
             display: flex; align-items: center; gap: 10px;
             margin-bottom: 16px; padding: 9px 14px;
-            background: rgba(232,223,208,0.45);
+            background: rgba(212,146,74,0.07);
             border-radius: 9px;
-            border-left: 3px solid var(--accent);
+            border-left: 2.5px solid var(--gold);
         }
         .subsection-icon {
             width: 22px; height: 22px;
             background: var(--accent-light); border-radius: 6px;
             display: flex; align-items: center; justify-content: center;
-            color: var(--accent); flex-shrink: 0;
+            color: var(--gold); flex-shrink: 0;
         }
         .subsection-title {
-            font-size: 11px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.8px;
-            color: var(--text-secondary);
+            font-size: 10.5px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--muted);
         }
 
         /* ── FORM ELEMENTS ── */
@@ -270,151 +291,150 @@
 
         .form-label {
             display: block; margin-bottom: 7px;
-            color: var(--text-secondary); font-weight: 600;
-            font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;
+            color: var(--muted); font-weight: 600;
+            font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.8px;
         }
-        .form-label .required { color: var(--accent); margin-left: 2px; }
+        .form-label .required { color: var(--gold); margin-left: 2px; }
 
         .form-control {
             width: 100%; padding: 11px 14px;
-            border: 1.5px solid rgba(212,186,150,0.5);
+            border: 1.5px solid var(--input-border);
             border-radius: 9px;
-            font-size: 13.5px; font-family: 'Outfit', sans-serif;
-            background: rgba(255,255,255,0.65);
-            color: var(--text-primary);
+            font-size: 13.5px; font-family: 'DM Sans', sans-serif;
+            background: var(--input-bg);
+            color: var(--off);
             transition: all 0.2s;
             appearance: none; -webkit-appearance: none;
         }
+        .form-control::placeholder { color: rgba(242,237,230,0.22); }
         .form-control:focus {
-            outline: none; border-color: var(--accent);
-            background: rgba(255,255,255,0.9);
-            box-shadow: 0 0 0 3px rgba(184,134,78,0.14);
+            outline: none; border-color: var(--gold);
+            background: rgba(36,33,24,0.98);
+            box-shadow: 0 0 0 3px rgba(212,146,74,0.12);
         }
         select.form-control {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7A6E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23D4924A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 14px center;
             padding-right: 36px; cursor: pointer;
         }
+        select.form-control option { background: #1C1A16; color: var(--off); }
         textarea.form-control { resize: vertical; min-height: 100px; }
-        .form-hint { font-size: 11px; color: var(--text-muted); margin-top: 5px; line-height: 1.4; }
+        .form-hint { font-size: 11px; color: rgba(242,237,230,0.32); margin-top: 5px; line-height: 1.5; }
 
         /* ── PROPERTY TYPE CARDS ── */
         .property-type-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
         .prop-card {
             padding: 18px 12px;
-            border: 1.5px solid rgba(212,186,150,0.4);
-            background: rgba(255,255,255,0.55);
-            backdrop-filter: blur(10px);
+            border: 1.5px solid var(--rim);
+            background: rgba(36,33,24,0.6);
             border-radius: 12px; text-align: center;
             cursor: pointer; transition: all 0.2s;
             display: flex; flex-direction: column; align-items: center; gap: 8px;
         }
         .prop-card input[type="radio"] { display: none; }
-        .prop-card:hover { border-color: var(--accent); background: var(--accent-light); }
+        .prop-card:hover { border-color: var(--gold); background: var(--accent-light); }
         .prop-card.selected {
-            border-color: var(--accent);
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff;
+            border-color: var(--gold);
+            background: linear-gradient(135deg, var(--gold3), var(--gold));
+            color: var(--void);
         }
-        .prop-card.selected .prop-icon-wrap { background: rgba(0,0,0,0.12); color: #fff; }
-        .prop-card.selected .prop-label { color: #fff; }
+        .prop-card.selected .prop-icon-wrap { background: rgba(0,0,0,0.18); color: var(--void); }
+        .prop-card.selected .prop-label { color: var(--void); }
         .prop-icon-wrap {
             width: 36px; height: 36px; border-radius: 10px;
-            background: var(--accent-light); color: var(--accent);
+            background: var(--accent-light); color: var(--gold);
             display: flex; align-items: center; justify-content: center;
             transition: all 0.2s;
         }
-        .prop-label { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+        .prop-label { font-size: 12px; font-weight: 600; color: var(--off); }
 
         /* ── BUDGET CARDS ── */
         .budget-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
         .budget-card {
             padding: 22px 16px;
-            border: 1.5px solid rgba(212,186,150,0.4);
-            background: rgba(255,255,255,0.55);
-            backdrop-filter: blur(10px);
+            border: 1.5px solid var(--rim);
+            background: rgba(36,33,24,0.6);
             border-radius: 14px; text-align: center;
             cursor: pointer; transition: all 0.25s;
             display: flex; flex-direction: column; align-items: center; gap: 8px;
         }
         .budget-card input[type="radio"] { display: none; }
-        .budget-card:hover { border-color: var(--accent); background: var(--accent-light); }
+        .budget-card:hover { border-color: var(--gold); background: var(--accent-light); }
         .budget-card.selected {
-            border-color: var(--accent);
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff;
+            border-color: var(--gold);
+            background: linear-gradient(135deg, var(--gold3), var(--gold));
         }
-        .budget-card.selected .budget-icon-wrap { background: rgba(0,0,0,0.12); color: #fff; }
+        .budget-card.selected .budget-icon-wrap { background: rgba(0,0,0,0.18); color: var(--void); }
         .budget-card.selected .budget-label,
-        .budget-card.selected .budget-sub { color: #fff; }
+        .budget-card.selected .budget-sub { color: var(--void); }
         .budget-icon-wrap {
             width: 40px; height: 40px; border-radius: 11px;
-            background: var(--accent-light); color: var(--accent);
+            background: var(--accent-light); color: var(--gold);
             display: flex; align-items: center; justify-content: center;
             transition: all 0.2s;
         }
-        .budget-label { font-weight: 600; font-size: 14px; color: var(--text-primary); }
-        .budget-sub { font-size: 11px; color: var(--text-muted); }
+        .budget-label { font-weight: 600; font-size: 14px; color: var(--off); }
+        .budget-sub { font-size: 11px; color: var(--ghost); }
 
         /* ── TOGGLE GROUP ── */
         .toggle-group {
             display: flex; gap: 0;
-            border: 1.5px solid rgba(212,186,150,0.45);
+            border: 1.5px solid var(--input-border);
             border-radius: 9px; overflow: hidden;
         }
         .toggle-group input[type="radio"] { display: none; }
         .toggle-option {
             flex: 1; padding: 10px 16px; text-align: center;
             font-size: 13px; font-weight: 600; cursor: pointer;
-            transition: all 0.2s; color: var(--text-secondary);
-            background: rgba(255,255,255,0.55);
-            border-right: 1px solid rgba(212,186,150,0.35);
+            transition: all 0.2s; color: var(--muted);
+            background: rgba(36,33,24,0.6);
+            border-right: 1px solid var(--rim);
             user-select: none;
         }
         .toggle-option:last-child { border-right: none; }
         .toggle-group input[type="radio"]:checked + .toggle-option {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff;
+            background: linear-gradient(135deg, var(--gold3), var(--gold));
+            color: var(--void);
         }
 
         /* ── ADDON TILES ── */
         .addon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .addon-tile {
-            border: 1.5px solid rgba(212,186,150,0.4);
+            border: 1.5px solid var(--rim);
             border-radius: 12px; overflow: hidden; transition: all 0.2s;
-            background: rgba(255,255,255,0.45);
+            background: rgba(28,26,22,0.6);
         }
-        .addon-tile.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(184,134,78,0.15); }
+        .addon-tile.active { border-color: rgba(212,146,74,0.45); box-shadow: 0 0 0 1px rgba(212,146,74,0.12); }
         .addon-header {
             display: flex; align-items: center; gap: 10px;
-            padding: 12px 14px; background: rgba(232,223,208,0.4);
+            padding: 12px 14px; background: rgba(36,33,24,0.5);
             cursor: pointer; user-select: none;
         }
-        .addon-tile.active .addon-header { background: var(--accent-light); }
+        .addon-tile.active .addon-header { background: rgba(212,146,74,0.09); }
         .addon-checkbox {
             width: 18px; height: 18px;
-            border: 2px solid rgba(212,186,150,0.6); border-radius: 4px;
+            border: 1.5px solid var(--rim); border-radius: 4px;
             display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; transition: all 0.2s; color: #fff;
+            flex-shrink: 0; transition: all 0.2s; color: var(--void);
         }
         .addon-tile.active .addon-checkbox {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-color: var(--accent);
+            background: linear-gradient(135deg, var(--gold3), var(--gold));
+            border-color: var(--gold);
         }
         .addon-icon-wrap {
             width: 28px; height: 28px; border-radius: 7px;
-            background: var(--accent-light); color: var(--accent);
+            background: var(--accent-light); color: var(--gold);
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0; transition: all 0.2s;
         }
         .addon-tile.active .addon-icon-wrap {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff;
+            background: linear-gradient(135deg, var(--gold3), var(--gold));
+            color: var(--void);
         }
-        .addon-label { font-weight: 600; font-size: 13px; color: var(--text-primary); }
-        .addon-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
-        .addon-body { padding: 14px; background: rgba(255,255,255,0.6); display: none; }
+        .addon-label { font-weight: 600; font-size: 13px; color: var(--off); }
+        .addon-sub { font-size: 11px; color: var(--ghost); margin-top: 1px; }
+        .addon-body { padding: 14px; background: rgba(20,18,16,0.5); display: none; }
         .addon-tile.active .addon-body { display: block; }
 
         /* ── EXPANDED / VILLA / APARTMENT SECTIONS ── */
@@ -440,90 +460,92 @@
 
         /* ── VILLA BANNER ── */
         .villa-banner {
-            background: linear-gradient(135deg, #1C1917 0%, #3D2B1F 50%, #1C1917 100%);
+            background: linear-gradient(135deg, #0E0D0A 0%, #2A1F0F 50%, #0E0D0A 100%);
             border-radius: 18px; padding: 24px 30px; margin-bottom: 20px;
             display: flex; align-items: center; gap: 16px;
             position: relative; overflow: hidden;
-            border: 1px solid rgba(184,134,78,0.25);
+            border: 1px solid rgba(212,146,74,0.2);
+            box-shadow: 0 4px 32px rgba(0,0,0,0.4);
         }
         .villa-banner::before {
             content: '';
             position: absolute; top: -40px; right: -40px;
             width: 160px; height: 160px;
-            background: radial-gradient(circle, rgba(184,134,78,0.25) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(212,146,74,0.2) 0%, transparent 70%);
             pointer-events: none;
         }
         .villa-banner-icon {
             width: 48px; height: 48px; border-radius: 12px;
-            background: rgba(184,134,78,0.2); color: var(--accent);
+            background: rgba(212,146,74,0.15); color: var(--gold);
             display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
         .villa-banner-text h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 18px; font-weight: 700; color: #F7EDE2;
-            margin-bottom: 3px;
+            font-family: 'DM Serif Display', serif;
+            font-size: 18px; font-weight: 400; color: var(--white); margin-bottom: 3px;
         }
-        .villa-banner-text p { font-size: 12px; color: rgba(247,237,226,0.6); }
+        .villa-banner-text p { font-size: 12px; color: var(--ghost); }
         .villa-badge {
             margin-left: auto;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff; font-size: 10px; font-weight: 700;
+            background: linear-gradient(135deg, var(--gold3), var(--gold));
+            color: var(--void); font-size: 10px; font-weight: 700;
             text-transform: uppercase; letter-spacing: 1px;
-            padding: 5px 12px; border-radius: 20px; flex-shrink: 0;
+            padding: 5px 12px; border-radius: 999px; flex-shrink: 0;
         }
         .subsection-header.villa-accent {
-            border-left-color: var(--accent-dark);
-            background: linear-gradient(90deg, var(--accent-light), rgba(232,223,208,0.3));
+            border-left-color: var(--gold3);
+            background: rgba(212,146,74,0.06);
         }
+        .subsection-header.villa-accent .subsection-icon { background: rgba(212,146,74,0.12); color: var(--gold2); }
 
         /* ── APT BANNER ── */
         .apt-banner {
-            background: linear-gradient(135deg, #0F2137 0%, #1A3A5C 50%, #0F2137 100%);
+            background: linear-gradient(135deg, #080F18 0%, #0F2137 50%, #080F18 100%);
             border-radius: 18px; padding: 24px 30px; margin-bottom: 20px;
             display: flex; align-items: center; gap: 16px;
             position: relative; overflow: hidden;
-            border: 1px solid rgba(59,130,246,0.2);
+            border: 1px solid rgba(74,143,212,0.18);
+            box-shadow: 0 4px 32px rgba(0,0,0,0.4);
         }
         .apt-banner::before {
             content: '';
             position: absolute; top: -40px; right: -40px;
             width: 160px; height: 160px;
-            background: radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(74,143,212,0.15) 0%, transparent 70%);
             pointer-events: none;
         }
         .apt-banner-icon {
             width: 48px; height: 48px; border-radius: 12px;
-            background: rgba(59,130,246,0.2); color: #60A5FA;
+            background: rgba(74,143,212,0.15); color: #60A5FA;
             display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
         .apt-banner-text h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 18px; font-weight: 700; color: #E8F4FF; margin-bottom: 3px;
+            font-family: 'DM Serif Display', serif;
+            font-size: 18px; font-weight: 400; color: var(--white); margin-bottom: 3px;
         }
-        .apt-banner-text p { font-size: 12px; color: rgba(232,244,255,0.55); }
+        .apt-banner-text p { font-size: 12px; color: var(--ghost); }
         .apt-badge {
-            margin-left: auto; background: #2563EB; color: white;
+            margin-left: auto; background: var(--blue); color: white;
             font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 1px; padding: 5px 12px; border-radius: 20px; flex-shrink: 0;
+            letter-spacing: 1px; padding: 5px 12px; border-radius: 999px; flex-shrink: 0;
         }
         .subsection-header.apt-accent {
             border-left-color: var(--blue);
-            background: linear-gradient(90deg, rgba(219,234,254,0.5), rgba(232,223,208,0.2));
+            background: rgba(74,143,212,0.07);
         }
-        .subsection-header.apt-accent .subsection-icon { background: rgba(219,234,254,0.7); color: var(--blue); }
+        .subsection-header.apt-accent .subsection-icon { background: rgba(74,143,212,0.12); color: var(--blue); }
 
         /* ── UNIT MIX ── */
         .unit-mix-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 4px; }
         .unit-mix-card {
-            border: 1.5px solid rgba(212,186,150,0.35);
+            border: 1.5px solid var(--rim);
             border-radius: 12px; overflow: hidden;
-            background: rgba(255,255,255,0.45);
+            background: rgba(28,26,22,0.5);
         }
         .unit-mix-header {
-            background: rgba(232,223,208,0.5); padding: 8px 12px;
-            font-size: 11px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.6px;
-            color: var(--text-secondary);
+            background: rgba(36,33,24,0.7); padding: 8px 12px;
+            font-size: 10.5px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            color: var(--muted);
             display: flex; align-items: center; gap: 6px;
         }
         .unit-mix-body { padding: 12px; }
@@ -533,131 +555,108 @@
         /* ── SAFETY TILES ── */
         .safety-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .safety-tile {
-            border: 1.5px solid rgba(212,186,150,0.35);
+            border: 1.5px solid var(--rim);
             border-radius: 12px; overflow: hidden; transition: all 0.2s;
-            background: rgba(255,255,255,0.45);
+            background: rgba(28,26,22,0.6);
         }
-        .safety-tile.active { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(37,99,235,0.12); }
+        .safety-tile.active { border-color: rgba(74,143,212,0.4); box-shadow: 0 0 0 1px rgba(74,143,212,0.1); }
         .safety-header {
             display: flex; align-items: center; gap: 10px;
-            padding: 12px 14px; background: rgba(232,223,208,0.4);
+            padding: 12px 14px; background: rgba(36,33,24,0.5);
             cursor: pointer; user-select: none;
         }
-        .safety-tile.active .safety-header { background: rgba(219,234,254,0.5); }
+        .safety-tile.active .safety-header { background: rgba(74,143,212,0.08); }
         .safety-checkbox {
             width: 18px; height: 18px;
-            border: 2px solid rgba(212,186,150,0.5); border-radius: 4px;
+            border: 1.5px solid var(--rim); border-radius: 4px;
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0; transition: all 0.2s; color: white;
         }
         .safety-tile.active .safety-checkbox { background: var(--blue); border-color: var(--blue); }
         .safety-icon-wrap {
             width: 28px; height: 28px; border-radius: 7px;
-            background: rgba(255,255,255,0.6); color: var(--text-muted);
+            background: rgba(255,255,255,0.05); color: var(--ghost);
             display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
-        .safety-tile.active .safety-icon-wrap { background: rgba(219,234,254,0.7); color: var(--blue); }
-        .safety-body { padding: 12px 14px; background: rgba(255,255,255,0.55); display: none; }
+        .safety-tile.active .safety-icon-wrap { background: rgba(74,143,212,0.15); color: var(--blue); }
+        .safety-body { padding: 12px 14px; background: rgba(20,18,16,0.5); display: none; }
         .safety-tile.active .safety-body { display: block; }
 
         /* ── STEEL INDICATOR ── */
         .steel-indicator {
-            background: rgba(219,234,254,0.7);
-            border: 1px solid #BFDBFE; border-radius: 8px;
+            background: rgba(74,143,212,0.1);
+            border: 1px solid rgba(74,143,212,0.25); border-radius: 8px;
             padding: 10px 14px; margin-top: 8px;
-            font-size: 12px; color: #1E40AF; font-weight: 500; display: none;
+            font-size: 12px; color: #60A5FA; font-weight: 500; display: none;
         }
         .steel-indicator.show { display: block; }
         .steel-indicator strong { font-weight: 700; }
 
         /* ── INNER BOX ── */
         .inner-box {
-            background: rgba(232,223,208,0.35);
-            border: 1px solid rgba(212,186,150,0.3);
+            background: rgba(20,18,16,0.5);
+            border: 1px solid var(--rim);
             border-radius: 12px; padding: 16px; margin-bottom: 16px;
         }
         .inner-box-title {
-            font-size: 11px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.7px;
-            color: var(--text-secondary); margin-bottom: 12px;
+            font-size: 10.5px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            color: var(--muted); margin-bottom: 12px;
         }
 
         /* ── INFO BANNERS ── */
         .info-banner {
             background: var(--accent-light);
-            border: 1px solid rgba(184,134,78,0.2);
+            border: 1px solid rgba(212,146,74,0.2);
             border-radius: 10px; padding: 12px 16px;
             display: flex; align-items: flex-start; gap: 10px;
-            font-size: 12px; color: var(--accent-dark);
+            font-size: 12px; color: var(--gold2);
         }
         .info-banner svg { flex-shrink: 0; margin-top: 1px; }
         .info-banner-blue {
-            background: rgba(219,234,254,0.7);
-            border: 1px solid #BFDBFE;
+            background: rgba(74,143,212,0.08);
+            border: 1px solid rgba(74,143,212,0.2);
             border-radius: 10px; padding: 12px 16px;
-            font-size: 12px; color: #1E40AF;
+            font-size: 12px; color: #60A5FA;
             display: flex; align-items: flex-start; gap: 8px;
         }
 
         /* ── ALERTS ── */
         .alert { padding: 13px 16px; border-radius: 10px; margin-bottom: 18px; font-size: 14px; }
-        .alert-success { background: rgba(209,250,229,0.85); color: #065F46; border: 1px solid #A7F3D0; }
-        .alert-error   { background: rgba(254,226,226,0.85); color: #991B1B; border: 1px solid #FECACA; }
+        .alert-success { background: var(--green-bg); color: var(--green); border: 1px solid rgba(76,175,130,0.3); }
+        .alert-error   { background: var(--red-bg); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
 
         /* ── PARKING SUMMARY ── */
         #parkingAreaSummary {
-            background: rgba(219,234,254,0.6);
-            border: 1px solid #BFDBFE; border-radius: 10px;
+            background: rgba(74,143,212,0.08);
+            border: 1px solid rgba(74,143,212,0.2); border-radius: 10px;
             padding: 14px 16px; margin-bottom: 12px;
         }
-
-        /* ── COLOR CHIPS ── */
-        .color-chip {
-            display: flex; flex-direction: column; align-items: center;
-            gap: 5px; padding: 9px 10px;
-            border: 1.5px solid rgba(212,186,150,0.4); border-radius: 10px;
-            cursor: pointer; transition: all 0.2s;
-            background: rgba(255,255,255,0.55);
-        }
-        .color-chip:hover { border-color: var(--accent); }
-        .color-chip.selected {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(184,134,78,0.2);
-            background: var(--accent-light);
-        }
-        .chip-swatch { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.1); }
-        .chip-label { font-size: 10px; font-weight: 600; color: var(--text-secondary); text-align: center; }
-        .color-chips-row { display: flex; gap: 8px; flex-wrap: wrap; }
-        .shape-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
 
         /* ── BUTTONS ── */
         .btn-primary {
             padding: 13px 32px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff; border: none; border-radius: 10px;
+            background: linear-gradient(135deg, var(--gold3), var(--gold));
+            color: var(--void); border: none; border-radius: 10px;
             font-weight: 700; font-size: 14px; cursor: pointer;
             transition: all 0.2s; text-decoration: none;
             display: inline-flex; align-items: center; gap: 8px;
-            font-family: 'Outfit', sans-serif;
-            box-shadow: 0 3px 14px rgba(184,134,78,0.3);
+            font-family: 'DM Sans', sans-serif;
+            box-shadow: 0 4px 20px var(--glow);
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(184,134,78,0.42); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px var(--glow); background: linear-gradient(135deg, var(--gold), var(--gold2)); }
         .btn-ghost {
             padding: 13px 28px;
-            background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(10px);
-            color: var(--text-secondary);
-            border: 1px solid rgba(212,186,150,0.4); border-radius: 10px;
+            background: rgba(36,33,24,0.8);
+            border: 1px solid var(--rim); border-radius: 10px;
             font-weight: 600; font-size: 14px; cursor: pointer;
             text-decoration: none; transition: all 0.2s;
             display: inline-flex; align-items: center; gap: 8px;
-            font-family: 'Outfit', sans-serif;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--muted);
         }
-        .btn-ghost:hover { background: var(--accent-light); border-color: rgba(184,134,78,0.5); }
+        .btn-ghost:hover { background: var(--accent-light); border-color: rgba(212,146,74,0.35); color: var(--gold); }
         .form-actions { display: flex; gap: 12px; margin-top: 8px; }
-
-        /* ── STAIRCASE CARDS (villa) ── */
-        .stair-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
 
         /* ── SVG checkbox icons ── */
         .check-icon { display: none; }
@@ -672,68 +671,78 @@
         }
 
         /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .nav { padding: 0 22px; }
+            .nav-center { display: none; }
+        }
         @media (max-width: 768px) {
-            .navbar { padding: 0 18px; }
-            .nav-label { display: none; }
             .form-grid, .form-grid-3, .form-grid-4 { grid-template-columns: 1fr; }
             .budget-grid, .addon-grid, .property-type-grid, .safety-grid { grid-template-columns: 1fr 1fr; }
-            .shape-grid { grid-template-columns: repeat(2,1fr); }
             .form-card { padding: 20px 18px; }
             .container { padding: 20px 14px 56px; }
             .page-header { padding: 22px 22px; }
-            .page-header h1 { font-size: 22px; }
+            .page-header h1 { font-size: 24px; }
         }
     </style>
 </head>
 <body>
 
+<div class="bg-noise"></div>
 <div class="bg-grid"></div>
-<div class="bg-warm"></div>
 
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
-<!-- ── NAVBAR ── -->
-<nav class="navbar" role="navigation" aria-label="Main navigation">
-    <a href="{{ url_for('user.dashboard') }}" class="navbar-brand" aria-label="House-Forge home">
-        <div class="navbar-brand-icon" aria-hidden="true">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<!-- ══════════════════════════════
+     NAVBAR — DASHBOARD STYLE
+══════════════════════════════ -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+    <a href="{{ url_for('user.dashboard') }}" class="nav-logo" aria-label="House-Forge home">
+        <div class="nav-logo-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
-        House-Forge
+        <span class="nav-logo-name">House<b>-Forge</b></span>
     </a>
-    <div class="navbar-menu">
-        <a href="{{ url_for('user.dashboard') }}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            <span class="nav-label">Dashboard</span>
+
+    <div class="nav-center">
+        <a href="{{ url_for('user.dashboard') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
         </a>
-        <a href="{{ url_for('user.projects') }}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            <span class="nav-label">Projects</span>
+        <a href="{{ url_for('user.projects') }}" class="nlink active">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Projects
         </a>
-        <a href="/user/bids">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                Bids
-                <span class="badge-notification badge-amber" id="bidsBadge"></span>
-            </a>
-        <a href="{{ url_for('user.my_orders') }}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-            <span class="nav-label">Orders</span>
+        <a href="/user/bids" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Bids
+            <span class="npip amber" id="bidsBadge"></span>
         </a>
-        <a href="{{ url_for('user.messages') }}" class="nav-icon-wrap" aria-label="Messages">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <span class="nav-label">Messages</span>
-            <span class="badge-notification" id="messagesBadge" role="status" aria-live="polite">0</span>
+        <a href="{{ url_for('user.my_orders') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Orders
         </a>
-        <div class="nav-divider" aria-hidden="true"></div>
-        <a href="{{ url_for('user.profile') }}" style="padding:7px 9px;" aria-label="View profile">
-            {% if user_profile_picture %}
-                <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="{{ current_user.name }}'s profile picture" class="profile-pic">
-            {% else %}
-                <div class="profile-placeholder" aria-hidden="true">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
-            {% endif %}
+        <a href="{{ url_for('user.messages') }}" class="nlink" style="position:relative;" aria-label="Messages">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Messages
+            <span class="npip" id="messagesBadge" role="status" aria-live="polite"></span>
         </a>
-        <a href="{{ url_for('auth.logout') }}" class="logout-link" aria-label="Log out">
+    </div>
+
+    <div class="nav-right">
+        <a href="{{ url_for('user.profile') }}" class="nav-profile" aria-label="View profile">
+            <div class="nav-av">
+                {% if user_profile_picture %}
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="{{ current_user.name }}'s profile picture">
+                {% else %}
+                    {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                {% endif %}
+            </div>
+            <span class="nav-uname">{{ current_user.name }}</span>
+        </a>
+        <div class="ndiv" aria-hidden="true"></div>
+        <a href="{{ url_for('auth.logout') }}" class="nav-out" aria-label="Sign out">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            <span class="nav-label">Logout</span>
+            Sign Out
         </a>
     </div>
 </nav>
@@ -1143,7 +1152,6 @@
                                         <option value="luxury">Royal / Luxury Emulsion — Premium · ₹30–45/sqft</option>
                                         <option value="texture">Texture / Designer Paint — High-end · ₹50–90/sqft</option>
                                     </select>
-                                    <div class="form-hint">Applied to total internal wall area (all floors)</div>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">External Paint Quality</label>
@@ -1152,7 +1160,6 @@
                                         <option value="elastomeric">Elastomeric / Damp Proof — Premium · ₹38–55/sqft</option>
                                         <option value="texture_ext">Exterior Texture Paint — High-end · ₹55–100/sqft</option>
                                     </select>
-                                    <div class="form-hint">Applied to external perimeter wall area only</div>
                                 </div>
                             </div>
                         </div>
@@ -1385,7 +1392,7 @@
                 <div class="section-title">Structural Details <span class="section-badge">The Skeleton</span></div>
                 <div class="subsection">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M4 20V10l8-8 8 8v10M10 20v-5h4v5"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M4 20V10l8-8 8 8v10M10 20v-5h4v5"/></svg></div>
                         <span class="subsection-title">Roof, Height &amp; Staircase</span>
                     </div>
                     <div class="form-grid">
@@ -1429,7 +1436,7 @@
 
                 <div class="subsection">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></div>
                         <span class="subsection-title">Concrete, Steel &amp; Slab</span>
                     </div>
                     <div class="form-grid-3">
@@ -1462,7 +1469,7 @@
 
                 <div class="subsection">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4l3 3"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4l3 3"/></svg></div>
                         <span class="subsection-title">Foundation &amp; Protection</span>
                     </div>
                     <div class="form-grid">
@@ -1519,7 +1526,7 @@
                 <div class="section-title">Masonry &amp; Openings <span class="section-badge">The Walls</span></div>
                 <div class="subsection">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
                         <span class="subsection-title">Wall Construction</span>
                     </div>
                     <div class="form-grid-3">
@@ -1550,7 +1557,7 @@
                 </div>
                 <div class="subsection">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/></svg></div>
                         <span class="subsection-title">Doors, Windows &amp; Plaster</span>
                     </div>
                     <div class="form-grid-3">
@@ -1617,7 +1624,7 @@
                 <div class="section-title">Luxury Finishes <span class="section-badge">Budget Drivers</span></div>
                 <div class="subsection">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
                         <span class="subsection-title">Flooring</span>
                     </div>
                     <div class="form-grid">
@@ -1645,7 +1652,7 @@
                 </div>
                 <div class="subsection">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
                         <span class="subsection-title">Paint &amp; Ceiling</span>
                     </div>
                     <div class="form-grid">
@@ -1681,7 +1688,7 @@
                 </div>
                 <div class="subsection">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></div>
                         <span class="subsection-title">External Cladding</span>
                     </div>
                     <div class="form-grid">
@@ -1712,7 +1719,7 @@
                 <div class="section-title">Plumbing &amp; Electrical <span class="section-badge">MEP Systems</span></div>
                 <div class="subsection">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg></div>
                         <span class="subsection-title">Plumbing &amp; Sanitary</span>
                     </div>
                     <div class="form-grid">
@@ -1750,7 +1757,7 @@
                 </div>
                 <div class="subsection">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
                         <span class="subsection-title">Electrical Works</span>
                     </div>
                     <div class="form-grid">
@@ -1796,7 +1803,7 @@
                 <!-- Pool -->
                 <div class="subsection">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20M2 18c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M6 6c0-2.2 1.8-4 4-4s4 1.8 4 4v6"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20M2 18c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M6 6c0-2.2 1.8-4 4-4s4 1.8 4 4v6"/></svg></div>
                         <span class="subsection-title">Swimming Pool</span>
                     </div>
                     <div class="addon-tile" id="tile-pool" style="margin-bottom:0;">
@@ -1839,7 +1846,7 @@
                 <!-- Car Porch Villa -->
                 <div class="subsection" style="margin-top:20px;">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
                         <span class="subsection-title">Car Porch</span>
                     </div>
                     <div class="addon-tile" id="tile-villa-porch">
@@ -1889,7 +1896,7 @@
                 <!-- Boundary Wall Villa -->
                 <div class="subsection" style="margin-top:20px;">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg></div>
                         <span class="subsection-title">Boundary Wall</span>
                     </div>
                     <div class="form-grid">
@@ -1919,7 +1926,7 @@
                 <!-- Garden Villa -->
                 <div class="subsection" style="margin-top:20px;">
                     <div class="subsection-header villa-accent">
-                        <div class="subsection-icon" style="background:var(--accent-light);color:var(--accent);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12M12 12C12 12 17 7 22 7c0 5-5 10-10 10M12 12C12 12 7 7 2 7c0 5 5 10 10 10"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12M12 12C12 12 17 7 22 7c0 5-5 10-10 10M12 12C12 12 7 7 2 7c0 5 5 10 10 10"/></svg></div>
                         <span class="subsection-title">Garden &amp; Landscaping</span>
                     </div>
                     <div class="form-grid">
@@ -2033,7 +2040,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="unitMixSummary" style="display:none; margin-top:14px; padding:12px 16px; background:rgba(232,223,208,0.4); border-radius:10px; border-left:3px solid var(--blue); font-size:13px; color:var(--text-secondary); line-height:1.8;"></div>
+                    <div id="unitMixSummary" style="display:none; margin-top:14px; padding:12px 16px; background:rgba(74,143,212,0.07); border-radius:10px; border-left:2.5px solid var(--blue); font-size:13px; color:var(--muted); line-height:1.8;"></div>
                 </div>
             </div>
 
@@ -2331,7 +2338,7 @@
                 <div class="section-title">MEP Systems <span class="section-badge">Building Services</span></div>
                 <div class="subsection">
                     <div class="subsection-header apt-accent">
-                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="12" y1="6" x2="12" y2="6.01"/><line x1="12" y1="10" x2="12" y2="10.01"/><line x1="12" y1="14" x2="12" y2="14.01"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg></div>
+                        <div class="subsection-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/></svg></div>
                         <span class="subsection-title">Vertical Transport — Lifts</span>
                     </div>
                     <div class="form-grid">
@@ -2484,11 +2491,11 @@
                         <div class="form-group"><label class="form-label">Aisle Width (ft)</label><input type="number" name="apt_aisle_width" id="aptAisleWidth" min="16" max="26" value="20" step="0.5" class="form-control" oninput="calcParkingArea()"></div>
                     </div>
                     <div id="parkingAreaSummary" style="display:none;">
-                        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--blue); margin-bottom:8px;">Calculated Parking Area</div>
+                        <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--blue); margin-bottom:8px;">Calculated Parking Area</div>
                         <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
-                            <div style="text-align:center;"><div style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; color:var(--blue);" id="parkNetArea">—</div><div style="font-size:10px; color:#3B82F6; font-weight:600;">Net Slot Area (sqft)</div></div>
-                            <div style="text-align:center;"><div style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; color:var(--blue);" id="parkGrossArea">—</div><div style="font-size:10px; color:#3B82F6; font-weight:600;">Gross incl. Aisles (sqft)</div></div>
-                            <div style="text-align:center;"><div style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; color:var(--blue);" id="parkSqftPerSlot">—</div><div style="font-size:10px; color:#3B82F6; font-weight:600;">sqft / slot (gross)</div></div>
+                            <div style="text-align:center;"><div style="font-family:'DM Serif Display',serif; font-size:22px; font-weight:400; color:var(--blue);" id="parkNetArea">—</div><div style="font-size:10px; color:#60A5FA; font-weight:600;">Net Slot Area (sqft)</div></div>
+                            <div style="text-align:center;"><div style="font-family:'DM Serif Display',serif; font-size:22px; font-weight:400; color:var(--blue);" id="parkGrossArea">—</div><div style="font-size:10px; color:#60A5FA; font-weight:600;">Gross incl. Aisles (sqft)</div></div>
+                            <div style="text-align:center;"><div style="font-family:'DM Serif Display',serif; font-size:22px; font-weight:400; color:var(--blue);" id="parkSqftPerSlot">—</div><div style="font-size:10px; color:#60A5FA; font-weight:600;">sqft / slot (gross)</div></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -2501,8 +2508,8 @@
                             <option value="anti_skid_ramp">Anti-skid Coating (Ramps &amp; Entry Only)</option>
                         </select>
                     </div>
-                    <div id="basementExtras" style="display:none; margin-top:12px; padding-top:12px; border-top:1px dashed rgba(212,186,150,0.5);">
-                        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--red); margin-bottom:10px;">Basement-Specific Inputs</div>
+                    <div id="basementExtras" style="display:none; margin-top:12px; padding-top:12px; border-top:1px dashed var(--rim);">
+                        <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--red); margin-bottom:10px;">Basement-Specific Inputs</div>
                         <div class="form-grid">
                             <div class="form-group"><label class="form-label">Basement Depth (ft)</label><input type="number" name="apt_basement_depth" min="10" max="30" value="14" class="form-control"></div>
                             <div class="form-group">
@@ -2703,7 +2710,7 @@
     function toggleVillaPorchCustom(select){const group=document.getElementById('villaPorchCustomGroup');if(group)group.style.display=select.value==='custom'?'block':'none';}
     function toggleVillaAddon(id){villaAddonStates[id]=!villaAddonStates[id];const tile=document.getElementById('tile-'+id),chk=document.getElementById('chk-'+id);if(villaAddonStates[id]){tile.classList.add('active');chk.textContent='';}else{tile.classList.remove('active');}}
 
-    document.getElementById('villaRoofType')?.addEventListener('change',function(){const hint=document.getElementById('roofHint'),hints={flat_rcc:'Standard flat slab — concrete volume as calculated',sloped_tiled:'+15% extra concrete volume + Roof Tiles added',decorative_pergola:'Open pergola — steel posts & timber beams, reduced slab area'};if(hint)hint.textContent=hints[this.value]||'';const grp=document.getElementById('roofTileColorGroup');if(grp)grp.style.display=this.value==='sloped_tiled'?'block':'none';});
+    document.getElementById('villaRoofType')?.addEventListener('change',function(){const hint=document.getElementById('roofHint'),hints={flat_rcc:'Standard flat slab — concrete volume as calculated',sloped_tiled:'+15% extra concrete volume + Roof Tiles added',decorative_pergola:'Open pergola — steel posts & timber beams, reduced slab area'};if(hint)hint.textContent=hints[this.value]||'';});
 
     document.querySelectorAll('[name="villa_false_ceiling"]').forEach(r=>{r.addEventListener('change',function(){const hint=document.getElementById('villaFalseCeilingHint');if(!hint)return;const sqft=parseFloat(document.getElementById('squareFeet')?.value)||0,msgs={no:'No gypsum board required',partial:sqft>0?'Partial: ~'+Math.round(sqft*0.35).toLocaleString('en-IN')+' sqft estimated':'Partial — approx. 35% of built-up area',full:sqft>0?'Full house: '+sqft.toLocaleString('en-IN')+' sqft gypsum board':'Full house — area = total built-up sq ft'};hint.textContent=msgs[this.value]||'';});});
 
@@ -2736,7 +2743,7 @@
 
     function autoActivateFireSafety(){const floors=parseInt(document.getElementById('aptTotalFloors')?.value)||2;if(floors>=4){safetyStates.fire=true;document.getElementById('stile-fire')?.classList.add('active');}else{safetyStates.fire=false;document.getElementById('stile-fire')?.classList.remove('active');}}
 
-    function updateUnitHints(){const total=parseInt(document.getElementById('aptTotalUnits')?.value)||0,bhk1=parseInt(document.getElementById('apt1BHK')?.value)||0,bhk2=parseInt(document.getElementById('apt2BHK')?.value)||0,bhk3=parseInt(document.getElementById('apt3BHK')?.value)||0,caPct=parseFloat(document.getElementById('aptCommonAreaPct')?.value)||20,sumCard=document.getElementById('unitMixSummary'),caHint=document.getElementById('aptCommonHint');if(caHint)caHint.textContent=caPct+'% of total BUA = lobbies, corridors, stairwells, plant rooms';if(total<1||!sumCard)return;const toilets=(bhk1*1)+(bhk2*2)+(bhk3*3),doors=(bhk1*3)+(bhk2*5)+(bhk3*7),windows=(bhk1*4)+(bhk2*6)+(bhk3*8),defined=bhk1+bhk2+bhk3,remaining=total-defined;let html='<strong>Quantity Multipliers (from unit mix):</strong><br>';if(bhk1)html+='· 1BHK ×'+bhk1+': ~'+bhk1+' bathroom sets, ~'+(bhk1*3)+' doors<br>';if(bhk2)html+='· 2BHK ×'+bhk2+': ~'+(bhk2*2)+' bathroom sets, ~'+(bhk2*5)+' doors<br>';if(bhk3)html+='· 3BHK ×'+bhk3+': ~'+(bhk3*3)+' bathroom sets, ~'+(bhk3*7)+' doors<br>';if(defined>0)html+='<strong>Total:</strong> ~'+toilets+' bathroom sets · ~'+doors+' doors · ~'+windows+' windows';if(remaining>0&&defined>0)html+='<br><span style="color:var(--accent);">'+remaining+' unit(s) not assigned to a BHK type</span>';sumCard.innerHTML=html;sumCard.style.display=defined>0?'block':'none';}
+    function updateUnitHints(){const total=parseInt(document.getElementById('aptTotalUnits')?.value)||0,bhk1=parseInt(document.getElementById('apt1BHK')?.value)||0,bhk2=parseInt(document.getElementById('apt2BHK')?.value)||0,bhk3=parseInt(document.getElementById('apt3BHK')?.value)||0,caPct=parseFloat(document.getElementById('aptCommonAreaPct')?.value)||20,sumCard=document.getElementById('unitMixSummary'),caHint=document.getElementById('aptCommonHint');if(caHint)caHint.textContent=caPct+'% of total BUA = lobbies, corridors, stairwells, plant rooms';if(total<1||!sumCard)return;const toilets=(bhk1*1)+(bhk2*2)+(bhk3*3),doors=(bhk1*3)+(bhk2*5)+(bhk3*7),windows=(bhk1*4)+(bhk2*6)+(bhk3*8),defined=bhk1+bhk2+bhk3,remaining=total-defined;let html='<strong style="color:var(--off)">Quantity Multipliers (from unit mix):</strong><br>';if(bhk1)html+='· 1BHK ×'+bhk1+': ~'+bhk1+' bathroom sets, ~'+(bhk1*3)+' doors<br>';if(bhk2)html+='· 2BHK ×'+bhk2+': ~'+(bhk2*2)+' bathroom sets, ~'+(bhk2*5)+' doors<br>';if(bhk3)html+='· 3BHK ×'+bhk3+': ~'+(bhk3*3)+' bathroom sets, ~'+(bhk3*7)+' doors<br>';if(defined>0)html+='<strong style="color:var(--off)">Total:</strong> ~'+toilets+' bathroom sets · ~'+doors+' doors · ~'+windows+' windows';if(remaining>0&&defined>0)html+='<br><span style="color:var(--gold);">'+remaining+' unit(s) not assigned to a BHK type</span>';sumCard.innerHTML=html;sumCard.style.display=defined>0?'block':'none';}
 
     function updateParkingSlotHint(){const units=parseInt(document.getElementById('aptTotalUnits')?.value)||0,hint=document.getElementById('parkingSlotHint');if(!hint)return;hint.textContent=units>0?units+' units → standard: '+units+' slots (1×) · premium: '+Math.round(units*1.5)+' slots (1.5×)':'Enter total units above to get a suggested slot count';}
 
@@ -2755,46 +2762,59 @@
 
     function calcParkingArea(){const slots=parseInt(document.getElementById('aptParkingSlots')?.value)||0,len=parseFloat(document.getElementById('aptSlotLength')?.value)||18,width=parseFloat(document.getElementById('aptSlotWidth')?.value)||8.5,aisle=parseFloat(document.getElementById('aptAisleWidth')?.value)||20,sumDiv=document.getElementById('parkingAreaSummary');if(!sumDiv)return;if(slots<1){sumDiv.style.display='none';return;}const netArea=Math.round(slots*len*width),grossArea=Math.round(slots*len*(width+aisle/2)),sqftPerSlot=Math.round(grossArea/slots);document.getElementById('parkNetArea').textContent=netArea.toLocaleString('en-IN');document.getElementById('parkGrossArea').textContent=grossArea.toLocaleString('en-IN');document.getElementById('parkSqftPerSlot').textContent=sqftPerSlot;sumDiv.style.display='block';}
 
-    function handleBuildingShape(radio){['shape-square','shape-rectangular','shape-l_shape','shape-u_shape'].forEach(id=>{document.getElementById(id)?.classList.remove('selected');});radio.closest('.prop-card').classList.add('selected');document.getElementById('customDimGroup').style.display=radio.value==='rectangular'?'block':'none';}
-    function selectColor(name,label){document.querySelectorAll('.color-chip').forEach(c=>c.classList.remove('selected'));label.classList.add('selected');label.querySelector('input').checked=true;}
+    function updateMessageBadge(){
+        fetch('/user/messages/unread-count')
+            .then(r=>{if(!r.ok)return null;const ct=r.headers.get('content-type')||'';if(!ct.includes('application/json'))return null;return r.json();})
+            .then(data=>{if(!data)return;const b=document.getElementById('messagesBadge');if(!b)return;if(data.count>0){b.style.display='block';}else{b.style.display='none';}})
+            .catch(()=>{});
+    }
 
-    function updateMessageBadge(){fetch('/user/messages/unread-count').then(r=>{if(!r.ok)return null;const ct=r.headers.get('content-type')||'';if(!ct.includes('application/json'))return null;return r.json();}).then(data=>{if(!data)return;const b=document.getElementById('messagesBadge');if(!b)return;if(data.count>0){b.textContent=data.count;b.style.display='flex';}else{b.style.display='none';}}).catch(()=>{});}
+    function updateBidsBadge(){
+        fetch('/user/bids/pending-count')
+            .then(r=>r.ok&&r.headers.get('content-type')?.includes('application/json')?r.json():null)
+            .then(d=>{if(!d)return;const b=document.getElementById('bidsBadge');if(!b)return;b.style.display=d.count>0?'block':'none';})
+            .catch(()=>{});
+    }
 
-    document.addEventListener('DOMContentLoaded',function(){updateMessageBadge();updateSteelIndicator();});
-    setInterval(()=>{updateMessageBadge();},30000);
+    document.addEventListener('DOMContentLoaded',function(){
+        updateMessageBadge();
+        updateBidsBadge();
+        updateSteelIndicator();
+    });
+    setInterval(()=>{updateMessageBadge();updateBidsBadge();},30000);
 
     const districtData = {
-            'Kerala': ['Alappuzha','Ernakulam','Idukki','Kannur','Kasaragod','Kollam','Kottayam','Kozhikode','Malappuram','Palakkad','Pathanamthitta','Thiruvananthapuram','Thrissur','Wayanad'],
-            'Tamil Nadu': ['Chennai','Coimbatore','Cuddalore','Dharmapuri','Dindigul','Erode','Kallakurichi','Kancheepuram','Kanyakumari','Karur','Krishnagiri','Madurai','Nagapattinam','Namakkal','Nilgiris','Perambalur','Pudukkottai','Ramanathapuram','Ranipet','Salem','Sivaganga','Tenkasi','Thanjavur','Theni','Thoothukudi','Tiruchirappalli','Tirunelveli','Tirupathur','Tiruppur','Tiruvallur','Tiruvannamalai','Tiruvarur','Vellore','Viluppuram','Virudhunagar'],
-            'Karnataka': ['Bagalkot','Ballari','Belagavi','Bengaluru Rural','Bengaluru Urban','Bidar','Chamarajanagar','Chikballapur','Chikkamagaluru','Chitradurga','Dakshina Kannada','Davanagere','Dharwad','Gadag','Hassan','Haveri','Kalaburagi','Kodagu','Kolar','Koppal','Mandya','Mysuru','Raichur','Ramanagara','Shivamogga','Tumakuru','Udupi','Uttara Kannada','Vijayapura','Yadgir'],
-            'Maharashtra': ['Ahmednagar','Akola','Amravati','Aurangabad','Beed','Bhandara','Buldhana','Chandrapur','Dhule','Gadchiroli','Gondia','Hingoli','Jalgaon','Jalna','Kolhapur','Latur','Mumbai City','Mumbai Suburban','Nagpur','Nanded','Nandurbar','Nashik','Osmanabad','Palghar','Parbhani','Pune','Raigad','Ratnagiri','Sangli','Satara','Sindhudurg','Solapur','Thane','Wardha','Washim','Yavatmal'],
-            'Andhra Pradesh': ['Alluri Sitharama Raju','Anakapalli','Anantapur','Annamayya','Bapatla','Chittoor','East Godavari','Eluru','Guntur','Kadapa','Kakinada','Konaseema','Krishna','Kurnool','Nandyal','Nellore','NTR','Palnadu','Parvathipuram Manyam','Prakasam','Sri Potti Sriramulu Nellore','Sri Sathya Sai','Srikakulam','Tirupati','Visakhapatnam','Vizianagaram','West Godavari'],
-            'Telangana': ['Adilabad','Bhadradri Kothagudem','Hanumakonda','Hyderabad','Jagtial','Jangaon','Jayashankar Bhupalpally','Jogulamba Gadwal','Kamareddy','Karimnagar','Khammam','Komaram Bheem','Mahabubabad','Mahabubnagar','Mancherial','Medak','Medchal Malkajgiri','Mulugu','Nagarkurnool','Nalgonda','Narayanpet','Nirmal','Nizamabad','Peddapalli','Rajanna Sircilla','Rangareddy','Sangareddy','Siddipet','Suryapet','Vikarabad','Wanaparthy','Warangal','Yadadri Bhuvanagiri'],
-            'Gujarat': ['Ahmedabad','Amreli','Anand','Aravalli','Banaskantha','Bharuch','Bhavnagar','Botad','Chhota Udaipur','Dahod','Dang','Devbhoomi Dwarka','Gandhinagar','Gir Somnath','Jamnagar','Junagadh','Kheda','Kutch','Mahisagar','Mehsana','Morbi','Narmada','Navsari','Panchmahal','Patan','Porbandar','Rajkot','Sabarkantha','Surat','Surendranagar','Tapi','Vadodara','Valsad'],
-            'Delhi': ['Central Delhi','East Delhi','New Delhi','North Delhi','North East Delhi','North West Delhi','Shahdara','South Delhi','South East Delhi','South West Delhi','West Delhi'],
-            'Rajasthan': ['Ajmer','Alwar','Banswara','Baran','Barmer','Bharatpur','Bhilwara','Bikaner','Bundi','Chittorgarh','Churu','Dausa','Dholpur','Dungarpur','Hanumangarh','Jaipur','Jaisalmer','Jalore','Jhalawar','Jhunjhunu','Jodhpur','Karauli','Kota','Nagaur','Pali','Pratapgarh','Rajsamand','Sawai Madhopur','Sikar','Sirohi','Sri Ganganagar','Tonk','Udaipur'],
-            'Uttar Pradesh': ['Agra','Aligarh','Ambedkar Nagar','Amethi','Amroha','Auraiya','Ayodhya','Azamgarh','Baghpat','Bahraich','Ballia','Balrampur','Banda','Barabanki','Bareilly','Basti','Bhadohi','Bijnor','Budaun','Bulandshahr','Chandauli','Chitrakoot','Deoria','Etah','Etawah','Farrukhabad','Fatehpur','Firozabad','Gautam Buddha Nagar','Ghaziabad','Ghazipur','Gonda','Gorakhpur','Hamirpur','Hapur','Hardoi','Hathras','Jalaun','Jaunpur','Jhansi','Kannauj','Kanpur Dehat','Kanpur Nagar','Kasganj','Kaushambi','Kheri','Kushinagar','Lalitpur','Lucknow','Maharajganj','Mahoba','Mainpuri','Mathura','Mau','Meerut','Mirzapur','Moradabad','Muzaffarnagar','Pilibhit','Pratapgarh','Prayagraj','Raebareli','Rampur','Saharanpur','Sambhal','Sant Kabir Nagar','Shahjahanpur','Shamli','Shrawasti','Siddharthnagar','Sitapur','Sonbhadra','Sultanpur','Unnao','Varanasi'],
-            'West Bengal': ['Alipurduar','Bankura','Birbhum','Cooch Behar','Dakshin Dinajpur','Darjeeling','Hooghly','Howrah','Jalpaiguri','Jhargram','Kalimpong','Kolkata','Malda','Murshidabad','Nadia','North 24 Parganas','Paschim Bardhaman','Paschim Medinipur','Purba Bardhaman','Purba Medinipur','Purulia','South 24 Parganas','Uttar Dinajpur'],
-            'Punjab': ['Amritsar','Barnala','Bathinda','Faridkot','Fatehgarh Sahib','Fazilka','Ferozepur','Gurdaspur','Hoshiarpur','Jalandhar','Kapurthala','Ludhiana','Mansa','Moga','Mohali','Muktsar','Pathankot','Patiala','Rupnagar','Sangrur','Shaheed Bhagat Singh Nagar','Tarn Taran'],
-            'Haryana': ['Ambala','Bhiwani','Charkhi Dadri','Faridabad','Fatehabad','Gurugram','Hisar','Jhajjar','Jind','Kaithal','Karnal','Kurukshetra','Mahendragarh','Nuh','Palwal','Panchkula','Panipat','Rewari','Rohtak','Sirsa','Sonipat','Yamunanagar'],
-            'Madhya Pradesh': ['Agar Malwa','Alirajpur','Anuppur','Ashoknagar','Balaghat','Barwani','Betul','Bhind','Bhopal','Burhanpur','Chhatarpur','Chhindwara','Damoh','Datia','Dewas','Dhar','Dindori','Guna','Gwalior','Harda','Hoshangabad','Indore','Jabalpur','Jhabua','Katni','Khandwa','Khargone','Mandla','Mandsaur','Morena','Narsinghpur','Neemuch','Niwari','Panna','Raisen','Rajgarh','Ratlam','Rewa','Sagar','Satna','Sehore','Seoni','Shahdol','Shajapur','Sheopur','Shivpuri','Sidhi','Singrauli','Tikamgarh','Ujjain','Umaria','Vidisha'],
-            'Bihar': ['Araria','Arwal','Aurangabad','Banka','Begusarai','Bhagalpur','Bhojpur','Buxar','Darbhanga','East Champaran','Gaya','Gopalganj','Jamui','Jehanabad','Kaimur','Katihar','Khagaria','Kishanganj','Lakhisarai','Madhepura','Madhubani','Munger','Muzaffarpur','Nalanda','Nawada','Patna','Purnia','Rohtas','Saharsa','Samastipur','Saran','Sheikhpura','Sheohar','Sitamarhi','Siwan','Supaul','Vaishali','West Champaran'],
-            'Goa': ['North Goa','South Goa'],
-            'Himachal Pradesh': ['Bilaspur','Chamba','Hamirpur','Kangra','Kinnaur','Kullu','Lahaul and Spiti','Mandi','Shimla','Sirmaur','Solan','Una'],
-            'Uttarakhand': ['Almora','Bageshwar','Chamoli','Champawat','Dehradun','Haridwar','Nainital','Pauri Garhwal','Pithoragarh','Rudraprayag','Tehri Garhwal','Udham Singh Nagar','Uttarkashi'],
-            'Jharkhand': ['Bokaro','Chatra','Deoghar','Dhanbad','Dumka','East Singhbhum','Garhwa','Giridih','Godda','Gumla','Hazaribagh','Jamtara','Khunti','Koderma','Latehar','Lohardaga','Pakur','Palamu','Ramgarh','Ranchi','Sahebganj','Seraikela Kharsawan','Simdega','West Singhbhum'],
-            'Assam': ['Bajali','Baksa','Barpeta','Biswanath','Bongaigaon','Cachar','Charaideo','Chirang','Darrang','Dhemaji','Dhubri','Dibrugarh','Dima Hasao','Goalpara','Golaghat','Hailakandi','Hojai','Jorhat','Kamrup','Kamrup Metropolitan','Karbi Anglong','Karimganj','Kokrajhar','Lakhimpur','Majuli','Morigaon','Nagaon','Nalbari','Sivasagar','Sonitpur','South Salmara-Mankachar','Tinsukia','Udalguri','West Karbi Anglong'],
-            'Odisha': ['Angul','Balangir','Balasore','Bargarh','Bhadrak','Boudh','Cuttack','Deogarh','Dhenkanal','Gajapati','Ganjam','Jagatsinghpur','Jajpur','Jharsuguda','Kalahandi','Kandhamal','Kendrapara','Kendujhar','Khordha','Koraput','Malkangiri','Mayurbhanj','Nabarangpur','Nayagarh','Nuapada','Puri','Rayagada','Sambalpur','Subarnapur','Sundargarh'],
-            'Chhattisgarh': ['Balod','Baloda Bazar','Balrampur','Bastar','Bemetara','Bijapur','Bilaspur','Dantewada','Dhamtari','Durg','Gariaband','Gaurela Pendra Marwahi','Janjgir Champa','Jashpur','Kabirdham','Kanker','Khairagarh','Kondagaon','Korba','Korea','Mahasamund','Manendragarh','Mohla Manpur','Mungeli','Narayanpur','Raigarh','Raipur','Rajnandgaon','Sakti','Sarangarh Bilaigarh','Sukma','Surajpur','Surguja'],
-            'Sikkim': ['East Sikkim','North Sikkim','Pakyong','Soreng','South Sikkim','West Sikkim'],
-            'Manipur': ['Bishnupur','Chandel','Churachandpur','Imphal East','Imphal West','Jiribam','Kakching','Kamjong','Kangpokpi','Noney','Pherzawl','Senapati','Tamenglong','Tengnoupal','Thoubal','Ukhrul'],
-            'Meghalaya': ['East Garo Hills','East Jaintia Hills','East Khasi Hills','Eastern West Khasi Hills','North Garo Hills','Ri Bhoi','South Garo Hills','South West Garo Hills','South West Khasi Hills','West Garo Hills','West Jaintia Hills','West Khasi Hills'],
-            'Tripura': ['Dhalai','Gomati','Khowai','North Tripura','Sepahijala','South Tripura','Sipahijala','Unakoti','West Tripura'],
-            'Arunachal Pradesh': ['Anjaw','Changlang','Dibang Valley','East Kameng','East Siang','Kamle','Kra Daadi','Kurung Kumey','Lepa Rada','Lohit','Longding','Lower Dibang Valley','Lower Siang','Lower Subansiri','Namsai','Pakke Kessang','Papum Pare','Shi Yomi','Siang','Tawang','Tirap','Upper Dibang Valley','Upper Siang','Upper Subansiri','West Kameng','West Siang'],
-            'Mizoram': ['Aizawl','Champhai','Hnahthial','Khawzawl','Kolasib','Lawngtlai','Lunglei','Mamit','Saiha','Saitual','Serchhip'],
-            'Nagaland': ['Chumoukedima','Dimapur','Kiphire','Kohima','Longleng','Mokokchung','Mon','Niuland','Noklak','Peren','Phek','Shamator','Tseminyu','Tuensang','Wokha','Zunheboto']
-        };
- 
+        'Kerala': ['Alappuzha','Ernakulam','Idukki','Kannur','Kasaragod','Kollam','Kottayam','Kozhikode','Malappuram','Palakkad','Pathanamthitta','Thiruvananthapuram','Thrissur','Wayanad'],
+        'Tamil Nadu': ['Chennai','Coimbatore','Cuddalore','Dharmapuri','Dindigul','Erode','Kallakurichi','Kancheepuram','Kanyakumari','Karur','Krishnagiri','Madurai','Nagapattinam','Namakkal','Nilgiris','Perambalur','Pudukkottai','Ramanathapuram','Ranipet','Salem','Sivaganga','Tenkasi','Thanjavur','Theni','Thoothukudi','Tiruchirappalli','Tirunelveli','Tirupathur','Tiruppur','Tiruvallur','Tiruvannamalai','Tiruvarur','Vellore','Viluppuram','Virudhunagar'],
+        'Karnataka': ['Bagalkot','Ballari','Belagavi','Bengaluru Rural','Bengaluru Urban','Bidar','Chamarajanagar','Chikballapur','Chikkamagaluru','Chitradurga','Dakshina Kannada','Davanagere','Dharwad','Gadag','Hassan','Haveri','Kalaburagi','Kodagu','Kolar','Koppal','Mandya','Mysuru','Raichur','Ramanagara','Shivamogga','Tumakuru','Udupi','Uttara Kannada','Vijayapura','Yadgir'],
+        'Maharashtra': ['Ahmednagar','Akola','Amravati','Aurangabad','Beed','Bhandara','Buldhana','Chandrapur','Dhule','Gadchiroli','Gondia','Hingoli','Jalgaon','Jalna','Kolhapur','Latur','Mumbai City','Mumbai Suburban','Nagpur','Nanded','Nandurbar','Nashik','Osmanabad','Palghar','Parbhani','Pune','Raigad','Ratnagiri','Sangli','Satara','Sindhudurg','Solapur','Thane','Wardha','Washim','Yavatmal'],
+        'Andhra Pradesh': ['Alluri Sitharama Raju','Anakapalli','Anantapur','Annamayya','Bapatla','Chittoor','East Godavari','Eluru','Guntur','Kadapa','Kakinada','Konaseema','Krishna','Kurnool','Nandyal','Nellore','NTR','Palnadu','Parvathipuram Manyam','Prakasam','Sri Potti Sriramulu Nellore','Sri Sathya Sai','Srikakulam','Tirupati','Visakhapatnam','Vizianagaram','West Godavari'],
+        'Telangana': ['Adilabad','Bhadradri Kothagudem','Hanumakonda','Hyderabad','Jagtial','Jangaon','Jayashankar Bhupalpally','Jogulamba Gadwal','Kamareddy','Karimnagar','Khammam','Komaram Bheem','Mahabubabad','Mahabubnagar','Mancherial','Medak','Medchal Malkajgiri','Mulugu','Nagarkurnool','Nalgonda','Narayanpet','Nirmal','Nizamabad','Peddapalli','Rajanna Sircilla','Rangareddy','Sangareddy','Siddipet','Suryapet','Vikarabad','Wanaparthy','Warangal','Yadadri Bhuvanagiri'],
+        'Gujarat': ['Ahmedabad','Amreli','Anand','Aravalli','Banaskantha','Bharuch','Bhavnagar','Botad','Chhota Udaipur','Dahod','Dang','Devbhoomi Dwarka','Gandhinagar','Gir Somnath','Jamnagar','Junagadh','Kheda','Kutch','Mahisagar','Mehsana','Morbi','Narmada','Navsari','Panchmahal','Patan','Porbandar','Rajkot','Sabarkantha','Surat','Surendranagar','Tapi','Vadodara','Valsad'],
+        'Delhi': ['Central Delhi','East Delhi','New Delhi','North Delhi','North East Delhi','North West Delhi','Shahdara','South Delhi','South East Delhi','South West Delhi','West Delhi'],
+        'Rajasthan': ['Ajmer','Alwar','Banswara','Baran','Barmer','Bharatpur','Bhilwara','Bikaner','Bundi','Chittorgarh','Churu','Dausa','Dholpur','Dungarpur','Hanumangarh','Jaipur','Jaisalmer','Jalore','Jhalawar','Jhunjhunu','Jodhpur','Karauli','Kota','Nagaur','Pali','Pratapgarh','Rajsamand','Sawai Madhopur','Sikar','Sirohi','Sri Ganganagar','Tonk','Udaipur'],
+        'Uttar Pradesh': ['Agra','Aligarh','Ambedkar Nagar','Amethi','Amroha','Auraiya','Ayodhya','Azamgarh','Baghpat','Bahraich','Ballia','Balrampur','Banda','Barabanki','Bareilly','Basti','Bhadohi','Bijnor','Budaun','Bulandshahr','Chandauli','Chitrakoot','Deoria','Etah','Etawah','Farrukhabad','Fatehpur','Firozabad','Gautam Buddha Nagar','Ghaziabad','Ghazipur','Gonda','Gorakhpur','Hamirpur','Hapur','Hardoi','Hathras','Jalaun','Jaunpur','Jhansi','Kannauj','Kanpur Dehat','Kanpur Nagar','Kasganj','Kaushambi','Kheri','Kushinagar','Lalitpur','Lucknow','Maharajganj','Mahoba','Mainpuri','Mathura','Mau','Meerut','Mirzapur','Moradabad','Muzaffarnagar','Pilibhit','Pratapgarh','Prayagraj','Raebareli','Rampur','Saharanpur','Sambhal','Sant Kabir Nagar','Shahjahanpur','Shamli','Shrawasti','Siddharthnagar','Sitapur','Sonbhadra','Sultanpur','Unnao','Varanasi'],
+        'West Bengal': ['Alipurduar','Bankura','Birbhum','Cooch Behar','Dakshin Dinajpur','Darjeeling','Hooghly','Howrah','Jalpaiguri','Jhargram','Kalimpong','Kolkata','Malda','Murshidabad','Nadia','North 24 Parganas','Paschim Bardhaman','Paschim Medinipur','Purba Bardhaman','Purba Medinipur','Purulia','South 24 Parganas','Uttar Dinajpur'],
+        'Punjab': ['Amritsar','Barnala','Bathinda','Faridkot','Fatehgarh Sahib','Fazilka','Ferozepur','Gurdaspur','Hoshiarpur','Jalandhar','Kapurthala','Ludhiana','Mansa','Moga','Mohali','Muktsar','Pathankot','Patiala','Rupnagar','Sangrur','Shaheed Bhagat Singh Nagar','Tarn Taran'],
+        'Haryana': ['Ambala','Bhiwani','Charkhi Dadri','Faridabad','Fatehabad','Gurugram','Hisar','Jhajjar','Jind','Kaithal','Karnal','Kurukshetra','Mahendragarh','Nuh','Palwal','Panchkula','Panipat','Rewari','Rohtak','Sirsa','Sonipat','Yamunanagar'],
+        'Madhya Pradesh': ['Agar Malwa','Alirajpur','Anuppur','Ashoknagar','Balaghat','Barwani','Betul','Bhind','Bhopal','Burhanpur','Chhatarpur','Chhindwara','Damoh','Datia','Dewas','Dhar','Dindori','Guna','Gwalior','Harda','Hoshangabad','Indore','Jabalpur','Jhabua','Katni','Khandwa','Khargone','Mandla','Mandsaur','Morena','Narsinghpur','Neemuch','Niwari','Panna','Raisen','Rajgarh','Ratlam','Rewa','Sagar','Satna','Sehore','Seoni','Shahdol','Shajapur','Sheopur','Shivpuri','Sidhi','Singrauli','Tikamgarh','Ujjain','Umaria','Vidisha'],
+        'Bihar': ['Araria','Arwal','Aurangabad','Banka','Begusarai','Bhagalpur','Bhojpur','Buxar','Darbhanga','East Champaran','Gaya','Gopalganj','Jamui','Jehanabad','Kaimur','Katihar','Khagaria','Kishanganj','Lakhisarai','Madhepura','Madhubani','Munger','Muzaffarpur','Nalanda','Nawada','Patna','Purnia','Rohtas','Saharsa','Samastipur','Saran','Sheikhpura','Sheohar','Sitamarhi','Siwan','Supaul','Vaishali','West Champaran'],
+        'Goa': ['North Goa','South Goa'],
+        'Himachal Pradesh': ['Bilaspur','Chamba','Hamirpur','Kangra','Kinnaur','Kullu','Lahaul and Spiti','Mandi','Shimla','Sirmaur','Solan','Una'],
+        'Uttarakhand': ['Almora','Bageshwar','Chamoli','Champawat','Dehradun','Haridwar','Nainital','Pauri Garhwal','Pithoragarh','Rudraprayag','Tehri Garhwal','Udham Singh Nagar','Uttarkashi'],
+        'Jharkhand': ['Bokaro','Chatra','Deoghar','Dhanbad','Dumka','East Singhbhum','Garhwa','Giridih','Godda','Gumla','Hazaribagh','Jamtara','Khunti','Koderma','Latehar','Lohardaga','Pakur','Palamu','Ramgarh','Ranchi','Sahebganj','Seraikela Kharsawan','Simdega','West Singhbhum'],
+        'Assam': ['Bajali','Baksa','Barpeta','Biswanath','Bongaigaon','Cachar','Charaideo','Chirang','Darrang','Dhemaji','Dhubri','Dibrugarh','Dima Hasao','Goalpara','Golaghat','Hailakandi','Hojai','Jorhat','Kamrup','Kamrup Metropolitan','Karbi Anglong','Karimganj','Kokrajhar','Lakhimpur','Majuli','Morigaon','Nagaon','Nalbari','Sivasagar','Sonitpur','South Salmara-Mankachar','Tinsukia','Udalguri','West Karbi Anglong'],
+        'Odisha': ['Angul','Balangir','Balasore','Bargarh','Bhadrak','Boudh','Cuttack','Deogarh','Dhenkanal','Gajapati','Ganjam','Jagatsinghpur','Jajpur','Jharsuguda','Kalahandi','Kandhamal','Kendrapara','Kendujhar','Khordha','Koraput','Malkangiri','Mayurbhanj','Nabarangpur','Nayagarh','Nuapada','Puri','Rayagada','Sambalpur','Subarnapur','Sundargarh'],
+        'Chhattisgarh': ['Balod','Baloda Bazar','Balrampur','Bastar','Bemetara','Bijapur','Bilaspur','Dantewada','Dhamtari','Durg','Gariaband','Gaurela Pendra Marwahi','Janjgir Champa','Jashpur','Kabirdham','Kanker','Khairagarh','Kondagaon','Korba','Korea','Mahasamund','Manendragarh','Mohla Manpur','Mungeli','Narayanpur','Raigarh','Raipur','Rajnandgaon','Sakti','Sarangarh Bilaigarh','Sukma','Surajpur','Surguja'],
+        'Sikkim': ['East Sikkim','North Sikkim','Pakyong','Soreng','South Sikkim','West Sikkim'],
+        'Manipur': ['Bishnupur','Chandel','Churachandpur','Imphal East','Imphal West','Jiribam','Kakching','Kamjong','Kangpokpi','Noney','Pherzawl','Senapati','Tamenglong','Tengnoupal','Thoubal','Ukhrul'],
+        'Meghalaya': ['East Garo Hills','East Jaintia Hills','East Khasi Hills','Eastern West Khasi Hills','North Garo Hills','Ri Bhoi','South Garo Hills','South West Garo Hills','South West Khasi Hills','West Garo Hills','West Jaintia Hills','West Khasi Hills'],
+        'Tripura': ['Dhalai','Gomati','Khowai','North Tripura','Sepahijala','South Tripura','Sipahijala','Unakoti','West Tripura'],
+        'Arunachal Pradesh': ['Anjaw','Changlang','Dibang Valley','East Kameng','East Siang','Kamle','Kra Daadi','Kurung Kumey','Lepa Rada','Lohit','Longding','Lower Dibang Valley','Lower Siang','Lower Subansiri','Namsai','Pakke Kessang','Papum Pare','Shi Yomi','Siang','Tawang','Tirap','Upper Dibang Valley','Upper Siang','Upper Subansiri','West Kameng','West Siang'],
+        'Mizoram': ['Aizawl','Champhai','Hnahthial','Khawzawl','Kolasib','Lawngtlai','Lunglei','Mamit','Saiha','Saitual','Serchhip'],
+        'Nagaland': ['Chumoukedima','Dimapur','Kiphire','Kohima','Longleng','Mokokchung','Mon','Niuland','Noklak','Peren','Phek','Shamator','Tseminyu','Tuensang','Wokha','Zunheboto']
+    };
+
     function loadDistricts(state) {
         const districtSelect = document.getElementById('locationDistrict');
         districtSelect.innerHTML = '<option value="">— Select District —</option>';
@@ -2806,7 +2826,7 @@
         });
         districtSelect.disabled = false;
     }
- 
+
     function buildLocationString() {
         const state    = document.getElementById('locationState')?.value    || '';
         const district = document.getElementById('locationDistrict')?.value || '';
@@ -2816,7 +2836,7 @@
         const parts    = [address, place, district, state, pin].filter(Boolean);
         document.getElementById('locationCombined').value = parts.join(', ');
     }
- 
+
     ['locationState','locationDistrict','locationPlace','locationPin','locationAddress'].forEach(id => {
         document.getElementById(id)?.addEventListener('change', buildLocationString);
         document.getElementById(id)?.addEventListener('input',  buildLocationString);

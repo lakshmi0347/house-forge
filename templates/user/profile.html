@@ -3,565 +3,697 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Profile — House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #F0EBE1;
-            --bg-card: #FAF6EF;
-            --bg-card2: #F4EEE3;
-            --sand: #E8DFD0;
-            --stone: #D4C8B8;
-            --accent: #B8864E;
-            --accent2: #D4A96A;
-            --accent-dark: #96693A;
-            --accent-light: #FBF3E4;
-            --accent-glow: rgba(184,134,78,0.18);
-            --text-primary: #1A1612;
-            --text-secondary: #4A3F35;
-            --text-muted: #8A7A6E;
-            --ink: #2C2318;
-        }
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+            --void:    #0C0B09;
+            --ink:     #141210;
+            --deep:    #1C1A16;
+            --surface: #242118;
+            --rim:     rgba(255,255,255,0.07);
+            --rim2:    rgba(255,255,255,0.04);
 
+            --gold:    #D4924A;
+            --gold2:   #F0C07A;
+            --gold3:   #B8743A;
+            --glow:    rgba(212,146,74,0.22);
+            --soft:    rgba(212,146,74,0.10);
+
+            --white:   #FFFFFF;
+            --off:     #F2EDE6;
+            --fog:     rgba(242,237,230,0.55);
+            --ghost:   rgba(242,237,230,0.28);
+
+            --green:  #4CAF82; --green-bg: rgba(76,175,130,0.13);
+            --red:    #EF4444; --red-bg:   rgba(239,68,68,0.12);
+            --amber:  #D49440; --amber-bg: rgba(212,148,64,0.13);
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg);
-            min-height: 100vh;
-            color: var(--text-primary);
-            overflow-x: hidden;
+            font-family:'DM Sans',sans-serif;
+            background:var(--void);
+            color:var(--off);
+            min-height:100vh;
+            overflow-x:hidden;
+            -webkit-font-smoothing:antialiased;
         }
 
-        /* ── BACKGROUNDS ── */
-        body::before {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: url('/static/images/Home.jpg') no-repeat center center / cover;
-            opacity: 0.28;
-            filter: saturate(0.3) sepia(0.85) hue-rotate(-15deg) brightness(0.95);
+        /* ── NAV ── */
+        .nav {
+            position:fixed; top:0; left:0; right:0; z-index:300;
+            height:66px;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 52px;
+            background:rgba(12,11,9,0.88);
+            backdrop-filter:blur(22px);
+            -webkit-backdrop-filter:blur(22px);
+            border-bottom:1px solid var(--rim);
         }
-        body::after {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: radial-gradient(ellipse 100% 100% at 50% 50%,
-                rgba(184,134,78,0.12) 0%,
-                rgba(240,235,225,0.0) 55%,
-                rgba(240,235,225,0.45) 100%);
+        .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+        .nav-logo-icon {
+            width:40px; height:40px; border-radius:9px;
+            border:1.5px solid var(--gold);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold); position:relative; overflow:hidden;
         }
-        .bg-grid {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background-image:
-                linear-gradient(rgba(184,134,78,0.045) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(184,134,78,0.045) 1px, transparent 1px);
-            background-size: 48px 48px;
+        .nav-logo-icon::before {
+            content:''; position:absolute; inset:0;
+            background:radial-gradient(circle at 30% 30%, rgba(212,146,74,0.18), transparent 70%);
         }
-        .bg-warm {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: rgba(184,134,78,0.10);
-            mix-blend-mode: multiply;
+        .nav-logo-name {
+            font-family:'Syne',sans-serif;
+            font-size:18px; font-weight:800; color:var(--white); letter-spacing:-0.4px;
+        }
+        .nav-logo-name b { color:var(--gold); font-weight:800; }
+
+        .nav-center {
+            position:absolute; left:50%; transform:translateX(-50%);
+            display:flex; align-items:center; gap:2px;
+        }
+        .nlink {
+            display:flex; align-items:center; gap:6px;
+            padding:7px 16px; border-radius:8px;
+            text-decoration:none; font-size:13.5px; font-weight:500;
+            color:var(--ghost); transition:color .18s, background .18s;
+            position:relative; white-space:nowrap;
+        }
+        .nlink:hover { color:var(--off); background:var(--rim2); }
+        .nlink.active { color:var(--gold); }
+        .nlink.active::after {
+            content:''; position:absolute; bottom:-1px; left:16px; right:16px;
+            height:2px; background:var(--gold); border-radius:2px;
+            box-shadow:0 0 10px var(--glow);
+        }
+        .npip {
+            position:absolute; top:5px; right:5px;
+            width:6px; height:6px; border-radius:50%;
+            background:#EF4444; border:1.5px solid var(--void);
+            display:none;
+        }
+        .npip.amber { background:var(--amber); }
+
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .nav-profile {
+            display:flex; align-items:center; gap:9px;
+            padding:5px 14px 5px 5px; border-radius:999px;
+            border:1px solid var(--gold); background:var(--soft);
+            text-decoration:none;
+            transition:border-color .2s, background .2s;
+        }
+        .nav-profile:hover { background:rgba(212,146,74,0.18); }
+        .nav-av {
+            width:30px; height:30px; border-radius:50%;
+            background:var(--gold3); color:#fff;
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:700; flex-shrink:0;
+        }
+        .nav-av img { width:30px; height:30px; border-radius:50%; object-fit:cover; display:block; }
+        .nav-uname { font-size:13px; font-weight:500; color:var(--gold); }
+        .ndiv { width:1px; height:22px; background:var(--rim); }
+        .nav-out {
+            display:flex; align-items:center; gap:6px;
+            text-decoration:none; font-size:13px; font-weight:500;
+            color:var(--ghost); padding:7px 14px; border-radius:8px;
+            transition:color .18s, background .18s;
+        }
+        .nav-out:hover { color:#EF4444; background:rgba(239,68,68,0.08); }
+
+        /* ── SHELL ── */
+        .shell { padding-top:66px; }
+
+        /* ── HERO ── */
+        .hero { position:relative; height:340px; overflow:hidden; }
+        .hero-bg {
+            position:absolute; inset:0;
+            background:url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1600&q=80') center 35%/cover;
+            filter:brightness(0.25) saturate(0.55);
+            transform:scale(1.04);
+            animation:hzoom 16s ease-in-out infinite alternate;
+        }
+        @keyframes hzoom { from{transform:scale(1.04)} to{transform:scale(1.0)} }
+        .hero::before {
+            content:''; position:absolute; inset:0; z-index:1;
+            background:
+                linear-gradient(90deg,rgba(12,11,9,0.95) 0%,rgba(12,11,9,0.40) 55%,transparent 100%),
+                linear-gradient(0deg,rgba(12,11,9,0.98) 0%,transparent 55%);
+        }
+        .hero::after {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:3px; z-index:2;
+            background:linear-gradient(180deg,transparent,var(--gold),transparent);
+        }
+        .hero-body {
+            position:absolute; inset:0; z-index:3;
+            display:flex; flex-direction:column; justify-content:flex-end;
+            padding:0 72px 44px;
+        }
+        .hero-tag {
+            display:inline-flex; align-items:center; gap:9px;
+            font-size:10px; font-weight:600; letter-spacing:3px;
+            text-transform:uppercase; color:var(--gold); margin-bottom:14px;
+        }
+        .hero-tag-ln { width:30px; height:1px; background:var(--gold); }
+        .hero-h1 {
+            font-family:'DM Serif Display',Georgia,serif;
+            font-size:48px; font-weight:400; line-height:1.06;
+            color:var(--white); letter-spacing:-1px; margin-bottom:12px;
+        }
+        .hero-h1 em { font-style:italic; color:var(--gold2); }
+        .hero-sub {
+            font-size:14px; color:rgba(242,237,230,0.42);
+            line-height:1.7; max-width:440px; font-weight:300;
         }
 
-        /* ── NAVBAR ── */
-        .navbar {
-            background: rgba(250,246,239,0.94);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--stone);
-            padding: 0 44px;
-            height: 66px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 1px 0 rgba(184,134,78,0.12), 0 4px 20px rgba(28,22,18,0.05);
-        }
-        .navbar-brand {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px; font-weight: 700;
-            color: var(--text-primary);
-            display: flex; align-items: center; gap: 11px;
-            text-decoration: none; letter-spacing: 0.3px;
-        }
-        .navbar-brand-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            color: #fff;
-            box-shadow: 0 2px 10px rgba(184,134,78,0.35);
-            position: relative; overflow: hidden;
-        }
-        .navbar-brand-icon::after {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent);
-        }
-        .navbar-menu { display: flex; align-items: center; gap: 2px; }
-        .navbar-menu a {
-            color: var(--text-secondary); text-decoration: none;
-            padding: 7px 12px; border-radius: 9px;
-            font-size: 13.5px; font-weight: 500;
-            transition: color 0.2s, background 0.2s;
-            display: flex; align-items: center; gap: 6px; position: relative;
-        }
-        .navbar-menu a:hover, .navbar-menu a.nav-active { color: var(--accent); background: var(--accent-light); }
-        .badge-notification {
-            position: absolute; top: 2px; right: 2px;
-            background: #DC2626; color: white;
-            border-radius: 50%; width: 15px; height: 15px;
-            display: none; align-items: center; justify-content: center;
-            font-size: 8px; font-weight: 700;
-            border: 2px solid var(--bg-card);
-        }
-        .profile-pic { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); display: block; }
-        .profile-placeholder {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            color: var(--accent); display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 13px; border: 2px solid var(--stone);
-        }
-        .nav-divider { width: 1px; height: 20px; background: var(--stone); margin: 0 5px; }
-        .logout-link {
-            color: var(--text-muted) !important; text-decoration: none;
-            padding: 7px 12px; border-radius: 9px;
-            font-size: 13px; font-weight: 500;
-            display: inline-flex; align-items: center; gap: 5px;
-            transition: color 0.2s, background 0.2s;
-        }
-        .logout-link:hover { color: #DC2626 !important; background: #FEF2F2; }
+        /* ── MAIN ── */
+        .main { padding:40px 72px 80px; }
 
-        /* ── LAYOUT ── */
-        .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; position: relative; z-index: 1; }
-
-        /* ── PAGE HEADER ── */
-        .page-header {
-            background: rgba(250,244,234,0.82);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.55);
-            border-radius: 22px;
-            padding: 0;
-            margin-bottom: 24px;
-            overflow: hidden;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
-            position: relative;
-            box-shadow: 0 4px 32px rgba(150,105,58,0.10), inset 0 1px 0 rgba(255,248,235,0.7);
-            animation: slideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
-        }
-        .page-header::before {
-            content: '';
-            position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-            background: linear-gradient(180deg, var(--accent), var(--accent2));
-            border-radius: 22px 0 0 22px;
-        }
-        .header-left { padding: 28px 40px; }
-        .header-eyebrow {
-            font-size: 11px; font-weight: 600; letter-spacing: 2px;
-            text-transform: uppercase; color: var(--accent);
-            margin-bottom: 8px; display: flex; align-items: center; gap: 7px;
-        }
-        .header-eyebrow::before {
-            content: ''; width: 22px; height: 1.5px;
-            background: var(--accent); display: inline-block;
-        }
-        .header-left h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 30px; font-weight: 700;
-            color: var(--text-primary); line-height: 1.15; margin-bottom: 6px;
-        }
-        .header-left p { color: var(--text-secondary); font-size: 13.5px; }
-        .header-deco {
-            padding: 20px 36px;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        /* ── PROFILE GRID ── */
         .profile-grid {
-            display: grid; grid-template-columns: 290px 1fr;
-            gap: 20px;
-            animation: slideUp 0.55s 0.1s cubic-bezier(0.22,1,0.36,1) both;
+            display:grid; grid-template-columns:300px 1fr;
+            gap:20px; align-items:start;
         }
 
         /* ── SIDEBAR ── */
         .sidebar {
-            background: rgba(250,244,234,0.78);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.48);
-            border-radius: 18px; padding: 28px 22px;
-            box-shadow: 0 2px 24px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.65);
-            height: fit-content;
+            display:flex; flex-direction:column; gap:14px;
+            position:sticky; top:82px;
         }
-        .pic-section {
-            text-align: center; margin-bottom: 22px; padding-bottom: 22px;
-            border-bottom: 1px solid var(--sand);
-        }
-        .pic-wrapper { position: relative; width: 110px; height: 110px; margin: 0 auto 14px; }
-        .pic-circle {
-            width: 110px; height: 110px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            border: 3px solid rgba(184,134,78,0.35);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 40px; color: var(--accent); overflow: hidden;
-            box-shadow: 0 4px 20px rgba(184,134,78,0.2);
-        }
-        .pic-circle img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .upload-btn {
-            position: absolute; bottom: 2px; right: 2px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            width: 32px; height: 32px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; border: 2px solid var(--bg-card);
-            transition: all 0.25s; font-size: 13px;
-            box-shadow: 0 2px 10px rgba(184,134,78,0.4);
-        }
-        .upload-btn:hover { transform: scale(1.12); box-shadow: 0 4px 16px rgba(184,134,78,0.5); }
-        .upload-btn input { display: none; }
-        .sidebar-name {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 20px; font-weight: 700;
-            color: var(--text-primary); margin-bottom: 3px;
-        }
-        .sidebar-email { font-size: 12.5px; color: var(--text-muted); }
 
-        .stat-list { display: flex; flex-direction: column; gap: 0; }
-        .stat-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 11px 0; border-bottom: 1px solid var(--sand);
+        /* Avatar card */
+        .avatar-card {
+            background:var(--deep); border:1px solid var(--rim);
+            border-radius:20px; overflow:hidden;
+            transition:border-color .3s;
         }
-        .stat-row:last-child { border-bottom: none; }
+        .avatar-card:hover { border-color:rgba(212,146,74,0.25); }
+        .avatar-banner {
+            height:80px; position:relative;
+            background:url('https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=600&q=60') center/cover;
+            filter:brightness(0.32) saturate(0.4);
+        }
+        .avatar-banner::after {
+            content:''; position:absolute; inset:0;
+            background:linear-gradient(0deg,var(--deep) 0%,transparent 65%);
+        }
+        .avatar-body { padding:0 24px 26px; }
+        .pic-wrapper {
+            position:relative; width:84px; height:84px;
+            margin:-42px 0 16px;
+        }
+        .pic-circle {
+            width:84px; height:84px; border-radius:50%;
+            background:linear-gradient(135deg, #2a2318, #3a2e1e);
+            border:3px solid var(--deep);
+            outline:2px solid rgba(212,146,74,0.4);
+            display:flex; align-items:center; justify-content:center;
+            font-family:'DM Serif Display',serif;
+            font-size:28px; color:var(--gold); overflow:hidden;
+            box-shadow:0 8px 28px rgba(0,0,0,0.5);
+            transition:outline-color .25s;
+        }
+        .pic-circle:hover { outline-color:var(--gold); }
+        .pic-circle img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+        .upload-btn {
+            position:absolute; bottom:2px; right:2px;
+            background:var(--gold); width:28px; height:28px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; border:2.5px solid var(--deep);
+            transition:all .2s; color:var(--void);
+            box-shadow:0 2px 10px var(--glow);
+        }
+        .upload-btn:hover { transform:scale(1.15); background:var(--gold2); }
+        .upload-btn input { display:none; }
+
+        .sidebar-name {
+            font-family:'DM Serif Display',serif;
+            font-size:20px; color:var(--white); line-height:1.2; margin-bottom:4px;
+        }
+        .sidebar-email { font-size:12px; color:var(--ghost); margin-bottom:18px; }
+
+        /* Stats list */
+        .stat-list { display:flex; flex-direction:column; }
+        .stat-row {
+            display:flex; justify-content:space-between; align-items:center;
+            padding:12px 0; border-bottom:1px solid var(--rim2);
+        }
+        .stat-row:last-child { border-bottom:none; }
         .stat-row-label {
-            font-size: 12px; color: var(--text-secondary); font-weight: 500;
-            text-transform: uppercase; letter-spacing: 0.6px;
-            display: flex; align-items: center; gap: 7px;
+            font-size:11.5px; color:var(--ghost); font-weight:500;
+            display:flex; align-items:center; gap:8px;
         }
         .stat-row-icon {
-            width: 22px; height: 22px;
-            background: var(--accent-light); border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--accent); flex-shrink: 0;
+            width:24px; height:24px; border-radius:7px;
+            background:var(--soft); border:1px solid rgba(212,146,74,0.2);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold); flex-shrink:0;
         }
         .stat-row-val {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 16px; font-weight: 700; color: var(--accent);
+            font-family:'Syne',sans-serif;
+            font-size:14px; font-weight:700; color:var(--gold);
         }
+
+        /* Nav card */
+        .nav-card {
+            background:var(--deep); border:1px solid var(--rim);
+            border-radius:18px; overflow:hidden;
+        }
+        .nav-card-link {
+            display:flex; align-items:center; gap:11px;
+            padding:13px 20px; text-decoration:none;
+            color:var(--ghost); font-size:13.5px; font-weight:500;
+            border-bottom:1px solid var(--rim2);
+            transition:color .18s, background .18s, padding-left .2s;
+            position:relative;
+        }
+        .nav-card-link:last-child { border-bottom:none; }
+        .nav-card-link:hover { color:var(--off); background:var(--rim2); padding-left:26px; }
+        .nav-card-link.active { color:var(--gold); background:var(--soft); }
+        .nav-card-link.active::before {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:2.5px;
+            background:var(--gold); border-radius:0 2px 2px 0;
+        }
+        .nav-card-icon {
+            width:32px; height:32px; border-radius:8px;
+            background:rgba(255,255,255,0.04);
+            display:flex; align-items:center; justify-content:center; flex-shrink:0;
+        }
+        .nav-card-link.active .nav-card-icon { background:var(--soft); color:var(--gold); }
+        .nav-card-arrow { margin-left:auto; opacity:.35; transition:opacity .18s, transform .2s; }
+        .nav-card-link:hover .nav-card-arrow { opacity:.7; transform:translateX(3px); }
 
         /* ── MAIN CARD ── */
         .main-card {
-            background: rgba(250,244,234,0.78);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.48);
-            border-radius: 18px; padding: 30px 34px;
-            box-shadow: 0 2px 24px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.65);
+            background:var(--deep);
+            border:1px solid var(--rim);
+            border-radius:20px; overflow:hidden;
         }
 
-        /* ── TABS ── */
+        /* Tabs */
         .tabs {
-            display: flex; gap: 4px; margin-bottom: 26px;
-            border-bottom: 1px solid var(--sand); padding-bottom: 0;
+            display:flex; gap:0;
+            border-bottom:1px solid var(--rim);
+            background:rgba(12,11,9,0.4);
         }
         .tab-btn {
-            padding: 9px 22px; background: none; border: none;
-            font-family: 'Outfit', sans-serif;
-            font-size: 13.5px; font-weight: 600; color: var(--text-muted);
-            cursor: pointer; border-bottom: 2px solid transparent;
-            margin-bottom: -1px; transition: all 0.2s;
-            display: flex; align-items: center; gap: 7px;
+            display:flex; align-items:center; gap:8px;
+            padding:16px 28px; background:none; border:none;
+            font-family:'DM Sans',sans-serif;
+            font-size:13.5px; font-weight:500; color:var(--ghost);
+            cursor:pointer; border-bottom:2px solid transparent;
+            margin-bottom:-1px; transition:all .2s;
+            position:relative;
         }
-        .tab-btn:hover { color: var(--accent); }
-        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-btn::after {
+            content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+            background:var(--gold); transform:scaleX(0); transition:transform .25s;
+            box-shadow:0 0 10px var(--glow);
+        }
+        .tab-btn:hover { color:var(--off); }
+        .tab-btn.active { color:var(--gold); }
+        .tab-btn.active::after { transform:scaleX(1); }
 
-        /* ── SECTION TITLES ── */
-        .section-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 16px; font-weight: 700; color: var(--text-primary);
-            margin-bottom: 18px; padding-bottom: 12px;
-            border-bottom: 1px solid var(--sand);
-            display: flex; align-items: center; gap: 8px;
+        .tab-icon {
+            width:28px; height:28px; border-radius:7px;
+            background:rgba(255,255,255,0.04);
+            display:flex; align-items:center; justify-content:center; flex-shrink:0;
+            transition:background .2s;
         }
-        .section-title-dot {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            flex-shrink: 0;
-        }
-        .form-section { margin-bottom: 26px; }
+        .tab-btn.active .tab-icon { background:var(--soft); color:var(--gold); }
 
-        /* ── FORM ELEMENTS ── */
-        .form-group { margin-bottom: 16px; }
+        .tab-pane { display:none; }
+        .tab-pane.active { display:block; animation:fadeUp .3s cubic-bezier(.22,1,.36,1); }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+        /* Pane content */
+        .pane-inner { padding:32px 36px; }
+
+        /* Section heading */
+        .sec-head {
+            display:flex; align-items:center; gap:12px;
+            margin-bottom:24px; padding-bottom:18px;
+            border-bottom:1px solid var(--rim);
+        }
+        .sec-head-icon {
+            width:38px; height:38px; border-radius:10px;
+            background:var(--soft); border:1px solid rgba(212,146,74,0.25);
+            display:flex; align-items:center; justify-content:center; color:var(--gold);
+        }
+        .sec-head-text h3 {
+            font-family:'DM Serif Display',serif;
+            font-size:18px; color:var(--white); margin-bottom:2px;
+        }
+        .sec-head-text p { font-size:12px; color:var(--ghost); font-weight:300; }
+
+        /* Form */
+        .form-group { margin-bottom:18px; }
         .form-label {
-            display: block; margin-bottom: 6px;
-            color: var(--text-secondary); font-weight: 600;
-            font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
+            display:block; margin-bottom:7px;
+            color:var(--ghost); font-weight:600;
+            font-size:10.5px; text-transform:uppercase; letter-spacing:1px;
         }
         .form-control {
-            width: 100%; padding: 11px 14px;
-            border: 1.5px solid var(--stone); border-radius: 10px;
-            font-size: 14px; font-family: 'Outfit', sans-serif;
-            background: rgba(255,255,255,0.6);
-            color: var(--text-primary);
-            transition: all 0.2s;
-            backdrop-filter: blur(8px);
+            width:100%; padding:12px 16px;
+            border:1px solid var(--rim); border-radius:10px;
+            font-size:14px; font-family:'DM Sans',sans-serif;
+            background:rgba(255,255,255,0.04);
+            color:var(--off);
+            transition:all .2s;
         }
+        .form-control::placeholder { color:rgba(242,237,230,0.2); }
         .form-control:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: rgba(255,255,255,0.85);
-            box-shadow: 0 0 0 3px rgba(184,134,78,0.12);
+            outline:none;
+            border-color:rgba(212,146,74,0.55);
+            background:rgba(212,146,74,0.06);
+            box-shadow:0 0 0 3px rgba(212,146,74,0.10);
         }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 
         /* ── ALERTS ── */
         .alert {
-            padding: 12px 16px; border-radius: 10px;
-            margin-bottom: 18px; font-size: 13.5px; display: none;
-            align-items: center; gap: 9px;
+            padding:12px 18px; border-radius:10px;
+            margin-bottom:20px; font-size:13px;
+            display:none; align-items:center; gap:10px; font-weight:500;
         }
-        .alert.show { display: flex; animation: fadeIn 0.3s ease; }
-        .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
-        .alert-error { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+        .alert.show { display:flex; animation:fadeUp .3s ease; }
+        .alert-success { background:var(--green-bg); color:var(--green); border:1px solid rgba(76,175,130,0.25); }
+        .alert-error   { background:var(--red-bg);   color:var(--red);   border:1px solid rgba(239,68,68,0.25); }
 
-        /* ── PASSWORD REQS ── */
+        /* Password requirements */
         .pw-reqs {
-            margin-top: 10px; padding: 14px 16px;
-            background: rgba(232,223,208,0.6); border-radius: 10px;
-            font-size: 12px; border: 1px solid var(--sand);
+            margin-top:10px; padding:14px 16px;
+            background:rgba(255,255,255,0.03);
+            border:1px solid var(--rim); border-radius:10px;
+            font-size:12px;
         }
-        .req { color: var(--text-muted); margin: 4px 0; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
-        .req.valid { color: #059669; }
-        .req.invalid { color: #DC2626; }
+        .req { color:var(--ghost); margin:4px 0; display:flex; align-items:center; gap:8px; transition:color .2s; }
+        .req.valid { color:var(--green); }
+        .req.invalid { color:var(--red); }
 
-        /* ── BUTTONS ── */
-        .form-actions { display: flex; gap: 10px; margin-top: 22px; }
+        /* Buttons */
+        .form-actions { display:flex; gap:10px; margin-top:24px; }
         .btn-primary {
-            padding: 11px 28px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: white; border: none; border-radius: 10px;
-            font-weight: 600; font-size: 13.5px; cursor: pointer;
-            font-family: 'Outfit', sans-serif;
-            transition: all 0.25s;
-            box-shadow: 0 2px 12px rgba(184,134,78,0.35);
-            display: inline-flex; align-items: center; gap: 7px;
+            display:inline-flex; align-items:center; gap:7px;
+            padding:12px 28px; border-radius:10px;
+            background:var(--gold); color:var(--void);
+            border:none; font-weight:600; font-size:13.5px; cursor:pointer;
+            font-family:'DM Sans',sans-serif; transition:all .2s;
+            box-shadow:0 4px 18px var(--glow);
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(184,134,78,0.45); }
+        .btn-primary:hover { background:var(--gold2); transform:translateY(-1px); box-shadow:0 8px 26px var(--glow); }
         .btn-ghost {
-            padding: 11px 24px;
-            background: rgba(232,223,208,0.6); color: var(--text-secondary);
-            border: 1.5px solid var(--stone); border-radius: 10px;
-            font-weight: 600; font-size: 13.5px; cursor: pointer;
-            font-family: 'Outfit', sans-serif; transition: all 0.2s;
+            display:inline-flex; align-items:center; gap:7px;
+            padding:12px 22px; border-radius:10px;
+            background:transparent; color:var(--fog);
+            border:1px solid var(--rim);
+            font-weight:600; font-size:13.5px; cursor:pointer;
+            font-family:'DM Sans',sans-serif; transition:all .2s;
         }
-        .btn-ghost:hover { background: var(--stone); }
-        .btn-danger-outline {
-            padding: 11px 26px;
-            background: transparent; color: #DC2626;
-            border: 1.5px solid #FECACA; border-radius: 10px;
-            font-weight: 600; font-size: 13.5px; cursor: pointer;
-            font-family: 'Outfit', sans-serif; transition: all 0.2s;
-            display: inline-flex; align-items: center; gap: 7px;
+        .btn-ghost:hover { background:var(--rim2); color:var(--off); border-color:rgba(255,255,255,0.14); }
+        .btn-danger {
+            display:inline-flex; align-items:center; gap:7px;
+            padding:12px 26px; border-radius:10px;
+            background:transparent; color:var(--red);
+            border:1px solid rgba(239,68,68,0.3);
+            font-weight:600; font-size:13.5px; cursor:pointer;
+            font-family:'DM Sans',sans-serif; transition:all .2s;
         }
-        .btn-danger-outline:hover { background: #FEE2E2; border-color: #FCA5A5; }
+        .btn-danger:hover { background:var(--red-bg); border-color:rgba(239,68,68,0.55); }
 
-        /* ── 2FA SECTION ── */
-        .tfa-section {
-            background: linear-gradient(135deg, rgba(26,20,16,0.88), rgba(44,32,16,0.85));
-            border: 1px solid rgba(184,134,78,0.3);
-            border-radius: 14px; padding: 22px 24px;
-            margin-top: 26px; position: relative; overflow: hidden;
+        /* 2FA panel */
+        .tfa-panel {
+            margin-top:28px; padding:24px 28px;
+            background:rgba(255,255,255,0.025);
+            border:1px solid var(--rim); border-radius:14px;
+            position:relative; overflow:hidden;
         }
-        .tfa-section::before {
-            content: '';
-            position: absolute; inset: 0;
+        .tfa-panel::before {
+            content:''; position:absolute; inset:0; pointer-events:none;
             background-image:
-                linear-gradient(rgba(184,134,78,0.07) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(184,134,78,0.07) 1px, transparent 1px);
-            background-size: 20px 20px;
+                linear-gradient(rgba(212,146,74,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(212,146,74,0.05) 1px, transparent 1px);
+            background-size:24px 24px;
         }
-        .tfa-section .section-title {
-            border-color: rgba(184,134,78,0.2);
-            color: #F5D89A;
-            position: relative; z-index: 1;
+        .tfa-top {
+            display:flex; align-items:center; gap:14px; margin-bottom:14px;
+            position:relative; z-index:1;
         }
-        .tfa-section .section-title-dot {
-            background: linear-gradient(135deg, #F5D89A, var(--accent2));
+        .tfa-icon {
+            width:44px; height:44px; border-radius:12px;
+            background:linear-gradient(135deg, rgba(212,146,74,0.2), rgba(212,146,74,0.08));
+            border:1px solid rgba(212,146,74,0.3);
+            display:flex; align-items:center; justify-content:center; color:var(--gold);
+            flex-shrink:0;
         }
-        .tfa-section p {
-            font-size: 13px; color: rgba(212,169,106,0.65);
-            margin-bottom: 16px; line-height: 1.6;
-            position: relative; z-index: 1;
+        .tfa-title {
+            font-family:'DM Serif Display',serif;
+            font-size:16px; color:var(--white); margin-bottom:2px;
         }
-        .tfa-section .btn-ghost {
-            background: rgba(184,134,78,0.15);
-            border-color: rgba(184,134,78,0.4);
-            color: #F5D89A;
-            position: relative; z-index: 1;
+        .tfa-sub { font-size:12px; color:var(--ghost); font-weight:300; }
+        .tfa-desc {
+            font-size:13px; color:var(--ghost); line-height:1.65;
+            margin-bottom:18px; font-weight:300;
+            position:relative; z-index:1;
         }
-        .tfa-section .btn-ghost:hover {
-            background: rgba(184,134,78,0.28);
+        .tfa-panel .btn-ghost {
+            position:relative; z-index:1;
+            border-color:rgba(212,146,74,0.3); color:var(--gold2);
         }
+        .tfa-panel .btn-ghost:hover { background:var(--soft); border-color:var(--gold); }
+
+        /* Divider */
+        .form-divider {
+            height:1px; background:var(--rim); margin:26px 0;
+        }
+
+        /* sec-lbl */
+        .sec-lbl {
+            font-size:10px; font-weight:600; letter-spacing:2.5px;
+            text-transform:uppercase; color:var(--gold);
+            display:flex; align-items:center; gap:10px; margin-bottom:20px;
+        }
+        .sec-lbl::before { content:''; width:22px; height:1px; background:var(--gold); }
 
         /* ── ANIMATIONS ── */
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(22px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .fu { animation:slideUp .6s cubic-bezier(.22,1,.36,1) both; }
+        .d1{animation-delay:.06s} .d2{animation-delay:.14s}
 
-        @media (max-width: 900px) { .profile-grid { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) { .navbar { padding: 0 20px; } .container { padding: 20px 16px; } .main-card { padding: 20px; } .form-grid { grid-template-columns: 1fr; } .header-left { padding: 22px 24px; } }
+        /* ── RESPONSIVE ── */
+        @media(max-width:1000px){
+            .profile-grid{grid-template-columns:1fr;}
+            .sidebar{position:static; display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+        }
+        @media(max-width:900px){
+            .nav{padding:0 22px;} .nav-center{display:none;}
+            .main{padding:28px 22px 60px;}
+            .hero-body{padding:0 28px 36px;} .hero-h1{font-size:36px;}
+        }
+        @media(max-width:600px){
+            .form-grid{grid-template-columns:1fr;}
+            .pane-inner{padding:22px 20px;}
+            .sidebar{grid-template-columns:1fr;}
+        }
     </style>
 </head>
 <body>
-<div class="bg-grid"></div>
-<div class="bg-warm"></div>
 
-    <nav class="navbar">
-        <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">
-            <div class="navbar-brand-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            </div>
-            House-Forge
+<!-- ── NAV ── -->
+<nav class="nav">
+    <a href="{{ url_for('user.dashboard') }}" class="nav-logo">
+        <div class="nav-logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <span class="nav-logo-name">House<b>-Forge</b></span>
+    </a>
+
+    <div class="nav-center">
+        <a href="{{ url_for('user.dashboard') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
         </a>
-        <div class="navbar-menu">
-            <a href="{{ url_for('user.dashboard') }}">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                Dashboard
-            </a>
-            <a href="{{ url_for('user.projects') }}">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                Projects
-            </a>
-            <a href="{{ url_for('user.my_orders') }}">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                Orders
-            </a>
-            <a href="/user/bids">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                Bids
-                <span class="badge-notification badge-amber" id="bidsBadge"></span>
-            </a>
-            <a href="{{ url_for('user.messages') }}" style="position:relative;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                Messages
-                <span class="badge-notification" id="messagesBadge"></span>
-            </a>
-            
-            <div class="nav-divider"></div>
-            <a href="{{ url_for('user.profile') }}" class="nav-active" style="padding:8px 9px;">
+        <a href="{{ url_for('user.projects') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Projects
+        </a>
+        <a href="/user/bids" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Bids
+            <span class="npip amber" id="bidsBadge"></span>
+        </a>
+        <a href="{{ url_for('user.my_orders') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Orders
+        </a>
+        <a href="{{ url_for('user.messages') }}" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Messages
+            <span class="npip" id="messagesBadge"></span>
+        </a>
+    </div>
+
+    <div class="nav-right">
+        <a href="{{ url_for('user.profile') }}" class="nav-profile">
+            <div class="nav-av">
                 {% if user_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile">
                 {% else %}
-                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
+                    {{ current_user.name[0].upper() if current_user.name else 'U' }}
                 {% endif %}
-            </a>
-            <a href="{{ url_for('auth.logout') }}" class="logout-link">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                Sign Out
-            </a>
-        </div>
-    </nav>
-
-    <div class="container">
-
-        <!-- PAGE HEADER -->
-        <div class="page-header">
-            <div class="header-left">
-                <div class="header-eyebrow">Account Settings</div>
-                <h1>My Profile</h1>
-                <p>Manage your personal information and account security</p>
             </div>
-            <div class="header-deco">
-                <svg width="90" height="72" viewBox="0 0 90 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="45" cy="28" r="20" fill="rgba(184,134,78,0.1)" stroke="rgba(184,134,78,0.45)" stroke-width="1.2"/>
-                    <circle cx="45" cy="28" r="13" fill="rgba(184,134,78,0.12)" stroke="rgba(184,134,78,0.5)" stroke-width="1"/>
-                    <circle cx="45" cy="23" r="5" fill="rgba(184,134,78,0.25)" stroke="rgba(184,134,78,0.6)" stroke-width="1"/>
-                    <path d="M28 55c0-9.39 7.61-17 17-17s17 7.61 17 17" stroke="rgba(184,134,78,0.55)" stroke-width="1.2" fill="rgba(184,134,78,0.08)" stroke-linecap="round"/>
-                    <line x1="10" y1="66" x2="80" y2="66" stroke="rgba(184,134,78,0.25)" stroke-width="1" stroke-dasharray="3 3"/>
-                    <circle cx="45" cy="28" r="20" stroke="rgba(184,134,78,0.15)" stroke-width="6" stroke-dasharray="2 4"/>
-                </svg>
-            </div>
-        </div>
+            <span class="nav-uname">{{ current_user.name }}</span>
+        </a>
+        <div class="ndiv"></div>
+        <a href="{{ url_for('auth.logout') }}" class="nav-out">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+        </a>
+    </div>
+</nav>
 
-        <!-- PROFILE GRID -->
+<div class="shell">
+
+    <!-- ── HERO ── -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-body">
+            <div class="hero-tag"><span class="hero-tag-ln"></span> Account Settings</div>
+            <h1 class="hero-h1">My <em>Profile</em></h1>
+            <p class="hero-sub">Manage your personal information, account security, and preferences all in one place.</p>
+        </div>
+    </section>
+
+    <main class="main">
         <div class="profile-grid">
 
-            <!-- SIDEBAR -->
-            <div class="sidebar">
-                <div class="pic-section">
-                    <div class="pic-wrapper">
-                        <div class="pic-circle" id="profilePicCircle">
-                            {% if user_data.get('profile_picture') %}
-                                <img id="profileImg" src="{{ url_for('static', filename='uploads/profiles/' + user_data.profile_picture) }}" alt="">
-                            {% else %}
-                                <span id="profileInitials">{{ user_data.name[:2].upper() if user_data.name else 'U' }}</span>
-                            {% endif %}
+            <!-- ── SIDEBAR ── -->
+            <div class="sidebar fu d1">
+
+                <!-- Avatar card -->
+                <div class="avatar-card">
+                    <div class="avatar-banner"></div>
+                    <div class="avatar-body">
+                        <div class="pic-wrapper">
+                            <div class="pic-circle" id="profilePicCircle">
+                                {% if user_data.get('profile_picture') %}
+                                    <img id="profileImg" src="{{ url_for('static', filename='uploads/profiles/' + user_data.profile_picture) }}" alt="">
+                                {% else %}
+                                    <span id="profileInitials">{{ user_data.name[:2].upper() if user_data.name else 'U' }}</span>
+                                {% endif %}
+                            </div>
+                            <label class="upload-btn" for="profileUpload" title="Change photo">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                <input type="file" id="profileUpload" accept="image/*">
+                            </label>
                         </div>
-                        <label class="upload-btn" for="profileUpload" title="Change photo">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                            <input type="file" id="profileUpload" accept="image/*">
-                        </label>
+                        <div class="sidebar-name" id="sidebarName">{{ user_data.name }}</div>
+                        <div class="sidebar-email" id="sidebarEmail">{{ user_data.email }}</div>
+
+                        <div class="stat-list">
+                            <div class="stat-row">
+                                <span class="stat-row-label">
+                                    <span class="stat-row-icon">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                                    </span>
+                                    Projects
+                                </span>
+                                <span class="stat-row-val">{{ project_count or 0 }}</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">
+                                    <span class="stat-row-icon">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                    </span>
+                                    Member Since
+                                </span>
+                                <span class="stat-row-val" style="font-size:12px;">{{ user_data.get('created_at', 'N/A') }}</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">
+                                    <span class="stat-row-icon">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    Role
+                                </span>
+                                <span class="stat-row-val">{{ user_data.get('role', 'User').title() }}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="sidebar-name" id="sidebarName">{{ user_data.name }}</div>
-                    <div class="sidebar-email" id="sidebarEmail">{{ user_data.email }}</div>
                 </div>
 
-                <div class="stat-list">
-                    <div class="stat-row">
-                        <span class="stat-row-label">
-                            <span class="stat-row-icon">
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                            </span>
-                            Projects
+                <!-- Quick nav card -->
+                <div class="nav-card">
+                    <a href="{{ url_for('user.dashboard') }}" class="nav-card-link">
+                        <span class="nav-card-icon">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                         </span>
-                        <span class="stat-row-val">{{ project_count or 0 }}</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-row-label">
-                            <span class="stat-row-icon">
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                            </span>
-                            Member Since
+                        Dashboard
+                        <svg class="nav-card-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                    <a href="{{ url_for('user.projects') }}" class="nav-card-link">
+                        <span class="nav-card-icon">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                         </span>
-                        <span class="stat-row-val">{{ user_data.get('created_at', 'N/A') }}</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-row-label">
-                            <span class="stat-row-icon">
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            </span>
-                            Role
+                        My Projects
+                        <svg class="nav-card-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                    <a href="{{ url_for('user.my_orders') }}" class="nav-card-link">
+                        <span class="nav-card-icon">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                         </span>
-                        <span class="stat-row-val">{{ user_data.get('role', 'User').title() }}</span>
-                    </div>
+                        My Orders
+                        <svg class="nav-card-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                    <a href="{{ url_for('auth.logout') }}" class="nav-card-link" style="color:rgba(239,68,68,0.65);">
+                        <span class="nav-card-icon" style="color:#EF4444;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        </span>
+                        Sign Out
+                        <svg class="nav-card-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
                 </div>
+
             </div>
+            <!-- /sidebar -->
 
-            <!-- MAIN CARD -->
-            <div class="main-card">
+            <!-- ── MAIN CARD ── -->
+            <div class="main-card fu d2">
+
+                <!-- Tabs -->
                 <div class="tabs">
                     <button class="tab-btn active" onclick="switchTab('personal', this)">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span class="tab-icon">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </span>
                         Personal Info
                     </button>
                     <button class="tab-btn" onclick="switchTab('security', this)">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <span class="tab-icon">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </span>
                         Security
                     </button>
                 </div>
 
-                <!-- PERSONAL TAB -->
+                <!-- ── PERSONAL TAB ── -->
                 <div id="personal" class="tab-pane active">
-                    <div id="personalAlert" class="alert alert-success">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        Profile updated successfully!
-                    </div>
-                    <form id="personalInfoForm">
-                        <div class="form-section">
-                            <div class="section-title">
-                                <span class="section-title-dot"></span>
-                                Basic Information
+                    <div class="pane-inner">
+
+                        <div id="personalAlert" class="alert alert-success">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Profile updated successfully!
+                        </div>
+
+                        <div class="sec-head">
+                            <div class="sec-head-icon">
+                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             </div>
+                            <div class="sec-head-text">
+                                <h3>Basic Information</h3>
+                                <p>Update your name, contact details and location</p>
+                            </div>
+                        </div>
+
+                        <form id="personalInfoForm">
                             <div class="form-group">
                                 <label class="form-label">Full Name *</label>
                                 <input type="text" name="name" id="fullName" value="{{ user_data.get('name','') }}" required class="form-control" placeholder="Your full name">
@@ -580,36 +712,45 @@
                                 <label class="form-label">Location</label>
                                 <input type="text" name="location" value="{{ user_data.get('location','') }}" class="form-control" placeholder="City, State">
                             </div>
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn-ghost" onclick="document.getElementById('personalInfoForm').reset()">Cancel</button>
-                            <button type="submit" class="btn-primary">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                Save Changes
-                            </button>
-                        </div>
-                    </form>
+                            <div class="form-actions">
+                                <button type="button" class="btn-ghost" onclick="document.getElementById('personalInfoForm').reset()">Cancel</button>
+                                <button type="submit" class="btn-primary">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
                 </div>
 
-                <!-- SECURITY TAB -->
+                <!-- ── SECURITY TAB ── -->
                 <div id="security" class="tab-pane">
-                    <div id="securityAlert" class="alert alert-success">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        Password changed successfully!
-                    </div>
-                    <form id="securityForm">
-                        <div class="form-section">
-                            <div class="section-title">
-                                <span class="section-title-dot"></span>
-                                Change Password
+                    <div class="pane-inner">
+
+                        <div id="securityAlert" class="alert alert-success">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Password changed successfully!
+                        </div>
+
+                        <div class="sec-head">
+                            <div class="sec-head-icon">
+                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                             </div>
+                            <div class="sec-head-text">
+                                <h3>Change Password</h3>
+                                <p>Keep your account secure with a strong password</p>
+                            </div>
+                        </div>
+
+                        <form id="securityForm">
                             <div class="form-group">
                                 <label class="form-label">Current Password *</label>
-                                <input type="password" name="currentPassword" id="currentPassword" required class="form-control">
+                                <input type="password" name="currentPassword" id="currentPassword" required class="form-control" placeholder="Enter current password">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">New Password *</label>
-                                <input type="password" name="newPassword" id="newPassword" required class="form-control">
+                                <input type="password" name="newPassword" id="newPassword" required class="form-control" placeholder="Enter new password">
                                 <div class="pw-reqs">
                                     <div class="req" id="req-length">● At least 8 characters</div>
                                     <div class="req" id="req-uppercase">● One uppercase letter</div>
@@ -620,104 +761,126 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Confirm New Password *</label>
-                                <input type="password" name="confirmPassword" id="confirmPassword" required class="form-control">
+                                <input type="password" name="confirmPassword" id="confirmPassword" required class="form-control" placeholder="Confirm new password">
                             </div>
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn-ghost" onclick="resetSecurity()">Cancel</button>
-                            <button type="submit" class="btn-danger-outline">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                                Change Password
+                            <div class="form-actions">
+                                <button type="button" class="btn-ghost" onclick="resetSecurity()">Cancel</button>
+                                <button type="submit" class="btn-danger">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                    Change Password
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- 2FA -->
+                        <div class="tfa-panel">
+                            <div class="tfa-top">
+                                <div class="tfa-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                </div>
+                                <div>
+                                    <div class="tfa-title">Two-Factor Authentication</div>
+                                    <div class="tfa-sub">Extra layer of account security</div>
+                                </div>
+                            </div>
+                            <p class="tfa-desc">Once enabled, you'll need a verification code each time you log in. This significantly reduces the risk of unauthorised access.</p>
+                            <button class="btn-ghost">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                Enable 2FA
                             </button>
                         </div>
-                    </form>
 
-                    <div class="tfa-section">
-                        <div class="section-title">
-                            <span class="section-title-dot"></span>
-                            Two-Factor Authentication
-                        </div>
-                        <p>Add an extra layer of security to your account. Once enabled, you'll need a verification code each time you log in.</p>
-                        <button class="btn-ghost">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            Enable 2FA
-                        </button>
                     </div>
                 </div>
+
             </div>
+            <!-- /main-card -->
+
         </div>
-    </div>
+    </main>
+</div>
 
-    <script>
-        function switchTab(name, btn) {
-            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(name).classList.add('active');
-            btn.classList.add('active');
-        }
+<script>
+    function switchTab(name, btn) {
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(name).classList.add('active');
+        btn.classList.add('active');
+    }
 
-        document.getElementById('profileUpload').addEventListener('change', function(e) {
-            const file = e.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const circle = document.getElementById('profilePicCircle');
-                circle.innerHTML = `<img src="${e.target.result}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-            };
-            reader.readAsDataURL(file);
-            const fd = new FormData(); fd.append('profile_picture', file);
-            fetch('{{ url_for("user.upload_profile_picture") }}', { method: 'POST', body: fd })
-                .then(r => r.json()).then(d => { if (!d.success) alert('Upload error: ' + d.message); }).catch(() => {});
-        });
+    document.getElementById('profileUpload').addEventListener('change', function(e) {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const circle = document.getElementById('profilePicCircle');
+            circle.innerHTML = `<img src="${e.target.result}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        };
+        reader.readAsDataURL(file);
+        const fd = new FormData(); fd.append('profile_picture', file);
+        fetch('{{ url_for("user.upload_profile_picture") }}', { method:'POST', body:fd })
+            .then(r => r.json()).then(d => { if (!d.success) alert('Upload error: ' + d.message); }).catch(() => {});
+    });
 
-        document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const fd = new FormData(this);
-            fetch('{{ url_for("user.update_profile") }}', { method: 'POST', body: fd })
-                .then(r => r.json()).then(d => {
-                    if (d.success) {
-                        document.getElementById('sidebarName').textContent = document.getElementById('fullName').value;
-                        document.getElementById('sidebarEmail').textContent = document.getElementById('email').value;
-                        const a = document.getElementById('personalAlert'); a.classList.add('show');
-                        setTimeout(() => a.classList.remove('show'), 3000);
-                    } else { alert('Error: ' + d.message); }
-                });
-        });
+    document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fd = new FormData(this);
+        fetch('{{ url_for("user.update_profile") }}', { method:'POST', body:fd })
+            .then(r => r.json()).then(d => {
+                if (d.success) {
+                    document.getElementById('sidebarName').textContent = document.getElementById('fullName').value;
+                    document.getElementById('sidebarEmail').textContent = document.getElementById('email').value;
+                    const a = document.getElementById('personalAlert'); a.classList.add('show');
+                    setTimeout(() => a.classList.remove('show'), 3000);
+                } else { alert('Error: ' + d.message); }
+            });
+    });
 
-        document.getElementById('newPassword').addEventListener('input', function() {
-            const p = this.value;
-            setReq('req-length', p.length >= 8);
-            setReq('req-uppercase', /[A-Z]/.test(p));
-            setReq('req-lowercase', /[a-z]/.test(p));
-            setReq('req-number', /[0-9]/.test(p));
-            setReq('req-special', /[!@#$%^&*(),.?":{}|<>]/.test(p));
-        });
+    document.getElementById('newPassword').addEventListener('input', function() {
+        const p = this.value;
+        setReq('req-length',    p.length >= 8);
+        setReq('req-uppercase', /[A-Z]/.test(p));
+        setReq('req-lowercase', /[a-z]/.test(p));
+        setReq('req-number',    /[0-9]/.test(p));
+        setReq('req-special',   /[!@#$%^&*(),.?":{}|<>]/.test(p));
+    });
 
-        function setReq(id, v) {
-            const el = document.getElementById(id);
-            el.className = 'req ' + (v ? 'valid' : 'invalid');
-        }
+    function setReq(id, v) {
+        const el = document.getElementById(id);
+        el.className = 'req ' + (v ? 'valid' : 'invalid');
+    }
 
-        document.getElementById('securityForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const np = document.getElementById('newPassword').value;
-            const cp = document.getElementById('confirmPassword').value;
-            if (np !== cp) { alert('Passwords do not match!'); return; }
-            if (np.length < 8) { alert('Password must be at least 8 characters'); return; }
-            const fd = new FormData(this);
-            fetch('{{ url_for("user.change_password") }}', { method: 'POST', body: fd })
-                .then(r => r.json()).then(d => {
-                    if (d.success) {
-                        const a = document.getElementById('securityAlert'); a.classList.add('show');
-                        setTimeout(() => a.classList.remove('show'), 3000);
-                        this.reset(); document.querySelectorAll('.req').forEach(r => r.className = 'req');
-                    } else { alert('Error: ' + d.message); }
-                });
-        });
+    document.getElementById('securityForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const np = document.getElementById('newPassword').value;
+        const cp = document.getElementById('confirmPassword').value;
+        if (np !== cp) { alert('Passwords do not match!'); return; }
+        if (np.length < 8) { alert('Password must be at least 8 characters'); return; }
+        const fd = new FormData(this);
+        fetch('{{ url_for("user.change_password") }}', { method:'POST', body:fd })
+            .then(r => r.json()).then(d => {
+                if (d.success) {
+                    const a = document.getElementById('securityAlert'); a.classList.add('show');
+                    setTimeout(() => a.classList.remove('show'), 3000);
+                    this.reset(); document.querySelectorAll('.req').forEach(r => r.className = 'req');
+                } else { alert('Error: ' + d.message); }
+            });
+    });
 
-        function resetSecurity() {
-            document.getElementById('securityForm').reset();
-            document.querySelectorAll('.req').forEach(r => r.className = 'req');
-        }
-    </script>
+    function resetSecurity() {
+        document.getElementById('securityForm').reset();
+        document.querySelectorAll('.req').forEach(r => r.className = 'req');
+    }
+
+    function updateBadge(ep, id) {
+        fetch(ep).then(r => r.ok && r.headers.get('content-type')?.includes('application/json') ? r.json() : null)
+        .then(d => { if (!d) return; const b = document.getElementById(id); if (!b) return; b.style.display = d.count > 0 ? 'block' : 'none'; }).catch(() => {});
+    }
+    function refreshBadges() {
+        updateBadge('/user/messages/unread-count', 'messagesBadge');
+        updateBadge('/user/bids/pending-count',    'bidsBadge');
+    }
+    document.addEventListener('DOMContentLoaded', refreshBadges);
+    setInterval(refreshBadges, 30000);
+</script>
 </body>
 </html>

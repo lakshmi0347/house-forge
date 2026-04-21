@@ -3,435 +3,475 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Messages - House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Messages — House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #F0EBE1;
-            --bg-card: #FAF6EF;
-            --bg-card2: #F4EEE3;
-            --sand: #E8DFD0;
-            --stone: #D4C8B8;
-            --accent: #B8864E;
-            --accent2: #D4A96A;
-            --accent-dark: #96693A;
-            --accent-light: #FBF3E4;
-            --text-primary: #1A1612;
-            --text-secondary: #4A3F35;
-            --text-muted: #8A7A6E;
-        }
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+            --void:    #0C0B09;
+            --ink:     #141210;
+            --deep:    #1C1A16;
+            --surface: #242118;
+            --panel:   #181612;
+            --rim:     rgba(255,255,255,0.07);
+            --rim2:    rgba(255,255,255,0.04);
+            --rim3:    rgba(255,255,255,0.035);
 
+            --gold:    #D4924A;
+            --gold2:   #F0C07A;
+            --gold3:   #B8743A;
+            --glow:    rgba(212,146,74,0.22);
+            --soft:    rgba(212,146,74,0.10);
+            --soft2:   rgba(212,146,74,0.06);
+
+            --white:   #FFFFFF;
+            --off:     #F2EDE6;
+            --fog:     rgba(242,237,230,0.55);
+            --ghost:   rgba(242,237,230,0.28);
+            --faint:   rgba(242,237,230,0.12);
+
+            --green:   #4CAF82; --green-bg: rgba(76,175,130,0.13); --green-border: rgba(76,175,130,0.3);
+            --blue:    #4A8FD4; --blue-bg:  rgba(74,143,212,0.13);
+            --amber:   #D49440; --amber-bg: rgba(212,148,64,0.13);
+            --purple:  #9B7EE0; --purple-bg: rgba(155,126,224,0.13); --purple-border: rgba(155,126,224,0.28);
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { height:100%; }
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg);
-            min-height: 100vh;
-            color: var(--text-primary);
-            overflow: hidden;
+            font-family:'DM Sans',sans-serif;
+            background:var(--void); color:var(--off);
+            height:100%; overflow:hidden;
+            -webkit-font-smoothing:antialiased;
         }
 
-        /* ── HOUSE PHOTO BACKGROUND ── */
-        body::before {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: url('/static/images/Home.jpg') no-repeat center center / cover;
-            opacity: 0.28;
-            filter: saturate(0.3) sepia(0.85) hue-rotate(-15deg) brightness(0.95);
+        /* ── NAV ── */
+        .nav {
+            position:fixed; top:0; left:0; right:0; z-index:300;
+            height:66px; display:flex; align-items:center; justify-content:space-between;
+            padding:0 52px;
+            background:rgba(12,11,9,0.92);
+            backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+            border-bottom:1px solid var(--rim);
         }
-        body::after {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: radial-gradient(ellipse 100% 100% at 50% 50%,
-                rgba(184,134,78,0.12) 0%, rgba(240,235,225,0.0) 55%, rgba(240,235,225,0.45) 100%);
+        .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+        .nav-logo-icon {
+            width:40px; height:40px; border-radius:9px;
+            border:1.5px solid var(--gold);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold); position:relative; overflow:hidden;
         }
-        .bg-grid {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background-image:
-                linear-gradient(rgba(184,134,78,0.045) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(184,134,78,0.045) 1px, transparent 1px);
-            background-size: 48px 48px;
+        .nav-logo-icon::before {
+            content:''; position:absolute; inset:0;
+            background:radial-gradient(circle at 30% 30%, rgba(212,146,74,0.18), transparent 70%);
         }
-        .bg-warm {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: rgba(184,134,78,0.10);
-            mix-blend-mode: multiply;
-        }
+        .nav-logo-name { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:var(--white); letter-spacing:-0.4px; }
+        .nav-logo-name b { color:var(--gold); font-weight:800; }
 
-        /* ── NAVBAR ── */
-        .navbar {
-            background: rgba(250,246,239,0.94); backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--stone);
-            padding: 0 44px; height: 66px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 1px 0 rgba(184,134,78,0.12), 0 4px 20px rgba(28,22,18,0.05);
+        .nav-center {
+            position:absolute; left:50%; transform:translateX(-50%);
+            display:flex; align-items:center; gap:2px;
         }
-        .navbar-brand {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px; font-weight: 700; color: var(--text-primary);
-            display: flex; align-items: center; gap: 11px; text-decoration: none; letter-spacing: 0.3px;
+        .nlink {
+            display:flex; align-items:center; gap:6px;
+            padding:7px 16px; border-radius:8px;
+            text-decoration:none; font-size:13.5px; font-weight:500;
+            color:var(--ghost); transition:color .18s, background .18s;
+            position:relative; white-space:nowrap;
         }
-        .navbar-brand-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            color: #fff; box-shadow: 0 2px 10px rgba(184,134,78,0.35); position: relative; overflow: hidden;
+        .nlink:hover { color:var(--off); background:var(--rim2); }
+        .nlink.active { color:var(--gold); }
+        .nlink.active::after {
+            content:''; position:absolute; bottom:-1px; left:16px; right:16px;
+            height:2px; background:var(--gold); border-radius:2px;
+            box-shadow:0 0 10px var(--glow);
         }
-        .navbar-brand-icon::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent); }
-        .navbar-menu { display: flex; align-items: center; gap: 2px; }
-        .navbar-menu a {
-            color: var(--text-secondary); text-decoration: none;
-            padding: 7px 12px; border-radius: 9px; font-size: 13.5px; font-weight: 500;
-            transition: color 0.2s, background 0.2s;
-            display: flex; align-items: center; gap: 6px; position: relative;
+        .npip {
+            position:absolute; top:5px; right:5px;
+            width:6px; height:6px; border-radius:50%;
+            background:#EF4444; border:1.5px solid var(--void); display:none;
         }
-        .navbar-menu a:hover, .navbar-menu a.nav-active { color: var(--accent); background: var(--accent-light); }
-        .badge-notification {
-            position: absolute; top: 2px; right: 2px;
-            background: #DC2626; color: white; border-radius: 50%;
-            width: 15px; height: 15px; display: none;
-            align-items: center; justify-content: center;
-            font-size: 8px; font-weight: 700; border: 2px solid var(--bg-card);
-        }
-        .profile-pic { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); display: block; }
-        .profile-placeholder {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            color: var(--accent); display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 13px; border: 2px solid var(--stone);
-        }
-        .nav-divider { width: 1px; height: 20px; background: var(--stone); margin: 0 5px; }
-        .logout-link {
-            color: var(--text-muted) !important; text-decoration: none;
-            padding: 7px 12px; border-radius: 9px; font-size: 13px; font-weight: 500;
-            display: inline-flex; align-items: center; gap: 5px; transition: color 0.2s, background 0.2s;
-        }
-        .logout-link:hover { color: #DC2626 !important; background: #FEF2F2; }
+        .npip.amber { background:var(--amber); }
 
-        /* ── CHAT LAYOUT ── */
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .nav-profile {
+            display:flex; align-items:center; gap:9px;
+            padding:5px 14px 5px 5px; border-radius:999px;
+            border:1px solid var(--rim); text-decoration:none;
+            transition:border-color .2s, background .2s;
+        }
+        .nav-profile:hover { border-color:var(--gold); background:var(--soft); }
+        .nav-av {
+            width:30px; height:30px; border-radius:50%;
+            background:var(--gold3); color:#fff;
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:700; flex-shrink:0;
+        }
+        .nav-av img { width:30px; height:30px; border-radius:50%; object-fit:cover; display:block; }
+        .nav-uname { font-size:13px; font-weight:500; color:var(--off); }
+        .ndiv { width:1px; height:22px; background:var(--rim); }
+        .nav-out {
+            display:flex; align-items:center; gap:6px;
+            text-decoration:none; font-size:13px; font-weight:500;
+            color:var(--ghost); padding:7px 14px; border-radius:8px;
+            transition:color .18s, background .18s;
+        }
+        .nav-out:hover { color:#EF4444; background:rgba(239,68,68,0.08); }
+
+        /* ── LAYOUT ── */
         .chat-layout {
-            display: flex;
-            height: calc(100vh - 66px);
-            position: relative; z-index: 1;
+            display:flex;
+            height:calc(100vh - 66px);
+            margin-top:66px;
+            position:relative;
         }
 
-        /* ── LEFT PANEL ── */
-        .convos-panel {
-            width: 340px; flex-shrink: 0;
-            background: rgba(250,244,234,0.82);
-            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-            border-right: 1px solid rgba(212,186,150,0.5);
-            display: flex; flex-direction: column;
-            box-shadow: 2px 0 20px rgba(150,105,58,0.06);
+        /* ── LEFT SIDEBAR ── */
+        .sidebar {
+            width:320px; flex-shrink:0;
+            background:var(--panel);
+            border-right:1px solid var(--rim);
+            display:flex; flex-direction:column;
         }
-        .convos-header {
-            padding: 22px 20px 0;
-            border-bottom: 1px solid rgba(212,186,150,0.3);
+
+        /* Sidebar header */
+        .sidebar-head {
+            padding:24px 20px 0;
+            border-bottom:1px solid var(--rim);
         }
-        .convos-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 20px; font-weight: 700; color: var(--text-primary);
-            margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+        .sidebar-title {
+            font-family:'DM Serif Display',serif;
+            font-size:20px; color:var(--white);
+            margin-bottom:16px;
+            display:flex; align-items:center; gap:10px;
         }
-        .convos-title-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
+        .sidebar-title-dot {
+            width:8px; height:8px; border-radius:50%;
+            background:var(--gold);
+            box-shadow:0 0 8px var(--glow);
         }
-        .search-wrap { position: relative; margin-bottom: 14px; }
+
+        /* Search */
+        .search-wrap { position:relative; margin-bottom:16px; }
         .search-wrap input {
-            width: 100%; padding: 9px 14px 9px 38px;
-            border: 1px solid rgba(212,186,150,0.5); border-radius: 20px;
-            font-size: 13px; font-family: 'Outfit', sans-serif;
-            background: rgba(244,238,227,0.65);
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            color: var(--text-primary); transition: all 0.2s;
+            width:100%; padding:9px 14px 9px 38px;
+            border:1px solid var(--rim); border-radius:10px;
+            font-size:13px; font-family:'DM Sans',sans-serif;
+            background:rgba(255,255,255,0.04);
+            color:var(--off); transition:all .2s; outline:none;
         }
-        .search-wrap input:focus {
-            outline: none; border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(184,134,78,0.12);
-            background: rgba(250,244,234,0.9);
-        }
-        .search-wrap input::placeholder { color: var(--text-muted); }
-        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-wrap input:focus { border-color:var(--gold); background:var(--soft2); box-shadow:0 0 0 3px rgba(212,146,74,0.08); }
+        .search-wrap input::placeholder { color:var(--ghost); }
+        .search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--ghost); pointer-events:none; }
 
         /* Filter tabs */
         .filter-tabs {
-            display: flex; gap: 6px; padding: 10px 16px;
-            background: rgba(232,223,208,0.55);
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(212,186,150,0.3);
-            flex-wrap: wrap;
+            display:flex; gap:5px; padding:10px 16px 10px;
+            border-bottom:1px solid var(--rim);
+            background:rgba(255,255,255,0.02);
         }
         .filter-tab {
-            padding: 5px 13px; border-radius: 16px; font-size: 12px; font-weight: 600;
-            cursor: pointer; font-family: 'Outfit', sans-serif;
-            border: 1px solid rgba(212,186,150,0.45);
-            background: rgba(250,244,234,0.7);
-            color: var(--text-secondary); transition: all 0.2s;
+            padding:5px 13px; border-radius:999px; font-size:12px; font-weight:600;
+            cursor:pointer; font-family:'DM Sans',sans-serif;
+            border:1px solid var(--rim); background:transparent;
+            color:var(--ghost); transition:all .18s;
         }
-        .filter-tab:hover { border-color: var(--accent); color: var(--accent); }
-        .filter-tab.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-color: transparent; box-shadow: 0 2px 8px rgba(184,134,78,0.28); }
+        .filter-tab:hover { border-color:rgba(212,146,74,0.35); color:var(--off); }
+        .filter-tab.active { background:linear-gradient(135deg, var(--gold), var(--gold2)); color:var(--void); border-color:transparent; font-weight:700; box-shadow:0 2px 10px var(--glow); }
 
         /* Conversation list */
-        .convos-list { flex: 1; overflow-y: auto; }
-        .convos-list::-webkit-scrollbar { width: 4px; }
-        .convos-list::-webkit-scrollbar-thumb { background: rgba(212,186,150,0.4); border-radius: 2px; }
+        .convos-list { flex:1; overflow-y:auto; }
+        .convos-list::-webkit-scrollbar { width:3px; }
+        .convos-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.08); border-radius:2px; }
 
         .convo-item {
-            padding: 14px 18px; border-bottom: 1px solid rgba(212,186,150,0.2);
-            cursor: pointer; display: flex; gap: 12px; align-items: flex-start;
-            transition: all 0.2s;
+            padding:14px 18px; border-bottom:1px solid var(--rim3);
+            cursor:pointer; display:flex; gap:12px; align-items:flex-start;
+            transition:background .18s;
+            position:relative;
         }
-        .convo-item:hover { background: rgba(244,238,227,0.65); }
+        .convo-item:hover { background:rgba(255,255,255,0.04); }
         .convo-item.active {
-            background: rgba(251,243,228,0.88);
-            border-left: 3px solid var(--accent);
-            box-shadow: inset 0 1px 0 rgba(255,248,235,0.5);
+            background:var(--soft2);
+            border-left:2.5px solid var(--gold);
         }
-        .convo-item.unread { background: rgba(251,243,228,0.5); }
+        .convo-item.unread { background:rgba(212,146,74,0.04); }
+
+        /* Avatar */
         .convo-avatar {
-            width: 42px; height: 42px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            border: 2px solid rgba(184,134,78,0.3);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; color: var(--accent);
+            width:42px; height:42px; border-radius:12px;
+            background:rgba(255,255,255,0.05);
+            border:1.5px solid var(--rim);
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0; color:var(--ghost);
+            transition:border-color .2s, box-shadow .2s, transform .2s;
+            cursor:pointer;
         }
-        .convo-avatar.supplier { background: linear-gradient(135deg, #EDE9FE, #DDD6FE); border-color: rgba(139,92,246,0.3); color: #6D28D9; }
-        .convo-content { flex: 1; min-width: 0; }
-        .convo-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3px; }
-        .convo-name { font-weight: 600; font-size: 13.5px; color: var(--text-primary); }
-        .convo-time { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
-        .convo-preview { font-size: 12.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .convo-item.unread .convo-preview { font-weight: 600; color: var(--text-secondary); }
-        .unread-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: white; font-size: 9px; font-weight: 700;
-            padding: 2px 7px; border-radius: 10px; margin-top: 4px;
+        .convo-avatar:hover { border-color:var(--gold); box-shadow:0 0 14px rgba(212,146,74,0.2); transform:scale(1.08); }
+        .convo-avatar.contractor { color:var(--gold); border-color:rgba(212,146,74,0.25); background:var(--soft2); }
+        .convo-avatar.supplier   { color:var(--purple); border-color:var(--purple-border); background:var(--purple-bg); }
+
+        .convo-content { flex:1; min-width:0; }
+        .convo-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:3px; }
+        .convo-name { font-weight:600; font-size:13.5px; color:var(--off); }
+        .convo-time { font-size:10.5px; color:var(--ghost); white-space:nowrap; }
+        .convo-preview { font-size:12.5px; color:var(--ghost); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .convo-item.unread .convo-preview { color:var(--fog); font-weight:500; }
+        .convo-type-tag {
+            display:inline-block; margin-top:5px;
+            font-size:9.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+            padding:2px 8px; border-radius:999px;
         }
+        .tag-contractor { background:var(--soft); color:var(--gold2); }
+        .tag-supplier   { background:var(--purple-bg); color:var(--purple); }
+        .unread-dot {
+            position:absolute; top:16px; right:16px;
+            width:8px; height:8px; border-radius:50%;
+            background:var(--gold);
+            box-shadow:0 0 8px var(--glow);
+        }
+
+        /* Empty sidebar */
+        .empty-convos {
+            text-align:center; padding:52px 20px; color:var(--ghost);
+        }
+        .empty-convos-icon {
+            width:52px; height:52px; border-radius:14px;
+            background:rgba(255,255,255,0.04); border:1px solid var(--rim);
+            display:flex; align-items:center; justify-content:center;
+            margin:0 auto 14px;
+        }
+        .empty-convos p { font-size:13px; }
 
         /* ── CHAT PANEL ── */
         .chat-panel {
-            flex: 1; display: flex; flex-direction: column;
-            background: rgba(240,235,225,0.55);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            flex:1; display:flex; flex-direction:column;
+            background:var(--deep);
+            min-width:0;
         }
+
+        /* Chat header */
         .chat-header {
-            padding: 16px 26px;
-            border-bottom: 1px solid rgba(212,186,150,0.4);
-            display: flex; align-items: center; gap: 14px;
-            background: rgba(250,244,234,0.88);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 2px 14px rgba(150,105,58,0.06);
+            padding:16px 28px;
+            border-bottom:1px solid var(--rim);
+            display:flex; align-items:center; gap:14px;
+            background:rgba(28,26,22,0.95);
+            backdrop-filter:blur(16px);
+            flex-shrink:0;
         }
         .chat-header-avatar {
-            width: 42px; height: 42px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            border: 2px solid rgba(184,134,78,0.3);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; color: var(--accent);
+            width:42px; height:42px; border-radius:12px;
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0; border:1.5px solid;
         }
-        .chat-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 700; color: var(--text-primary); }
-        .chat-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
-        .chat-actions-right { margin-left: auto; }
-        .btn-profile {
-            padding: 7px 14px;
-            background: rgba(244,238,227,0.72);
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(212,186,150,0.45); border-radius: 9px;
-            font-size: 12px; font-weight: 600; cursor: pointer;
-            color: var(--text-secondary); transition: all 0.2s; font-family: 'Outfit', sans-serif;
-            display: flex; align-items: center; gap: 6px;
+        .chat-header-avatar.contractor { background:var(--soft2); border-color:rgba(212,146,74,0.3); color:var(--gold); }
+        .chat-header-avatar.supplier   { background:var(--purple-bg); border-color:var(--purple-border); color:var(--purple); }
+        .chat-name { font-family:'DM Serif Display',serif; font-size:17px; color:var(--white); }
+        .chat-sub { font-size:12px; color:var(--ghost); margin-top:2px; display:flex; align-items:center; gap:5px; }
+        .online-dot { width:6px; height:6px; border-radius:50%; background:var(--green); }
+        .chat-header-actions { margin-left:auto; }
+        .btn-view-profile {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:7px 16px; border-radius:9px;
+            font-size:12.5px; font-weight:600; cursor:pointer;
+            border:1px solid var(--rim); background:rgba(255,255,255,0.04);
+            color:var(--fog); transition:all .2s; font-family:'DM Sans',sans-serif;
+            text-decoration:none;
         }
-        .btn-profile:hover { background: rgba(250,244,234,0.9); border-color: var(--accent); color: var(--accent); }
+        .btn-view-profile:hover { border-color:var(--gold); color:var(--gold); background:var(--soft); }
 
         /* Messages area */
         .messages-area {
-            flex: 1; overflow-y: auto; padding: 22px 26px;
-            display: flex; flex-direction: column; gap: 4px;
+            flex:1; overflow-y:auto; padding:24px 32px;
+            display:flex; flex-direction:column; gap:3px;
         }
-        .messages-area::-webkit-scrollbar { width: 4px; }
-        .messages-area::-webkit-scrollbar-thumb { background: rgba(212,186,150,0.35); border-radius: 2px; }
+        .messages-area::-webkit-scrollbar { width:4px; }
+        .messages-area::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.07); border-radius:2px; }
 
-        .date-divider { text-align: center; position: relative; margin: 14px 0; }
-        .date-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(212,186,150,0.35); }
+        /* Date divider */
+        .date-divider { text-align:center; position:relative; margin:18px 0 12px; }
+        .date-divider::before { content:''; position:absolute; top:50%; left:0; right:0; height:1px; background:var(--rim); }
         .date-divider span {
-            background: rgba(240,235,225,0.85); backdrop-filter: blur(6px);
-            padding: 4px 14px; border-radius: 12px;
-            font-size: 11px; color: var(--text-muted); font-weight: 600;
-            position: relative; z-index: 1;
-            border: 1px solid rgba(212,186,150,0.3);
+            background:var(--deep); padding:4px 16px; border-radius:20px;
+            font-size:11px; color:var(--ghost); font-weight:600;
+            position:relative; z-index:1;
+            border:1px solid var(--rim);
         }
 
-        .message { display: flex; gap: 8px; align-items: flex-end; }
-        .message.sent { flex-direction: row-reverse; }
+        /* Message bubbles */
+        .message { display:flex; gap:10px; align-items:flex-end; margin-bottom:2px; }
+        .message.sent { flex-direction:row-reverse; }
+        .message + .message.sent,
+        .message.sent + .message { margin-top:8px; }
+
         .msg-avatar {
-            width: 28px; height: 28px; border-radius: 50%;
-            background: rgba(244,238,227,0.72);
-            border: 1.5px solid rgba(212,186,150,0.4);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; color: var(--text-muted);
+            width:30px; height:30px; border-radius:9px;
+            background:rgba(255,255,255,0.05); border:1px solid var(--rim);
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0; color:var(--ghost);
         }
         .message.sent .msg-avatar {
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            border-color: rgba(184,134,78,0.3);
-            color: var(--accent);
+            background:var(--soft); border-color:rgba(212,146,74,0.25); color:var(--gold);
         }
-        .msg-content { max-width: 58%; }
+
+        .msg-content { max-width:60%; }
         .msg-bubble {
-            padding: 11px 15px; border-radius: 16px;
-            background: rgba(250,244,234,0.88);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(212,186,150,0.4);
-            font-size: 13px; line-height: 1.55; color: var(--text-primary);
-            box-shadow: 0 2px 12px rgba(150,105,58,0.07), inset 0 1px 0 rgba(255,248,235,0.5);
-            word-wrap: break-word;
+            padding:11px 15px; border-radius:16px;
+            font-size:13.5px; line-height:1.58; word-wrap:break-word;
         }
+        /* Received */
+        .message:not(.sent) .msg-bubble {
+            background:var(--surface);
+            border:1px solid var(--rim);
+            color:var(--off);
+            border-bottom-left-radius:5px;
+        }
+        /* Sent */
         .message.sent .msg-bubble {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-color: transparent;
-            color: #fff;
-            box-shadow: 0 3px 14px rgba(184,134,78,0.32);
+            background:linear-gradient(135deg, var(--gold), var(--gold2));
+            color:var(--void);
+            font-weight:500;
+            border-bottom-right-radius:5px;
+            box-shadow:0 3px 14px var(--glow);
         }
-        .msg-time { font-size: 10px; color: var(--text-muted); margin-top: 4px; padding: 0 4px; }
-        .message.sent .msg-time { text-align: right; }
+
+        .msg-time { font-size:10px; color:var(--ghost); margin-top:5px; padding:0 4px; }
+        .message.sent .msg-time { text-align:right; }
+        .msg-read { color:var(--green); font-size:10px; }
+
+        /* Empty chat */
+        .empty-chat {
+            display:flex; flex-direction:column;
+            align-items:center; justify-content:center;
+            height:100%; color:var(--ghost); text-align:center; padding:40px;
+            gap:16px;
+        }
+        .empty-chat-icon {
+            width:80px; height:80px; border-radius:22px;
+            background:rgba(255,255,255,0.04); border:1px solid var(--rim);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold);
+        }
+        .empty-chat h2 {
+            font-family:'DM Serif Display',serif;
+            font-size:22px; color:var(--off);
+        }
+        .empty-chat p { font-size:13.5px; color:var(--ghost); line-height:1.65; }
 
         /* Input area */
         .input-area {
-            padding: 14px 26px;
-            border-top: 1px solid rgba(212,186,150,0.4);
-            background: rgba(250,244,234,0.88);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            padding:14px 28px 18px;
+            border-top:1px solid var(--rim);
+            background:rgba(28,26,22,0.95);
+            flex-shrink:0;
         }
-        .input-row { display: flex; gap: 10px; align-items: flex-end; }
-        .input-wrap { flex: 1; }
+        .input-row { display:flex; gap:10px; align-items:flex-end; }
+        .input-wrap { flex:1; }
         .input-wrap textarea {
-            width: 100%; padding: 10px 16px;
-            border: 1px solid rgba(212,186,150,0.5); border-radius: 20px;
-            font-size: 13.5px; font-family: 'Outfit', sans-serif;
-            resize: none; max-height: 100px;
-            background: rgba(244,238,227,0.7);
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            color: var(--text-primary); transition: all 0.2s;
-            box-shadow: inset 0 1px 0 rgba(255,248,235,0.4);
+            width:100%; padding:11px 18px;
+            border:1px solid var(--rim); border-radius:14px;
+            font-size:13.5px; font-family:'DM Sans',sans-serif;
+            resize:none; max-height:120px; line-height:1.55;
+            background:rgba(255,255,255,0.05);
+            color:var(--off); transition:all .2s; outline:none;
         }
         .input-wrap textarea:focus {
-            outline: none; border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(184,134,78,0.12), inset 0 1px 0 rgba(255,248,235,0.4);
-            background: rgba(250,244,234,0.9);
+            border-color:var(--gold);
+            background:rgba(212,146,74,0.06);
+            box-shadow:0 0 0 3px rgba(212,146,74,0.10);
         }
-        .input-wrap textarea::placeholder { color: var(--text-muted); }
+        .input-wrap textarea::placeholder { color:var(--ghost); }
         .send-btn {
-            width: 42px; height: 42px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border: none; color: white; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s; flex-shrink: 0;
-            box-shadow: 0 3px 12px rgba(184,134,78,0.35);
+            width:44px; height:44px; border-radius:12px;
+            background:linear-gradient(135deg, var(--gold), var(--gold2));
+            border:none; color:var(--void); cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            transition:all .2s; flex-shrink:0;
+            box-shadow:0 3px 14px var(--glow);
         }
-        .send-btn:hover { transform: scale(1.08); box-shadow: 0 5px 18px rgba(184,134,78,0.45); }
-        .send-btn:disabled { background: var(--stone); cursor: not-allowed; transform: none; box-shadow: none; }
+        .send-btn:hover { transform:translateY(-1px) scale(1.04); box-shadow:0 6px 20px var(--glow); }
+        .send-btn:disabled { background:rgba(255,255,255,0.08); color:var(--ghost); cursor:not-allowed; transform:none; box-shadow:none; }
+        .input-hint { font-size:11px; color:var(--ghost); margin-top:6px; padding-left:2px; }
 
-        /* Empty states */
-        .empty-chat {
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            height: 100%; color: var(--text-muted); text-align: center; padding: 40px;
-        }
-        .empty-chat-icon {
-            width: 80px; height: 80px; border-radius: 22px;
-            background: rgba(244,238,227,0.72);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(212,186,150,0.4);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px; color: var(--accent);
-            box-shadow: inset 0 1px 0 rgba(255,248,235,0.5);
-        }
-        .empty-chat h2 {
-            font-family: 'Cormorant Garamond', serif;
-            color: var(--text-secondary); margin-bottom: 8px; font-size: 22px; font-weight: 700;
-        }
-        .empty-chat p { font-size: 13.5px; color: var(--text-muted); line-height: 1.6; }
+        /* ── TYPING INDICATOR ── */
+        .typing-indicator { display:flex; gap:4px; align-items:center; padding:4px 0; }
+        .typing-dot { width:5px; height:5px; border-radius:50%; background:var(--ghost); animation:typing 1.4s infinite; }
+        .typing-dot:nth-child(2) { animation-delay:.2s; }
+        .typing-dot:nth-child(3) { animation-delay:.4s; }
+        @keyframes typing { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
 
-        /* Empty convos */
-        .empty-convos {
-            text-align: center; padding: 48px 20px; color: var(--text-muted);
+        /* ── RESPONSIVE ── */
+        @media(max-width:900px){
+            .nav{padding:0 22px;} .nav-center{display:none;}
+            .sidebar{width:270px;}
         }
-        .empty-convos-icon {
-            width: 56px; height: 56px; border-radius: 16px;
-            background: rgba(232,223,208,0.6);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 12px; color: var(--text-muted);
-            border: 1px solid rgba(212,186,150,0.3);
+        @media(max-width:640px){
+            .sidebar{width:240px;}
+            .messages-area{padding:16px;}
+            .input-area{padding:10px 16px 14px;}
         }
-
-        /* Typing dots */
-        .typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); animation: typing 1.4s infinite; display: inline-block; margin: 0 2px; }
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes typing { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-7px); } }
-
-        @media (max-width: 768px) { .convos-panel { width: 280px; } .navbar { padding: 0 20px; } }
-        @media (max-width: 580px) { .convos-panel { width: 240px; } }
     </style>
 </head>
 <body>
-<div class="bg-grid"></div>
-<div class="bg-warm"></div>
 
-<nav class="navbar">
-    <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">
-        <div class="navbar-brand-icon">
+<!-- NAV -->
+<nav class="nav">
+    <a href="{{ url_for('user.dashboard') }}" class="nav-logo">
+        <div class="nav-logo-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
-        House-Forge
+        <span class="nav-logo-name">House<b>-Forge</b></span>
     </a>
-    <div class="navbar-menu">
-        <a href="{{ url_for('user.dashboard') }}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+
+    <div class="nav-center">
+        <a href="{{ url_for('user.dashboard') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Dashboard
         </a>
-        <a href="{{ url_for('user.projects') }}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <a href="{{ url_for('user.projects') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
             Projects
         </a>
-        <a href="/user/bids">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                Bids
-                <span class="badge-notification badge-amber" id="bidsBadge"></span>
-            </a>
-        <a href="{{ url_for('user.my_orders') }}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <a href="/user/bids" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Bids
+            <span class="npip amber" id="bidsBadge"></span>
+        </a>
+        <a href="{{ url_for('user.my_orders') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             Orders
         </a>
-        <a href="{{ url_for('user.messages') }}" class="nav-active" style="position:relative;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <a href="{{ url_for('user.messages') }}" class="nlink active" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             Messages
-            <span class="badge-notification" id="messagesBadge"></span>
+            <span class="npip" id="messagesBadge"></span>
         </a>
-        
-        <div class="nav-divider"></div>
-        <a href="{{ url_for('user.profile') }}" style="padding:8px 9px;">
-            {% if user_profile_picture %}
-                <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
-            {% else %}
-                <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
-            {% endif %}
+    </div>
+
+    <div class="nav-right">
+        <a href="{{ url_for('user.profile') }}" class="nav-profile">
+            <div class="nav-av">
+                {% if user_profile_picture %}
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile">
+                {% else %}
+                    {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                {% endif %}
+            </div>
+            <span class="nav-uname">{{ current_user.name }}</span>
         </a>
-        <a href="{{ url_for('auth.logout') }}" class="logout-link">
+        <div class="ndiv"></div>
+        <a href="{{ url_for('auth.logout') }}" class="nav-out">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            Logout
+            Sign Out
         </a>
     </div>
 </nav>
 
 <div class="chat-layout">
 
-    <!-- ── LEFT PANEL ── -->
-    <div class="convos-panel">
-        <div class="convos-header">
-            <div class="convos-title">
-                <span class="convos-title-dot"></span>
+    <!-- ── LEFT SIDEBAR ── -->
+    <div class="sidebar">
+        <div class="sidebar-head">
+            <div class="sidebar-title">
+                <span class="sidebar-title-dot"></span>
                 Messages
             </div>
             <div class="search-wrap">
@@ -464,58 +504,66 @@
 </div>
 
 <script>
-    let conversations = [], currentConvo = null, messages = {};
+    let conversations = [], currentConvo = null, currentType = null, messages = {};
+
     function getParam(n) { return new URLSearchParams(window.location.search).get(n); }
 
-    document.addEventListener('DOMContentLoaded', () => { loadConvos(); setupListeners(); });
+    document.addEventListener('DOMContentLoaded', () => {
+        loadConvos();
+        setupListeners();
+    });
 
     function setupListeners() {
         document.querySelectorAll('.filter-tab').forEach(t => t.addEventListener('click', function () {
             document.querySelectorAll('.filter-tab').forEach(x => x.classList.remove('active'));
-            this.classList.add('active'); filterConvos(this.dataset.filter);
+            this.classList.add('active');
+            filterConvos(this.dataset.filter);
         }));
         document.getElementById('searchInput').addEventListener('input', e => searchConvos(e.target.value));
     }
 
     function loadConvos() {
         fetch('/user/messages/conversations').then(r => r.json()).then(d => {
-            conversations = d.conversations || []; renderConvos(conversations);
+            conversations = d.conversations || [];
+            renderConvos(conversations);
             const id = getParam('open'), type = getParam('type');
-            if (id && type) setTimeout(() => openConvo(id, type), 500);
+            if (id && type) setTimeout(() => openConvo(id, type), 400);
         }).catch(() => emptyConvos());
     }
 
-    function contractorIcon() {
-        return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`;
+    /* ── Icons ── */
+    function contractorIcon(size = 18) {
+        return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`;
     }
-    function supplierIcon() {
-        return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>`;
+    function supplierIcon(size = 18) {
+        return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>`;
     }
-    function userIcon() {
-        return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+    function userIcon(size = 14) {
+        return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
     }
 
+    /* ── Render sidebar conversations ── */
     function renderConvos(cvs) {
         const el = document.getElementById('convosList');
         if (!cvs.length) { emptyConvos(); return; }
         el.innerHTML = cvs.map(c => `
-            <div class="convo-item ${c.unread_count > 0 ? 'unread' : ''}" data-id="${c.id}" data-type="${c.sender_type}" onclick="openConvo('${c.id}','${c.sender_type}')">
-                <div class="convo-avatar ${c.sender_type === 'supplier' ? 'supplier' : ''}" 
-     onclick="event.stopPropagation(); viewProfile('${c.id}','${c.sender_type}')" 
-     title="View ${c.sender_name}'s profile"
-     style="cursor:pointer; transition: transform 0.2s, box-shadow 0.2s;"
-     onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 4px 14px rgba(184,134,78,0.3)';"
-     onmouseout="this.style.transform='';this.style.boxShadow='';">
-    ${c.sender_type === 'contractor' ? contractorIcon() : supplierIcon()}
-</div>
+            <div class="convo-item ${c.unread_count > 0 ? 'unread' : ''}"
+                 data-id="${c.id}" data-type="${c.sender_type}"
+                 onclick="openConvo('${c.id}','${c.sender_type}')">
+                <div class="convo-avatar ${c.sender_type}"
+                     onclick="event.stopPropagation(); viewProfile('${c.id}','${c.sender_type}')"
+                     title="View ${escHtml(c.sender_name)}'s profile">
+                    ${c.sender_type === 'contractor' ? contractorIcon() : supplierIcon()}
+                </div>
                 <div class="convo-content">
                     <div class="convo-top">
-                        <span class="convo-name">${c.sender_name}</span>
+                        <span class="convo-name">${escHtml(c.sender_name)}</span>
                         <span class="convo-time">${fmtTime(c.last_message_time)}</span>
                     </div>
-                    <div class="convo-preview">${c.last_message || ''}</div>
-                    ${c.unread_count > 0 ? `<span class="unread-badge">${c.unread_count} new</span>` : ''}
+                    <div class="convo-preview">${escHtml(c.last_message || '')}</div>
+                    <span class="convo-type-tag tag-${c.sender_type}">${c.sender_type}</span>
                 </div>
+                ${c.unread_count > 0 ? '<span class="unread-dot"></span>' : ''}
             </div>`).join('');
     }
 
@@ -523,60 +571,76 @@
         document.getElementById('convosList').innerHTML = `
             <div class="empty-convos">
                 <div class="empty-convos-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 </div>
-                <p style="font-size:13px;">No messages yet</p>
+                <p>No messages yet</p>
             </div>`;
     }
 
+    /* ── Open conversation ── */
     function openConvo(id, type) {
-        currentConvo = id;
+        currentConvo = id; currentType = type;
         document.querySelectorAll('.convo-item').forEach(i => {
             i.classList.remove('active');
             if (i.dataset.id === id && i.dataset.type === type) i.classList.add('active');
         });
         fetch(`/user/messages/conversation/${id}?type=${type}`).then(r => r.json()).then(d => {
-            messages[id] = d.messages || []; renderChat(id, d.contact_info, type);
+            messages[id] = d.messages || [];
+            renderChatPanel(id, d.contact_info, type);
         });
     }
 
-    function renderChat(id, info, type) {
+    /* ── Render full chat panel ── */
+    function renderChatPanel(id, info, type) {
         const panel = document.getElementById('chatPanel');
-        const avatarHtml = type === 'contractor' ? contractorIcon() : supplierIcon();
+        const profileUrl = type === 'contractor' ? `/user/contractor/${id}` : `/user/supplier/${id}`;
         panel.innerHTML = `
             <div class="chat-header">
-                <div class="chat-header-avatar">${avatarHtml}</div>
-                <div>
-                    <div class="chat-name">${info.name}</div>
-                    <div class="chat-sub">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+                <div class="chat-header-avatar ${type}">
+                    ${type === 'contractor' ? contractorIcon(20) : supplierIcon(20)}
                 </div>
-                
+                <div>
+                    <div class="chat-name">${escHtml(info.name)}</div>
+                    <div class="chat-sub">
+                        <span class="online-dot"></span>
+                        ${type.charAt(0).toUpperCase() + type.slice(1)}
+                    </div>
+                </div>
+                <div class="chat-header-actions">
+                    <a href="${profileUrl}" class="btn-view-profile">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        View Profile
+                    </a>
+                </div>
             </div>
-            <div class="messages-area" id="msgsArea">${renderMsgs(id, type)}</div>
+            <div class="messages-area" id="msgsArea">${renderMessages(id, type)}</div>
             <div class="input-area">
                 <form id="msgForm" onsubmit="sendMsg(event,'${id}','${type}')">
                     <div class="input-row">
                         <div class="input-wrap">
-                            <textarea id="msgInput" placeholder="Type a message…" rows="1" onkeypress="handleKey(event)"></textarea>
+                            <textarea id="msgInput" placeholder="Type a message…" rows="1" onkeydown="handleKey(event)"></textarea>
                         </div>
                         <button type="submit" class="send-btn" id="sendBtn">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                         </button>
                     </div>
+                    <div class="input-hint">Enter to send · Shift+Enter for new line</div>
                 </form>
             </div>`;
 
+        /* Auto-resize textarea */
         document.getElementById('msgInput').addEventListener('input', () => {
             const t = document.getElementById('msgInput');
             t.style.height = 'auto';
-            t.style.height = Math.min(t.scrollHeight, 100) + 'px';
+            t.style.height = Math.min(t.scrollHeight, 120) + 'px';
         });
         scrollBottom();
     }
 
-    function renderMsgs(id, type) {
+    /* ── Render messages ── */
+    function renderMessages(id, type) {
         const msgs = messages[id] || [];
-        if (!msgs.length) return `<div style="text-align:center;color:var(--text-muted);margin-top:48px;font-size:13px;">Start the conversation!</div>`;
+        if (!msgs.length) return `<div style="text-align:center;color:var(--ghost);margin-top:60px;font-size:13.5px;">Start the conversation!</div>`;
         let html = '', lastDate = null;
         msgs.forEach(m => {
             const d = new Date(m.created_at).toDateString();
@@ -585,37 +649,61 @@
                 lastDate = d;
             }
             const sent = m.direction === 'outgoing';
-            const avatar = sent ? userIcon() : (type === 'contractor' ? contractorIcon() : supplierIcon());
-            html += `<div class="message ${sent ? 'sent' : ''}">
-                <div class="msg-avatar">${avatar}</div>
-                <div class="msg-content">
-                    <div class="msg-bubble">${escHtml(m.message)}</div>
-                    <div class="msg-time">${fmtMsgTime(m.created_at)}${sent && m.read ? ' · Read' : ''}</div>
-                </div>
-            </div>`;
+            const avatarIcon = sent ? userIcon() : (type === 'contractor' ? contractorIcon(14) : supplierIcon(14));
+            html += `
+                <div class="message ${sent ? 'sent' : ''}">
+                    <div class="msg-avatar">${avatarIcon}</div>
+                    <div class="msg-content">
+                        <div class="msg-bubble">${escHtml(m.message)}</div>
+                        <div class="msg-time">
+                            ${fmtMsgTime(m.created_at)}
+                            ${sent && m.read ? '<span class="msg-read"> · Read</span>' : ''}
+                        </div>
+                    </div>
+                </div>`;
         });
         return html;
     }
 
+    /* ── Send message ── */
     function sendMsg(e, id, type) {
         e.preventDefault();
-        const input = document.getElementById('msgInput'), msg = input.value.trim();
+        const input = document.getElementById('msgInput');
+        const msg = input.value.trim();
         if (!msg) return;
-        const btn = document.getElementById('sendBtn'); btn.disabled = true;
-        const fd = new FormData(); fd.append('message', msg); fd.append('recipient_type', type);
-        fetch(`/user/messages/send/${id}`, { method: 'POST', body: fd }).then(r => r.json()).then(d => {
-            if (d.success) {
-                if (!messages[id]) messages[id] = [];
-                messages[id].push({ message: msg, direction: 'outgoing', created_at: new Date().toISOString(), read: false });
-                renderChat(id, { name: conversations.find(c => c.id === id)?.sender_name || 'Contact' }, type);
-                input.value = ''; input.style.height = 'auto'; loadConvos();
-            }
-        }).finally(() => btn.disabled = false);
+        const btn = document.getElementById('sendBtn');
+        btn.disabled = true;
+        const fd = new FormData();
+        fd.append('message', msg);
+        fd.append('recipient_type', type);
+        fetch(`/user/messages/send/${id}`, { method:'POST', body:fd })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    if (!messages[id]) messages[id] = [];
+                    messages[id].push({ message: msg, direction:'outgoing', created_at: new Date().toISOString(), read: false });
+                    const convo = conversations.find(c => c.id === id);
+                    renderChatPanel(id, { name: convo?.sender_name || 'Contact' }, type);
+                    input.value = ''; input.style.height = 'auto';
+                    loadConvos();
+                }
+            })
+            .finally(() => { if (document.getElementById('sendBtn')) document.getElementById('sendBtn').disabled = false; });
     }
 
-    function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('msgForm').dispatchEvent(new Event('submit')); } }
-    function scrollBottom() { const a = document.getElementById('msgsArea'); if (a) setTimeout(() => a.scrollTop = a.scrollHeight, 80); }
+    function handleKey(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById('msgForm')?.dispatchEvent(new Event('submit'));
+        }
+    }
 
+    function scrollBottom() {
+        const a = document.getElementById('msgsArea');
+        if (a) setTimeout(() => a.scrollTop = a.scrollHeight, 80);
+    }
+
+    /* ── Filter / Search ── */
     function filterConvos(f) {
         let c = conversations;
         if (f === 'contractor') c = c.filter(x => x.sender_type === 'contractor');
@@ -623,25 +711,54 @@
         else if (f === 'unread') c = c.filter(x => x.unread_count > 0);
         renderConvos(c);
     }
-    function searchConvos(q) { renderConvos(conversations.filter(c => c.sender_name.toLowerCase().includes(q.toLowerCase()) || c.last_message?.toLowerCase().includes(q.toLowerCase()))); }
+    function searchConvos(q) {
+        renderConvos(conversations.filter(c =>
+            c.sender_name.toLowerCase().includes(q.toLowerCase()) ||
+            c.last_message?.toLowerCase().includes(q.toLowerCase())
+        ));
+    }
 
-    function fmtTime(ts) { if (!ts) return ''; const d = new Date(ts), now = new Date(), diff = now - d, min = Math.floor(diff / 60000); if (min < 1) return 'Now'; if (min < 60) return min + 'm'; if (diff < 86400000) return Math.floor(diff / 3600000) + 'h'; return d.toLocaleDateString(); }
-    function fmtDate(ts) { const d = new Date(ts), today = new Date(), yest = new Date(today); yest.setDate(yest.getDate() - 1); if (d.toDateString() === today.toDateString()) return 'Today'; if (d.toDateString() === yest.toDateString()) return 'Yesterday'; return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
-    function fmtMsgTime(ts) { return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }); }
-    function escHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+    /* ── Profile navigation ── */
+    function viewProfile(id, type) {
+        window.location = type === 'contractor' ? `/user/contractor/${id}` : `/user/supplier/${id}`;
+    }
 
+    /* ── Badge refresh ── */
+    function updateBadge(ep, id) {
+        fetch(ep).then(r => r.ok && r.headers.get('content-type')?.includes('application/json') ? r.json() : null)
+        .then(d => { if (!d) return; const b = document.getElementById(id); if (!b) return; b.style.display = d.count > 0 ? 'block' : 'none'; }).catch(() => {});
+    }
+    function refreshBadges() {
+        updateBadge('/user/messages/unread-count', 'messagesBadge');
+        updateBadge('/user/bids/pending-count', 'bidsBadge');
+    }
+    refreshBadges();
+
+    /* ── Auto-refresh every 30s ── */
     setInterval(() => {
-        if (currentConvo) { const t = conversations.find(c => c.id === currentConvo)?.sender_type; if (t) openConvo(currentConvo, t); }
+        if (currentConvo && currentType) openConvo(currentConvo, currentType);
         loadConvos();
+        refreshBadges();
     }, 30000);
 
-function viewProfile(id, type) {
-    if (type === 'contractor') {
-        window.location = '/user/contractor/' + id;
-    } else {
-        window.location = '/user/supplier/' + id;
+    /* ── Helpers ── */
+    function fmtTime(ts) {
+        if (!ts) return '';
+        const d = new Date(ts), now = new Date(), diff = now - d, min = Math.floor(diff / 60000);
+        if (min < 1) return 'Now';
+        if (min < 60) return min + 'm';
+        if (diff < 86400000) return Math.floor(diff / 3600000) + 'h';
+        return d.toLocaleDateString();
     }
-}
+    function fmtDate(ts) {
+        const d = new Date(ts), today = new Date(), yest = new Date(today);
+        yest.setDate(yest.getDate() - 1);
+        if (d.toDateString() === today.toDateString()) return 'Today';
+        if (d.toDateString() === yest.toDateString()) return 'Yesterday';
+        return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+    }
+    function fmtMsgTime(ts) { return new Date(ts).toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit', hour12:true }); }
+    function escHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 </script>
 </body>
 </html>

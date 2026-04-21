@@ -4,388 +4,659 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirm Payment — House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg:       #F2EDE4;
-            --card:     #FAF7F2;
-            --card2:    #F5F0E8;
-            --sand:     #EDE6DB;
-            --stone:    #D9CFC2;
-            --accent:   #C9A84C;
-            --accent-d: #a8893a;
-            --accent-l: #FBF3E0;
-            --text:     #1C1917;
-            --text2:    #5C4F43;
-            --muted:    #8C7E72;
-            --shadow:   0 4px 18px rgba(28,25,23,0.08);
-            --shadow-sm:0 1px 3px rgba(28,25,23,0.06);
-            --blue:     #1E40AF;
-            --blue-bg:  #DBEAFE;
-            --blue-bd:  rgba(30,64,175,.25);
+            --void:    #0C0B09;
+            --ink:     #141210;
+            --deep:    #1C1A16;
+            --surface: #242118;
+            --rim:     rgba(255,255,255,0.07);
+            --rim2:    rgba(255,255,255,0.04);
+
+            --gold:    #D4924A;
+            --gold2:   #F0C07A;
+            --gold3:   #B8743A;
+            --glow:    rgba(212,146,74,0.22);
+            --soft:    rgba(212,146,74,0.10);
+
+            --white:   #FFFFFF;
+            --off:     #F2EDE6;
+            --fog:     rgba(242,237,230,0.55);
+            --ghost:   rgba(242,237,230,0.28);
+
+            --green:   #4CAF82; --green-bg:  rgba(76,175,130,0.13);
+            --blue:    #4A8FD4; --blue-bg:   rgba(74,143,212,0.13); --blue-bd: rgba(74,143,212,0.25);
+            --amber:   #D49440; --amber-bg:  rgba(212,148,64,0.13);
+            --red:     #EF4444; --red-bg:    rgba(239,68,68,0.12);
         }
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'DM Sans',sans-serif; background:var(--bg); min-height:100vh; color:var(--text); }
-        body::before { content:''; position:fixed; inset:0; background:url('/static/images/house.jpg') no-repeat center/cover; opacity:.045; z-index:0; pointer-events:none; }
+        html { scroll-behavior:smooth; }
+        body {
+            font-family:'DM Sans',sans-serif;
+            background:var(--void);
+            color:var(--off);
+            min-height:100vh;
+            overflow-x:hidden;
+            -webkit-font-smoothing:antialiased;
+        }
 
-        /* ── Navbar ── */
-        .navbar { background:rgba(250,247,242,.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--stone); padding:0 40px; height:68px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; box-shadow:var(--shadow-sm); }
-        .navbar-brand { font-family:'Playfair Display',serif; font-size:21px; font-weight:700; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:10px; }
-        .brand-icon { width:34px; height:34px; background:var(--accent); border-radius:9px; display:flex; align-items:center; justify-content:center; color:#0A0A0A; }
-        .navbar-menu { display:flex; align-items:center; gap:4px; }
-        .navbar-menu a { color:var(--text2); text-decoration:none; padding:8px 13px; border-radius:8px; font-size:14px; font-weight:500; transition:all .2s; }
-        .navbar-menu a:hover { color:var(--accent); background:var(--accent-l); }
-        .profile-pic { width:33px; height:33px; border-radius:50%; object-fit:cover; border:2px solid var(--stone); }
-        .profile-ph { width:33px; height:33px; border-radius:50%; background:var(--accent-l); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; border:2px solid var(--stone); }
-        .nav-div { width:1px; height:20px; background:var(--stone); margin:0 6px; }
-        .logout-link { color:var(--muted); text-decoration:none; padding:8px 13px; border-radius:8px; font-size:13px; font-weight:500; transition:all .2s; }
-        .logout-link:hover { color:#DC2626; background:#FEF2F2; }
+        /* ── NAV ── */
+        .nav {
+            position:fixed; top:0; left:0; right:0; z-index:300;
+            height:66px;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 52px;
+            background:rgba(12,11,9,0.88);
+            backdrop-filter:blur(22px);
+            border-bottom:1px solid var(--rim);
+        }
+        .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+        .nav-logo-icon {
+            width:40px; height:40px; border-radius:9px;
+            border:1.5px solid var(--gold);
+            display:flex; align-items:center; justify-content:center; color:var(--gold);
+        }
+        .nav-logo-name { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:var(--white); letter-spacing:-0.4px; }
+        .nav-logo-name b { color:var(--gold); }
+        .nav-links { display:flex; align-items:center; gap:2px; }
+        .nlink {
+            display:flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px;
+            text-decoration:none; font-size:13px; font-weight:500; color:var(--ghost);
+            transition:color .18s, background .18s;
+        }
+        .nlink:hover { color:var(--off); background:var(--rim2); }
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .nav-profile {
+            display:flex; align-items:center; gap:9px; padding:5px 14px 5px 5px;
+            border-radius:999px; border:1px solid var(--rim); text-decoration:none;
+            transition:border-color .2s, background .2s;
+        }
+        .nav-profile:hover { border-color:var(--gold); background:var(--soft); }
+        .nav-av {
+            width:30px; height:30px; border-radius:50%; background:var(--gold3);
+            color:#fff; display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:700; flex-shrink:0; overflow:hidden;
+        }
+        .nav-av img { width:30px; height:30px; border-radius:50%; object-fit:cover; display:block; }
+        .nav-uname { font-size:13px; font-weight:500; color:var(--off); }
+        .ndiv { width:1px; height:22px; background:var(--rim); }
+        .nav-out {
+            display:flex; align-items:center; gap:6px; text-decoration:none;
+            font-size:13px; font-weight:500; color:var(--ghost); padding:7px 14px; border-radius:8px;
+            transition:color .18s, background .18s;
+        }
+        .nav-out:hover { color:#EF4444; background:rgba(239,68,68,0.08); }
 
-        /* ── Layout ── */
-        .page { max-width:820px; margin:40px auto; padding:0 24px; position:relative; z-index:1; }
-        .back-link { display:inline-flex; align-items:center; gap:6px; color:var(--accent); text-decoration:none; font-size:14px; font-weight:500; margin-bottom:24px; transition:gap .2s; }
-        .back-link:hover { gap:10px; }
+        /* ── SHELL ── */
+        .shell { padding-top:66px; }
 
-        /* ── Order summary card ── */
-        .summary-card { background:var(--card); border:1px solid var(--stone); border-radius:20px; padding:32px 36px; margin-bottom:20px; box-shadow:var(--shadow); animation:fadeUp .4s ease both; }
-        .card-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.9px; color:var(--muted); margin-bottom:6px; }
-        .card-title { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--text); margin-bottom:4px; }
-        .divider { width:36px; height:3px; background:var(--accent); border-radius:2px; margin:12px 0 20px; }
+        /* ── HERO STRIP ── */
+        .hero-strip { position:relative; height:200px; overflow:hidden; }
+        .hero-strip-bg {
+            position:absolute; inset:0;
+            background:url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=70') center 60%/cover;
+            filter:brightness(0.18) saturate(0.5);
+        }
+        .hero-strip::before {
+            content:''; position:absolute; inset:0; z-index:1;
+            background:
+                linear-gradient(90deg,rgba(12,11,9,0.97) 0%,rgba(12,11,9,0.55) 60%,transparent 100%),
+                linear-gradient(0deg,rgba(12,11,9,0.98) 0%,transparent 60%);
+        }
+        .hero-strip::after {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:3px; z-index:2;
+            background:linear-gradient(180deg,transparent,var(--gold),transparent);
+        }
+        .hero-body {
+            position:absolute; inset:0; z-index:3;
+            display:flex; flex-direction:column; justify-content:flex-end;
+            padding:0 52px 32px;
+        }
+        .hero-tag {
+            display:inline-flex; align-items:center; gap:9px;
+            font-size:10px; font-weight:600; letter-spacing:3px;
+            text-transform:uppercase; color:var(--gold); margin-bottom:10px;
+        }
+        .hero-tag-ln { width:22px; height:1px; background:var(--gold); }
+        .hero-h1 {
+            font-family:'DM Serif Display',Georgia,serif;
+            font-size:34px; font-weight:400; line-height:1.1;
+            color:var(--white); letter-spacing:-0.5px;
+        }
+        .hero-h1 em { font-style:italic; color:var(--gold2); }
 
-        .items-table { width:100%; border-collapse:collapse; margin-bottom:20px; }
-        .items-table th { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); padding:0 0 10px; text-align:left; border-bottom:1px solid var(--sand); }
+        /* ── MAIN ── */
+        .main { max-width:820px; margin:0 auto; padding:36px 32px 80px; }
+
+        .back-link {
+            display:inline-flex; align-items:center; gap:7px;
+            color:var(--gold); text-decoration:none; font-size:13px; font-weight:500;
+            margin-bottom:26px; opacity:0.75; transition:opacity .18s, gap .18s;
+        }
+        .back-link:hover { opacity:1; gap:10px; }
+
+        /* ── PANEL ── */
+        .panel {
+            background:var(--deep); border:1px solid var(--rim);
+            border-radius:20px; overflow:hidden; margin-bottom:16px;
+            position:relative;
+            animation:fadeUp .45s cubic-bezier(.22,1,.36,1) both;
+        }
+        .panel::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:2px;
+            background:linear-gradient(90deg,var(--gold),var(--gold2));
+            transform:scaleX(0); transform-origin:left;
+            transition:transform .35s cubic-bezier(.22,1,.36,1);
+        }
+        .panel:hover::before { transform:scaleX(1); }
+        .panel-head {
+            padding:22px 28px 18px; border-bottom:1px solid var(--rim);
+            display:flex; align-items:center; gap:14px;
+        }
+        .panel-head-icon {
+            width:36px; height:36px; border-radius:9px;
+            background:var(--soft); border:1px solid rgba(212,146,74,0.22);
+            display:flex; align-items:center; justify-content:center; color:var(--gold); flex-shrink:0;
+        }
+        .panel-title { font-family:'DM Serif Display',serif; font-size:18px; color:var(--white); margin-bottom:1px; }
+        .panel-sub { font-size:11.5px; color:var(--ghost); font-weight:300; }
+        .panel-body { padding:24px 28px; }
+
+        /* ── ORDER SUMMARY ── */
+        .order-id-badge {
+            display:inline-flex; align-items:center; gap:7px;
+            padding:5px 14px; border-radius:999px;
+            background:var(--soft); border:1px solid rgba(212,146,74,0.2);
+            font-size:11.5px; font-weight:600; color:var(--gold);
+            font-family:monospace; letter-spacing:1px; margin-bottom:20px;
+        }
+
+        .items-table { width:100%; border-collapse:collapse; margin-bottom:22px; }
+        .items-table th {
+            font-size:9.5px; font-weight:600; text-transform:uppercase;
+            letter-spacing:2px; color:var(--ghost); padding:0 0 11px;
+            text-align:left; border-bottom:1px solid var(--rim);
+        }
         .items-table th:last-child { text-align:right; }
-        .items-table td { padding:12px 0; border-bottom:1px solid var(--sand); font-size:14px; color:var(--text2); vertical-align:top; }
-        .items-table td:last-child { text-align:right; font-weight:600; color:var(--text); }
+        .items-table td {
+            padding:14px 0; border-bottom:1px solid var(--rim2);
+            font-size:13.5px; color:var(--fog); vertical-align:top;
+        }
+        .items-table td:last-child { text-align:right; font-weight:600; color:var(--off); white-space:nowrap; }
         .items-table tr:last-child td { border-bottom:none; }
-        .item-name { font-weight:600; color:var(--text); margin-bottom:2px; }
-        .item-sub  { font-size:12px; color:var(--muted); }
+        .item-name { font-weight:600; color:var(--off); margin-bottom:3px; }
+        .item-sub  { font-size:11.5px; color:var(--ghost); font-weight:300; }
 
-        .total-row { background:var(--accent); border-radius:12px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
-        .total-label { font-size:14px; color:rgba(0,0,0,.65); font-weight:500; }
-        .total-value { font-family:'Playfair Display',serif; font-size:26px; font-weight:700; color:#0A0A0A; }
+        .total-bar {
+            background:var(--gold); border-radius:12px; padding:15px 20px;
+            display:flex; justify-content:space-between; align-items:center; margin-top:4px;
+        }
+        .total-bar-label { font-size:13px; color:rgba(0,0,0,0.5); font-weight:500; }
+        .total-bar-val { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--void); }
 
-        .meta-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px; }
-        .meta-item { background:var(--card2); border:1px solid var(--stone); border-radius:10px; padding:14px 16px; }
-        .meta-key { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:4px; }
-        .meta-val { font-size:14px; font-weight:600; color:var(--text); }
+        .meta-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px; }
+        .meta-item {
+            background:var(--surface); border:1px solid var(--rim2);
+            border-radius:12px; padding:14px 16px;
+        }
+        .meta-key { font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:1.8px; color:var(--ghost); margin-bottom:5px; }
+        .meta-val { font-size:13.5px; font-weight:500; color:var(--off); }
 
-        /* ── Delivery strip ── */
-        .delivery-strip { display:flex; align-items:flex-start; gap:10px; padding:11px 16px; background:var(--accent-l); border:1px solid rgba(201,168,76,.3); border-radius:10px; margin-top:16px; font-size:13px; color:var(--text2); }
-        .delivery-strip svg { flex-shrink:0; color:var(--accent-d); margin-top:1px; }
-        .delivery-strip-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:2px; }
-        .delivery-strip-value { font-weight:600; color:var(--text); }
+        .delivery-strip {
+            display:flex; align-items:flex-start; gap:12px;
+            padding:13px 16px;
+            background:var(--soft); border:1px solid rgba(212,146,74,0.2);
+            border-radius:11px; margin-top:14px;
+        }
+        .delivery-strip-icon {
+            width:32px; height:32px; border-radius:8px;
+            background:rgba(212,146,74,0.15); border:1px solid rgba(212,146,74,0.2);
+            display:flex; align-items:center; justify-content:center; color:var(--gold); flex-shrink:0;
+        }
+        .delivery-strip-label { font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); opacity:0.7; margin-bottom:3px; }
+        .delivery-strip-value { font-size:13px; font-weight:500; color:var(--off); }
 
-        /* ── Payment method selector ── */
-        .payment-card { background:var(--card); border:1px solid var(--stone); border-radius:20px; padding:32px 36px; box-shadow:var(--shadow); animation:fadeUp .4s .08s ease both; }
-        .payment-title { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--text); margin-bottom:6px; }
-        .payment-sub { font-size:14px; color:var(--text2); line-height:1.6; margin-bottom:28px; }
-
-        /* Method tabs */
-        .method-tabs { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:28px; }
-        .method-tab { border:2px solid var(--stone); border-radius:14px; padding:18px 20px; cursor:pointer; transition:all .2s; background:var(--card2); display:flex; align-items:center; gap:14px; }
-        .method-tab:hover { border-color:var(--accent); background:var(--accent-l); }
-        .method-tab.selected-cod  { border-color:var(--accent); background:var(--accent-l); }
-        .method-tab.selected-card { border-color:var(--blue);   background:var(--blue-bg); }
-        .method-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:22px; transition:all .2s; background:var(--sand); }
-        .method-tab.selected-cod  .method-icon { background:var(--accent); }
-        .method-tab.selected-card .method-icon { background:var(--blue-bg); }
-        .method-name { font-size:15px; font-weight:700; color:var(--text); margin-bottom:2px; }
-        .method-desc { font-size:12px; color:var(--muted); line-height:1.45; }
-        .method-tab.selected-cod  .method-name { color:var(--accent-d); }
+        /* ── PAYMENT METHOD TABS ── */
+        .method-tabs { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px; }
+        .method-tab {
+            border:1px solid var(--rim); border-radius:14px; padding:18px 16px;
+            cursor:pointer; transition:all .22s; background:var(--surface);
+            display:flex; align-items:center; gap:14px; position:relative;
+        }
+        .method-tab:hover { border-color:rgba(212,146,74,0.35); background:var(--deep); }
+        .method-tab.selected-cod {
+            border-color:rgba(212,146,74,0.5); background:rgba(212,146,74,0.07);
+            box-shadow:0 0 0 3px rgba(212,146,74,0.1);
+        }
+        .method-tab.selected-card {
+            border-color:rgba(74,143,212,0.5); background:rgba(74,143,212,0.07);
+            box-shadow:0 0 0 3px rgba(74,143,212,0.1);
+        }
+        .method-icon-wrap {
+            width:42px; height:42px; border-radius:11px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:20px; flex-shrink:0;
+            background:var(--rim); border:1px solid var(--rim); transition:all .22s;
+        }
+        .method-tab.selected-cod  .method-icon-wrap { background:var(--soft); border-color:rgba(212,146,74,0.25); }
+        .method-tab.selected-card .method-icon-wrap { background:var(--blue-bg); border-color:var(--blue-bd); }
+        .method-name { font-size:13.5px; font-weight:600; color:var(--off); margin-bottom:3px; transition:color .2s; }
+        .method-desc { font-size:11.5px; color:var(--ghost); font-weight:300; line-height:1.5; }
+        .method-tab.selected-cod  .method-name { color:var(--gold); }
         .method-tab.selected-card .method-name { color:var(--blue); }
-        .method-check { width:20px; height:20px; border-radius:50%; border:2px solid var(--stone); margin-left:auto; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .2s; }
-        .method-tab.selected-cod  .method-check { background:var(--accent); border-color:var(--accent); }
-        .method-tab.selected-card .method-check { background:var(--blue);   border-color:var(--blue); }
+        .method-check {
+            width:20px; height:20px; border-radius:50%; border:1.5px solid var(--rim);
+            margin-left:auto; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+            transition:all .2s;
+        }
+        .method-tab.selected-cod  .method-check { background:var(--gold); border-color:var(--gold); }
+        .method-tab.selected-card .method-check { background:var(--blue); border-color:var(--blue); }
         .checkmark { display:none; }
         .method-tab.selected-cod  .checkmark,
         .method-tab.selected-card .checkmark { display:block; }
 
-        /* Method detail panels */
+        /* ── METHOD PANELS ── */
         .method-panel { display:none; animation:fadeUp .3s ease both; }
         .method-panel.visible { display:block; }
 
-        /* COD panel */
-        .steps { background:var(--card2); border:1px solid var(--stone); border-radius:12px; padding:20px; margin-bottom:24px; display:flex; flex-direction:column; gap:14px; }
+        .select-prompt {
+            text-align:center; padding:36px 20px; color:var(--ghost);
+            font-size:13.5px; font-weight:300;
+        }
+        .select-prompt-icon {
+            width:60px; height:60px; border-radius:14px;
+            background:var(--surface); border:1px solid var(--rim);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--ghost); margin:0 auto 16px;
+        }
+
+        /* COD steps */
+        .steps {
+            background:var(--surface); border:1px solid var(--rim);
+            border-radius:14px; padding:20px 22px; margin-bottom:22px;
+            display:flex; flex-direction:column; gap:16px;
+        }
         .step { display:flex; align-items:flex-start; gap:14px; }
-        .step-num { width:26px; height:26px; border-radius:50%; background:var(--accent); color:#0A0A0A; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
-        .step-text { font-size:14px; color:var(--text2); line-height:1.5; }
-        .step-text strong { color:var(--text); }
+        .step-num {
+            width:26px; height:26px; border-radius:8px;
+            background:var(--soft); border:1px solid rgba(212,146,74,0.25);
+            color:var(--gold); font-size:12px; font-weight:700;
+            display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;
+        }
+        .step-text { font-size:13px; color:var(--fog); line-height:1.6; font-weight:300; }
+        .step-text strong { color:var(--off); font-weight:600; }
 
-        /* Card panel */
-        .card-info-box { background:var(--blue-bg); border:1px solid var(--blue-bd); border-radius:12px; padding:18px 20px; margin-bottom:22px; }
-        .card-info-title { font-size:13px; font-weight:700; color:var(--blue); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
-        .card-steps { display:flex; flex-direction:column; gap:10px; }
+        /* Card info box */
+        .card-info-box {
+            background:var(--blue-bg); border:1px solid var(--blue-bd);
+            border-radius:14px; padding:20px 22px; margin-bottom:22px;
+        }
+        .card-info-title {
+            font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px;
+            color:var(--blue); margin-bottom:14px; display:flex; align-items:center; gap:7px;
+        }
+        .card-info-title svg { flex-shrink:0; }
+        .card-steps { display:flex; flex-direction:column; gap:12px; }
         .card-step { display:flex; align-items:flex-start; gap:12px; }
-        .card-step-num { width:22px; height:22px; border-radius:50%; background:var(--blue); color:white; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
-        .card-step-text { font-size:13px; color:#1e3a8a; line-height:1.5; }
-        .card-step-text strong { color:var(--blue); }
+        .card-step-num {
+            width:22px; height:22px; border-radius:6px;
+            background:rgba(74,143,212,0.25); border:1px solid var(--blue-bd);
+            color:var(--blue); font-size:11px; font-weight:700;
+            display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;
+        }
+        .card-step-text { font-size:12.5px; color:rgba(74,143,212,0.75); line-height:1.6; font-weight:300; }
+        .card-step-text strong { color:var(--blue); font-weight:600; }
 
-        /* Card detail inputs */
-        .card-fields { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:22px; }
-        .card-field-full { margin-bottom:22px; }
-        .card-field-label { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:8px; display:block; }
-        .card-field-input { width:100%; padding:12px 15px; border:2px solid var(--stone); border-radius:10px; font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text); background:var(--card2); transition:border-color .2s; }
-        .card-field-input:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(30,64,175,.12); }
-        .card-field-hint { font-size:11px; color:var(--muted); margin-top:5px; }
+        /* Card input fields */
+        .card-fields { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; }
+        .field-group { display:flex; flex-direction:column; gap:6px; }
+        .field-label {
+            font-size:10px; font-weight:600; text-transform:uppercase;
+            letter-spacing:1.5px; color:var(--gold); opacity:0.75;
+        }
+        .field-input {
+            width:100%; padding:12px 16px; border:1px solid var(--rim); border-radius:10px;
+            font-size:13.5px; font-family:'DM Sans',sans-serif; color:var(--off);
+            background:var(--surface); transition:border-color .2s, box-shadow .2s; outline:none;
+        }
+        .field-input:focus { border-color:rgba(212,146,74,0.5); box-shadow:0 0 0 3px rgba(212,146,74,0.1); }
+        .field-hint { font-size:11px; color:var(--ghost); font-weight:300; }
+        .field-input::placeholder { color:var(--ghost); font-weight:300; }
 
-        .card-notice { display:flex; align-items:flex-start; gap:10px; padding:12px 15px; background:var(--accent-l); border:1px solid rgba(201,168,76,.3); border-radius:9px; margin-bottom:22px; font-size:12px; color:var(--text2); }
-        .card-notice svg { flex-shrink:0; color:var(--accent-d); margin-top:1px; }
+        /* Amount highlights */
+        .amount-highlight {
+            display:flex; justify-content:space-between; align-items:center;
+            padding:15px 20px; border-radius:12px; margin-bottom:22px;
+        }
+        .amount-highlight.cod-hl {
+            background:var(--soft); border:1px solid rgba(212,146,74,0.2);
+        }
+        .amount-highlight.card-hl {
+            background:var(--blue-bg); border:1px solid var(--blue-bd);
+        }
+        .amount-highlight-label { font-size:13px; font-weight:300; color:var(--fog); }
+        .amount-highlight-val {
+            font-family:'Syne',sans-serif; font-size:22px; font-weight:800;
+        }
+        .cod-hl  .amount-highlight-val { color:var(--gold); }
+        .card-hl .amount-highlight-val { color:var(--blue); }
 
-        /* Amount highlight — shared */
-        .amount-highlight { background:var(--accent-l); border:1px solid rgba(201,168,76,.4); border-radius:10px; padding:14px 18px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; }
-        .amount-highlight.card-hl { background:var(--blue-bg); border-color:var(--blue-bd); }
-        .amount-highlight span { font-size:14px; color:var(--text2); font-weight:500; }
-        .amount-highlight strong { font-family:'Playfair Display',serif; font-size:22px; color:var(--accent-d); }
-        .amount-highlight.card-hl strong { color:var(--blue); }
+        /* Warning notice */
+        .notice {
+            display:flex; align-items:flex-start; gap:12px;
+            padding:14px 16px; border-radius:11px; margin-bottom:22px;
+            background:var(--amber-bg); border:1px solid rgba(212,148,64,0.25);
+        }
+        .notice svg { flex-shrink:0; color:var(--amber); margin-top:1px; }
+        .notice-text { font-size:12.5px; color:rgba(212,148,64,0.75); line-height:1.6; font-weight:300; }
+        .notice-text strong { color:var(--amber); font-weight:600; }
 
         /* Confirm button */
-        .btn-confirm { width:100%; padding:16px; border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:16px; font-weight:700; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; }
-        .btn-confirm.cod-btn  { background:var(--accent); color:#0A0A0A; }
-        .btn-confirm.cod-btn:hover  { background:var(--accent-d); transform:translateY(-2px); box-shadow:0 6px 20px rgba(201,168,76,.35); }
-        .btn-confirm.card-btn { background:var(--blue); color:white; }
-        .btn-confirm.card-btn:hover { background:#1e3a8a; transform:translateY(-2px); box-shadow:0 6px 20px rgba(30,64,175,.3); }
-        .btn-confirm:disabled { background:var(--stone); color:var(--muted); cursor:not-allowed; transform:none; box-shadow:none; }
+        .btn-confirm {
+            width:100%; padding:15px; border:none; border-radius:12px;
+            font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700;
+            cursor:pointer; transition:all .22s;
+            display:flex; align-items:center; justify-content:center; gap:9px;
+            letter-spacing:0.3px;
+        }
+        .btn-confirm.cod-btn { background:var(--gold); color:var(--void); }
+        .btn-confirm.cod-btn:hover:not(:disabled) { background:var(--gold2); transform:translateY(-2px); box-shadow:0 8px 28px var(--glow); }
+        .btn-confirm.card-btn { background:var(--blue); color:#fff; }
+        .btn-confirm.card-btn:hover:not(:disabled) { background:#3a7fc4; transform:translateY(-2px); box-shadow:0 8px 28px rgba(74,143,212,0.3); }
+        .btn-confirm:disabled { background:var(--surface); color:var(--ghost); cursor:not-allowed; transform:none; box-shadow:none; border:1px solid var(--rim); }
 
-        .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.25); border-top-color:white; border-radius:50%; animation:spin .7s linear infinite; display:none; }
-        .cod-btn .spinner { border-top-color:#0A0A0A; border-color:rgba(0,0,0,.15); }
+        .spinner {
+            width:16px; height:16px; border:2px solid rgba(255,255,255,.2);
+            border-top-color:currentColor; border-radius:50%;
+            animation:spin .7s linear infinite; display:none; flex-shrink:0;
+        }
+        .cod-btn .spinner { border-top-color:var(--void); border-color:rgba(0,0,0,.15); }
         .btn-confirm.loading .btn-label { display:none; }
         .btn-confirm.loading .spinner  { display:block; }
 
-        .cancel-link { display:block; text-align:center; margin-top:14px; color:var(--muted); font-size:13px; text-decoration:none; }
-        .cancel-link:hover { color:var(--text); }
+        .cancel-link {
+            display:block; text-align:center; margin-top:13px;
+            color:var(--ghost); font-size:12.5px; text-decoration:none; font-weight:300;
+            transition:color .18s;
+        }
+        .cancel-link:hover { color:var(--off); }
 
-        /* Select-method prompt */
-        .select-prompt { text-align:center; padding:28px 20px; color:var(--muted); font-size:14px; }
-        .select-prompt svg { display:block; margin:0 auto 10px; opacity:.35; }
-
-        @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
         @keyframes spin   { to{transform:rotate(360deg)} }
 
-        @media(max-width:600px) {
-            .navbar{padding:0 16px;}
-            .summary-card,.payment-card{padding:22px 20px;}
-            .meta-row{grid-template-columns:1fr;}
-            .method-tabs{grid-template-columns:1fr;}
-            .card-fields{grid-template-columns:1fr;}
+        @media(max-width:860px){ .nav { padding:0 20px; } .hero-body { padding:0 22px 26px; } }
+        @media(max-width:600px){
+            .main { padding:24px 16px 60px; }
+            .panel-body { padding:18px 18px; }
+            .panel-head { padding:18px 18px 14px; }
+            .meta-row, .method-tabs, .card-fields { grid-template-columns:1fr; }
+            .hero-h1 { font-size:26px; }
         }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">
-        <div class="brand-icon">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<!-- NAV -->
+<nav class="nav">
+    <a href="{{ url_for('user.dashboard') }}" class="nav-logo">
+        <div class="nav-logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
-        House-Forge
+        <span class="nav-logo-name">House<b>-Forge</b></span>
     </a>
-    <div class="navbar-menu">
-        <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('user.my_orders') }}">My Orders</a>
-        <div class="nav-div"></div>
-        <a href="{{ url_for('user.profile') }}" style="padding:8px 9px;">
-            {% if user_profile_picture %}
-                <img src="/static/uploads/profiles/{{ user_profile_picture }}" class="profile-pic" alt="Profile">
-            {% else %}
-                <div class="profile-ph">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
-            {% endif %}
+    <div class="nav-links">
+        <a href="{{ url_for('user.dashboard') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
         </a>
-        <a href="{{ url_for('auth.logout') }}" class="logout-link">Logout</a>
+        <a href="{{ url_for('user.my_orders') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            My Orders
+        </a>
+    </div>
+    <div class="nav-right">
+        <a href="{{ url_for('user.profile') }}" class="nav-profile">
+            <div class="nav-av">
+                {% if user_profile_picture %}
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile">
+                {% else %}
+                    {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                {% endif %}
+            </div>
+            <span class="nav-uname">{{ current_user.name }}</span>
+        </a>
+        <div class="ndiv"></div>
+        <a href="{{ url_for('auth.logout') }}" class="nav-out">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+        </a>
     </div>
 </nav>
 
-<div class="page">
-    <a href="{{ url_for('user.my_orders') }}" class="back-link">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        Back to Orders
-    </a>
+<div class="shell">
 
-    <!-- ── Order Summary ── -->
-    <div class="summary-card">
-        <div class="card-label">Material Order</div>
-        <div class="card-title">Order #{{ order.id[:8] }}</div>
-        <div class="divider"></div>
-
-        <table class="items-table">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th style="text-align:right">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in order.order_items %}
-                <tr>
-                    <td>
-                        <div class="item-name">{{ item.material_name }}</div>
-                        <div class="item-sub">{{ item.quantity }} {{ item.unit }} × ₹{{ "{:,.0f}".format(item.price_per_unit) }}</div>
-                    </td>
-                    <td>₹{{ "{:,.0f}".format(item.total) }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <div class="total-row">
-            <span class="total-label">Total Payable</span>
-            <span class="total-value">₹{{ "{:,.0f}".format(order.total) }}</span>
+    <!-- HERO STRIP -->
+    <section class="hero-strip">
+        <div class="hero-strip-bg"></div>
+        <div class="hero-body">
+            <div class="hero-tag"><span class="hero-tag-ln"></span> Confirm Payment</div>
+            <h1 class="hero-h1">Review &amp; <em>Pay</em></h1>
         </div>
+    </section>
 
-        <div class="meta-row">
-            <div class="meta-item">
-                <div class="meta-key">Supplier</div>
-                <div class="meta-val">{{ order.supplier_name or 'Supplier' }}</div>
-            </div>
-            <div class="meta-item">
-                <div class="meta-key">For Project</div>
-                <div class="meta-val">{{ order.project_title or '—' }}</div>
-            </div>
-        </div>
+    <!-- MAIN -->
+    <div class="main">
 
-        {% if order.delivery_address %}
-        <div class="delivery-strip">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <div>
-                <div class="delivery-strip-label">Deliver to</div>
-                <div class="delivery-strip-value">{{ order.delivery_address }}</div>
-            </div>
-        </div>
-        {% endif %}
-    </div>
+        <a href="{{ url_for('user.my_orders') }}" class="back-link">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Back to Orders
+        </a>
 
-    <!-- ── Payment Method Card ── -->
-    <div class="payment-card">
-        <div class="payment-title">Choose Payment Method</div>
-        <div class="payment-sub">Select how you would like to pay for this order. Your supplier will be notified immediately.</div>
-
-        <!-- Method selector tabs -->
-        <div class="method-tabs">
-            <div class="method-tab method-tab-cod" id="tab-cod" onclick="selectMethod('cod')">
-                <div class="method-icon">💵</div>
-                <div style="flex:1;">
-                    <div class="method-name">Cash on Delivery</div>
-                    <div class="method-desc">Pay in cash when materials arrive at your site</div>
-                </div>
-                <div class="method-check">
-                    <svg class="checkmark" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg>
-                </div>
-            </div>
-
-            <div class="method-tab method-tab-card" id="tab-card" onclick="selectMethod('card')">
-                <div class="method-icon">💳</div>
-                <div style="flex:1;">
-                    <div class="method-name">Card Payment</div>
-                    <div class="method-desc">Pay via debit or credit card. Supplier verifies on delivery</div>
-                </div>
-                <div class="method-check">
-                    <svg class="checkmark" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- No method selected prompt -->
-        <div id="panel-none" class="method-panel visible select-prompt">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-            Select a payment method above to continue
-        </div>
-
-        <!-- ── COD Panel ── -->
-        <div id="panel-cod" class="method-panel">
-            <div class="steps">
-                <div class="step">
-                    <div class="step-num">1</div>
-                    <div class="step-text">Click <strong>Confirm COD</strong> — supplier gets notified instantly.</div>
-                </div>
-                <div class="step">
-                    <div class="step-num">2</div>
-                    <div class="step-text">Supplier prepares and delivers the materials to your site.</div>
-                </div>
-                <div class="step">
-                    <div class="step-num">3</div>
-                    <div class="step-text"><strong>Pay ₹{{ "{:,.0f}".format(order.total) }} in cash</strong> on delivery. Supplier marks payment collected.</div>
-                </div>
-            </div>
-
-            <div class="amount-highlight">
-                <span>Amount to pay on delivery</span>
-                <strong>₹{{ "{:,.0f}".format(order.total) }}</strong>
-            </div>
-
-            <button class="btn-confirm cod-btn" id="codBtn" onclick="confirmCOD()">
-                <span class="btn-label">✓ Confirm Cash on Delivery</span>
-                <div class="spinner"></div>
-            </button>
-            <a href="{{ url_for('user.my_orders') }}" class="cancel-link">Cancel and go back</a>
-        </div>
-
-        <!-- ── Card Panel ── -->
-        <div id="panel-card" class="method-panel">
-            <div class="card-info-box">
-                <div class="card-info-title">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                    How card payment works
-                </div>
-                <div class="card-steps">
-                    <div class="card-step">
-                        <div class="card-step-num">1</div>
-                        <div class="card-step-text">Complete your card payment of <strong>₹{{ "{:,.0f}".format(order.total) }}</strong> using your debit or credit card via your bank or payment portal.</div>
-                    </div>
-                    <div class="card-step">
-                        <div class="card-step-num">2</div>
-                        <div class="card-step-text">Enter the <strong>last 4 digits</strong> of the card used and the <strong>Transaction / Reference ID</strong> from your bank statement (optional but recommended).</div>
-                    </div>
-                    <div class="card-step">
-                        <div class="card-step-num">3</div>
-                        <div class="card-step-text">Click <strong>Confirm Card Payment</strong>. Supplier is notified and will verify on delivery.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card detail fields -->
-            <div class="card-fields">
-                <div>
-                    <label class="card-field-label" for="cardLast4Input">Last 4 digits of card (optional)</label>
-                    <input
-                        type="text"
-                        id="cardLast4Input"
-                        class="card-field-input"
-                        placeholder="e.g. 4321"
-                        maxlength="4"
-                        inputmode="numeric"
-                        autocomplete="off"
-                    >
-                    <div class="card-field-hint">The last 4 digits printed on your card</div>
+        <!-- ── ORDER SUMMARY PANEL ── -->
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-head-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                 </div>
                 <div>
-                    <label class="card-field-label" for="cardTxnInput">Transaction / Reference ID (optional)</label>
-                    <input
-                        type="text"
-                        id="cardTxnInput"
-                        class="card-field-input"
-                        placeholder="e.g. TXN20250326XXXXXX"
-                        autocomplete="off"
-                    >
-                    <div class="card-field-hint">Found in your bank SMS or statement</div>
+                    <div class="panel-title">Material Order</div>
+                    <div class="panel-sub">Review your items before payment</div>
                 </div>
             </div>
+            <div class="panel-body">
 
-            <div class="card-notice">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                <span>Submit only after you have actually completed the card transaction. The supplier will verify the payment on delivery before handing over the materials.</span>
+                <div class="order-id-badge">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    Order #{{ order.id[:8] }}
+                </div>
+
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th style="text-align:right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.order_items %}
+                        <tr>
+                            <td>
+                                <div class="item-name">{{ item.material_name }}</div>
+                                <div class="item-sub">{{ item.quantity }} {{ item.unit }} × ₹{{ "{:,.0f}".format(item.price_per_unit) }}</div>
+                            </td>
+                            <td>₹{{ "{:,.0f}".format(item.total) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="total-bar">
+                    <span class="total-bar-label">Total Payable</span>
+                    <span class="total-bar-val">₹{{ "{:,.0f}".format(order.total) }}</span>
+                </div>
+
+                <div class="meta-row">
+                    <div class="meta-item">
+                        <div class="meta-key">Supplier</div>
+                        <div class="meta-val">{{ order.supplier_name or 'Supplier' }}</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-key">For Project</div>
+                        <div class="meta-val">{{ order.project_title or '—' }}</div>
+                    </div>
+                </div>
+
+                {% if order.delivery_address %}
+                <div class="delivery-strip">
+                    <div class="delivery-strip-icon">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <div>
+                        <div class="delivery-strip-label">Deliver to</div>
+                        <div class="delivery-strip-value">{{ order.delivery_address }}</div>
+                    </div>
+                </div>
+                {% endif %}
+
             </div>
-
-            <div class="amount-highlight card-hl">
-                <span>Card payment amount declared</span>
-                <strong>₹{{ "{:,.0f}".format(order.total) }}</strong>
-            </div>
-
-            <button class="btn-confirm card-btn" id="cardBtn" onclick="declareCard()">
-                <span class="btn-label">💳 Confirm Card Payment</span>
-                <div class="spinner"></div>
-            </button>
-            <a href="{{ url_for('user.my_orders') }}" class="cancel-link">Cancel and go back</a>
         </div>
+
+        <!-- ── PAYMENT METHOD PANEL ── -->
+        <div class="panel" style="animation-delay:.08s">
+            <div class="panel-head">
+                <div class="panel-head-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                </div>
+                <div>
+                    <div class="panel-title">Choose Payment Method</div>
+                    <div class="panel-sub">Your supplier will be notified immediately</div>
+                </div>
+            </div>
+            <div class="panel-body">
+
+                <div class="method-tabs">
+                    <div class="method-tab" id="tab-cod" onclick="selectMethod('cod')">
+                        <div class="method-icon-wrap">💵</div>
+                        <div style="flex:1;">
+                            <div class="method-name">Cash on Delivery</div>
+                            <div class="method-desc">Pay in cash when materials arrive at your site</div>
+                        </div>
+                        <div class="method-check">
+                            <svg class="checkmark" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg>
+                        </div>
+                    </div>
+                    <div class="method-tab" id="tab-card" onclick="selectMethod('card')">
+                        <div class="method-icon-wrap">💳</div>
+                        <div style="flex:1;">
+                            <div class="method-name">Card Payment</div>
+                            <div class="method-desc">Pay via debit or credit card. Supplier verifies on delivery</div>
+                        </div>
+                        <div class="method-check">
+                            <svg class="checkmark" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No selection prompt -->
+                <div id="panel-none" class="method-panel visible select-prompt">
+                    <div class="select-prompt-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                    </div>
+                    Select a payment method above to continue
+                </div>
+
+                <!-- COD Panel -->
+                <div id="panel-cod" class="method-panel">
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-num">1</div>
+                            <div class="step-text">Click <strong>Confirm COD</strong> — your supplier gets notified instantly.</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">2</div>
+                            <div class="step-text">Supplier prepares and delivers the materials to your site.</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">3</div>
+                            <div class="step-text"><strong>Pay ₹{{ "{:,.0f}".format(order.total) }} in cash</strong> on delivery. Supplier marks payment collected.</div>
+                        </div>
+                    </div>
+
+                    <div class="amount-highlight cod-hl">
+                        <span class="amount-highlight-label">Amount to pay on delivery</span>
+                        <span class="amount-highlight-val">₹{{ "{:,.0f}".format(order.total) }}</span>
+                    </div>
+
+                    <button class="btn-confirm cod-btn" id="codBtn" onclick="confirmCOD()">
+                        <span class="btn-label">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px"><polyline points="20 6 9 17 4 12"/></svg>
+                            Confirm Cash on Delivery
+                        </span>
+                        <div class="spinner"></div>
+                    </button>
+                    <a href="{{ url_for('user.my_orders') }}" class="cancel-link">Cancel and go back</a>
+                </div>
+
+                <!-- Card Panel -->
+                <div id="panel-card" class="method-panel">
+                    <div class="card-info-box">
+                        <div class="card-info-title">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                            How card payment works
+                        </div>
+                        <div class="card-steps">
+                            <div class="card-step">
+                                <div class="card-step-num">1</div>
+                                <div class="card-step-text">Complete your card payment of <strong>₹{{ "{:,.0f}".format(order.total) }}</strong> using your debit or credit card via your bank or payment portal.</div>
+                            </div>
+                            <div class="card-step">
+                                <div class="card-step-num">2</div>
+                                <div class="card-step-text">Enter the <strong>last 4 digits</strong> of the card used and the <strong>Transaction / Reference ID</strong> from your bank statement (optional but recommended).</div>
+                            </div>
+                            <div class="card-step">
+                                <div class="card-step-num">3</div>
+                                <div class="card-step-text">Click <strong>Confirm Card Payment</strong>. Supplier is notified and will verify on delivery.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-fields">
+                        <div class="field-group">
+                            <label class="field-label" for="cardLast4Input">Last 4 digits of card <span style="opacity:0.5;text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></label>
+                            <input type="text" id="cardLast4Input" class="field-input" placeholder="e.g. 4321" maxlength="4" inputmode="numeric" autocomplete="off">
+                            <span class="field-hint">The last 4 digits printed on your card</span>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" for="cardTxnInput">Transaction / Reference ID <span style="opacity:0.5;text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></label>
+                            <input type="text" id="cardTxnInput" class="field-input" placeholder="e.g. TXN20250326XXXXXX" autocomplete="off">
+                            <span class="field-hint">Found in your bank SMS or statement</span>
+                        </div>
+                    </div>
+
+                    <div class="notice">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <div class="notice-text">Submit only <strong>after</strong> you have actually completed the card transaction. The supplier will verify the payment on delivery before handing over the materials.</div>
+                    </div>
+
+                    <div class="amount-highlight card-hl">
+                        <span class="amount-highlight-label">Card payment amount declared</span>
+                        <span class="amount-highlight-val">₹{{ "{:,.0f}".format(order.total) }}</span>
+                    </div>
+
+                    <button class="btn-confirm card-btn" id="cardBtn" onclick="declareCard()">
+                        <span class="btn-label">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                            Confirm Card Payment
+                        </span>
+                        <div class="spinner"></div>
+                    </button>
+                    <a href="{{ url_for('user.my_orders') }}" class="cancel-link">Cancel and go back</a>
+                </div>
+
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -395,66 +666,40 @@
     function selectMethod(method) {
         selectedMethod = method;
 
-        // Reset tabs
-        document.getElementById('tab-cod').className  = 'method-tab method-tab-cod';
-        document.getElementById('tab-card').className = 'method-tab method-tab-card';
+        document.getElementById('tab-cod').className  = 'method-tab';
+        document.getElementById('tab-card').className = 'method-tab';
+        if (method === 'cod')  document.getElementById('tab-cod').classList.add('selected-cod');
+        else                   document.getElementById('tab-card').classList.add('selected-card');
 
-        // Activate selected tab
-        if (method === 'cod') {
-            document.getElementById('tab-cod').classList.add('selected-cod');
-        } else {
-            document.getElementById('tab-card').classList.add('selected-card');
-        }
-
-        // Show/hide panels
         document.getElementById('panel-none').classList.remove('visible');
         document.getElementById('panel-cod').classList.remove('visible');
         document.getElementById('panel-card').classList.remove('visible');
         document.getElementById('panel-' + method).classList.add('visible');
     }
 
-    // ── COD ──
     function confirmCOD() {
         const btn = document.getElementById('codBtn');
         btn.disabled = true;
         btn.classList.add('loading');
-
         fetch('{{ url_for("payment.confirm_order_cod", order_id=order.id) }}', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         })
         .then(r => r.json())
         .then(data => {
-            if (data.success) {
-                window.location.href = data.redirect_url;
-            } else {
-                alert('Error: ' + data.message);
-                btn.disabled = false;
-                btn.classList.remove('loading');
-            }
+            if (data.success) { window.location.href = data.redirect_url; }
+            else { alert('Error: ' + data.message); btn.disabled = false; btn.classList.remove('loading'); }
         })
-        .catch(() => {
-            alert('Something went wrong. Please try again.');
-            btn.disabled = false;
-            btn.classList.remove('loading');
-        });
+        .catch(() => { alert('Something went wrong. Please try again.'); btn.disabled = false; btn.classList.remove('loading'); });
     }
 
-    // ── Card ──
     function declareCard() {
-        const btn      = document.getElementById('cardBtn');
-        const last4    = document.getElementById('cardLast4Input').value.trim();
-        const txnId    = document.getElementById('cardTxnInput').value.trim();
-
-        // Validate last4 if provided
-        if (last4 && !/^\d{4}$/.test(last4)) {
-            alert('Card last 4 digits must be exactly 4 numbers.');
-            return;
-        }
-
+        const btn   = document.getElementById('cardBtn');
+        const last4 = document.getElementById('cardLast4Input').value.trim();
+        const txnId = document.getElementById('cardTxnInput').value.trim();
+        if (last4 && !/^\d{4}$/.test(last4)) { alert('Card last 4 digits must be exactly 4 numbers.'); return; }
         btn.disabled = true;
         btn.classList.add('loading');
-
         fetch('{{ url_for("payment.declare_order_card", order_id=order.id) }}', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -462,19 +707,10 @@
         })
         .then(r => r.json())
         .then(data => {
-            if (data.success) {
-                window.location.href = data.redirect_url;
-            } else {
-                alert('Error: ' + data.message);
-                btn.disabled = false;
-                btn.classList.remove('loading');
-            }
+            if (data.success) { window.location.href = data.redirect_url; }
+            else { alert('Error: ' + data.message); btn.disabled = false; btn.classList.remove('loading'); }
         })
-        .catch(() => {
-            alert('Something went wrong. Please try again.');
-            btn.disabled = false;
-            btn.classList.remove('loading');
-        });
+        .catch(() => { alert('Something went wrong. Please try again.'); btn.disabled = false; btn.classList.remove('loading'); });
     }
 </script>
 </body>

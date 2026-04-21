@@ -623,11 +623,36 @@ def find_contractors():
         for doc in contractors_ref:
             contractor_data = doc.to_dict()
             contractor_data['id'] = doc.id
+
+            # ── Live completed-project count ──────────────────────────────
+            try:
+                completed_qs = (
+                    db.collection('projects')
+                      .where('contractor_id', '==', doc.id)
+                      .where('status', '==', 'completed')
+                      .stream()
+                )
+                contractor_data['completed_projects'] = len(list(completed_qs))
+            except Exception as e:
+                print(f"Warning: could not count projects for {doc.id}: {e}")
+                contractor_data.setdefault('completed_projects', 0)
+
             contractors.append(contractor_data)
         
         contractors.sort(key=lambda x: x.get('rating', 0), reverse=True)
+
+        # Profile picture for navbar
+        user_profile_picture = None
+        try:
+            user_doc = db.collection('users').document(current_user.id).get()
+            if user_doc.exists:
+                user_profile_picture = user_doc.to_dict().get('profile_picture')
+        except Exception:
+            pass
         
-        return render_template('user/find_contractors.html', contractors=contractors)
+        return render_template('user/find_contractors.html',
+                               contractors=contractors,
+                               user_profile_picture=user_profile_picture)
         
     except Exception as e:
         flash(f'Error loading contractors: {str(e)}', 'error')
@@ -652,6 +677,19 @@ def view_contractor(contractor_id):
         contractor_data = contractor_doc.to_dict()
         contractor_data['id'] = contractor_id
         
+        # ── Live completed-project count ──────────────────────────────────────
+        try:
+            completed_qs = (
+                db.collection('projects')
+                  .where('contractor_id', '==', contractor_id)
+                  .where('status', '==', 'completed')
+                  .stream()
+            )
+            contractor_data['completed_projects'] = len(list(completed_qs))
+        except Exception as e:
+            print(f"Warning: could not count completed projects: {e}")
+            contractor_data.setdefault('completed_projects', 0)
+
         return render_template('user/contractor_profile.html', contractor=contractor_data)
         
     except Exception as e:
@@ -1844,7 +1882,20 @@ def contact_contractor(contractor_id):
         
         contractor_data = contractor_doc.to_dict()
         contractor_data['id'] = contractor_id
-        
+
+        # ── Live completed-project count ──────────────────────────────────────
+        try:
+            completed_qs = (
+                db.collection('projects')
+                  .where('contractor_id', '==', contractor_id)
+                  .where('status', '==', 'completed')
+                  .stream()
+            )
+            contractor_data['completed_projects'] = len(list(completed_qs))
+        except Exception as e:
+            print(f"Warning: could not count completed projects: {e}")
+            contractor_data.setdefault('completed_projects', 0)
+
         return render_template('user/contractor_contact.html', contractor=contractor_data)
         
     except Exception as e:
@@ -2841,3 +2892,9 @@ def bids_pending_count():
     except Exception as e:
         print(f"Error getting pending bid count: {e}")
         return jsonify({'count': 0})
+    
+@user_bp.route('/bids/list')
+@login_required
+def bids_list():
+    """Alias — redirects to all_bids"""
+    return redirect(url_for('user.all_bids'))

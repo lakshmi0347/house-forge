@@ -3,783 +3,699 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard - House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Dashboard — House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #F0EBE1;
-            --bg-card: #FAF6EF;
-            --bg-card2: #F4EEE3;
-            --sand: #E8DFD0;
-            --stone: #D4C8B8;
-            --accent: #B8864E;
-            --accent2: #D4A96A;
-            --accent-dark: #96693A;
-            --accent-light: #FBF3E4;
-            --accent-glow: rgba(184,134,78,0.18);
-            --text-primary: #1A1612;
-            --text-secondary: #4A3F35;
-            --text-muted: #8A7A6E;
-            --ink: #2C2318;
-            --blueprint: rgba(184,134,78,0.06);
-        }
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+            --void:    #0C0B09;
+            --ink:     #141210;
+            --deep:    #1C1A16;
+            --surface: #242118;
+            --rim:     rgba(255,255,255,0.07);
+            --rim2:    rgba(255,255,255,0.04);
 
+            --gold:    #D4924A;
+            --gold2:   #F0C07A;
+            --gold3:   #B8743A;
+            --glow:    rgba(212,146,74,0.22);
+            --soft:    rgba(212,146,74,0.10);
+
+            --white:   #FFFFFF;
+            --off:     #F2EDE6;
+            --fog:     rgba(242,237,230,0.55);
+            --ghost:   rgba(242,237,230,0.28);
+
+            --green:  #4CAF82; --green-bg: rgba(76,175,130,0.13);
+            --blue:   #4A8FD4; --blue-bg:  rgba(74,143,212,0.13);
+            --amber:  #D49440; --amber-bg: rgba(212,148,64,0.13);
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg);
-            min-height: 100vh;
-            color: var(--text-primary);
-            overflow-x: hidden;
+            font-family:'DM Sans',sans-serif;
+            background:var(--void);
+            color:var(--off);
+            min-height:100vh;
+            overflow-x:hidden;
+            -webkit-font-smoothing:antialiased;
         }
 
-        /* ── HOUSE PHOTO BACKGROUND ── */
-        body::before {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: url('/static/images/house.jpg') no-repeat center center / cover;
-            opacity: 0.28;
-            filter: saturate(0.3) sepia(0.85) hue-rotate(-15deg) brightness(0.95);
+        /* ── NAV ── */
+        .nav {
+            position:fixed; top:0; left:0; right:0; z-index:300;
+            height:66px;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 52px;
+            background:rgba(12,11,9,0.85);
+            backdrop-filter:blur(22px);
+            -webkit-backdrop-filter:blur(22px);
+            border-bottom:1px solid var(--rim);
         }
-        /* Warm amber tint overlay — blends cool photo into golden template */
-        body::after {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+        .nav-logo-icon {
+            width:40px; height:40px; border-radius:9px;
+            border:1.5px solid var(--gold);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold); position:relative; overflow:hidden;
+        }
+        .nav-logo-icon::before {
+            content:''; position:absolute; inset:0;
+            background:radial-gradient(circle at 30% 30%, rgba(212,146,74,0.18), transparent 70%);
+        }
+        .nav-logo-name {
+            font-family:'Syne',sans-serif;
+            font-size:18px; font-weight:800; color:var(--white); letter-spacing:-0.4px;
+        }
+        .nav-logo-name b { color:var(--gold); font-weight:800; }
+
+        .nav-center {
+            position:absolute; left:50%; transform:translateX(-50%);
+            display:flex; align-items:center; gap:2px;
+        }
+        .nlink {
+            display:flex; align-items:center; gap:6px;
+            padding:7px 16px; border-radius:8px;
+            text-decoration:none; font-size:13.5px; font-weight:500;
+            color:var(--ghost); transition:color .18s, background .18s;
+            position:relative; white-space:nowrap;
+        }
+        .nlink:hover { color:var(--off); background:var(--rim2); }
+        .nlink.active { color:var(--gold); }
+        .nlink.active::after {
+            content:''; position:absolute; bottom:-1px; left:16px; right:16px;
+            height:2px; background:var(--gold); border-radius:2px;
+            box-shadow:0 0 10px var(--glow);
+        }
+        .npip {
+            position:absolute; top:5px; right:5px;
+            width:6px; height:6px; border-radius:50%;
+            background:#EF4444; border:1.5px solid var(--void);
+            display:none;
+        }
+        .npip.amber { background:var(--amber); }
+
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .nav-profile {
+            display:flex; align-items:center; gap:9px;
+            padding:5px 14px 5px 5px; border-radius:999px;
+            border:1px solid var(--rim); text-decoration:none;
+            transition:border-color .2s, background .2s;
+        }
+        .nav-profile:hover { border-color:var(--gold); background:var(--soft); }
+        .nav-av {
+            width:30px; height:30px; border-radius:50%;
+            background:var(--gold3); color:#fff;
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:700; flex-shrink:0;
+        }
+        .nav-av img { width:30px; height:30px; border-radius:50%; object-fit:cover; display:block; }
+        .nav-uname { font-size:13px; font-weight:500; color:var(--off); }
+        .ndiv { width:1px; height:22px; background:var(--rim); }
+        .nav-out {
+            display:flex; align-items:center; gap:6px;
+            text-decoration:none; font-size:13px; font-weight:500;
+            color:var(--ghost); padding:7px 14px; border-radius:8px;
+            transition:color .18s, background .18s;
+        }
+        .nav-out:hover { color:#EF4444; background:rgba(239,68,68,0.08); }
+
+        /* ── SHELL ── */
+        .shell { padding-top:66px; }
+
+        /* ── HERO ── */
+        .hero { position:relative; height:520px; overflow:hidden; }
+        .hero-bg {
+            position:absolute; inset:0;
+            background:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80') center 35%/cover;
+            filter:brightness(0.36) saturate(0.65);
+            transform:scale(1.04);
+            animation:hzoom 14s ease-in-out infinite alternate;
+        }
+        @keyframes hzoom { from{transform:scale(1.04)} to{transform:scale(1.0)} }
+        .hero::before {
+            content:''; position:absolute; inset:0; z-index:1;
             background:
-                radial-gradient(ellipse 100% 100% at 50% 50%,
-                    rgba(184,134,78,0.12) 0%,
-                    rgba(240,235,225,0.0) 55%,
-                    rgba(240,235,225,0.45) 100%);
+                linear-gradient(90deg,rgba(12,11,9,0.88) 0%,rgba(12,11,9,0.28) 55%,transparent 100%),
+                linear-gradient(0deg,rgba(12,11,9,0.92) 0%,transparent 50%);
         }
-        /* Blueprint grid */
-        .bg-grid {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background-image:
-                linear-gradient(rgba(184,134,78,0.045) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(184,134,78,0.045) 1px, transparent 1px);
-            background-size: 48px 48px;
+        .hero::after {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:3px; z-index:2;
+            background:linear-gradient(180deg,transparent,var(--gold),transparent);
         }
-        /* Warm amber wash — sits above photo, below content, tints cool image golden */
-        .bg-warm {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: rgba(184, 134, 78, 0.10);
-            mix-blend-mode: multiply;
+        .hero-body {
+            position:absolute; inset:0; z-index:3;
+            display:flex; flex-direction:column; justify-content:flex-end;
+            padding:0 72px 56px;
         }
-
-        /* ── NAVBAR ── */
-        .navbar {
-            background: rgba(250,246,239,0.94);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--stone);
-            padding: 0 44px;
-            height: 66px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 1px 0 rgba(184,134,78,0.12), 0 4px 20px rgba(28,22,18,0.05);
+        .hero-tag {
+            display:inline-flex; align-items:center; gap:9px;
+            font-size:10px; font-weight:600; letter-spacing:3px;
+            text-transform:uppercase; color:var(--gold); margin-bottom:18px;
         }
-        .navbar-brand {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px; font-weight: 700;
-            color: var(--text-primary);
-            display: flex; align-items: center; gap: 11px;
-            text-decoration: none; letter-spacing: 0.3px;
+        .hero-tag-ln { width:30px; height:1px; background:var(--gold); }
+        .hero-h1 {
+            font-family:'DM Serif Display',Georgia,serif;
+            font-size:58px; font-weight:400; line-height:1.06;
+            color:var(--white); letter-spacing:-1px; margin-bottom:16px;
         }
-        .navbar-brand-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            color: #fff;
-            box-shadow: 0 2px 10px rgba(184,134,78,0.35);
-            position: relative;
-            overflow: hidden;
+        .hero-h1 em { font-style:italic; color:var(--gold2); }
+        .hero-sub {
+            font-size:15px; color:rgba(242,237,230,0.5);
+            line-height:1.7; max-width:420px; margin-bottom:30px; font-weight:300;
         }
-        .navbar-brand-icon::after {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent);
-        }
-        .navbar-menu { display: flex; align-items: center; gap: 2px; }
-        .navbar-menu a {
-            color: var(--text-secondary); text-decoration: none;
-            padding: 7px 12px; border-radius: 9px;
-            font-size: 13.5px; font-weight: 500;
-            transition: color 0.2s, background 0.2s;
-            display: flex; align-items: center; gap: 6px; position: relative;
-        }
-        .navbar-menu a:hover, .navbar-menu a.nav-active {
-            color: var(--accent);
-            background: var(--accent-light);
-        }
-        .badge-notification {
-            position: absolute; top: 2px; right: 2px;
-            background: #DC2626; color: white;
-            border-radius: 50%; width: 15px; height: 15px;
-            display: none; align-items: center; justify-content: center;
-            font-size: 8px; font-weight: 700;
-            border: 2px solid var(--bg-card);
-        }
-        .badge-amber { background: #D97706; }
-        .profile-pic { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); display: block; }
-        .profile-placeholder {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            color: var(--accent); display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 13px; border: 2px solid var(--stone);
-        }
-        .nav-divider { width: 1px; height: 20px; background: var(--stone); margin: 0 5px; }
-        .logout-link {
-            color: var(--text-muted) !important; text-decoration: none;
-            padding: 7px 12px; border-radius: 9px;
-            font-size: 13px; font-weight: 500;
-            display: inline-flex; align-items: center; gap: 5px;
-            transition: color 0.2s, background 0.2s;
-        }
-        .logout-link:hover { color: #DC2626 !important; background: #FEF2F2; }
-
-        /* ── LAYOUT ── */
-        .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; position: relative; z-index: 1; }
-
-        /* ── HERO BANNER ── */
-        .welcome-banner {
-            background: rgba(250,244,234,0.82);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.55);
-            border-radius: 22px;
-            padding: 0;
-            margin-bottom: 24px;
-            overflow: hidden;
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            position: relative;
-            box-shadow: 0 4px 32px rgba(150,105,58,0.10), inset 0 1px 0 rgba(255,248,235,0.7);
-            animation: slideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
-        }
-        .welcome-banner::before {
-            content: '';
-            position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-            background: linear-gradient(180deg, var(--accent), var(--accent2));
-            border-radius: 22px 0 0 22px;
-        }
-        .banner-left { padding: 36px 40px; position: relative; }
-        .banner-eyebrow {
-            font-size: 11px; font-weight: 600; letter-spacing: 2px;
-            text-transform: uppercase; color: var(--accent);
-            margin-bottom: 10px; display: flex; align-items: center; gap: 7px;
-        }
-        .banner-eyebrow::before {
-            content: '';
-            width: 22px; height: 1.5px;
-            background: var(--accent);
-            display: inline-block;
-        }
-        .banner-left h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 34px; font-weight: 700;
-            color: var(--text-primary); line-height: 1.15;
-            margin-bottom: 10px;
-        }
-        .banner-left p { color: var(--text-secondary); font-size: 14px; line-height: 1.6; max-width: 380px; }
-        .banner-date {
-            margin-top: 20px;
-            display: inline-flex; align-items: center; gap: 7px;
-            font-size: 12.5px; color: var(--text-muted); font-weight: 500;
-            background: var(--bg-card2); border: 1px solid var(--sand);
-            padding: 7px 14px; border-radius: 20px;
-        }
-        .banner-right {
-            background: linear-gradient(135deg, rgba(251,243,228,0.72) 0%, rgba(253,236,200,0.68) 100%);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-left: 1px solid rgba(212,186,150,0.4);
-            display: flex; align-items: center; justify-content: center;
-            position: relative; overflow: hidden; padding: 20px;
-        }
-        .banner-right::before {
-            content: '';
-            position: absolute; inset: 0;
-            background-image:
-                linear-gradient(rgba(184,134,78,0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(184,134,78,0.08) 1px, transparent 1px);
-            background-size: 24px 24px;
-        }
-        .house-illustration { position: relative; z-index: 1; }
-
-        /* ── STATS ── */
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(4,1fr);
-            gap: 14px; margin-bottom: 24px;
-        }
-        .stat-card {
-            background: rgba(250,244,234,0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(212,186,150,0.45);
-            border-radius: 18px; padding: 24px 22px;
-            box-shadow: 0 2px 20px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.6);
-            transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s, border-color 0.3s, background 0.3s;
-            position: relative; overflow: hidden; cursor: default;
-        }
-        .stat-card:nth-child(1) { animation: slideUp 0.55s 0.08s cubic-bezier(0.22,1,0.36,1) both; }
-        .stat-card:nth-child(2) { animation: slideUp 0.55s 0.13s cubic-bezier(0.22,1,0.36,1) both; }
-        .stat-card:nth-child(3) { animation: slideUp 0.55s 0.18s cubic-bezier(0.22,1,0.36,1) both; }
-        .stat-card:nth-child(4) { animation: slideUp 0.55s 0.23s cubic-bezier(0.22,1,0.36,1) both; }
-        .stat-card::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            transform: scaleX(0); transform-origin: left;
-            transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
-            border-radius: 18px 18px 0 0;
-        }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(150,105,58,0.16); border-color: rgba(184,134,78,0.55); background: rgba(252,247,238,0.88); }
-        .stat-card:hover::before { transform: scaleX(1); }
-        .stat-icon-wrap {
-            width: 42px; height: 42px;
-            background: var(--accent-light);
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            margin-bottom: 16px; color: var(--accent);
-            border: 1px solid rgba(184,134,78,0.2);
-            transition: background 0.2s, transform 0.2s;
-        }
-        .stat-card:hover .stat-icon-wrap {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: white; transform: scale(1.08) rotate(-4deg);
-        }
-        .stat-number {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 38px; font-weight: 700;
-            color: var(--text-primary); line-height: 1;
-            margin-bottom: 5px;
-        }
-        .stat-label { color: var(--text-muted); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* ── BOTTOM GRID ── */
-        .bottom-grid {
-            display: grid; grid-template-columns: 1fr 310px;
-            gap: 18px; align-items: start;
-            animation: slideUp 0.55s 0.25s cubic-bezier(0.22,1,0.36,1) both;
-        }
-        .section {
-            background: rgba(250,244,234,0.78);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.48);
-            border-radius: 18px; padding: 28px 32px;
-            box-shadow: 0 2px 24px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.65);
-        }
-        .section-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 22px; padding-bottom: 16px;
-            border-bottom: 1px solid var(--sand);
-        }
-        .section-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 19px; font-weight: 700; color: var(--text-primary);
-            display: flex; align-items: center; gap: 8px;
-        }
-        .section-title-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            flex-shrink: 0;
+        .hero-chip {
+            display:inline-flex; align-items:center; gap:8px;
+            font-size:12px; color:rgba(242,237,230,0.38); font-weight:400;
+            border:1px solid var(--rim); background:rgba(255,255,255,0.04);
+            padding:8px 18px; border-radius:999px; backdrop-filter:blur(8px);
         }
 
-        /* ── BUTTONS ── */
-        .btn {
-            padding: 8px 18px; border-radius: 9px;
-            text-decoration: none; font-weight: 600; font-size: 13px;
-            transition: all 0.2s; border: none; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 6px;
-            font-family: 'Outfit', sans-serif;
+        /* Stats strip bottom-right */
+        .hero-stats {
+            position:absolute; bottom:0; right:0; z-index:3;
+            display:flex;
         }
-        .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; box-shadow: 0 2px 12px rgba(184,134,78,0.3); }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(184,134,78,0.4); }
-        .btn-outline { background: transparent; color: var(--accent); border: 1.5px solid rgba(184,134,78,0.5); }
-        .btn-outline:hover { background: var(--accent-light); border-color: var(--accent); }
+        .hstat {
+            padding:20px 32px;
+            background:rgba(12,11,9,0.78);
+            backdrop-filter:blur(16px);
+            border-top:1px solid var(--rim);
+            border-left:1px solid var(--rim);
+            text-align:center;
+        }
+        .hstat-n {
+            font-family:'Syne',sans-serif;
+            font-size:30px; font-weight:800; color:var(--white); line-height:1; margin-bottom:4px;
+        }
+        .hstat-n sup { font-size:15px; color:var(--gold); font-family:'DM Sans',sans-serif; vertical-align:super; }
+        .hstat-l { font-size:9.5px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; color:var(--ghost); }
 
-        /* ── QUICK ACTIONS ── */
-        .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .action-card {
-            padding: 22px 14px;
-            border: 1px solid rgba(212,186,150,0.45);
-            background: rgba(244,238,227,0.62);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 16px; text-align: center; text-decoration: none;
-            color: var(--text-primary);
-            transition: border-color 0.25s, background 0.25s, transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s;
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
-            position: relative; overflow: hidden;
-            box-shadow: 0 1px 8px rgba(150,105,58,0.06), inset 0 1px 0 rgba(255,248,235,0.5);
-        }
-        .action-card::after {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(135deg, rgba(184,134,78,0.06), transparent);
-            opacity: 0; transition: opacity 0.25s;
-        }
-        .action-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 8px 24px rgba(184,134,78,0.14); }
-        .action-card:hover::after { opacity: 1; }
-        .action-icon {
-            width: 42px; height: 42px;
-            background: var(--bg-card); border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--accent); border: 1px solid var(--sand);
-            transition: all 0.25s; position: relative; z-index: 1;
-        }
-        .action-card:hover .action-icon {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: white; border-color: transparent;
-            transform: scale(1.12) rotate(-6deg);
-            box-shadow: 0 4px 14px rgba(184,134,78,0.35);
-        }
-        .action-label { font-weight: 600; font-size: 12px; color: var(--text-primary); position: relative; z-index: 1; }
+        /* ── MAIN CONTENT ── */
+        .main { padding:52px 72px 80px; display:flex; flex-direction:column; gap:44px; }
 
-        /* ── PROJECT CARDS ── */
-        .project-list { display: flex; flex-direction: column; gap: 9px; }
-        .project-card {
-            border: 1px solid rgba(212,186,150,0.42);
-            background: rgba(248,242,232,0.65);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 15px 18px; border-radius: 14px;
-            transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
-            display: flex; justify-content: space-between; align-items: center; gap: 14px;
-            position: relative; overflow: hidden;
-            box-shadow: inset 0 1px 0 rgba(255,248,235,0.45);
+        .sec-lbl {
+            font-size:10px; font-weight:600; letter-spacing:2.5px;
+            text-transform:uppercase; color:var(--gold);
+            display:flex; align-items:center; gap:10px; margin-bottom:20px;
         }
-        .project-card::before {
-            content: '';
-            position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-            background: linear-gradient(180deg, var(--accent), var(--accent2));
-            transform: scaleY(0); transform-origin: bottom;
-            transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
-            border-radius: 3px 0 0 3px;
-        }
-        .project-card:hover { border-color: rgba(184,134,78,0.55); background: rgba(251,243,228,0.82); box-shadow: 0 4px 18px rgba(150,105,58,0.14), inset 0 1px 0 rgba(255,248,235,0.6); transform: translateX(5px); }
-        .project-card:hover::before { transform: scaleY(1); }
-        .project-info { flex: 1; min-width: 0; }
-        .project-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .project-details { display: flex; gap: 12px; color: var(--text-muted); font-size: 12px; flex-wrap: wrap; }
-        .project-detail-item { display: flex; align-items: center; gap: 4px; }
+        .sec-lbl::before { content:''; width:22px; height:1px; background:var(--gold); }
 
-        /* ── STATUS BADGES ── */
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 4px 12px; border-radius: 20px;
-            font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
-            text-transform: uppercase; white-space: nowrap; flex-shrink: 0;
+        /* ── QUICK ACTIONS — IMAGE CARDS ── */
+        .actions-grid {
+            display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
         }
-        .status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-        .status-planning  { background: #FEF3C7; color: #92400E; } .status-planning  .status-dot { background: #D97706; }
-        .status-active    { background: #DBEAFE; color: #1E40AF; } .status-active    .status-dot { background: #2563EB; }
-        .status-completed { background: #D1FAE5; color: #065F46; } .status-completed .status-dot { background: #059669; }
+        .acard {
+            position:relative; border-radius:20px; overflow:hidden;
+            aspect-ratio:3/4; display:flex; flex-direction:column; justify-content:flex-end;
+            text-decoration:none; cursor:pointer;
+            transition:transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s;
+        }
+        .acard:hover { transform:translateY(-8px) scale(1.02); box-shadow:0 28px 64px rgba(0,0,0,0.55), 0 0 0 1.5px var(--gold3); }
+        .acard-img {
+            position:absolute; inset:0; background-size:cover; background-position:center;
+            filter:brightness(0.52) saturate(0.75);
+            transition:filter .4s, transform .6s cubic-bezier(.22,1,.36,1);
+        }
+        .acard:hover .acard-img { filter:brightness(0.38) saturate(0.85); transform:scale(1.08); }
+        .acard::before {
+            content:''; position:absolute; inset:0; z-index:1;
+            background:linear-gradient(0deg,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.18) 55%,transparent 100%);
+        }
+        .acard::after {
+            content:''; position:absolute; inset:0; z-index:1;
+            background:linear-gradient(135deg,rgba(212,146,74,0.14) 0%,transparent 55%);
+            opacity:0; transition:opacity .3s;
+        }
+        .acard:hover::after { opacity:1; }
+        .acard-border {
+            position:absolute; inset:0; z-index:2;
+            border:1.5px solid transparent; border-radius:20px;
+            transition:border-color .3s;
+        }
+        .acard:hover .acard-border { border-color:rgba(212,146,74,0.55); }
+        .acard-body { position:relative; z-index:3; padding:0 20px 22px; }
+        .acard-icon {
+            width:36px; height:36px; border-radius:8px;
+            border:1px solid rgba(212,146,74,0.5);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold2); margin-bottom:11px;
+            background:rgba(12,11,9,0.4); backdrop-filter:blur(6px);
+            transition:background .3s, border-color .3s, color .3s;
+        }
+        .acard:hover .acard-icon { background:var(--gold); border-color:var(--gold); color:var(--void); }
+        .acard-title {
+            font-family:'DM Serif Display',serif;
+            font-size:20px; color:var(--white); line-height:1.2; margin-bottom:5px;
+        }
+        .acard-desc { font-size:12px; color:rgba(242,237,230,0.48); line-height:1.5; font-weight:300; }
+        .acard-cta {
+            display:inline-flex; align-items:center; gap:5px;
+            font-size:10.5px; font-weight:600; letter-spacing:1px;
+            text-transform:uppercase; color:var(--gold); margin-top:13px;
+            opacity:0; transform:translateX(-6px);
+            transition:opacity .28s, transform .28s;
+        }
+        .acard:hover .acard-cta { opacity:1; transform:translateX(0); }
 
-        /* ── EMPTY STATE ── */
-        .empty-state { text-align: center; padding: 48px 20px; }
-        .empty-state-icon {
-            width: 64px; height: 64px;
-            background: var(--sand); border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 16px; color: var(--text-muted);
-            border: 1px solid var(--stone);
-        }
-        .empty-state p { font-size: 14px; margin-bottom: 20px; color: var(--text-secondary); line-height: 1.6; }
+        /* BG images */
+        .ac1 .acard-img { background-image:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=75'); }
+        .ac2 .acard-img { background-image:url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=75'); }
+        .ac3 .acard-img { background-image:url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=75'); }
+        .ac4 .acard-img { background-image:url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&q=75'); }
 
-        /* ── COST METER WIDGET ── */
-        .cost-meter {
-            background: linear-gradient(135deg, #1A1410, #2C2010);
-            border-radius: 18px; padding: 22px;
-            margin-top: 0; position: relative; overflow: hidden;
-            border: 1px solid rgba(184,134,78,0.3);
+        /* ── PROJECTS + SIDEBAR ── */
+        .bottom-grid { display:grid; grid-template-columns:1fr 330px; gap:22px; align-items:start; }
+
+        /* Panel */
+        .panel {
+            background:var(--deep); border:1px solid var(--rim);
+            border-radius:20px; overflow:hidden;
         }
-        .cost-meter::before {
-            content: '';
-            position: absolute; inset: 0;
-            background-image: linear-gradient(rgba(184,134,78,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(184,134,78,0.07) 1px, transparent 1px);
-            background-size: 20px 20px;
+        .panel-head {
+            padding:26px 30px 20px;
+            border-bottom:1px solid var(--rim);
+            display:flex; align-items:center; justify-content:space-between;
         }
-        .cost-meter-title {
-            font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
-            text-transform: uppercase; color: rgba(212,169,106,0.7);
-            margin-bottom: 6px; position: relative; z-index: 1;
+        .panel-title {
+            font-family:'DM Serif Display',serif;
+            font-size:22px; font-weight:400; color:var(--white);
         }
-        .cost-meter-value {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 28px; font-weight: 700; color: #F5D89A;
-            line-height: 1; margin-bottom: 16px; position: relative; z-index: 1;
+        .btn-pill {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:7px 18px; border-radius:999px;
+            font-size:12.5px; font-weight:600; text-decoration:none;
+            border:1px solid var(--rim); color:var(--fog);
+            transition:border-color .2s, color .2s, background .2s;
         }
-        .cost-meter-value span { font-size: 14px; color: rgba(212,169,106,0.6); font-family: 'Outfit', sans-serif; }
-        .cost-bar-track {
-            height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px;
-            overflow: hidden; position: relative; z-index: 1; margin-bottom: 8px;
+        .btn-pill:hover { border-color:var(--gold); color:var(--gold); background:var(--soft); }
+        .btn-solid {
+            display:inline-flex; align-items:center; gap:7px;
+            padding:12px 24px; border-radius:12px;
+            font-size:13px; font-weight:600; text-decoration:none;
+            background:var(--gold); color:var(--void);
+            transition:background .2s, transform .2s, box-shadow .2s;
+            box-shadow:0 4px 20px var(--glow);
         }
-        .cost-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent), #F5D89A);
-            border-radius: 3px;
-            animation: barGrow 1.5s 0.8s cubic-bezier(0.22,1,0.36,1) both;
-            transform-origin: left;
+        .btn-solid:hover { background:var(--gold2); transform:translateY(-1px); box-shadow:0 8px 30px var(--glow); }
+
+        /* Project rows */
+        .prow {
+            display:flex; align-items:center; gap:16px;
+            padding:18px 30px;
+            border-bottom:1px solid var(--rim2);
+            text-decoration:none; color:inherit;
+            position:relative; transition:background .2s;
         }
-        @keyframes barGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-        .cost-bar-labels {
-            display: flex; justify-content: space-between;
-            font-size: 11px; color: rgba(212,169,106,0.5);
-            position: relative; z-index: 1;
+        .prow:last-child { border-bottom:none; }
+        .prow:hover { background:var(--rim2); }
+        .prow::before {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:2.5px;
+            background:var(--gold);
+            transform:scaleY(0); transform-origin:bottom;
+            transition:transform .28s cubic-bezier(.22,1,.36,1);
         }
-        .cost-breakdown {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 10px; margin-top: 16px; position: relative; z-index: 1;
+        .prow:hover::before { transform:scaleY(1); }
+
+        .pthumb {
+            width:52px; height:52px; border-radius:9px;
+            background-size:cover; background-position:center;
+            flex-shrink:0; border:1px solid var(--rim);
+            position:relative; overflow:hidden;
         }
-        
-        .cost-item-label { font-size: 10px; color: rgba(212,169,106,0.5); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px; }
-        .cost-item-val { font-size: 14px; font-weight: 600; color: rgba(245,216,154,0.9); }
+        .pthumb::after {
+            content:''; position:absolute; inset:0;
+            background:linear-gradient(135deg,rgba(212,146,74,0.22),transparent);
+        }
+        .pt1 { background-image:url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200&q=60'); }
+        .pt2 { background-image:url('https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=200&q=60'); }
+        .pt3 { background-image:url('https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=200&q=60'); }
+        .pt4 { background-image:url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=200&q=60'); }
+        .pt5 { background-image:url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=60'); }
+        .ptd { background-image:url('https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=200&q=60'); }
+
+        .pinfo { flex:1; min-width:0; }
+        .pname {
+            font-size:14.5px; font-weight:600; color:var(--white);
+            margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .pmeta { display:flex; gap:12px; flex-wrap:wrap; }
+        .pchip { display:flex; align-items:center; gap:4px; font-size:11.5px; color:var(--ghost); }
+
+        /* Status */
+        .stag {
+            display:inline-flex; align-items:center; gap:5px;
+            padding:4px 12px; border-radius:999px;
+            font-size:10px; font-weight:700; letter-spacing:.8px;
+            text-transform:uppercase; white-space:nowrap; flex-shrink:0;
+        }
+        .sdot { width:5px; height:5px; border-radius:50%; }
+        .s-planning  { background:var(--amber-bg); color:var(--amber); }
+        .s-planning  .sdot { background:var(--amber); }
+        .s-active    { background:var(--blue-bg);   color:var(--blue);  }
+        .s-active    .sdot { background:var(--blue); }
+        .s-completed { background:var(--green-bg);  color:var(--green); }
+        .s-completed .sdot { background:var(--green); }
+
+        /* Empty */
+        .empty {
+            display:flex; flex-direction:column; align-items:center;
+            padding:52px 32px; text-align:center;
+        }
+        .empty-img {
+            width:100%; max-width:260px; height:150px; border-radius:14px;
+            background:url('https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=600&q=60') center/cover;
+            margin-bottom:22px; opacity:0.38; border:1px solid var(--rim);
+        }
+        .empty p { font-size:14px; color:var(--ghost); line-height:1.7; margin-bottom:22px; max-width:280px; }
+
+        /* ── SIDEBAR ── */
+        .sidebar { display:flex; flex-direction:column; gap:16px; }
+
+        .inspo {
+            position:relative; border-radius:18px; overflow:hidden; height:210px;
+            text-decoration:none;
+        }
+        .inspo-img {
+            position:absolute; inset:0;
+            background:url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=700&q=75') center/cover;
+            filter:brightness(0.42) saturate(0.65);
+        }
+        .inspo::before {
+            content:''; position:absolute; inset:0; z-index:1;
+            background:linear-gradient(0deg,rgba(12,11,9,0.94) 0%,rgba(12,11,9,0.18) 60%,transparent 100%);
+        }
+        .inspo-body {
+            position:relative; z-index:2; height:100%;
+            display:flex; flex-direction:column; justify-content:flex-end;
+            padding:18px 20px;
+        }
+        .inspo-tag { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:5px; }
+        .inspo-h { font-family:'DM Serif Display',serif; font-size:17px; color:var(--white); line-height:1.25; margin-bottom:7px; }
+        .inspo-p { font-size:12px; color:var(--ghost); line-height:1.55; font-weight:300; }
+
+        .tip-card {
+            background:var(--deep); border:1px solid var(--rim);
+            border-radius:18px; overflow:hidden;
+        }
+        .tip-img {
+            width:100%; height:96px;
+            background:url('https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=600&q=60') center 60%/cover;
+            filter:brightness(0.38) saturate(0.5);
+            position:relative;
+        }
+        .tip-img::after {
+            content:''; position:absolute; inset:0;
+            background:linear-gradient(0deg,var(--deep) 0%,transparent 65%);
+        }
+        .tip-body { padding:14px 20px 20px; }
+        .tip-lbl { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:7px; }
+        .tip-h { font-size:14px; font-weight:600; color:var(--white); margin-bottom:7px; }
+        .tip-p { font-size:12px; color:var(--ghost); line-height:1.6; font-weight:300; }
+
+        /* ── MATERIAL STRIP ── */
+        .mat-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+        .mcard {
+            position:relative; border-radius:14px; overflow:hidden; height:130px;
+        }
+        .mcard-img {
+            position:absolute; inset:0; background-size:cover; background-position:center;
+            filter:brightness(0.5) saturate(0.6);
+            transition:filter .35s, transform .45s cubic-bezier(.22,1,.36,1);
+        }
+        .mcard:hover .mcard-img { filter:brightness(0.38); transform:scale(1.09); }
+        .mcard::before {
+            content:''; position:absolute; inset:0; z-index:1;
+            background:linear-gradient(0deg,rgba(0,0,0,0.82) 0%,transparent 65%);
+        }
+        .mcard-body {
+            position:relative; z-index:2; height:100%;
+            display:flex; flex-direction:column; justify-content:flex-end;
+            padding:12px 14px;
+        }
+        .mname { font-size:13px; font-weight:600; color:var(--white); margin-bottom:2px; }
+        .msub  { font-size:11px; color:var(--ghost); }
+
+        .mc1 .mcard-img { background-image:url('https://images.unsplash.com/photo-1558970084-5c4b2499e830?w=400&q=60'); }
+        .mc2 .mcard-img { background-image:url('https://images.unsplash.com/photo-1635070039609-da6fc3ecdbd4?w=400&q=60'); }
+        .mc3 .mcard-img { background-image:url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&q=60'); }
+        .mc4 .mcard-img { background-image:url('https://images.unsplash.com/photo-1516455590571-18256e5bb9ff?w=400&q=60'); }
 
         /* ── ANIMATIONS ── */
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(22px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+        .fu { animation:fadeUp .6s cubic-bezier(.22,1,.36,1) both; }
+        .d1{animation-delay:.06s} .d2{animation-delay:.14s} .d3{animation-delay:.22s} .d4{animation-delay:.30s}
 
-        /* ── PROGRESS RING ── */
-        .ring-wrap { display: flex; align-items: center; gap: 14px; margin-top: 18px; position: relative; z-index: 1; }
-        .ring-svg { transform: rotate(-90deg); }
-        .ring-track { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 5; }
-        .ring-fill {
-            fill: none; stroke: url(#ringGrad); stroke-width: 5;
-            stroke-linecap: round;
-            stroke-dasharray: 100.53;
-            stroke-dashoffset: 100.53;
-            animation: ringDraw 1.8s 1s cubic-bezier(0.22,1,0.36,1) forwards;
+        /* ── RESPONSIVE ── */
+        @media(max-width:1100px){
+            .actions-grid{grid-template-columns:repeat(2,1fr);}
+            .bottom-grid{grid-template-columns:1fr;}
+            .sidebar{display:grid;grid-template-columns:1fr 1fr;}
+            .mat-strip{grid-template-columns:repeat(2,1fr);}
         }
-        @keyframes ringDraw { to { stroke-dashoffset: 35; } }
-        .ring-label { color: rgba(245,216,154,0.85); font-size: 12px; line-height: 1.5; }
-        .ring-label strong { display: block; font-size: 18px; font-weight: 700; font-family: 'Cormorant Garamond', serif; color: #F5D89A; }
-
-        /* ── TIP CARD ── */
-        .tip-card {
-            background: var(--accent-light);
-            border: 1px solid rgba(184,134,78,0.25);
-            border-radius: 14px; padding: 16px 18px;
-            margin-top: 14px;
-            display: flex; gap: 12px; align-items: flex-start;
+        @media(max-width:900px){
+            .nav{padding:0 22px;} .nav-center{display:none;}
+            .main{padding:36px 22px 60px;}
+            .hero-body{padding:0 28px 44px;} .hero-h1{font-size:40px;}
+            .hero-stats{display:none;}
         }
-        .tip-icon {
-            width: 32px; height: 32px; flex-shrink: 0;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 9px; display: flex; align-items: center; justify-content: center;
-            color: white;
+        @media(max-width:600px){
+            .actions-grid{grid-template-columns:1fr 1fr;}
+            .acard{aspect-ratio:1/1;}
+            .sidebar{grid-template-columns:1fr;}
         }
-        .tip-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; }
-        .tip-text strong { display: block; font-size: 13px; color: var(--accent-dark); margin-bottom: 3px; font-weight: 600; }
-
-        @media (max-width: 1024px) { .stats-grid { grid-template-columns: repeat(2,1fr); } .welcome-banner { grid-template-columns: 1fr; } .banner-right { display: none; } }
-        @media (max-width: 900px) { .bottom-grid { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) { .navbar { padding: 0 20px; } .container { padding: 20px 16px; } .banner-left { padding: 24px; } .section { padding: 20px; } }
     </style>
 </head>
 <body>
-<div class="bg-grid"></div>
-<div class="bg-warm"></div>
 
-    <nav class="navbar">
-        <a href="/user/dashboard" class="navbar-brand">
-            <div class="navbar-brand-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            </div>
-            House-Forge
+<!-- NAV -->
+<nav class="nav">
+    <a href="/user/dashboard" class="nav-logo">
+        <div class="nav-logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <span class="nav-logo-name">House<b>-Forge</b></span>
+    </a>
+
+    <div class="nav-center">
+        <a href="/user/dashboard" class="nlink active">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
         </a>
+        <a href="/user/projects" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Projects
+        </a>
+        <a href="/user/bids" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Bids
+            <span class="npip amber" id="bidsBadge"></span>
+        </a>
+        <a href="/user/my-orders" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Orders
+        </a>
+        <a href="/user/messages" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Messages
+            <span class="npip" id="messagesBadge"></span>
+        </a>
+    </div>
 
-        <div class="navbar-menu">
-            <a href="/user/dashboard" class="nav-active">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                Dashboard
-            </a>
-            <a href="/user/projects">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                Projects
-            </a>
-            <a href="/user/bids">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                Bids
-                <span class="badge-notification badge-amber" id="bidsBadge"></span>
-            </a>
-            <a href="/user/my-orders">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                Orders
-            </a>
-            <a href="/user/messages">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                Messages
-                <span class="badge-notification" id="messagesBadge"></span>
-            </a>
-            <div class="nav-divider"></div>
-            <a href="/user/profile" style="padding:8px 9px;">
+    <div class="nav-right">
+        <a href="/user/profile" class="nav-profile">
+            <div class="nav-av">
                 {% if user_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile">
                 {% else %}
-                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
+                    {{ current_user.name[0].upper() if current_user.name else 'U' }}
                 {% endif %}
-            </a>
-            <a href="{{ url_for('auth.logout') }}" class="logout-link">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                Sign Out
-            </a>
-        </div>
-    </nav>
-
-    <main class="container">
-
-        <!-- HERO BANNER -->
-        <div class="welcome-banner">
-            <div class="banner-left">
-                <div class="banner-eyebrow">Cost Estimation Platform</div>
-                <h1>Welcome back,<br>{{ current_user.name }} 👋</h1>
-                <p>Your construction projects and material cost estimates are ready. Here's a live snapshot of everything in motion.</p>
-                <div class="banner-date">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    <span id="dateText"></span>
-                </div>
             </div>
-            <div class="banner-right">
-                <div class="house-illustration">
-                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <line x1="20" y1="178" x2="240" y2="178" stroke="rgba(184,134,78,0.35)" stroke-width="1.5" stroke-dasharray="4 3"/>
-                        <rect x="55" y="108" width="110" height="70" rx="2" fill="rgba(184,134,78,0.08)" stroke="rgba(184,134,78,0.5)" stroke-width="1.2"/>
-                        <polyline points="45,110 110,52 175,110" stroke="rgba(184,134,78,0.7)" stroke-width="1.5" stroke-linejoin="round"/>
-                        <polygon points="45,110 110,52 175,110" fill="rgba(184,134,78,0.08)" stroke="none"/>
-                        <rect x="138" y="60" width="14" height="28" fill="rgba(184,134,78,0.12)" stroke="rgba(184,134,78,0.5)" stroke-width="1"/>
-                        <rect x="97" y="138" width="26" height="40" rx="13" fill="rgba(184,134,78,0.14)" stroke="rgba(184,134,78,0.55)" stroke-width="1.2"/>
-                        <circle cx="119" cy="158" r="2" fill="rgba(184,134,78,0.7)"/>
-                        <rect x="63" y="122" width="24" height="22" rx="2" fill="rgba(184,134,78,0.1)" stroke="rgba(184,134,78,0.45)" stroke-width="1"/>
-                        <line x1="75" y1="122" x2="75" y2="144" stroke="rgba(184,134,78,0.35)" stroke-width="0.8"/>
-                        <line x1="63" y1="133" x2="87" y2="133" stroke="rgba(184,134,78,0.35)" stroke-width="0.8"/>
-                        <rect x="133" y="122" width="24" height="22" rx="2" fill="rgba(184,134,78,0.1)" stroke="rgba(184,134,78,0.45)" stroke-width="1"/>
-                        <line x1="145" y1="122" x2="145" y2="144" stroke="rgba(184,134,78,0.35)" stroke-width="0.8"/>
-                        <line x1="133" y1="133" x2="157" y2="133" stroke="rgba(184,134,78,0.35)" stroke-width="0.8"/>
-                        <rect x="175" y="130" width="50" height="48" rx="2" fill="rgba(184,134,78,0.06)" stroke="rgba(184,134,78,0.4)" stroke-width="1"/>
-                        <line x1="175" y1="148" x2="225" y2="148" stroke="rgba(184,134,78,0.3)" stroke-width="0.8" stroke-dasharray="3 2"/>
-                        <line x1="200" y1="130" x2="200" y2="178" stroke="rgba(184,134,78,0.3)" stroke-width="0.8"/>
-                        <polyline points="170,132 200,110 230,132" stroke="rgba(184,134,78,0.5)" stroke-width="1" fill="none"/>
-                        <line x1="32" y1="178" x2="32" y2="140" stroke="rgba(184,134,78,0.45)" stroke-width="1.5"/>
-                        <circle cx="32" cy="125" r="16" fill="rgba(184,134,78,0.1)" stroke="rgba(184,134,78,0.4)" stroke-width="1"/>
-                        <circle cx="24" cy="132" r="10" fill="rgba(184,134,78,0.08)" stroke="rgba(184,134,78,0.3)" stroke-width="0.8"/>
-                        <circle cx="40" cy="130" r="11" fill="rgba(184,134,78,0.08)" stroke="rgba(184,134,78,0.3)" stroke-width="0.8"/>
-                        <line x1="55" y1="190" x2="165" y2="190" stroke="rgba(184,134,78,0.3)" stroke-width="0.8"/>
-                        <line x1="55" y1="186" x2="55" y2="194" stroke="rgba(184,134,78,0.3)" stroke-width="0.8"/>
-                        <line x1="165" y1="186" x2="165" y2="194" stroke="rgba(184,134,78,0.3)" stroke-width="0.8"/>
-                        <text x="110" y="198" text-anchor="middle" font-size="9" fill="rgba(184,134,78,0.6)" font-family="Outfit, sans-serif">1,200 sq ft</text>
-                        <line x1="240" y1="108" x2="248" y2="108" stroke="rgba(184,134,78,0.3)" stroke-width="0.8"/>
-                        <line x1="240" y1="178" x2="248" y2="178" stroke="rgba(184,134,78,0.3)" stroke-width="0.8"/>
-                        <line x1="244" y1="108" x2="244" y2="178" stroke="rgba(184,134,78,0.3)" stroke-width="0.8"/>
-                        <text x="252" y="147" text-anchor="start" font-size="9" fill="rgba(184,134,78,0.6)" font-family="Outfit, sans-serif">H</text>
-                        <rect x="78" y="62" width="60" height="20" rx="4" fill="rgba(26,20,16,0.75)" stroke="rgba(184,134,78,0.5)" stroke-width="0.8"/>
-                        <text x="108" y="76" text-anchor="middle" font-size="9.5" fill="#F5D89A" font-family="Outfit, sans-serif" font-weight="600">Est. Cost ₹</text>
-                    </svg>
-                </div>
+            <span class="nav-uname">{{ current_user.name }}</span>
+        </a>
+        <div class="ndiv"></div>
+        <a href="{{ url_for('auth.logout') }}" class="nav-out">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+        </a>
+    </div>
+</nav>
+
+<div class="shell">
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-body">
+            <div class="hero-tag"><span class="hero-tag-ln"></span> Cost Estimation Platform</div>
+            <h1 class="hero-h1">Welcome back,<br><em>{{ current_user.name }}</em></h1>
+            <p class="hero-sub">Your construction projects and material estimates are live. Every number here is real — from foundation to finish.</p>
+            <div class="hero-chip">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span id="dateText"></span>
             </div>
         </div>
-
-        <!-- STATS -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon-wrap">
-                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                </div>
-                <div class="stat-number">{{ stats.total_projects }}</div>
-                <div class="stat-label">Total Projects</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon-wrap">
-                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                </div>
-                <div class="stat-number">{{ stats.active_projects }}</div>
-                <div class="stat-label">Active Projects</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon-wrap">
-                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                </div>
-                <div class="stat-number">{{ stats.total_estimates }}</div>
-                <div class="stat-label">Estimates</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon-wrap">
-                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                </div>
-                <div class="stat-number">{{ stats.total_orders }}</div>
-                <div class="stat-label">Material Orders</div>
-            </div>
+        <div class="hero-stats">
+            <div class="hstat"><div class="hstat-n">{{ stats.total_projects }}<sup>+</sup></div><div class="hstat-l">Projects</div></div>
+            <div class="hstat"><div class="hstat-n">{{ stats.active_projects }}</div><div class="hstat-l">Active</div></div>
+            <div class="hstat"><div class="hstat-n">{{ stats.total_estimates }}</div><div class="hstat-l">Estimates</div></div>
+            <div class="hstat"><div class="hstat-n">{{ stats.total_orders }}</div><div class="hstat-l">Orders</div></div>
         </div>
+    </section>
 
-        <!-- BOTTOM GRID -->
-        <div class="bottom-grid">
+    <main class="main">
 
-            <!-- Recent Projects -->
-            <div class="section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <span class="section-title-dot"></span>
-                        Recent Projects
-                    </h2>
-                    <a href="/user/projects" class="btn btn-outline">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                        View All
-                    </a>
+        <!-- QUICK ACTIONS — IMAGE CARDS -->
+        <section class="fu d1">
+            <div class="sec-lbl">What would you like to do?</div>
+            <div class="actions-grid">
+
+                <a href="/user/create-project" class="acard ac1">
+                    <div class="acard-img"></div>
+                    <div class="acard-border"></div>
+                    <div class="acard-body">
+                        <div class="acard-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+                        <div class="acard-title">New Project</div>
+                        <div class="acard-desc">Plan a new build with instant cost estimates</div>
+                        <div class="acard-cta">Start building →</div>
+                    </div>
+                </a>
+
+                <a href="/user/find-contractors" class="acard ac2">
+                    <div class="acard-img"></div>
+                    <div class="acard-border"></div>
+                    <div class="acard-body">
+                        <div class="acard-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+                        <div class="acard-title">Find Contractors</div>
+                        <div class="acard-desc">Connect with verified construction experts</div>
+                        <div class="acard-cta">Browse experts →</div>
+                    </div>
+                </a>
+
+                <a href="/user/find-suppliers" class="acard ac3">
+                    <div class="acard-img"></div>
+                    <div class="acard-border"></div>
+                    <div class="acard-body">
+                        <div class="acard-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+                        <div class="acard-title">Find Suppliers</div>
+                        <div class="acard-desc">Source cement, steel &amp; finishing materials</div>
+                        <div class="acard-cta">Explore →</div>
+                    </div>
+                </a>
+
+                <a href="/user/my-orders" class="acard ac4">
+                    <div class="acard-img"></div>
+                    <div class="acard-border"></div>
+                    <div class="acard-body">
+                        <div class="acard-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+                        <div class="acard-title">My Orders</div>
+                        <div class="acard-desc">Track deliveries &amp; purchase history</div>
+                        <div class="acard-cta">View orders →</div>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- PROJECTS + SIDEBAR -->
+        <section class="bottom-grid fu d2">
+
+            <!-- Projects panel -->
+            <div class="panel">
+                <div class="panel-head">
+                    <h2 class="panel-title">Recent Projects</h2>
+                    <a href="/user/projects" class="btn-pill">View all <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
                 </div>
 
                 {% if projects %}
-                <div class="project-list">
                     {% for project in projects %}
                     {% set pid = project.get('id') or '' %}
-                    <a href="/user/project/{{ pid }}" style="text-decoration:none;">
-                        <div class="project-card">
-                            <div class="project-info">
-                                <div class="project-title">{{ project.get('title', 'Untitled') }}</div>
-                                <div class="project-details">
-                                    <span class="project-detail-item">
-                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-                                        {{ project.get('square_feet', 0)|int }} sq ft
-                                    </span>
-                                    <span class="project-detail-item">
-                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                                        {{ project.get('rooms', 0) }} rooms
-                                    </span>
-                                    <span class="project-detail-item">
-                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                                        {{ project.get('floors', 0) }} floors
-                                    </span>
-                                </div>
+                    {% set n = loop.index %}
+                    <a href="/user/project/{{ pid }}" class="prow">
+                        <div class="pthumb pt{{ n if n <= 5 else 'd' }}"></div>
+                        <div class="pinfo">
+                            <div class="pname">{{ project.get('title', 'Untitled Project') }}</div>
+                            <div class="pmeta">
+                                <span class="pchip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg> {{ project.get('square_feet', 0)|int }} sq ft</span>
+                                <span class="pchip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> {{ project.get('rooms', 0) }} rooms</span>
+                                <span class="pchip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg> {{ project.get('floors', 0) }} floors</span>
                             </div>
-                            <span class="status-badge status-{{ project.get('status', 'planning') }}">
-                                <span class="status-dot"></span>
-                                {{ project.get('status', 'planning').upper() }}
-                            </span>
                         </div>
+                        <span class="stag s-{{ project.get('status', 'planning') }}"><span class="sdot"></span>{{ project.get('status', 'planning').upper() }}</span>
                     </a>
                     {% endfor %}
-                </div>
                 {% else %}
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <div class="empty">
+                        <div class="empty-img"></div>
+                        <p>No projects yet. Start your first build and get full material estimates — cement, steel, sand and finishing.</p>
+                        <a href="/user/create-project" class="btn-solid">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Create First Project
+                        </a>
                     </div>
-                    <p>No projects yet.<br>Create your first project to start estimating material costs!</p>
-                    <a href="/user/create-project" class="btn btn-primary">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Create Project
-                    </a>
-                </div>
                 {% endif %}
             </div>
 
-            <!-- Right Column -->
-            <div style="display:flex; flex-direction:column; gap:18px;">
-
-                <!-- Quick Actions -->
-                <div class="section">
-                    <div class="section-header" style="margin-bottom:16px; padding-bottom:12px;">
-                        <h2 class="section-title">
-                            <span class="section-title-dot"></span>
-                            Quick Actions
-                        </h2>
-                    </div>
-                    <div class="quick-actions">
-                        <a href="/user/create-project" class="action-card">
-                            <div class="action-icon">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            </div>
-                            <span class="action-label">New Project</span>
-                        </a>
-                        <a href="/user/find-contractors" class="action-card">
-                            <div class="action-icon">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                            </div>
-                            <span class="action-label">Find Contractors</span>
-                        </a>
-                        <a href="/user/find-suppliers" class="action-card">
-                            <div class="action-icon">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                            </div>
-                            <span class="action-label">Find Suppliers</span>
-                        </a>
-                        <a href="/user/my-orders" class="action-card">
-                            <div class="action-icon">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                            </div>
-                            <span class="action-label">My Orders</span>
-                        </a>
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="inspo fu d3">
+                    <div class="inspo-img"></div>
+                    <div class="inspo-body">
+                        <div class="inspo-tag">Pro Tip</div>
+                        <div class="inspo-h">Get accurate estimates in minutes</div>
+                        <div class="inspo-p">Add area, rooms &amp; floors — get a full breakdown of cement, steel, sand and finishing costs instantly.</div>
                     </div>
                 </div>
-
-                
-
-                <!-- Tip -->
-                <div class="tip-card">
-                    <div class="tip-icon">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    </div>
-                    <div class="tip-text">
-                        <strong>Pro Tip</strong>
-                        Add your project area and room count to get an instant material cost estimate — cement, sand, steel, and finishing included.
+                <div class="tip-card fu d4">
+                    <div class="tip-img"></div>
+                    <div class="tip-body">
+                        <div class="tip-lbl">Live pricing</div>
+                        <div class="tip-h">Material prices update monthly</div>
+                        <div class="tip-p">House-Forge pulls current Kerala market rates — no guesswork, no outdated numbers.</div>
                     </div>
                 </div>
-
             </div>
-        </div>
+        </section>
+
+        <!-- MATERIALS STRIP -->
+        <section class="fu d3">
+            <div class="sec-lbl">Materials we estimate</div>
+            <div class="mat-strip">
+                <div class="mcard mc1"><div class="mcard-img"></div><div class="mcard-body"><div class="mname">Cement</div><div class="msub">OPC 53 grade · bags</div></div></div>
+                <div class="mcard mc2"><div class="mcard-img"></div><div class="mcard-body"><div class="mname">Steel Rebar</div><div class="msub">TMT bars · kg / tonne</div></div></div>
+                <div class="mcard mc3"><div class="mcard-img"></div><div class="mcard-body"><div class="mname">Bricks &amp; Blocks</div><div class="msub">Red clay · hollow blocks</div></div></div>
+                <div class="mcard mc4"><div class="mcard-img"></div><div class="mcard-body"><div class="mname">Tiles &amp; Finishing</div><div class="msub">Flooring · wall · exterior</div></div></div>
+            </div>
+        </section>
 
     </main>
+</div>
 
-    <script>
-        document.getElementById('dateText').textContent = new Date().toLocaleDateString('en-IN', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
+<script>
+    document.getElementById('dateText').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 
-        function updateBadge(endpoint, badgeId) {
-            fetch(endpoint)
-                .then(r => r.ok && r.headers.get('content-type')?.includes('application/json') ? r.json() : null)
-                .then(data => {
-                    if (!data) return;
-                    const badge = document.getElementById(badgeId);
-                    if (!badge) return;
-                    if (data.count > 0) { badge.textContent = data.count; badge.style.display = 'flex'; }
-                    else { badge.style.display = 'none'; }
-                }).catch(() => {});
-        }
+    function updateBadge(ep,id){
+        fetch(ep).then(r=>r.ok&&r.headers.get('content-type')?.includes('application/json')?r.json():null)
+        .then(d=>{if(!d)return;const b=document.getElementById(id);if(!b)return;b.style.display=d.count>0?'block':'none';}).catch(()=>{});
+    }
+    function refreshBadges(){
+        updateBadge('/user/messages/unread-count','messagesBadge');
+        updateBadge('/user/bids/pending-count','bidsBadge');
+    }
+    document.addEventListener('DOMContentLoaded',refreshBadges);
+    setInterval(refreshBadges,30000);
 
-        function refreshBadges() {
-            updateBadge('/user/messages/unread-count', 'messagesBadge');
-            updateBadge('/user/bids/pending-count',    'bidsBadge');
-        }
-
-        document.addEventListener('DOMContentLoaded', refreshBadges);
-        setInterval(refreshBadges, 30000);
-
-        /* Staggered project card entrance */
-        const cards = document.querySelectorAll('.project-card');
-        cards.forEach((card, i) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateX(-12px)';
-            card.style.transition = 'none';
-            setTimeout(() => {
-                card.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1), border-color 0.25s, background 0.25s, box-shadow 0.25s';
-                card.style.opacity = '1';
-                card.style.transform = 'translateX(0)';
-            }, 350 + i * 80);
-        });
-
-        /* Action cards staggered entrance */
-        const actionCards = document.querySelectorAll('.action-card');
-        actionCards.forEach((card, i) => {
-            card.style.opacity = '0';
-            card.style.transform = 'scale(0.9)';
-            setTimeout(() => {
-                card.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1), border-color 0.25s, background 0.25s, box-shadow 0.3s';
-                card.style.opacity = '1';
-                card.style.transform = 'scale(1)';
-            }, 450 + i * 70);
-        });
-    </script>
+    document.querySelectorAll('.prow').forEach((el,i)=>{
+        el.style.cssText='opacity:0;transform:translateX(-12px)';
+        setTimeout(()=>{el.style.transition='opacity .4s ease,transform .4s cubic-bezier(.22,1,.36,1),background .2s';el.style.opacity='1';el.style.transform='translateX(0)';},380+i*80);
+    });
+    document.querySelectorAll('.acard').forEach((el,i)=>{
+        el.style.cssText='opacity:0;transform:translateY(20px) scale(.96)';
+        setTimeout(()=>{el.style.transition='opacity .45s ease,transform .45s cubic-bezier(.22,1,.36,1)';el.style.opacity='1';el.style.transform='translateY(0) scale(1)';},180+i*90);
+    });
+    document.querySelectorAll('.mcard').forEach((el,i)=>{
+        el.style.opacity='0';
+        setTimeout(()=>{el.style.transition='opacity .38s ease';el.style.opacity='1';},620+i*80);
+    });
+</script>
 </body>
 </html>

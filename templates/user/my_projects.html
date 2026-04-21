@@ -3,583 +3,709 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Projects - House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>My Projects — House-Forge</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #F0EBE1;
-            --bg-card: #FAF6EF;
-            --bg-card2: #F4EEE3;
-            --sand: #E8DFD0;
-            --stone: #D4C8B8;
-            --accent: #B8864E;
-            --accent2: #D4A96A;
-            --accent-dark: #96693A;
-            --accent-light: #FBF3E4;
-            --accent-glow: rgba(184,134,78,0.18);
-            --text-primary: #1A1612;
-            --text-secondary: #4A3F35;
-            --text-muted: #8A7A6E;
-        }
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Outfit', sans-serif; background-color: var(--bg); min-height: 100vh; color: var(--text-primary); overflow-x: hidden; }
+            --void:    #0C0B09;
+            --ink:     #141210;
+            --deep:    #1C1A16;
+            --surface: #242118;
+            --rim:     rgba(255,255,255,0.07);
+            --rim2:    rgba(255,255,255,0.04);
 
-        /* ── HOUSE PHOTO BACKGROUND (from dashboard) ── */
-        body::before {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: url('/static/images/Home.jpg') no-repeat center center / cover;
-            opacity: 0.28;
-            filter: saturate(0.3) sepia(0.85) hue-rotate(-15deg) brightness(0.95);
+            --gold:    #D4924A;
+            --gold2:   #F0C07A;
+            --gold3:   #B8743A;
+            --glow:    rgba(212,146,74,0.22);
+            --soft:    rgba(212,146,74,0.10);
+
+            --white:   #FFFFFF;
+            --off:     #F2EDE6;
+            --fog:     rgba(242,237,230,0.55);
+            --ghost:   rgba(242,237,230,0.28);
+
+            --green:  #4CAF82; --green-bg: rgba(76,175,130,0.13);
+            --blue:   #4A8FD4; --blue-bg:  rgba(74,143,212,0.13);
+            --amber:  #D49440; --amber-bg: rgba(212,148,64,0.13);
+            --red:    #E05555; --red-bg:   rgba(224,85,85,0.13);
         }
-        body::after {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body {
+            font-family:'DM Sans',sans-serif;
+            background:var(--void);
+            color:var(--off);
+            min-height:100vh;
+            overflow-x:hidden;
+            -webkit-font-smoothing:antialiased;
+        }
+
+        /* ── NAV ── */
+        .nav {
+            position:fixed; top:0; left:0; right:0; z-index:300;
+            height:66px;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 52px;
+            background:rgba(12,11,9,0.85);
+            backdrop-filter:blur(22px);
+            -webkit-backdrop-filter:blur(22px);
+            border-bottom:1px solid var(--rim);
+        }
+        .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+        .nav-logo-icon {
+            width:40px; height:40px; border-radius:9px;
+            border:1.5px solid var(--gold);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold); position:relative; overflow:hidden;
+        }
+        .nav-logo-icon::before {
+            content:''; position:absolute; inset:0;
+            background:radial-gradient(circle at 30% 30%, rgba(212,146,74,0.18), transparent 70%);
+        }
+        .nav-logo-name {
+            font-family:'Syne',sans-serif;
+            font-size:18px; font-weight:800; color:var(--white); letter-spacing:-0.4px;
+        }
+        .nav-logo-name b { color:var(--gold); font-weight:800; }
+
+        .nav-center {
+            position:absolute; left:50%; transform:translateX(-50%);
+            display:flex; align-items:center; gap:2px;
+        }
+        .nlink {
+            display:flex; align-items:center; gap:6px;
+            padding:7px 16px; border-radius:8px;
+            text-decoration:none; font-size:13.5px; font-weight:500;
+            color:var(--ghost); transition:color .18s, background .18s;
+            position:relative; white-space:nowrap;
+        }
+        .nlink:hover { color:var(--off); background:var(--rim2); }
+        .nlink.active { color:var(--gold); }
+        .nlink.active::after {
+            content:''; position:absolute; bottom:-1px; left:16px; right:16px;
+            height:2px; background:var(--gold); border-radius:2px;
+            box-shadow:0 0 10px var(--glow);
+        }
+        .npip {
+            position:absolute; top:5px; right:5px;
+            width:6px; height:6px; border-radius:50%;
+            background:#EF4444; border:1.5px solid var(--void);
+            display:none;
+        }
+        .npip.amber { background:var(--amber); }
+
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .nav-profile {
+            display:flex; align-items:center; gap:9px;
+            padding:5px 14px 5px 5px; border-radius:999px;
+            border:1px solid var(--rim); text-decoration:none;
+            transition:border-color .2s, background .2s;
+        }
+        .nav-profile:hover { border-color:var(--gold); background:var(--soft); }
+        .nav-av {
+            width:30px; height:30px; border-radius:50%;
+            background:var(--gold3); color:#fff;
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:700; flex-shrink:0;
+        }
+        .nav-av img { width:30px; height:30px; border-radius:50%; object-fit:cover; display:block; }
+        .nav-uname { font-size:13px; font-weight:500; color:var(--off); }
+        .ndiv { width:1px; height:22px; background:var(--rim); }
+        .nav-out {
+            display:flex; align-items:center; gap:6px;
+            text-decoration:none; font-size:13px; font-weight:500;
+            color:var(--ghost); padding:7px 14px; border-radius:8px;
+            transition:color .18s, background .18s;
+        }
+        .nav-out:hover { color:#EF4444; background:rgba(239,68,68,0.08); }
+
+        /* ── SHELL ── */
+        .shell { padding-top:66px; }
+
+        /* ── HERO / PAGE HEADER ── */
+        .hero { position:relative; height:380px; overflow:hidden; }
+        .hero-bg {
+            position:absolute; inset:0;
+            background:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1600&q=80') center 40%/cover;
+            filter:brightness(0.32) saturate(0.55);
+            transform:scale(1.04);
+            animation:hzoom 16s ease-in-out infinite alternate;
+        }
+        @keyframes hzoom { from{transform:scale(1.04)} to{transform:scale(1.0)} }
+        .hero::before {
+            content:''; position:absolute; inset:0; z-index:1;
             background:
-                radial-gradient(ellipse 100% 100% at 50% 50%,
-                    rgba(184,134,78,0.12) 0%,
-                    rgba(240,235,225,0.0) 55%,
-                    rgba(240,235,225,0.45) 100%);
+                linear-gradient(90deg,rgba(12,11,9,0.92) 0%,rgba(12,11,9,0.4) 60%,transparent 100%),
+                linear-gradient(0deg,rgba(12,11,9,0.96) 0%,transparent 55%);
         }
-        .bg-grid {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background-image:
-                linear-gradient(rgba(184,134,78,0.045) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(184,134,78,0.045) 1px, transparent 1px);
-            background-size: 48px 48px;
+        .hero::after {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:3px; z-index:2;
+            background:linear-gradient(180deg,transparent,var(--gold),transparent);
         }
-        .bg-warm {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: rgba(184,134,78,0.10);
-            mix-blend-mode: multiply;
+        .hero-body {
+            position:absolute; inset:0; z-index:3;
+            display:flex; flex-direction:column; justify-content:flex-end;
+            padding:0 72px 48px;
+        }
+        .hero-tag {
+            display:inline-flex; align-items:center; gap:9px;
+            font-size:10px; font-weight:600; letter-spacing:3px;
+            text-transform:uppercase; color:var(--gold); margin-bottom:14px;
+        }
+        .hero-tag-ln { width:30px; height:1px; background:var(--gold); }
+        .hero-h1 {
+            font-family:'DM Serif Display',Georgia,serif;
+            font-size:52px; font-weight:400; line-height:1.06;
+            color:var(--white); letter-spacing:-1px; margin-bottom:12px;
+        }
+        .hero-h1 em { font-style:italic; color:var(--gold2); }
+        .hero-sub {
+            font-size:14.5px; color:rgba(242,237,230,0.45);
+            line-height:1.7; max-width:480px; font-weight:300;
         }
 
-        /* ── NAVBAR ── */
-        .navbar {
-            background: rgba(250,246,239,0.94); backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--stone);
-            padding: 0 44px; height: 66px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 1px 0 rgba(184,134,78,0.12), 0 4px 20px rgba(28,22,18,0.05);
+        /* Stats top-right */
+        .hero-stats {
+            position:absolute; bottom:0; right:0; z-index:3;
+            display:flex;
         }
-        .navbar-brand {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px; font-weight: 700; color: var(--text-primary);
-            display: flex; align-items: center; gap: 11px; text-decoration: none; letter-spacing: 0.3px;
+        .hstat {
+            padding:18px 30px;
+            background:rgba(12,11,9,0.78);
+            backdrop-filter:blur(16px);
+            border-top:1px solid var(--rim);
+            border-left:1px solid var(--rim);
+            text-align:center;
         }
-        .navbar-brand-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            color: #fff; box-shadow: 0 2px 10px rgba(184,134,78,0.35); position: relative; overflow: hidden;
+        .hstat-n {
+            font-family:'Syne',sans-serif;
+            font-size:28px; font-weight:800; color:var(--white); line-height:1; margin-bottom:3px;
         }
-        .navbar-brand-icon::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent); }
-        .navbar-menu { display: flex; align-items: center; gap: 2px; }
-        .navbar-menu a {
-            color: var(--text-secondary); text-decoration: none;
-            padding: 7px 12px; border-radius: 9px;
-            font-size: 13.5px; font-weight: 500;
-            transition: color 0.2s, background 0.2s;
-            display: flex; align-items: center; gap: 6px; position: relative;
-        }
-        .navbar-menu a:hover, .navbar-menu a.nav-active { color: var(--accent); background: var(--accent-light); }
-        .badge-notification {
-            position: absolute; top: 2px; right: 2px;
-            background: #DC2626; color: white; border-radius: 50%;
-            width: 15px; height: 15px; display: none;
-            align-items: center; justify-content: center;
-            font-size: 8px; font-weight: 700; border: 2px solid var(--bg-card);
-        }
-        .badge-amber { background: #D97706; }
-        .profile-pic { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); display: block; }
-        .profile-placeholder {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            color: var(--accent); display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 13px; border: 2px solid var(--stone);
-        }
-        .nav-divider { width: 1px; height: 20px; background: var(--stone); margin: 0 5px; }
-        .logout-link {
-            color: var(--text-muted) !important; text-decoration: none;
-            padding: 7px 12px; border-radius: 9px;
-            font-size: 13px; font-weight: 500;
-            display: inline-flex; align-items: center; gap: 5px;
-            transition: color 0.2s, background 0.2s;
-        }
-        .logout-link:hover { color: #DC2626 !important; background: #FEF2F2; }
+        .hstat-n sup { font-size:13px; color:var(--gold); vertical-align:super; font-family:'DM Sans',sans-serif; }
+        .hstat-l { font-size:9px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; color:var(--ghost); }
 
-        /* ── LAYOUT ── */
-        .container { max-width: 1180px; margin: 0 auto; padding: 32px 24px; position: relative; z-index: 1; }
+        /* ── MAIN ── */
+        .main { padding:44px 72px 80px; display:flex; flex-direction:column; gap:36px; }
 
-        /* ── PAGE HEADER (glassmorphism like dashboard) ── */
-        .page-header {
-            background: rgba(250,244,234,0.82);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.55);
-            border-radius: 22px; padding: 0;
-            margin-bottom: 28px;
-            overflow: hidden; display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: stretch;
-            box-shadow: 0 4px 32px rgba(150,105,58,0.10), inset 0 1px 0 rgba(255,248,235,0.7);
-            animation: slideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
-            position: relative;
+        .sec-lbl {
+            font-size:10px; font-weight:600; letter-spacing:2.5px;
+            text-transform:uppercase; color:var(--gold);
+            display:flex; align-items:center; gap:10px; margin-bottom:22px;
         }
-        .page-header::before {
-            content: '';
-            position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-            background: linear-gradient(180deg, var(--accent), var(--accent2));
-            border-radius: 22px 0 0 22px;
+        .sec-lbl::before { content:''; width:22px; height:1px; background:var(--gold); }
+
+        /* ── TOOLBAR ── */
+        .toolbar {
+            display:flex; align-items:center; justify-content:space-between; gap:16px;
+            flex-wrap:wrap;
         }
-        .header-left { padding: 34px 40px; }
-        .header-eyebrow {
-            font-size: 11px; font-weight: 600; letter-spacing: 2px;
-            text-transform: uppercase; color: var(--accent);
-            margin-bottom: 10px; display: flex; align-items: center; gap: 7px;
+        .toolbar-left { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+        .filter-btn {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:8px 18px; border-radius:8px;
+            font-size:12.5px; font-weight:500;
+            border:1px solid var(--rim); background:transparent; color:var(--ghost);
+            cursor:pointer; font-family:'DM Sans',sans-serif;
+            transition:all .2s;
         }
-        .header-eyebrow::before { content: ''; width: 22px; height: 1.5px; background: var(--accent); display: inline-block; }
-        .header-left h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 32px; font-weight: 700; color: var(--text-primary);
-            line-height: 1.15; margin-bottom: 8px;
+        .filter-btn:hover { border-color:var(--gold); color:var(--gold); background:var(--soft); }
+        .filter-btn.active { border-color:var(--gold); color:var(--gold); background:var(--soft); }
+        .filter-dot { width:5px; height:5px; border-radius:50%; background:currentColor; }
+
+        .btn-solid {
+            display:inline-flex; align-items:center; gap:7px;
+            padding:10px 22px; border-radius:10px;
+            font-size:13px; font-weight:600; text-decoration:none;
+            background:var(--gold); color:var(--void);
+            transition:background .2s, transform .2s, box-shadow .2s;
+            box-shadow:0 4px 20px var(--glow); border:none; cursor:pointer;
+            font-family:'DM Sans',sans-serif;
         }
-        .header-left p { color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
-        .header-right {
-            background: linear-gradient(135deg, rgba(251,243,228,0.72) 0%, rgba(253,236,200,0.68) 100%);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-left: 1px solid rgba(212,186,150,0.4);
-            display: flex; align-items: center; justify-content: center;
-            padding: 28px 36px; position: relative; overflow: hidden;
-            gap: 16px; flex-direction: column;
-        }
-        .header-right::before {
-            content: '';
-            position: absolute; inset: 0;
-            background-image: linear-gradient(rgba(184,134,78,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(184,134,78,0.08) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        .header-new-btn {
-            position: relative; z-index: 1;
-            padding: 11px 24px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff; border: none; border-radius: 11px;
-            font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600;
-            cursor: pointer; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 8px;
-            box-shadow: 0 4px 18px rgba(184,134,78,0.35);
-            transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
-            white-space: nowrap;
-        }
-        .header-new-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(184,134,78,0.45); }
-        .header-count { position: relative; z-index: 1; text-align: center; }
-        .header-count-num {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 28px; font-weight: 700; color: var(--accent-dark); line-height: 1;
-        }
-        .header-count-label { font-size: 11px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 3px; }
+        .btn-solid:hover { background:var(--gold2); transform:translateY(-1px); box-shadow:0 8px 30px var(--glow); }
 
         /* ── PROJECTS GRID ── */
         .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(360px, 1fr));
+            gap:18px;
         }
 
-        /* ── PROJECT CARD (glassmorphism from dashboard) ── */
+        /* ── PROJECT CARD ── */
         .project-card {
-            background: rgba(250,244,234,0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(212,186,150,0.45);
-            border-radius: 20px; padding: 26px 28px;
-            box-shadow: 0 2px 20px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.6);
-            transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
-            position: relative; overflow: hidden;
-        }
-        .project-card::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            transform: scaleX(0); transform-origin: left;
-            transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
-            border-radius: 20px 20px 0 0;
+            background:var(--deep);
+            border:1px solid var(--rim);
+            border-radius:20px;
+            overflow:hidden;
+            position:relative;
+            transition:transform .38s cubic-bezier(.22,1,.36,1), box-shadow .38s, border-color .3s;
+            display:flex; flex-direction:column;
         }
         .project-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 36px rgba(150,105,58,0.16);
-            border-color: rgba(184,134,78,0.55);
-            background: rgba(252,247,238,0.88);
+            transform:translateY(-7px);
+            box-shadow:0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,146,74,0.35);
+            border-color:rgba(212,146,74,0.35);
         }
-        .project-card:hover::before { transform: scaleX(1); }
-        .project-card.card-completed { opacity: 0.84; }
-        .project-card.card-completed:hover { opacity: 1; }
 
-        /* Card top row */
-        .project-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 12px; }
-        .project-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; line-height: 1.2;
+        /* Card image header */
+        .card-img-wrap {
+            position:relative; height:160px; overflow:hidden; flex-shrink:0;
         }
-        .project-location { color: var(--text-muted); font-size: 12.5px; display: flex; align-items: center; gap: 4px; }
+        .card-img {
+            position:absolute; inset:0; background-size:cover; background-position:center;
+            filter:brightness(0.48) saturate(0.6);
+            transition:filter .4s, transform .5s cubic-bezier(.22,1,.36,1);
+        }
+        .project-card:hover .card-img { filter:brightness(0.36) saturate(0.75); transform:scale(1.07); }
+        .card-img::after {
+            content:''; position:absolute; inset:0;
+            background:linear-gradient(0deg,var(--deep) 0%,rgba(12,11,9,0.4) 55%,transparent 100%);
+        }
+        /* Accent line */
+        .card-img::before {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:3px; z-index:2;
+            background:linear-gradient(180deg,transparent,var(--gold),transparent);
+            opacity:0; transition:opacity .35s;
+        }
+        .project-card:hover .card-img::before { opacity:1; }
 
-        /* Status badges */
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 4px 12px; border-radius: 20px;
-            font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
-            text-transform: uppercase; white-space: nowrap; flex-shrink: 0;
+        .card-img-overlay {
+            position:absolute; inset:0; z-index:2;
+            display:flex; align-items:flex-start; justify-content:space-between;
+            padding:16px 18px;
         }
-        .status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-        .status-planning  { background: #FEF3C7; color: #92400E; } .status-planning  .status-dot { background: #D97706; }
-        .status-active    { background: #DBEAFE; color: #1E40AF; } .status-active    .status-dot { background: #2563EB; }
-        .status-completed { background: #D1FAE5; color: #065F46; } .status-completed .status-dot { background: #059669; }
+        .card-location {
+            display:inline-flex; align-items:center; gap:5px;
+            padding:5px 11px; border-radius:999px;
+            font-size:11px; font-weight:500; color:var(--off);
+            background:rgba(12,11,9,0.6); backdrop-filter:blur(8px);
+            border:1px solid var(--rim);
+        }
 
-        /* Details strip (glassmorphism) */
-        .project-details {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 0; margin: 16px 0;
-            background: rgba(244,238,227,0.62);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(212,186,150,0.42); border-radius: 12px; overflow: hidden;
+        /* Status badge */
+        .stag {
+            display:inline-flex; align-items:center; gap:5px;
+            padding:4px 12px; border-radius:999px;
+            font-size:10px; font-weight:700; letter-spacing:.8px;
+            text-transform:uppercase; white-space:nowrap; flex-shrink:0;
         }
-        .detail-item {
-            padding: 11px 14px;
-            display: flex; align-items: center; gap: 8px;
-            border-right: 1px solid rgba(212,186,150,0.38);
-            border-bottom: 1px solid rgba(212,186,150,0.38);
-            font-size: 12.5px; color: var(--text-secondary);
-        }
-        .detail-item:nth-child(2n) { border-right: none; }
-        .detail-item:nth-last-child(-n+2) { border-bottom: none; }
-        .detail-icon {
-            width: 26px; height: 26px; border-radius: 7px;
-            background: var(--accent-light); color: var(--accent);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-        .detail-text { font-weight: 500; }
-        .detail-sub { font-size: 10px; color: var(--text-muted); }
+        .sdot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+        .s-planning  { background:var(--amber-bg); color:var(--amber); }
+        .s-planning  .sdot { background:var(--amber); }
+        .s-active    { background:var(--blue-bg);   color:var(--blue);  }
+        .s-active    .sdot { background:var(--blue); }
+        .s-completed { background:var(--green-bg);  color:var(--green); }
+        .s-completed .sdot { background:var(--green); }
 
-        /* Lock ribbon */
-        .card-lock-ribbon {
-            display: flex; align-items: center; gap: 7px;
-            margin-top: 12px; padding: 8px 12px;
-            border-radius: 10px;
-            font-size: 11.5px; font-weight: 600;
-            background: #FEF3C7; border: 1px solid #FCD34D; color: #92400E;
+        /* Card body */
+        .card-body { padding:20px 22px 0; flex:1; }
+        .card-title {
+            font-family:'DM Serif Display',serif;
+            font-size:19px; font-weight:400; color:var(--white); line-height:1.2; margin-bottom:18px;
         }
-        .card-lock-ribbon.green { background: #D1FAE5; border-color: #6EE7B7; color: #065F46; }
+
+        /* Stats grid */
+        .card-stats {
+            display:grid; grid-template-columns:1fr 1fr;
+            border:1px solid var(--rim); border-radius:12px; overflow:hidden;
+            margin-bottom:16px;
+        }
+        .cstat {
+            padding:12px 14px;
+            border-right:1px solid var(--rim);
+            border-bottom:1px solid var(--rim);
+            display:flex; align-items:center; gap:10px;
+        }
+        .cstat:nth-child(2n) { border-right:none; }
+        .cstat:nth-last-child(-n+2) { border-bottom:none; }
+        .cstat-icon {
+            width:28px; height:28px; border-radius:7px;
+            background:var(--soft); color:var(--gold);
+            display:flex; align-items:center; justify-content:center; flex-shrink:0;
+        }
+        .cstat-val { font-size:13.5px; font-weight:600; color:var(--white); line-height:1.1; }
+        .cstat-lbl { font-size:10px; color:var(--ghost); }
+
+        /* Lock notice */
+        .card-notice {
+            display:flex; align-items:center; gap:8px;
+            padding:9px 13px; border-radius:9px; margin-bottom:16px;
+            font-size:11.5px; font-weight:500;
+        }
+        .card-notice.locked { background:var(--amber-bg); border:1px solid rgba(212,148,64,0.25); color:var(--amber); }
+        .card-notice.done   { background:var(--green-bg);  border:1px solid rgba(76,175,130,0.25); color:var(--green); }
 
         /* Card footer */
-        .project-footer {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-top: 18px; padding-top: 16px;
-            border-top: 1px solid rgba(212,186,150,0.38);
+        .card-footer {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:14px 22px 18px;
+            border-top:1px solid var(--rim2);
+            margin-top:auto;
         }
-        .project-date { font-size: 11.5px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
-        .project-actions { display: flex; gap: 8px; }
+        .card-date {
+            display:flex; align-items:center; gap:6px;
+            font-size:11.5px; color:var(--ghost);
+        }
+        .card-actions { display:flex; gap:8px; }
 
         .btn-view {
-            padding: 8px 18px; font-size: 13px; border-radius: 9px;
-            text-decoration: none; font-weight: 600;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff; border: none; cursor: pointer;
-            font-family: 'Outfit', sans-serif;
-            display: inline-flex; align-items: center; gap: 6px;
-            box-shadow: 0 2px 10px rgba(184,134,78,0.25);
-            transition: all 0.2s;
+            display:inline-flex; align-items:center; gap:6px;
+            padding:8px 18px; border-radius:8px;
+            font-size:12.5px; font-weight:600; text-decoration:none;
+            background:var(--gold); color:var(--void);
+            border:none; cursor:pointer; font-family:'DM Sans',sans-serif;
+            transition:background .2s, transform .15s;
+            box-shadow:0 2px 12px var(--glow);
         }
-        .btn-view:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(184,134,78,0.38); }
+        .btn-view:hover { background:var(--gold2); transform:translateY(-1px); }
 
         .btn-del {
-            padding: 8px 12px; font-size: 13px; border-radius: 9px;
-            font-weight: 600; font-family: 'Outfit', sans-serif;
-            border: 1.5px solid #FECACA; background: #FEF2F2; color: #DC2626;
-            cursor: pointer; transition: all 0.2s;
-            display: inline-flex; align-items: center; gap: 5px;
+            display:inline-flex; align-items:center; gap:5px;
+            padding:8px 13px; border-radius:8px;
+            font-size:12.5px; font-weight:600;
+            border:1px solid rgba(224,85,85,0.3); background:var(--red-bg); color:var(--red);
+            cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .2s;
         }
-        .btn-del:hover { background: #DC2626; color: white; border-color: #DC2626; }
+        .btn-del:hover { background:var(--red); color:var(--white); border-color:var(--red); }
 
-        /* ── EMPTY STATE (glassmorphism) ── */
-        .empty-state {
-            text-align: center; padding: 80px 20px;
-            background: rgba(250,244,234,0.78);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.48);
-            border-radius: 22px;
-            box-shadow: 0 2px 24px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.65);
+        /* Card image themes */
+        .ci-1 { background-image:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=75'); }
+        .ci-2 { background-image:url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=75'); }
+        .ci-3 { background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=75'); }
+        .ci-4 { background-image:url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=75'); }
+        .ci-5 { background-image:url('https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=75'); }
+        .ci-6 { background-image:url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=75'); }
+
+        /* ── EMPTY STATE ── */
+        .empty-wrap {
+            grid-column:1/-1;
+            display:flex; flex-direction:column; align-items:center;
+            padding:0;
         }
-        .empty-icon-wrap {
-            width: 80px; height: 80px;
-            background: var(--sand); border-radius: 22px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px; color: var(--text-muted); border: 1px solid var(--stone);
+        .empty-hero {
+            position:relative; width:100%; height:280px; border-radius:20px; overflow:hidden; margin-bottom:0;
         }
-        .empty-state h2 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 24px; font-weight: 700; margin-bottom: 10px;
+        .empty-hero-img {
+            position:absolute; inset:0;
+            background:url('https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=1200&q=80') center/cover;
+            filter:brightness(0.35) saturate(0.55);
         }
-        .empty-state p { color: var(--text-muted); font-size: 14px; line-height: 1.65; margin-bottom: 24px; }
-        .btn-primary {
-            padding: 11px 26px; font-size: 14px; border-radius: 11px;
-            text-decoration: none; font-weight: 600;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff; border: none; cursor: pointer;
-            font-family: 'Outfit', sans-serif;
-            display: inline-flex; align-items: center; gap: 8px;
-            box-shadow: 0 4px 18px rgba(184,134,78,0.3);
-            transition: all 0.25s;
+        .empty-hero::before {
+            content:''; position:absolute; inset:0; z-index:1;
+            background:linear-gradient(0deg, var(--void) 0%, rgba(12,11,9,0.3) 60%, transparent 100%);
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(184,134,78,0.42); }
+        .empty-body {
+            position:relative; z-index:2;
+            display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+            height:100%; padding:0 32px 40px; text-align:center;
+        }
+        .empty-icon {
+            width:52px; height:52px; border-radius:14px;
+            border:1px solid rgba(212,146,74,0.4);
+            background:rgba(12,11,9,0.55); backdrop-filter:blur(10px);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold); margin-bottom:16px;
+        }
+        .empty-h {
+            font-family:'DM Serif Display',serif;
+            font-size:28px; color:var(--white); margin-bottom:10px;
+        }
+        .empty-p { font-size:14px; color:var(--ghost); line-height:1.7; margin-bottom:24px; max-width:340px; }
 
         /* ── MODAL ── */
         .modal {
-            display: none; position: fixed; z-index: 1000; inset: 0;
-            background: rgba(26,22,18,0.55); backdrop-filter: blur(4px);
-            align-items: center; justify-content: center;
+            display:none; position:fixed; z-index:1000; inset:0;
+            background:rgba(12,11,9,0.75); backdrop-filter:blur(6px);
+            align-items:center; justify-content:center;
         }
-        .modal.open { display: flex; }
+        .modal.open { display:flex; }
         .modal-box {
-            background: rgba(250,244,234,0.96);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(212,186,150,0.5);
-            border-radius: 22px; width: 90%; max-width: 460px;
-            box-shadow: 0 20px 60px rgba(28,22,18,0.2);
-            overflow: hidden;
-            animation: modalIn 0.3s cubic-bezier(0.22,1,0.36,1) both;
+            background:var(--deep);
+            border:1px solid var(--rim);
+            border-radius:22px; width:90%; max-width:460px;
+            box-shadow:0 30px 80px rgba(0,0,0,0.55);
+            overflow:hidden;
+            animation:modalIn .32s cubic-bezier(.22,1,.36,1) both;
         }
-        @keyframes modalIn { from { transform: translateY(24px) scale(0.97); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        @keyframes modalIn { from{transform:translateY(28px) scale(.97);opacity:0} to{transform:translateY(0) scale(1);opacity:1} }
+
         .modal-head {
-            background: linear-gradient(135deg, #DC2626, #EF4444);
-            color: white; padding: 20px 28px;
-            display: flex; justify-content: space-between; align-items: center;
+            padding:22px 28px;
+            border-bottom:1px solid var(--rim);
+            display:flex; justify-content:space-between; align-items:center;
+            background:rgba(224,85,85,0.12);
         }
-        .modal-head h2 { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; }
+        .modal-head-title {
+            font-family:'DM Serif Display',serif;
+            font-size:20px; color:var(--white);
+            display:flex; align-items:center; gap:10px;
+        }
+        .modal-head-title svg { color:var(--red); }
         .modal-close {
-            background: rgba(255,255,255,0.15); border: none; color: white;
-            width: 30px; height: 30px; border-radius: 50%;
-            font-size: 18px; cursor: pointer; line-height: 1;
-            display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s, transform 0.2s;
+            background:var(--rim); border:none; color:var(--fog);
+            width:30px; height:30px; border-radius:50%;
+            font-size:16px; cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            transition:background .2s, transform .2s;
         }
-        .modal-close:hover { background: rgba(255,255,255,0.25); transform: rotate(90deg); }
-        .modal-body { padding: 28px; }
-        .modal-body p { color: var(--text-secondary); font-size: 14px; line-height: 1.65; margin-bottom: 6px; }
+        .modal-close:hover { background:rgba(224,85,85,0.25); color:var(--red); transform:rotate(90deg); }
+
+        .modal-body { padding:26px 28px; }
+        .modal-body p { color:var(--fog); font-size:14px; line-height:1.65; margin-bottom:8px; }
         .modal-project {
-            background: rgba(244,238,227,0.7); border: 1px solid rgba(212,186,150,0.4);
-            padding: 12px 16px; border-radius: 10px;
-            margin: 14px 0; font-weight: 600; color: var(--text-primary); font-size: 14px;
-            display: flex; align-items: center; gap: 9px;
+            background:var(--surface); border:1px solid var(--rim);
+            padding:12px 16px; border-radius:10px;
+            margin:14px 0; font-weight:600; color:var(--white); font-size:14px;
+            display:flex; align-items:center; gap:9px;
         }
+        .modal-project svg { color:var(--gold); flex-shrink:0; }
         .modal-warn {
-            color: #DC2626; font-weight: 600; font-size: 13px; margin-top: 10px;
-            display: flex; align-items: center; gap: 6px;
-            padding: 10px 14px; background: #FEF2F2; border-radius: 9px; border: 1px solid #FECACA;
+            color:var(--red); font-size:12.5px; margin-top:12px;
+            display:flex; align-items:center; gap:6px;
+            padding:10px 14px; background:var(--red-bg); border-radius:9px;
+            border:1px solid rgba(224,85,85,0.25);
         }
         .modal-foot {
-            padding: 16px 28px; border-top: 1px solid rgba(212,186,150,0.38);
-            display: flex; justify-content: flex-end; gap: 10px;
+            padding:16px 28px; border-top:1px solid var(--rim);
+            display:flex; justify-content:flex-end; gap:10px;
         }
         .btn-cancel-m {
-            padding: 9px 22px; background: rgba(244,238,227,0.7); color: var(--text-secondary);
-            border: 1.5px solid var(--stone); border-radius: 9px;
-            font-weight: 600; font-size: 13px; cursor: pointer;
-            font-family: 'Outfit', sans-serif; transition: all 0.2s;
+            padding:10px 22px; background:var(--surface); color:var(--fog);
+            border:1px solid var(--rim); border-radius:9px;
+            font-weight:600; font-size:13px; cursor:pointer;
+            font-family:'DM Sans',sans-serif; transition:all .2s;
         }
-        .btn-cancel-m:hover { background: var(--sand); }
+        .btn-cancel-m:hover { border-color:var(--rim2); background:var(--deep); }
         .btn-del-m {
-            padding: 9px 22px; background: #DC2626; color: white;
-            border: none; border-radius: 9px;
-            font-weight: 600; font-size: 13px; cursor: pointer;
-            font-family: 'Outfit', sans-serif; transition: all 0.2s;
-            display: flex; align-items: center; gap: 7px;
+            padding:10px 22px; background:var(--red); color:white;
+            border:none; border-radius:9px;
+            font-weight:600; font-size:13px; cursor:pointer;
+            font-family:'DM Sans',sans-serif; transition:all .2s;
+            display:flex; align-items:center; gap:7px;
         }
-        .btn-del-m:hover { background: #B91C1C; }
-        .btn-del-m:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-del-m:hover { background:#c94444; }
+        .btn-del-m:disabled { background:#555; cursor:not-allowed; }
 
         /* ── TOAST ── */
         .toast {
-            position: fixed; top: 22px; right: 22px;
-            background: rgba(250,244,234,0.96);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(212,186,150,0.5);
-            padding: 13px 20px; border-radius: 12px;
-            box-shadow: 0 8px 28px rgba(28,22,18,0.14);
-            z-index: 2000;
-            font-size: 13.5px; font-weight: 500; color: var(--text-primary);
-            animation: toastIn 0.3s cubic-bezier(0.22,1,0.36,1);
-            display: none; align-items: center; gap: 9px;
-            max-width: 320px;
+            position:fixed; bottom:28px; right:28px;
+            background:var(--deep);
+            border:1px solid var(--rim);
+            padding:14px 20px; border-radius:12px;
+            box-shadow:0 12px 40px rgba(0,0,0,0.35);
+            z-index:2000;
+            font-size:13.5px; font-weight:500; color:var(--off);
+            animation:toastIn .32s cubic-bezier(.22,1,.36,1);
+            display:none; align-items:center; gap:10px;
+            max-width:320px;
         }
-        @keyframes toastIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .toast.success { border-left: 4px solid #059669; }
-        .toast.error   { border-left: 4px solid #DC2626; }
+        @keyframes toastIn { from{transform:translateX(20px);opacity:0} to{transform:translateX(0);opacity:1} }
+        .toast.success { border-left:3px solid var(--green); }
+        .toast.error   { border-left:3px solid var(--red); }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(22px); }
-            to   { opacity: 1; transform: translateY(0); }
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+        .fu { animation:fadeUp .6s cubic-bezier(.22,1,.36,1) both; }
+        .d1{animation-delay:.06s} .d2{animation-delay:.14s} .d3{animation-delay:.22s}
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:1100px){
+            .projects-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));}
         }
-
-        @media (max-width: 900px) { .page-header { grid-template-columns: 1fr; } .header-right { flex-direction: row; border-left: none; border-top: 1px solid rgba(212,186,150,0.4); } }
-        @media (max-width: 600px) { .projects-grid { grid-template-columns: 1fr; } .navbar { padding: 0 20px; } .container { padding: 20px 16px; } .header-left { padding: 24px; } }
+        @media(max-width:900px){
+            .nav{padding:0 22px;} .nav-center{display:none;}
+            .main{padding:30px 22px 60px;}
+            .hero-body{padding:0 28px 40px;} .hero-h1{font-size:38px;}
+            .hero-stats{display:none;}
+        }
+        @media(max-width:600px){
+            .projects-grid{grid-template-columns:1fr;}
+            .toolbar{flex-direction:column;align-items:flex-start;}
+        }
     </style>
 </head>
 <body>
-<div class="bg-grid"></div>
-<div class="bg-warm"></div>
 
-    <nav class="navbar">
-        <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">
-            <div class="navbar-brand-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            </div>
-            House-Forge
-        </a>
-        <div class="navbar-menu">
-            <a href="/user/dashboard" class="nav-active">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                Dashboard
-            </a>
-            <a href="/user/projects">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                Projects
-            </a>
-            <a href="/user/bids">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                Bids
-                <span class="badge-notification badge-amber" id="bidsBadge"></span>
-            </a>
-            <a href="/user/my-orders">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                Orders
-            </a>
-            <a href="/user/messages">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                Messages
-                <span class="badge-notification" id="messagesBadge"></span>
-            </a>
-            <div class="nav-divider"></div>
-            <a href="/user/profile" style="padding:8px 9px;">
-                {% if user_profile_picture %}
-                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile" class="profile-pic">
-                {% else %}
-                    <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
-                {% endif %}
-            </a>
-            <a href="{{ url_for('auth.logout') }}" class="logout-link">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                Sign Out
-            </a>
+<!-- NAV -->
+<nav class="nav">
+    <a href="{{ url_for('user.dashboard') }}" class="nav-logo">
+        <div class="nav-logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
-    </nav>
+        <span class="nav-logo-name">House<b>-Forge</b></span>
+    </a>
 
-    <div class="container">
+    <div class="nav-center">
+        <a href="/user/dashboard" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+        </a>
+        <a href="/user/projects" class="nlink active">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Projects
+        </a>
+        <a href="/user/bids" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Bids
+            <span class="npip amber" id="bidsBadge"></span>
+        </a>
+        <a href="/user/my-orders" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Orders
+        </a>
+        <a href="/user/messages" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Messages
+            <span class="npip" id="messagesBadge"></span>
+        </a>
+    </div>
 
-        <!-- PAGE HEADER -->
-        <div class="page-header">
-            <div class="header-left">
-                <div class="header-eyebrow">Construction Management</div>
-                <h1>My Projects</h1>
-                <p>Track all your construction projects, material estimates, and contractor activity in one place.</p>
+    <div class="nav-right">
+        <a href="/user/profile" class="nav-profile">
+            <div class="nav-av">
+                {% if user_profile_picture %}
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile">
+                {% else %}
+                    {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                {% endif %}
             </div>
-            <div class="header-right">
-                <div class="header-count">
-                    <div class="header-count-num">{{ projects|length if projects else 0 }}</div>
-                    <div class="header-count-label">Total Projects</div>
-                </div>
-                <a href="{{ url_for('user.create_project') }}" class="header-new-btn">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    New Project
-                </a>
+            <span class="nav-uname">{{ current_user.name }}</span>
+        </a>
+        <div class="ndiv"></div>
+        <a href="{{ url_for('auth.logout') }}" class="nav-out">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+        </a>
+    </div>
+</nav>
+
+<div class="shell">
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-body">
+            <div class="hero-tag"><span class="hero-tag-ln"></span> Construction Management</div>
+            <h1 class="hero-h1">My <em>Projects</em></h1>
+            <p class="hero-sub">Track builds, estimates, contractor activity and material orders — all in one place.</p>
+        </div>
+        <div class="hero-stats">
+            <div class="hstat">
+                <div class="hstat-n">{{ projects|length if projects else 0 }}<sup>+</sup></div>
+                <div class="hstat-l">Total</div>
             </div>
+            <div class="hstat">
+                <div class="hstat-n">{{ projects|selectattr('status','equalto','active')|list|length if projects else 0 }}</div>
+                <div class="hstat-l">Active</div>
+            </div>
+            <div class="hstat">
+                <div class="hstat-n">{{ projects|selectattr('status','equalto','completed')|list|length if projects else 0 }}</div>
+                <div class="hstat-l">Done</div>
+            </div>
+        </div>
+    </section>
+
+    <main class="main">
+
+        <!-- TOOLBAR -->
+        <div class="toolbar fu d1">
+            <div class="toolbar-left">
+                <div class="sec-lbl" style="margin-bottom:0;">Your builds</div>
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="planning"><span class="filter-dot" style="color:var(--amber)"></span>Planning</button>
+                <button class="filter-btn" data-filter="active"><span class="filter-dot" style="color:var(--blue)"></span>Active</button>
+                <button class="filter-btn" data-filter="completed"><span class="filter-dot" style="color:var(--green)"></span>Completed</button>
+            </div>
+            <a href="{{ url_for('user.create_project') }}" class="btn-solid">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Project
+            </a>
         </div>
 
         {% if projects %}
-        <div class="projects-grid" id="projectsGrid">
+        <div class="projects-grid fu d2" id="projectsGrid">
             {% for project in projects %}
             {% set is_completed   = project.status == 'completed' %}
             {% set has_contractor = project.get('contractor_id') %}
-            {% set ordering_locked = is_completed or has_contractor or project.get('ordering_locked') %}
+            {% set img_class = 'ci-' ~ ((loop.index0 % 6) + 1) %}
 
-            <div class="project-card {% if is_completed %}card-completed{% endif %}" data-index="{{ loop.index0 }}">
-                <div class="project-header">
-                    <div>
-                        <div class="project-title">{{ project.title }}</div>
-                        <div class="project-location">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div class="project-card" data-index="{{ loop.index0 }}" data-status="{{ project.status }}">
+
+                <!-- Image header -->
+                <div class="card-img-wrap">
+                    <div class="card-img {{ img_class }}"></div>
+                    <div class="card-img-overlay">
+                        <div class="card-location">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                             {{ project.location }}
                         </div>
-                    </div>
-                    <span class="status-badge status-{{ project.status }}">
-                        <span class="status-dot"></span>
-                        {{ project.status }}
-                    </span>
-                </div>
-
-                <div class="project-details">
-                    <div class="detail-item">
-                        <div class="detail-icon">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-                        </div>
-                        <div>
-                            <div class="detail-text">{{ project.square_feet }} sq ft</div>
-                            <div class="detail-sub">Area</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-icon">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                        </div>
-                        <div>
-                            <div class="detail-text">{{ project.rooms }} Rooms</div>
-                            <div class="detail-sub">Layout</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-icon">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                        </div>
-                        <div>
-                            <div class="detail-text">{{ project.floors }} Floors</div>
-                            <div class="detail-sub">Structure</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-icon">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                        </div>
-                        <div>
-                            <div class="detail-text">{{ project.budget_range.title() }}</div>
-                            <div class="detail-sub">Budget</div>
-                        </div>
+                        <span class="stag s-{{ project.status }}"><span class="sdot"></span>{{ project.status }}</span>
                     </div>
                 </div>
 
-                {% if is_completed %}
-                <div class="card-lock-ribbon green">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    Completed — ordering &amp; bidding closed
-                </div>
-                {% elif has_contractor %}
-                <div class="card-lock-ribbon">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    Contractor assigned — self-ordering disabled
-                </div>
-                {% endif %}
+                <!-- Body -->
+                <div class="card-body">
+                    <div class="card-title">{{ project.title }}</div>
 
-                <div class="project-footer">
-                    <div class="project-date">
+                    <div class="card-stats">
+                        <div class="cstat">
+                            <div class="cstat-icon">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                            </div>
+                            <div>
+                                <div class="cstat-val">{{ project.square_feet }} sqft</div>
+                                <div class="cstat-lbl">Area</div>
+                            </div>
+                        </div>
+                        <div class="cstat">
+                            <div class="cstat-icon">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                            </div>
+                            <div>
+                                <div class="cstat-val">{{ project.rooms }} Rooms</div>
+                                <div class="cstat-lbl">Layout</div>
+                            </div>
+                        </div>
+                        <div class="cstat">
+                            <div class="cstat-icon">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                            </div>
+                            <div>
+                                <div class="cstat-val">{{ project.floors }} Floors</div>
+                                <div class="cstat-lbl">Structure</div>
+                            </div>
+                        </div>
+                        <div class="cstat">
+                            <div class="cstat-icon">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            </div>
+                            <div>
+                                <div class="cstat-val">{{ project.budget_range.title() }}</div>
+                                <div class="cstat-lbl">Budget</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if is_completed %}
+                    <div class="card-notice done">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Completed — ordering &amp; bidding closed
+                    </div>
+                    {% elif has_contractor %}
+                    <div class="card-notice locked">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Contractor assigned — self-ordering disabled
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer">
+                    <div class="card-date">
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                         {{ project.created_at.strftime('%d %b %Y') if project.created_at else 'N/A' }}
                     </div>
-                    <div class="project-actions">
+                    <div class="card-actions">
                         <a href="{{ url_for('user.view_project', project_id=project.id) }}" class="btn-view">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             View
@@ -594,138 +720,156 @@
         </div>
 
         {% else %}
-        <div class="empty-state">
-            <div class="empty-icon-wrap">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <div class="projects-grid fu d2">
+            <div class="empty-wrap">
+                <div class="empty-hero">
+                    <div class="empty-hero-img"></div>
+                    <div class="empty-body">
+                        <div class="empty-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <h2 class="empty-h">No Projects Yet</h2>
+                        <p class="empty-p">Create your first construction project to start estimating materials and managing build costs in real time.</p>
+                        <a href="{{ url_for('user.create_project') }}" class="btn-solid">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Create Your First Project
+                        </a>
+                    </div>
+                </div>
             </div>
-            <h2>No Projects Yet</h2>
-            <p>Create your first construction project to start<br>estimating materials and managing costs.</p>
-            <a href="{{ url_for('user.create_project') }}" class="btn-primary">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Create Your First Project
-            </a>
         </div>
         {% endif %}
 
-    </div>
+    </main>
+</div>
 
-    <!-- DELETE MODAL -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-box">
-            <div class="modal-head">
-                <h2>Confirm Delete</h2>
-                <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+<!-- DELETE MODAL -->
+<div id="deleteModal" class="modal">
+    <div class="modal-box">
+        <div class="modal-head">
+            <div class="modal-head-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Confirm Delete
             </div>
-            <div class="modal-body">
-                <p>Are you sure you want to permanently delete this project?</p>
-                <div class="modal-project">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                    <span id="modalProjectName"></span>
-                </div>
-                <p>This will also permanently delete all bids, orders, and estimates linked to this project.</p>
-                <div class="modal-warn">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                    This action cannot be undone
-                </div>
+            <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to permanently delete this project?</p>
+            <div class="modal-project">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span id="modalProjectName"></span>
             </div>
-            <div class="modal-foot">
-                <button class="btn-cancel-m" onclick="closeModal()">Cancel</button>
-                <button class="btn-del-m" id="confirmDeleteBtn" onclick="deleteProject()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-                    Delete Project
-                </button>
+            <p>This will permanently delete all bids, orders, and estimates linked to this project.</p>
+            <div class="modal-warn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                This action cannot be undone
             </div>
         </div>
+        <div class="modal-foot">
+            <button class="btn-cancel-m" onclick="closeModal()">Cancel</button>
+            <button class="btn-del-m" id="confirmDeleteBtn" onclick="deleteProject()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                Delete Project
+            </button>
+        </div>
     </div>
+</div>
 
-    <!-- TOAST -->
-    <div id="toast" class="toast"></div>
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
 
-    <script>
-        /* ── Staggered card entrance ── */
-        document.addEventListener('DOMContentLoaded', () => {
+<script>
+    /* ── Staggered card entrance ── */
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.project-card').forEach((card, i) => {
+            card.style.cssText = 'opacity:0;transform:translateY(22px)';
+            setTimeout(() => {
+                card.style.transition = 'opacity .45s ease, transform .45s cubic-bezier(.22,1,.36,1), box-shadow .38s, border-color .3s';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 120 + i * 80);
+        });
+    });
+
+    /* ── Filter buttons ── */
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filter = btn.dataset.filter;
             document.querySelectorAll('.project-card').forEach(card => {
-                const idx = parseInt(card.dataset.index || '0', 10);
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'none';
-                setTimeout(() => {
-                    card.style.transition = 'opacity 0.45s ease, transform 0.45s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s, border-color 0.35s, background 0.35s';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, 80 + idx * 80);
+                const match = filter === 'all' || card.dataset.status === filter;
+                card.style.display = match ? '' : 'none';
             });
         });
+    });
 
-        /* ── Delete modal ── */
-        let projectToDelete = null;
-        function confirmDelete(id, name) {
-            projectToDelete = id;
-            document.getElementById('modalProjectName').textContent = name;
-            document.getElementById('deleteModal').classList.add('open');
-        }
-        function closeModal() {
-            document.getElementById('deleteModal').classList.remove('open');
-            projectToDelete = null;
-        }
-        window.addEventListener('click', e => {
-            if (e.target === document.getElementById('deleteModal')) closeModal();
-        });
+    /* ── Delete modal ── */
+    let projectToDelete = null;
+    function confirmDelete(id, name) {
+        projectToDelete = id;
+        document.getElementById('modalProjectName').textContent = name;
+        document.getElementById('deleteModal').classList.add('open');
+    }
+    function closeModal() {
+        document.getElementById('deleteModal').classList.remove('open');
+        projectToDelete = null;
+    }
+    window.addEventListener('click', e => {
+        if (e.target === document.getElementById('deleteModal')) closeModal();
+    });
 
-        async function deleteProject() {
-            if (!projectToDelete) return;
-            const btn = document.getElementById('confirmDeleteBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Deleting…';
-            try {
-                const url = `{{ url_for('user.delete_project', project_id='PROJECT_ID') }}`.replace('PROJECT_ID', projectToDelete);
-                const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
-                const ct = res.headers.get('content-type') || '';
-                if (!ct.includes('application/json')) throw new Error('Server error');
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    showToast('success', 'Project deleted successfully');
-                    closeModal();
-                    setTimeout(() => window.location.reload(), 1400);
-                } else {
-                    showToast('error', data.message || 'Delete failed');
-                    btn.disabled = false;
-                    btn.innerHTML = 'Delete Project';
-                }
-            } catch (err) {
-                showToast('error', err.message);
+    async function deleteProject() {
+        if (!projectToDelete) return;
+        const btn = document.getElementById('confirmDeleteBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Deleting…';
+        try {
+            const url = `{{ url_for('user.delete_project', project_id='PROJECT_ID') }}`.replace('PROJECT_ID', projectToDelete);
+            const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+            const ct = res.headers.get('content-type') || '';
+            if (!ct.includes('application/json')) throw new Error('Server error');
+            const data = await res.json();
+            if (res.ok && data.success) {
+                showToast('success', 'Project deleted successfully');
+                closeModal();
+                setTimeout(() => window.location.reload(), 1400);
+            } else {
+                showToast('error', data.message || 'Delete failed');
                 btn.disabled = false;
                 btn.innerHTML = 'Delete Project';
             }
+        } catch (err) {
+            showToast('error', err.message);
+            btn.disabled = false;
+            btn.innerHTML = 'Delete Project';
         }
+    }
 
-        function showToast(type, msg) {
-            const t = document.getElementById('toast');
-            t.className = 'toast ' + type;
-            t.textContent = msg;
-            t.style.display = 'flex';
-            setTimeout(() => { t.style.display = 'none'; }, 3200);
-        }
+    function showToast(type, msg) {
+        const t = document.getElementById('toast');
+        t.className = 'toast ' + type;
+        t.textContent = msg;
+        t.style.display = 'flex';
+        setTimeout(() => { t.style.display = 'none'; }, 3200);
+    }
 
-        /* ── Badges ── */
-        function updateBadge(url, id) {
-            fetch(url).then(r => r.ok && r.headers.get('content-type')?.includes('application/json') ? r.json() : null)
-            .then(data => {
-                if (!data) return;
-                const b = document.getElementById(id);
-                if (!b) return;
-                b.style.display = data.count > 0 ? 'flex' : 'none';
-                if (data.count > 0) b.textContent = data.count;
-            }).catch(() => {});
-        }
-        document.addEventListener('DOMContentLoaded', () => {
-            updateBadge('/user/messages/unread-count', 'messagesBadge');
-            updateBadge('/user/notifications/unread-count', 'notificationsBadge');
-        });
-        setInterval(() => {
-            updateBadge('/user/messages/unread-count', 'messagesBadge');
-            updateBadge('/user/notifications/unread-count', 'notificationsBadge');
-        }, 30000);
-    </script>
+    /* ── Badges ── */
+    function updateBadge(url, id) {
+        fetch(url).then(r => r.ok && r.headers.get('content-type')?.includes('application/json') ? r.json() : null)
+        .then(data => {
+            if (!data) return;
+            const b = document.getElementById(id);
+            if (!b) return;
+            b.style.display = data.count > 0 ? 'block' : 'none';
+        }).catch(() => {});
+    }
+    function refreshBadges() {
+        updateBadge('/user/messages/unread-count', 'messagesBadge');
+        updateBadge('/user/bids/pending-count', 'bidsBadge');
+    }
+    document.addEventListener('DOMContentLoaded', refreshBadges);
+    setInterval(refreshBadges, 30000);
+</script>
 </body>
 </html>

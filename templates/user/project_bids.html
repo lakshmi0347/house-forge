@@ -4,602 +4,653 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Bids — House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
+        
         :root {
-            --bg:           #F0EBE1;
-            --bg-card:      #FAF6EF;
-            --bg-card2:     #F4EEE3;
-            --sand:         #E8DFD0;
-            --stone:        #D4C8B8;
-            --accent:       #B8864E;
-            --accent2:      #D4A96A;
-            --accent-dark:  #96693A;
-            --accent-light: #FBF3E4;
-            --text-primary: #1A1612;
-            --text-secondary:#4A3F35;
-            --text-muted:   #8A7A6E;
-            --green:        #065F46;
-            --green-bg:     #D1FAE5;
-            --red:          #991B1B;
-            --red-bg:       #FEE2E2;
-            --blue:         #1E40AF;
-            --blue-bg:      #DBEAFE;
+            --void:    #0C0B09;
+            --ink:     #141210;
+            --deep:    #1C1A16;
+            --surface: #242118;
+            --rim:     rgba(255,255,255,0.07);
+            --rim2:    rgba(255,255,255,0.04);
+
+            --gold:    #D4924A;
+            --gold2:   #F0C07A;
+            --gold3:   #B8743A;
+            --glow:    rgba(212,146,74,0.22);
+            --soft:    rgba(212,146,74,0.10);
+
+            --white:   #FFFFFF;
+            --off:     #F2EDE6;
+            --fog:     rgba(242,237,230,0.55);
+            --ghost:   rgba(242,237,230,0.28);
+
+            --green:  #4CAF82; --green-bg: rgba(76,175,130,0.13);
+            --blue:   #4A8FD4; --blue-bg:  rgba(74,143,212,0.13);
+            --amber:  #D49440; --amber-bg: rgba(212,148,64,0.13);
+            --red:    #E05C5C; --red-bg:   rgba(224,92,92,0.12);
         }
 
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
+        html { scroll-behavior:smooth; }
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg);
-            min-height: 100vh;
-            color: var(--text-primary);
-            overflow-x: hidden;
+            font-family:'DM Sans',sans-serif;
+            background:var(--void);
+            color:var(--off);
+            min-height:100vh;
+            overflow-x:hidden;
+            -webkit-font-smoothing:antialiased;
         }
 
-        /* ── LAYERED BACKGROUND ── */
-        body::before {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: url('/static/images/Home.jpg') no-repeat center center / cover;
-            opacity: 0.28;
-            filter: saturate(0.3) sepia(0.85) hue-rotate(-15deg) brightness(0.95);
+        /* ── NAV ── */
+        .nav {
+            position:fixed; top:0; left:0; right:0; z-index:300;
+            height:66px;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 52px;
+            background:rgba(12,11,9,0.88);
+            backdrop-filter:blur(22px);
+            -webkit-backdrop-filter:blur(22px);
+            border-bottom:1px solid var(--rim);
         }
-        body::after {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: radial-gradient(ellipse 100% 100% at 50% 50%,
-                rgba(184,134,78,0.12) 0%,
-                rgba(240,235,225,0.0) 55%,
-                rgba(240,235,225,0.45) 100%);
+        .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+        .nav-logo-icon {
+            width:40px; height:40px; border-radius:9px;
+            border:1.5px solid var(--gold);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold); position:relative; overflow:hidden;
         }
-        .bg-grid {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background-image:
-                linear-gradient(rgba(184,134,78,0.045) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(184,134,78,0.045) 1px, transparent 1px);
-            background-size: 48px 48px;
+        .nav-logo-icon::before {
+            content:''; position:absolute; inset:0;
+            background:radial-gradient(circle at 30% 30%, rgba(212,146,74,0.18), transparent 70%);
         }
-        .bg-warm {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: rgba(184,134,78,0.10);
-            mix-blend-mode: multiply;
+        .nav-logo-name {
+            font-family:'Syne',sans-serif;
+            font-size:18px; font-weight:800; color:var(--white); letter-spacing:-0.4px;
         }
+        .nav-logo-name b { color:var(--gold); font-weight:800; }
+        .nav-center {
+            position:absolute; left:50%; transform:translateX(-50%);
+            display:flex; align-items:center; gap:2px;
+        }
+        .nlink {
+            display:flex; align-items:center; gap:6px;
+            padding:7px 16px; border-radius:8px;
+            text-decoration:none; font-size:13.5px; font-weight:500;
+            color:var(--ghost); transition:color .18s, background .18s;
+            position:relative; white-space:nowrap;
+        }
+        .nlink:hover { color:var(--off); background:var(--rim2); }
+        .nlink.active { color:var(--gold); }
+        .nlink.active::after {
+            content:''; position:absolute; bottom:-1px; left:16px; right:16px;
+            height:2px; background:var(--gold); border-radius:2px;
+            box-shadow:0 0 10px var(--glow);
+        }
+        .npip {
+            position:absolute; top:5px; right:5px;
+            width:6px; height:6px; border-radius:50%;
+            background:#EF4444; border:1.5px solid var(--void); display:none;
+        }
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .nav-profile {
+            display:flex; align-items:center; gap:9px;
+            padding:5px 14px 5px 5px; border-radius:999px;
+            border:1px solid var(--rim); text-decoration:none;
+            transition:border-color .2s, background .2s;
+        }
+        .nav-profile:hover { border-color:var(--gold); background:var(--soft); }
+        .nav-av {
+            width:30px; height:30px; border-radius:50%;
+            background:var(--gold3); color:#fff;
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:700; flex-shrink:0;
+        }
+        .nav-av img { width:30px; height:30px; border-radius:50%; object-fit:cover; display:block; }
+        .nav-uname { font-size:13px; font-weight:500; color:var(--off); }
+        .ndiv { width:1px; height:22px; background:var(--rim); }
+        .nav-out {
+            display:flex; align-items:center; gap:6px;
+            text-decoration:none; font-size:13px; font-weight:500;
+            color:var(--ghost); padding:7px 14px; border-radius:8px;
+            transition:color .18s, background .18s;
+        }
+        .nav-out:hover { color:#EF4444; background:rgba(239,68,68,0.08); }
 
-        /* ── NAVBAR ── */
-        .navbar {
-            background: rgba(250,246,239,0.94);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--stone);
-            padding: 0 44px;
-            height: 66px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 1px 0 rgba(184,134,78,0.12), 0 4px 20px rgba(28,22,18,0.05);
-        }
-        .navbar-brand {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px; font-weight: 700;
-            color: var(--text-primary);
-            display: flex; align-items: center; gap: 11px;
-            text-decoration: none; letter-spacing: 0.3px;
-        }
-        .navbar-brand-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            color: #fff;
-            box-shadow: 0 2px 10px rgba(184,134,78,0.35);
-            position: relative; overflow: hidden;
-        }
-        .navbar-brand-icon::after {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent);
-        }
-        .navbar-menu { display: flex; align-items: center; gap: 2px; }
-        .navbar-menu a {
-            color: var(--text-secondary); text-decoration: none;
-            padding: 7px 12px; border-radius: 9px;
-            font-size: 13.5px; font-weight: 500;
-            transition: color 0.2s, background 0.2s;
-        }
-        .navbar-menu a:hover, .navbar-menu a.nav-active {
-            color: var(--accent); background: var(--accent-light);
-        }
-        .profile-pic { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); display: block; }
-        .profile-placeholder {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            color: var(--accent); display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 13px; border: 2px solid var(--stone);
-        }
-        .nav-divider { width: 1px; height: 20px; background: var(--stone); margin: 0 5px; }
-        .logout-link {
-            color: var(--text-muted) !important; text-decoration: none;
-            padding: 7px 12px; border-radius: 9px;
-            font-size: 13px; font-weight: 500;
-            display: inline-flex; align-items: center; gap: 5px;
-            transition: color 0.2s, background 0.2s;
-        }
-        .logout-link:hover { color: #DC2626 !important; background: #FEF2F2; }
+        /* ── SHELL ── */
+        .shell { padding-top:66px; }
 
-        /* ── LAYOUT ── */
-        .container { max-width: 1060px; margin: 0 auto; padding: 32px 24px 72px; position: relative; z-index: 1; }
+        /* ── HERO ── */
+        .hero { position:relative; height:320px; overflow:hidden; }
+        .hero-bg {
+            position:absolute; inset:0;
+            background:url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=80') center 50%/cover;
+            filter:brightness(0.25) saturate(0.5);
+            transform:scale(1.04);
+            animation:hzoom 18s ease-in-out infinite alternate;
+        }
+        @keyframes hzoom { from{transform:scale(1.04)} to{transform:scale(1.0)} }
+        .hero::before {
+            content:''; position:absolute; inset:0; z-index:1;
+            background:
+                linear-gradient(90deg,rgba(12,11,9,0.97) 0%,rgba(12,11,9,0.5) 55%,transparent 100%),
+                linear-gradient(0deg,rgba(12,11,9,0.98) 0%,transparent 50%);
+        }
+        .hero::after {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:3px; z-index:2;
+            background:linear-gradient(180deg,transparent,var(--gold),transparent);
+        }
+        .hero-body {
+            position:absolute; inset:0; z-index:3;
+            display:flex; flex-direction:column; justify-content:flex-end;
+            padding:0 72px 46px;
+        }
+        .hero-tag {
+            display:inline-flex; align-items:center; gap:9px;
+            font-size:10px; font-weight:600; letter-spacing:3px;
+            text-transform:uppercase; color:var(--gold); margin-bottom:14px;
+        }
+        .hero-tag-ln { width:28px; height:1px; background:var(--gold); }
+        .hero-h1 {
+            font-family:'DM Serif Display',Georgia,serif;
+            font-size:42px; font-weight:400; line-height:1.08;
+            color:var(--white); letter-spacing:-0.8px; margin-bottom:12px;
+        }
+        .hero-h1 em { font-style:italic; color:var(--gold2); }
+        .hero-meta { display:flex; gap:8px; flex-wrap:wrap; }
+        .hmeta-chip {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:6px 14px; border-radius:999px;
+            font-size:11.5px; font-weight:500; color:var(--fog);
+            border:1px solid var(--rim); background:rgba(255,255,255,0.05);
+            backdrop-filter:blur(8px);
+        }
+        .hmeta-chip svg { color:var(--gold); flex-shrink:0; }
+
+        /* ── STATS STRIP ── */
+        .stats-strip {
+            display:grid; grid-template-columns:repeat(4,1fr);
+            border-bottom:1px solid var(--rim);
+        }
+        .sstat {
+            padding:24px 28px; text-align:center;
+            border-right:1px solid var(--rim);
+            transition:background .2s; position:relative;
+        }
+        .sstat:last-child { border-right:none; }
+        .sstat:hover { background:var(--rim2); }
+        .sstat::after {
+            content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+            background:linear-gradient(90deg,transparent,var(--gold),transparent);
+            transform:scaleX(0); transform-origin:center; transition:transform .3s;
+        }
+        .sstat:hover::after { transform:scaleX(1); }
+        .sstat-icon {
+            width:38px; height:38px; border-radius:10px;
+            background:rgba(212,146,74,0.1); color:var(--gold);
+            display:flex; align-items:center; justify-content:center;
+            margin:0 auto 10px; border:1px solid rgba(212,146,74,0.18);
+            transition:all .2s;
+        }
+        .sstat:hover .sstat-icon { background:var(--gold); color:var(--void); transform:scale(1.08) rotate(-4deg); }
+        .sstat-val {
+            font-family:'Syne',sans-serif;
+            font-size:28px; font-weight:800; color:var(--white); line-height:1; margin-bottom:5px;
+        }
+        .sstat-lbl { font-size:9.5px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--ghost); }
+
+        /* ── MAIN ── */
+        .main {
+            max-width:960px; margin:0 auto;
+            padding:32px 52px 80px;
+        }
 
         /* ── BACK LINK ── */
         .back-link {
-            display: inline-flex; align-items: center; gap: 7px;
-            color: var(--accent); font-size: 13.5px; font-weight: 600;
-            text-decoration: none; margin-bottom: 20px;
-            padding: 7px 14px; border-radius: 9px;
-            background: rgba(255,255,255,0.55);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(184,134,78,0.2);
-            transition: all 0.2s;
+            display:inline-flex; align-items:center; gap:7px;
+            color:var(--gold); font-size:13px; font-weight:600;
+            text-decoration:none; margin-bottom:24px;
+            padding:7px 16px; border-radius:9px;
+            background:rgba(212,146,74,0.08); border:1px solid rgba(212,146,74,0.2);
+            transition:all .2s;
         }
-        .back-link:hover { background: var(--accent-light); gap: 11px; border-color: rgba(184,134,78,0.4); }
-
-        /* ── PAGE BANNER ── */
-        .page-banner {
-            background: rgba(250,244,234,0.82);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.55);
-            border-radius: 22px;
-            padding: 32px 40px;
-            margin-bottom: 22px;
-            position: relative; overflow: hidden;
-            box-shadow: 0 4px 32px rgba(150,105,58,0.10), inset 0 1px 0 rgba(255,248,235,0.7);
-            animation: slideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
-        }
-        .page-banner::before {
-            content: '';
-            position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-            background: linear-gradient(180deg, var(--accent), var(--accent2));
-            border-radius: 22px 0 0 22px;
-        }
-        .banner-eyebrow {
-            font-size: 11px; font-weight: 600; letter-spacing: 2px;
-            text-transform: uppercase; color: var(--accent);
-            margin-bottom: 8px; display: flex; align-items: center; gap: 7px;
-        }
-        .banner-eyebrow::before {
-            content: ''; width: 22px; height: 1.5px;
-            background: var(--accent); display: inline-block;
-        }
-        .page-banner h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 30px; font-weight: 700;
-            color: var(--text-primary); margin-bottom: 10px; line-height: 1.15;
-        }
-        .project-meta {
-            display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 0;
-        }
-        .meta-chip {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 5px 13px;
-            background: rgba(255,255,255,0.55);
-            border: 1px solid rgba(212,186,150,0.4);
-            border-radius: 20px;
-            font-size: 12.5px; font-weight: 500; color: var(--text-secondary);
-        }
-
-        /* ── STATS ── */
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
-            margin-bottom: 22px;
-            animation: slideUp 0.55s 0.08s cubic-bezier(0.22,1,0.36,1) both;
-        }
-        @media(max-width:700px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
-
-        .stat-card {
-            background: rgba(250,244,234,0.75);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(212,186,150,0.45);
-            border-radius: 18px; padding: 22px 18px;
-            text-align: center;
-            box-shadow: 0 2px 20px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.6);
-            transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s, border-color 0.3s, background 0.3s;
-            position: relative; overflow: hidden; cursor: default;
-        }
-        .stat-card::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            transform: scaleX(0); transform-origin: left;
-            transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
-            border-radius: 18px 18px 0 0;
-        }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(150,105,58,0.16); border-color: rgba(184,134,78,0.55); background: rgba(252,247,238,0.88); }
-        .stat-card:hover::before { transform: scaleX(1); }
-        .stat-icon-wrap {
-            width: 42px; height: 42px;
-            background: var(--accent-light);
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 14px; color: var(--accent);
-            border: 1px solid rgba(184,134,78,0.2);
-            font-size: 19px;
-            transition: background 0.2s, transform 0.2s;
-        }
-        .stat-card:hover .stat-icon-wrap {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: white; transform: scale(1.08) rotate(-4deg);
-        }
-        .stat-number {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 36px; font-weight: 700;
-            color: var(--text-primary); line-height: 1; margin-bottom: 5px;
-        }
-        .stat-label {
-            color: var(--text-muted); font-size: 10.5px; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 1px;
-        }
+        .back-link:hover { background:rgba(212,146,74,0.15); border-color:rgba(212,146,74,0.4); gap:11px; }
 
         /* ── ALERTS ── */
         .alert {
-            padding: 12px 18px; border-radius: 10px;
-            margin-bottom: 16px; font-size: 13.5px;
-            backdrop-filter: blur(10px);
+            padding:12px 18px; border-radius:10px;
+            margin-bottom:16px; font-size:13.5px;
         }
-        .alert-success { background: rgba(209,250,229,0.85); color: #065F46; border: 1px solid #A7F3D0; }
-        .alert-error   { background: rgba(254,226,226,0.85); color: #991B1B; border: 1px solid #FECACA; }
+        .alert-success { background:var(--green-bg); color:var(--green); border:1px solid rgba(76,175,130,0.25); }
+        .alert-error   { background:var(--red-bg);   color:var(--red);   border:1px solid rgba(224,92,92,0.25); }
 
         /* ── BID CARD ── */
         .bid-card {
-            background: rgba(255,255,255,0.70);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255,255,255,0.80);
-            border-radius: 18px; margin-bottom: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 32px rgba(150,105,58,0.10), inset 0 1px 0 rgba(255,255,255,0.95);
-            transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s, border-color 0.3s, background 0.3s;
+            background:var(--deep);
+            border:1px solid var(--rim);
+            border-radius:20px; margin-bottom:16px; overflow:hidden;
+            transition:transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s, border-color .3s;
+            position:relative;
         }
-        .bid-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.88); box-shadow: 0 12px 40px rgba(150,105,58,0.14); border-color: rgba(184,134,78,0.30); }
+        .bid-card:hover { transform:translateY(-4px); border-color:rgba(212,146,74,0.3); box-shadow:0 18px 50px rgba(0,0,0,0.5); }
 
-        /* status top stripe */
-        .bid-stripe { height: 3.5px; }
-        .stripe-pending  { background: linear-gradient(90deg, #D97706, #FDE68A); }
-        .stripe-accepted { background: linear-gradient(90deg, #059669, #6EE7B7); }
-        .stripe-rejected { background: linear-gradient(90deg, #DC2626, #FCA5A5); }
+        /* Photo strip */
+        .bid-photo-strip {
+            position:relative; height:110px; overflow:hidden;
+        }
+        .bps-img {
+            position:absolute; inset:0; background-size:cover; background-position:center;
+            filter:brightness(0.3) saturate(0.55);
+            transition:filter .4s, transform .5s cubic-bezier(.22,1,.36,1);
+        }
+        .bid-card:hover .bps-img { filter:brightness(0.22); transform:scale(1.06); }
+        .bps-pending  .bps-img { background-image:url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=900&q=70'); }
+        .bps-accepted .bps-img { background-image:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=900&q=70'); }
+        .bps-rejected .bps-img { background-image:url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=70'); }
 
-        .bid-body { padding: 22px 26px; }
+        .bps-overlay {
+            position:absolute; inset:0;
+            background:linear-gradient(0deg, var(--deep) 0%, rgba(28,26,22,0.5) 60%, transparent 100%);
+        }
+        .bps-left-bar {
+            position:absolute; left:0; top:0; bottom:0; width:3px; z-index:2;
+        }
+        .bps-pending  .bps-left-bar { background:linear-gradient(180deg,transparent,var(--amber),transparent); }
+        .bps-accepted .bps-left-bar { background:linear-gradient(180deg,transparent,var(--green),transparent); }
+        .bps-rejected .bps-left-bar { background:linear-gradient(180deg,transparent,var(--red),transparent); }
+
+        .bps-badge {
+            position:absolute; top:14px; right:16px; z-index:3;
+            display:inline-flex; align-items:center; gap:5px;
+            padding:5px 14px; border-radius:999px;
+            font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+        }
+        .bps-badge .bdot { width:6px; height:6px; border-radius:50%; }
+        .bps-pending  .bps-badge { background:var(--amber-bg); color:var(--amber); border:1px solid rgba(212,148,64,0.3); }
+        .bps-pending  .bps-badge .bdot { background:var(--amber); animation:pulse 2s infinite; }
+        .bps-accepted .bps-badge { background:var(--green-bg); color:var(--green); border:1px solid rgba(76,175,130,0.3); }
+        .bps-accepted .bps-badge .bdot { background:var(--green); }
+        .bps-rejected .bps-badge { background:var(--red-bg);   color:var(--red);   border:1px solid rgba(224,92,92,0.3); }
+        .bps-rejected .bps-badge .bdot { background:var(--red); }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.5)} }
+
+        /* Card body */
+        .bid-body { padding:22px 26px 24px; }
 
         .bid-header {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            margin-bottom: 18px; gap: 16px;
+            display:flex; justify-content:space-between; align-items:flex-start;
+            margin-bottom:20px; gap:16px;
         }
-        .contractor-info { display: flex; align-items: center; gap: 14px; }
-        .contractor-avatar {
-            width: 50px; height: 50px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            border: 2px solid rgba(184,134,78,0.25);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 22px; flex-shrink: 0;
+        .contractor-info { display:flex; align-items:center; gap:14px; }
+        .contractor-av {
+            width:52px; height:52px; border-radius:50%;
+            background:rgba(212,146,74,0.1); border:2px solid rgba(212,146,74,0.25);
+            display:flex; align-items:center; justify-content:center;
+            font-size:22px; flex-shrink:0;
+            transition:border-color .2s;
         }
+        .bid-card:hover .contractor-av { border-color:rgba(212,146,74,0.5); }
         .contractor-name {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px;
+            font-family:'DM Serif Display',serif;
+            font-size:18px; color:var(--white); margin-bottom:3px;
         }
-        .contractor-sub  { font-size: 12.5px; color: var(--text-secondary); }
-        .contractor-rating { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+        .contractor-sub  { font-size:12.5px; color:var(--ghost); }
+        .contractor-rating { font-size:12px; color:var(--gold); margin-top:3px; }
 
-        /* ── STATUS BADGES ── */
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 5px 14px; border-radius: 20px;
-            font-size: 10.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
-            flex-shrink: 0;
-        }
-        .status-dot { width: 6px; height: 6px; border-radius: 50%; }
-        .status-pending  { background: #FEF3C7; color: #92400E; }
-        .status-pending .status-dot  { background: #D97706; }
-        .status-accepted { background: var(--green-bg); color: var(--green); }
-        .status-accepted .status-dot { background: #10B981; }
-        .status-rejected { background: var(--red-bg); color: var(--red); }
-        .status-rejected .status-dot { background: #EF4444; }
-
-        /* ── BID DETAILS GRID ── */
+        /* Details grid */
         .bid-details {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
-            padding: 16px 18px;
-            background: rgba(232,223,208,0.35);
-            border: 1px solid rgba(212,186,150,0.22);
-            border-radius: 12px;
-            margin-bottom: 16px;
+            display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+            padding:16px 18px;
+            background:var(--surface); border:1px solid var(--rim);
+            border-radius:12px; margin-bottom:16px;
         }
-        @media(max-width:600px) { .bid-details { grid-template-columns: repeat(2,1fr); } }
-        .detail-item { text-align: center; }
+        .detail-item { text-align:center; }
         .detail-label {
-            font-size: 10px; color: var(--text-muted); font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+            font-size:9.5px; color:var(--ghost); font-weight:700;
+            text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;
         }
-        .detail-value { font-size: 16px; font-weight: 700; color: var(--text-primary); }
-        .detail-value.accent { color: var(--accent-dark); }
+        .detail-value { font-size:17px; font-weight:700; color:var(--white); font-family:'Syne',sans-serif; }
+        .detail-value.gold { color:var(--gold2); }
 
-        /* ── PROPOSAL ── */
+        /* Proposal */
         .bid-proposal {
-            padding: 14px 16px;
-            background: rgba(251,243,228,0.55);
-            border: 1px solid rgba(184,134,78,0.2);
-            border-left: 3px solid var(--accent);
-            border-radius: 0 10px 10px 0;
-            font-size: 13.5px; line-height: 1.65; color: var(--text-secondary);
-            margin-bottom: 10px;
+            padding:14px 16px 14px 18px;
+            background:var(--surface);
+            border:1px solid var(--rim);
+            border-left:3px solid var(--gold);
+            border-radius:0 10px 10px 0;
+            font-size:13.5px; line-height:1.65; color:var(--fog);
+            margin-bottom:10px;
         }
-        .bid-proposal strong { color: var(--text-primary); font-weight: 600; }
-        .bid-timestamp { font-size: 11.5px; color: var(--text-muted); margin-bottom: 14px; }
+        .bid-proposal strong { color:var(--off); font-weight:600; }
 
-        /* ── BID ACTIONS ── */
-        .bid-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .bid-timestamp {
+            font-size:11.5px; color:var(--ghost); margin-bottom:16px;
+            display:flex; align-items:center; gap:5px;
+        }
+
+        /* Actions */
+        .bid-actions { display:flex; gap:10px; flex-wrap:wrap; }
         .btn-accept {
-            flex: 1; padding: 11px 20px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff; border: none; border-radius: 10px;
-            font-weight: 700; font-size: 13px; cursor: pointer;
-            transition: all 0.2s; font-family: 'Outfit', sans-serif;
-            box-shadow: 0 3px 12px rgba(184,134,78,0.3);
-            display: flex; align-items: center; justify-content: center; gap: 6px;
+            flex:1; padding:11px 20px;
+            background:var(--gold); color:var(--void);
+            border:none; border-radius:10px;
+            font-weight:700; font-size:13px; cursor:pointer;
+            font-family:'DM Sans',sans-serif;
+            box-shadow:0 4px 16px var(--glow);
+            transition:all .2s;
+            display:flex; align-items:center; justify-content:center; gap:7px;
         }
-        .btn-accept:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(184,134,78,0.42); }
+        .btn-accept:hover { background:var(--gold2); transform:translateY(-2px); box-shadow:0 8px 28px var(--glow); }
         .btn-reject {
-            flex: 1; padding: 11px 20px;
-            background: transparent; color: var(--red);
-            border: 1.5px solid #FECACA; border-radius: 10px;
-            font-weight: 600; font-size: 13px; cursor: pointer;
-            transition: all 0.2s; font-family: 'Outfit', sans-serif;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
+            flex:1; padding:11px 20px;
+            background:transparent; color:var(--red);
+            border:1px solid rgba(224,92,92,0.3); border-radius:10px;
+            font-weight:600; font-size:13px; cursor:pointer;
+            font-family:'DM Sans',sans-serif;
+            transition:all .2s;
+            display:flex; align-items:center; justify-content:center; gap:7px;
         }
-        .btn-reject:hover { background: var(--red-bg); border-color: #FCA5A5; transform: translateY(-1px); }
+        .btn-reject:hover { background:var(--red-bg); border-color:rgba(224,92,92,0.5); transform:translateY(-1px); }
         .btn-view {
-            padding: 11px 20px;
-            background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(10px);
-            color: var(--text-secondary);
-            border: 1px solid rgba(212,186,150,0.4);
-            border-radius: 10px; font-weight: 600; font-size: 13px;
-            text-decoration: none; transition: all 0.2s; white-space: nowrap;
-            display: inline-flex; align-items: center; gap: 6px;
+            padding:11px 20px;
+            background:transparent; color:var(--fog);
+            border:1px solid var(--rim); border-radius:10px;
+            font-weight:600; font-size:13px;
+            text-decoration:none; white-space:nowrap;
+            transition:all .2s;
+            display:inline-flex; align-items:center; gap:7px;
         }
-        .btn-view:hover { background: var(--accent-light); border-color: rgba(184,134,78,0.5); color: var(--accent-dark); }
+        .btn-view:hover { border-color:rgba(212,146,74,0.35); color:var(--gold); background:var(--soft); }
 
         /* ── EMPTY STATE ── */
         .empty-state {
-            background: rgba(255,255,255,0.70);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255,255,255,0.80);
-            border-radius: 18px; padding: 72px 24px;
-            text-align: center;
-            box-shadow: 0 4px 32px rgba(150,105,58,0.10);
+            background:var(--deep); border:1px solid var(--rim);
+            border-radius:20px; padding:72px 24px;
+            text-align:center; position:relative; overflow:hidden;
         }
+        .empty-state-bg {
+            position:absolute; inset:0;
+            background:url('https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=800&q=60') center/cover;
+            filter:brightness(0.12) saturate(0.3); opacity:.5;
+        }
+        .empty-state-body { position:relative; z-index:1; }
         .empty-icon {
-            width: 64px; height: 64px;
-            background: var(--sand); border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 18px; color: var(--text-muted);
-            border: 1px solid var(--stone); font-size: 28px;
+            width:60px; height:60px; border-radius:16px;
+            background:rgba(212,146,74,0.1); color:var(--gold);
+            border:1px solid rgba(212,146,74,0.2);
+            display:flex; align-items:center; justify-content:center;
+            margin:0 auto 18px;
         }
         .empty-state h2 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px; font-weight: 700;
-            color: var(--text-primary); margin-bottom: 8px;
+            font-family:'DM Serif Display',serif;
+            font-size:22px; color:var(--white); margin-bottom:8px;
         }
-        .empty-state p { font-size: 14px; color: var(--text-secondary); }
+        .empty-state p { font-size:14px; color:var(--ghost); }
 
         /* ── ANIMATIONS ── */
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .fu  { animation:fadeUp .55s cubic-bezier(.22,1,.36,1) both; }
+        .d1  { animation-delay:.04s } .d2 { animation-delay:.1s }
+        .d3  { animation-delay:.17s } .d4 { animation-delay:.24s }
 
         /* ── RESPONSIVE ── */
-        @media(max-width:768px) {
-            .navbar { padding: 0 18px; }
-            .container { padding: 20px 14px 56px; }
-            .page-banner { padding: 22px 22px; }
-            .page-banner h1 { font-size: 24px; }
-            .bid-body { padding: 16px 18px; }
-            .bid-header { flex-direction: column; gap: 10px; }
-            .bid-actions { flex-direction: column; }
+        @media(max-width:900px) {
+            .nav { padding:0 22px; } .nav-center { display:none; }
+            .hero-body { padding:0 28px 38px; } .hero-h1 { font-size:32px; }
+            .main { padding:24px 22px 60px; }
+            .stats-strip { grid-template-columns:repeat(2,1fr); }
         }
+        @media(max-width:600px) {
+            .bid-details { grid-template-columns:repeat(2,1fr); }
+            .bid-header  { flex-direction:column; gap:10px; }
+            .bid-actions { flex-direction:column; }
+        }
+        
     </style>
 </head>
 <body>
 
-<div class="bg-grid"></div>
-<div class="bg-warm"></div>
-
-<!-- ── NAVBAR ── -->
-<nav class="navbar">
-    <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">
-        <div class="navbar-brand-icon">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<!-- ── NAV ── -->
+<nav class="nav">
+    <a href="/user/dashboard" class="nav-logo">
+        <div class="nav-logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
-        House-Forge
+        <span class="nav-logo-name">House<b>-Forge</b></span>
     </a>
-    <div class="navbar-menu">
-        <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('user.projects') }}">My Projects</a>
-        <a href="{{ url_for('user.messages') }}" style="position:relative;">
+
+    <div class="nav-center">
+        <a href="/user/dashboard" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+        </a>
+        <a href="/user/projects" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Projects
+        </a>
+        <a href="/user/bids" class="nlink active">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Bids
+        </a>
+        <a href="/user/my-orders" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Orders
+        </a>
+        <a href="/user/messages" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             Messages
-            <span class="badge-notification" id="messagesBadge" style="position:absolute;top:2px;right:2px;background:#DC2626;color:#fff;border-radius:50%;width:15px;height:15px;display:none;align-items:center;justify-content:center;font-size:8px;font-weight:700;border:2px solid var(--bg-card);"></span>
+            <span class="npip" id="messagesBadge"></span>
         </a>
-        <div class="nav-divider"></div>
-        <a href="{{ url_for('user.profile') }}" style="padding:7px 9px;">
-            {% if user_profile_picture %}
-                <img src="/static/uploads/profiles/{{ user_profile_picture }}" class="profile-pic" alt="Profile">
-            {% else %}
-                <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
-            {% endif %}
+    </div>
+
+    <div class="nav-right">
+        <a href="/user/profile" class="nav-profile">
+            <div class="nav-av">
+                {% if user_profile_picture %}
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile">
+                {% else %}
+                    {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                {% endif %}
+            </div>
+            <span class="nav-uname">{{ current_user.name }}</span>
         </a>
-        <a href="{{ url_for('auth.logout') }}" class="logout-link">
+        <div class="ndiv"></div>
+        <a href="{{ url_for('auth.logout') }}" class="nav-out">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            Logout
+            Sign Out
         </a>
     </div>
 </nav>
 
-<!-- ── MAIN ── -->
-<div class="container">
+<div class="shell">
 
-    <a href="{{ url_for('user.view_project', project_id=project.id) }}" class="back-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        Back to Project
-    </a>
+    <!-- ── HERO ── -->
+    <section class="hero fu d1">
+        <div class="hero-bg"></div>
+        <div class="hero-body">
+            <div class="hero-tag"><span class="hero-tag-ln"></span> Bid Management</div>
+            <h1 class="hero-h1">Bids for<br><em>{{ project.title }}</em></h1>
+            <div class="hero-meta">
+                <span class="hmeta-chip">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                    {{ project.square_feet }} sq ft
+                </span>
+                <span class="hmeta-chip">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    {{ project.location }}
+                </span>
+                <span class="hmeta-chip">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    {{ project.budget_range.title() }} Budget
+                </span>
+            </div>
+        </div>
+    </section>
 
-    <!-- PAGE BANNER -->
-    <div class="page-banner">
-        <div class="banner-eyebrow">Bid Management</div>
-        <h1>📋 Bids for {{ project.title }}</h1>
-        <div class="project-meta">
-            <span class="meta-chip">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-                {{ project.square_feet }} sq ft
-            </span>
-            <span class="meta-chip">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                {{ project.location }}
-            </span>
-            <span class="meta-chip">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                {{ project.budget_range.title() }} Budget
-            </span>
+    <!-- ── STATS STRIP ── -->
+    {% set total_bids    = bids | length %}
+    {% set pending_bids  = bids | selectattr('status','equalto','pending')  | list | length %}
+    {% set accepted_bids = bids | selectattr('status','equalto','accepted') | list | length %}
+    {% set rejected_bids = bids | selectattr('status','equalto','rejected') | list | length %}
+
+    <div class="stats-strip fu d2">
+        <div class="sstat">
+            <div class="sstat-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="sstat-val">{{ total_bids }}</div>
+            <div class="sstat-lbl">Total Bids</div>
+        </div>
+        <div class="sstat">
+            <div class="sstat-icon" style="background:var(--amber-bg);color:var(--amber);border-color:rgba(212,148,64,0.2);">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="sstat-val">{{ pending_bids }}</div>
+            <div class="sstat-lbl">Awaiting Review</div>
+        </div>
+        <div class="sstat">
+            <div class="sstat-icon" style="background:var(--green-bg);color:var(--green);border-color:rgba(76,175,130,0.2);">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="sstat-val">{{ accepted_bids }}</div>
+            <div class="sstat-lbl">Accepted</div>
+        </div>
+        <div class="sstat">
+            <div class="sstat-icon" style="background:var(--red-bg);color:var(--red);border-color:rgba(224,92,92,0.2);">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="sstat-val">{{ rejected_bids }}</div>
+            <div class="sstat-lbl">Rejected</div>
         </div>
     </div>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}{% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}{% endif %}
-    {% endwith %}
+    <!-- ── MAIN CONTENT ── -->
+    <div class="main">
 
-    
+        <a href="{{ url_for('user.view_project', project_id=project.id) }}" class="back-link fu d2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Back to Project
+        </a>
 
-    <!-- BID CARDS -->
-    {% if bids %}
-        {% for bid in bids %}
-        <div class="bid-card">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}{% endif %}
+        {% endwith %}
 
-            <div class="bid-stripe stripe-{{ bid.status }}"></div>
-
-            <div class="bid-body">
-
-                <div class="bid-header">
-                    <div class="contractor-info">
-                        <div class="contractor-avatar">🔨</div>
-                        <div>
-                            <div class="contractor-name">{{ bid.contractor_company or bid.contractor_name }}</div>
-                            <div class="contractor-sub">{{ bid.contractor_name if bid.contractor_company else 'Professional Contractor' }}</div>
-                            <div class="contractor-rating">
-                                ⭐ {{ "%.1f"|format(bid.contractor_rating or 0) }} · {{ bid.contractor_experience or 0 }} yrs experience
-                            </div>
-                        </div>
-                    </div>
-                    <span class="status-badge status-{{ bid.status }}">
-                        <span class="status-dot"></span>
-                        {% if bid.status == 'pending' %}Pending
+        <!-- BID CARDS -->
+        {% if bids %}
+            {% for bid in bids %}
+            <div class="bid-card bps-{{ bid.status }} fu" data-delay="{{ 0.18 + loop.index0 * 0.08 }}">
+                <!-- Photo strip with status -->
+                <div class="bid-photo-strip bps-{{ bid.status }}">
+                    <div class="bps-img"></div>
+                    <div class="bps-overlay"></div>
+                    <div class="bps-left-bar"></div>
+                    <span class="bps-badge">
+                        <span class="bdot"></span>
+                        {% if bid.status == 'pending' %}Pending Review
                         {% elif bid.status == 'accepted' %}Accepted
                         {% else %}Rejected
                         {% endif %}
                     </span>
                 </div>
 
-                <div class="bid-details">
-                    <div class="detail-item">
-                        <div class="detail-label">Total Cost</div>
-                        <div class="detail-value accent">₹{{ "{:,.0f}".format(bid.total_cost) }}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Duration</div>
-                        <div class="detail-value">{{ bid.duration_months }} months</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Materials</div>
-                        <div class="detail-value">₹{{ "{:,.0f}".format(bid.material_cost or 0) }}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Labour</div>
-                        <div class="detail-value">₹{{ "{:,.0f}".format(bid.labor_cost or 0) }}</div>
-                    </div>
-                </div>
+                <div class="bid-body">
 
-                <div class="bid-proposal">
-                    <strong>Proposal</strong><br>{{ bid.proposal }}
-                </div>
-                <div class="bid-timestamp">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    Submitted {{ bid.created_at.strftime('%d %b %Y, %I:%M %p') if bid.created_at else 'N/A' }}
-                </div>
+                    <div class="bid-header">
+                        <div class="contractor-info">
+                            <div class="contractor-av">🔨</div>
+                            <div>
+                                <div class="contractor-name">{{ bid.contractor_company or bid.contractor_name }}</div>
+                                <div class="contractor-sub">{{ bid.contractor_name if bid.contractor_company else 'Professional Contractor' }}</div>
+                                <div class="contractor-rating">
+                                    ★ {{ "%.1f"|format(bid.contractor_rating or 0) }} &nbsp;·&nbsp; {{ bid.contractor_experience or 0 }} yrs experience
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                {% if bid.status == 'pending' %}
-                <div class="bid-actions">
-                    <form method="POST" action="{{ url_for('user.accept_bid', bid_id=bid.id) }}" onsubmit="return confirm('Accept this bid?');" style="flex:1;display:flex;">
-                        <button type="submit" class="btn-accept" style="width:100%;">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            Accept Bid
-                        </button>
-                    </form>
-                    <form method="POST" action="{{ url_for('user.reject_bid', bid_id=bid.id) }}" onsubmit="return confirm('Reject this bid?');" style="flex:1;display:flex;">
-                        <button type="submit" class="btn-reject" style="width:100%;">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                            Reject Bid
-                        </button>
-                    </form>
-                    <a href="{{ url_for('user.view_contractor', contractor_id=bid.contractor_id) }}" class="btn-view">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        View Profile
-                    </a>
-                </div>
-                {% endif %}
+                    <div class="bid-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Total Cost</div>
+                            <div class="detail-value gold">₹{{ "{:,.0f}".format(bid.total_cost) }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Duration</div>
+                            <div class="detail-value">{{ bid.duration_months }}<span style="font-size:12px;color:var(--ghost);font-weight:400;font-family:'DM Sans',sans-serif;"> mo</span></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Materials</div>
+                            <div class="detail-value" style="font-size:14px;">₹{{ "{:,.0f}".format(bid.material_cost or 0) }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Labour</div>
+                            <div class="detail-value" style="font-size:14px;">₹{{ "{:,.0f}".format(bid.labor_cost or 0) }}</div>
+                        </div>
+                    </div>
 
+                    <div class="bid-proposal">
+                        <strong>Proposal</strong><br>{{ bid.proposal }}
+                    </div>
+
+                    <div class="bid-timestamp">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Submitted {{ bid.created_at.strftime('%d %b %Y, %I:%M %p') if bid.created_at else 'N/A' }}
+                    </div>
+
+                    {% if bid.status == 'pending' %}
+                    <div class="bid-actions">
+                        <form method="POST" action="{{ url_for('user.accept_bid', bid_id=bid.id) }}" onsubmit="return confirm('Accept this bid?');" style="flex:1;display:flex;">
+                            <button type="submit" class="btn-accept" style="width:100%;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Accept Bid
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('user.reject_bid', bid_id=bid.id) }}" onsubmit="return confirm('Reject this bid?');" style="flex:1;display:flex;">
+                            <button type="submit" class="btn-reject" style="width:100%;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                Reject Bid
+                            </button>
+                        </form>
+                        <a href="{{ url_for('user.view_contractor', contractor_id=bid.contractor_id) }}" class="btn-view">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            View Profile
+                        </a>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+            {% endfor %}
+
+        {% else %}
+        <div class="empty-state fu d3">
+            <div class="empty-state-bg"></div>
+            <div class="empty-state-body">
+                <div class="empty-icon">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <h2>No Bids Yet</h2>
+                <p>No contractors have submitted bids for this project yet.</p>
             </div>
         </div>
-        {% endfor %}
+        {% endif %}
 
-    {% else %}
-    <div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <h2>No Bids Yet</h2>
-        <p>No contractors have submitted bids for this project yet.</p>
     </div>
-    {% endif %}
-
-</div>
+</div><!-- end shell -->
 
 <script>
-/* Staggered bid card entrance */
-document.querySelectorAll('.bid-card').forEach((card, i) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(18px)';
-    card.style.transition = 'none';
-    setTimeout(() => {
-        card.style.transition = 'opacity 0.45s cubic-bezier(0.22,1,0.36,1), transform 0.45s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s, border-color 0.3s, background 0.3s';
-        card.style.opacity = '1';
-        card.style.transform = 'translateY(0)';
-    }, 100 + i * 75);
-});
-
-/* Stat cards staggered entrance */
-document.querySelectorAll('.stat-card').forEach((card, i) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(14px)';
-    setTimeout(() => {
-        card.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1), border-color 0.25s, background 0.25s, box-shadow 0.3s';
-        card.style.opacity = '1';
-        card.style.transform = 'translateY(0)';
-    }, 200 + i * 60);
-});
-
-/* Message badge */
-fetch('/user/messages/unread-count')
-    .then(r => r.ok ? r.json() : null)
-    .then(data => {
-        if (!data) return;
-        const badge = document.getElementById('messagesBadge');
-        if (badge && data.count > 0) { badge.textContent = data.count; badge.style.display = 'flex'; }
-    }).catch(() => {});
+    /* Message badge */
+    fetch('/user/messages/unread-count')
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            if (!data) return;
+            const b = document.getElementById('messagesBadge');
+            if (b && data.count > 0) b.style.display = 'block';
+        }).catch(() => {});
 </script>
 
 </body>

@@ -4,205 +4,729 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment History — House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        :root{--bg:#F2EDE4;--card:#FAF7F2;--card2:#F5F0E8;--sand:#EDE6DB;--stone:#D9CFC2;--accent:#C9A84C;--accent-d:#a8893a;--accent-l:#FBF3E0;--text:#1C1917;--text2:#5C4F43;--muted:#8C7E72;}
-        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);}
-        body::before{content:'';position:fixed;inset:0;background:url('/static/images/house.jpg') no-repeat center/cover;opacity:.04;z-index:0;pointer-events:none;}
-        .navbar{background:rgba(250,247,242,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--stone);padding:0 40px;height:68px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(28,25,23,.07);}
-        .navbar-brand{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px;}
-        .brand-icon{width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#0A0A0A;}
-        .navbar-menu{display:flex;align-items:center;gap:4px;}
-        .navbar-menu a{color:var(--text2);text-decoration:none;padding:8px 13px;border-radius:8px;font-size:14px;font-weight:500;transition:all .2s;}
-        .navbar-menu a:hover,.navbar-menu a.active{color:var(--accent);background:var(--accent-l);}
-        .profile-pic{width:33px;height:33px;border-radius:50%;object-fit:cover;border:2px solid var(--stone);}
-        .profile-ph{width:33px;height:33px;border-radius:50%;background:var(--accent-l);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;border:2px solid var(--stone);}
-        .nav-div{width:1px;height:20px;background:var(--stone);margin:0 6px;}
-        .logout-link{color:var(--muted);text-decoration:none;padding:8px 13px;border-radius:8px;font-size:13px;font-weight:500;transition:all .2s;}
-        .logout-link:hover{color:#DC2626;background:#FEF2F2;}
+        :root {
+            --void:    #0C0B09;
+            --ink:     #141210;
+            --deep:    #1C1A16;
+            --surface: #242118;
+            --rim:     rgba(255,255,255,0.07);
+            --rim2:    rgba(255,255,255,0.04);
 
-        .page{max-width:1000px;margin:36px auto;padding:0 24px;position:relative;z-index:1;}
+            --gold:    #D4924A;
+            --gold2:   #F0C07A;
+            --gold3:   #B8743A;
+            --glow:    rgba(212,146,74,0.22);
+            --soft:    rgba(212,146,74,0.10);
 
-        .page-header{
-            background:var(--card);border:1px solid var(--stone);border-radius:20px;
-            padding:30px 36px;margin-bottom:20px;
-            box-shadow:0 4px 18px rgba(28,25,23,.08);
-            animation:fadeUp .4s ease both;
+            --white:   #FFFFFF;
+            --off:     #F2EDE6;
+            --fog:     rgba(242,237,230,0.55);
+            --ghost:   rgba(242,237,230,0.28);
+
+            --green:  #4CAF82; --green-bg: rgba(76,175,130,0.13);
+            --blue:   #4A8FD4; --blue-bg:  rgba(74,143,212,0.13);
+            --amber:  #D49440; --amber-bg: rgba(212,148,64,0.13);
+            --red:    #EF4444; --red-bg:   rgba(239,68,68,0.12);
+            --purple: #9B6DFF; --purple-bg: rgba(155,109,255,0.13);
         }
-        .page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--text);margin-bottom:4px;}
-        .divider{width:36px;height:3px;background:var(--accent);border-radius:2px;margin:10px 0 20px;}
-
-        .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-        .stat-box{background:var(--card2);border:1px solid var(--stone);border-radius:12px;padding:18px;text-align:center;transition:all .2s;}
-        .stat-box:hover{border-color:var(--accent);background:var(--accent-l);}
-        .stat-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--accent-d);margin-bottom:4px;}
-        .stat-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);}
-
-        .payment-card{
-            background:var(--card);border:1px solid var(--stone);border-radius:16px;
-            padding:22px 28px;margin-bottom:14px;
-            box-shadow:0 1px 3px rgba(28,25,23,.06);
-            transition:all .25s;
-            display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;
-            animation:fadeUp .4s ease both;
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body {
+            font-family:'DM Sans',sans-serif;
+            background:var(--void);
+            color:var(--off);
+            min-height:100vh;
+            overflow-x:hidden;
+            -webkit-font-smoothing:antialiased;
         }
-        .payment-card:hover{transform:translateY(-2px);box-shadow:0 4px 18px rgba(28,25,23,.09);border-color:rgba(201,168,76,.35);}
 
-        .payment-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-        .payment-icon.material{background:#EDE9FE;color:#6D28D9;}
-        .payment-icon.contractor{background:var(--accent-l);color:var(--accent-d);}
-        .payment-icon svg{width:22px;height:22px;}
+        /* ── NAV ── */
+        .nav {
+            position:fixed; top:0; left:0; right:0; z-index:300;
+            height:66px;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 52px;
+            background:rgba(12,11,9,0.88);
+            backdrop-filter:blur(22px);
+            -webkit-backdrop-filter:blur(22px);
+            border-bottom:1px solid var(--rim);
+        }
+        .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+        .nav-logo-icon {
+            width:40px; height:40px; border-radius:9px;
+            border:1.5px solid var(--gold);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold); position:relative; overflow:hidden;
+        }
+        .nav-logo-icon::before {
+            content:''; position:absolute; inset:0;
+            background:radial-gradient(circle at 30% 30%, rgba(212,146,74,0.18), transparent 70%);
+        }
+        .nav-logo-name {
+            font-family:'Syne',sans-serif;
+            font-size:18px; font-weight:800; color:var(--white); letter-spacing:-0.4px;
+        }
+        .nav-logo-name b { color:var(--gold); font-weight:800; }
+        .nav-center {
+            position:absolute; left:50%; transform:translateX(-50%);
+            display:flex; align-items:center; gap:2px;
+        }
+        .nlink {
+            display:flex; align-items:center; gap:6px;
+            padding:7px 16px; border-radius:8px;
+            text-decoration:none; font-size:13.5px; font-weight:500;
+            color:var(--ghost); transition:color .18s, background .18s;
+            position:relative; white-space:nowrap;
+        }
+        .nlink:hover { color:var(--off); background:var(--rim2); }
+        .nlink.active { color:var(--gold); }
+        .nlink.active::after {
+            content:''; position:absolute; bottom:-1px; left:16px; right:16px;
+            height:2px; background:var(--gold); border-radius:2px;
+            box-shadow:0 0 10px var(--glow);
+        }
+        .npip {
+            position:absolute; top:5px; right:5px;
+            width:6px; height:6px; border-radius:50%;
+            background:#EF4444; border:1.5px solid var(--void); display:none;
+        }
+        .npip.amber { background:var(--amber); }
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .nav-profile {
+            display:flex; align-items:center; gap:9px;
+            padding:5px 14px 5px 5px; border-radius:999px;
+            border:1px solid var(--rim); text-decoration:none;
+            transition:border-color .2s, background .2s;
+        }
+        .nav-profile:hover { border-color:var(--gold); background:var(--soft); }
+        .nav-av {
+            width:30px; height:30px; border-radius:50%;
+            background:var(--gold3); color:#fff;
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:700; flex-shrink:0;
+        }
+        .nav-av img { width:30px; height:30px; border-radius:50%; object-fit:cover; display:block; }
+        .nav-uname { font-size:13px; font-weight:500; color:var(--off); }
+        .ndiv { width:1px; height:22px; background:var(--rim); }
+        .nav-out {
+            display:flex; align-items:center; gap:6px;
+            text-decoration:none; font-size:13px; font-weight:500;
+            color:var(--ghost); padding:7px 14px; border-radius:8px;
+            transition:color .18s, background .18s;
+        }
+        .nav-out:hover { color:#EF4444; background:rgba(239,68,68,0.08); }
 
-        .payment-info h3{font-size:15px;font-weight:600;color:var(--text);margin-bottom:3px;}
-        .payment-meta{display:flex;gap:16px;flex-wrap:wrap;}
-        .payment-meta span{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px;}
+        /* ── SHELL ── */
+        .shell { padding-top:66px; }
 
-        .payment-right{text-align:right;flex-shrink:0;}
-        .payment-amount{font-family:'DM Sans',serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;}
+        /* ── HERO ── */
+        .hero { position:relative; height:340px; overflow:hidden; }
+        .hero-bg {
+            position:absolute; inset:0;
+            background:url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1600&q=80') center 40%/cover;
+            filter:brightness(0.28) saturate(0.55);
+            transform:scale(1.04);
+            animation:hzoom 14s ease-in-out infinite alternate;
+        }
+        @keyframes hzoom { from{transform:scale(1.04)} to{transform:scale(1.0)} }
+        .hero::before {
+            content:''; position:absolute; inset:0; z-index:1;
+            background:
+                linear-gradient(90deg,rgba(12,11,9,0.92) 0%,rgba(12,11,9,0.32) 55%,transparent 100%),
+                linear-gradient(0deg,rgba(12,11,9,0.96) 0%,transparent 55%);
+        }
+        .hero::after {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:3px; z-index:2;
+            background:linear-gradient(180deg,transparent,var(--gold),transparent);
+        }
+        .hero-body {
+            position:absolute; inset:0; z-index:3;
+            display:flex; flex-direction:column; justify-content:flex-end;
+            padding:0 72px 48px;
+        }
+        .hero-tag {
+            display:inline-flex; align-items:center; gap:9px;
+            font-size:10px; font-weight:600; letter-spacing:3px;
+            text-transform:uppercase; color:var(--gold); margin-bottom:14px;
+        }
+        .hero-tag-ln { width:30px; height:1px; background:var(--gold); }
+        .hero-h1 {
+            font-family:'DM Serif Display',Georgia,serif;
+            font-size:50px; font-weight:400; line-height:1.06;
+            color:var(--white); letter-spacing:-1px; margin-bottom:12px;
+        }
+        .hero-h1 em { font-style:italic; color:var(--gold2); }
+        .hero-sub {
+            font-size:14px; color:rgba(242,237,230,0.45);
+            line-height:1.7; max-width:400px; font-weight:300;
+        }
+        .hero-stats {
+            position:absolute; bottom:0; right:0; z-index:3; display:flex;
+        }
+        .hstat {
+            padding:20px 30px;
+            background:rgba(12,11,9,0.78);
+            backdrop-filter:blur(16px);
+            border-top:1px solid var(--rim); border-left:1px solid var(--rim);
+            text-align:center;
+        }
+        .hstat-n {
+            font-family:'Syne',sans-serif;
+            font-size:26px; font-weight:800; color:var(--white); line-height:1; margin-bottom:4px;
+        }
+        .hstat-n.gold { color:var(--gold); }
+        .hstat-n.green { color:var(--green); }
+        .hstat-l { font-size:9.5px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; color:var(--ghost); }
 
-        /* FIX: was .status-cod_confirmed — underscore after hyphen caused CSS parse error */
-        .payment-status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
-        .status-cod-confirmed{background:var(--accent-l);color:var(--accent-d);}
-        .status-paid{background:#D1FAE5;color:#065F46;}
+        /* ── MAIN ── */
+        .main { padding:48px 72px 80px; display:flex; flex-direction:column; gap:28px; }
 
-        .receipt-link{display:inline-flex;align-items:center;gap:5px;margin-top:6px;color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;transition:gap .15s;}
-        .receipt-link:hover{gap:8px;}
+        .sec-lbl {
+            font-size:10px; font-weight:600; letter-spacing:2.5px;
+            text-transform:uppercase; color:var(--gold);
+            display:flex; align-items:center; gap:10px; margin-bottom:20px;
+        }
+        .sec-lbl::before { content:''; width:22px; height:1px; background:var(--gold); }
 
-        .empty{background:var(--card);border:1px solid var(--stone);border-radius:16px;padding:60px 20px;text-align:center;}
-        .empty-icon{width:60px;height:60px;background:var(--sand);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--muted);}
-        .empty h2{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:8px;}
-        .empty p{font-size:14px;color:var(--text2);margin-bottom:22px;}
-        .btn-primary{padding:12px 24px;background:var(--accent);color:#0A0A0A;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s;}
-        .btn-primary:hover{background:var(--accent-d);transform:translateY(-1px);}
+        /* ── CONTENT GRID ── */
+        .content-grid { display:grid; grid-template-columns:1fr 300px; gap:20px; align-items:start; }
 
-        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-        @media(max-width:700px){
-            .navbar{padding:0 16px;}
-            .page-header{padding:22px 20px;}
-            .payment-card{grid-template-columns:auto 1fr;gap:14px;padding:18px 18px;}
-            .payment-right{grid-column:2;text-align:left;}
-            .stats-row{grid-template-columns:1fr 1fr;}
+        /* ── PANEL ── */
+        .panel {
+            background:var(--deep); border:1px solid var(--rim);
+            border-radius:20px; overflow:hidden;
+            position:relative;
+            animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;
+        }
+        .panel::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:2px;
+            background:linear-gradient(90deg,var(--gold),var(--gold2));
+            transform:scaleX(0); transform-origin:left;
+            transition:transform .35s cubic-bezier(.22,1,.36,1);
+        }
+        .panel:hover::before { transform:scaleX(1); }
+        .panel-head {
+            padding:22px 28px 18px;
+            border-bottom:1px solid var(--rim);
+            display:flex; align-items:center; justify-content:space-between;
+        }
+        .panel-head-left { display:flex; align-items:center; gap:12px; }
+        .panel-head-icon {
+            width:36px; height:36px; border-radius:9px;
+            background:var(--soft); border:1px solid rgba(212,146,74,0.22);
+            display:flex; align-items:center; justify-content:center; color:var(--gold);
+            flex-shrink:0;
+        }
+        .panel-title {
+            font-family:'DM Serif Display',serif;
+            font-size:18px; color:var(--white); margin-bottom:1px;
+        }
+        .panel-sub { font-size:11.5px; color:var(--ghost); font-weight:300; }
+
+        /* ── PAYMENT ROW ── */
+        /* KEY FIX: prow is now a block <a> tag so the whole row is clickable */
+        .prow {
+            display:grid; grid-template-columns:44px 1fr auto;
+            align-items:center; gap:16px;
+            padding:18px 28px;
+            border-bottom:1px solid var(--rim2);
+            transition:background .2s;
+            position:relative;
+            text-decoration:none;   /* it's now an <a> */
+            color:inherit;
+        }
+        .prow:last-child { border-bottom:none; }
+        .prow:hover { background:var(--rim2); cursor:pointer; }
+        .prow::before {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:2.5px;
+            background:var(--gold); transform:scaleY(0); transform-origin:bottom;
+            transition:transform .28s cubic-bezier(.22,1,.36,1);
+        }
+        .prow:hover::before { transform:scaleY(1); }
+
+        .picon {
+            width:44px; height:44px; border-radius:12px;
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0; border:1px solid var(--rim);
+            transition:border-color .25s;
+        }
+        .picon.material { background:var(--purple-bg); color:var(--purple); }
+        .picon.contractor { background:var(--soft); color:var(--gold); }
+        .prow:hover .picon { border-color:rgba(212,146,74,0.3); }
+
+        .pinfo-title { font-size:14px; font-weight:600; color:var(--white); margin-bottom:5px; }
+        .pmeta { display:flex; gap:14px; flex-wrap:wrap; }
+        .pmeta-chip {
+            display:flex; align-items:center; gap:4px;
+            font-size:11.5px; color:var(--ghost);
+        }
+
+        .pright { text-align:right; flex-shrink:0; }
+        .pamount {
+            font-family:'Syne',sans-serif;
+            font-size:18px; font-weight:700; color:var(--white); margin-bottom:6px;
+        }
+        .pstatus {
+            display:inline-flex; align-items:center; gap:5px;
+            padding:3px 11px; border-radius:999px;
+            font-size:10px; font-weight:700; letter-spacing:.5px;
+            text-transform:uppercase;
+        }
+        .pstatus-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+        .s-cod { background:var(--amber-bg); color:var(--amber); }
+        .s-cod .pstatus-dot { background:var(--amber); }
+        .s-paid { background:var(--green-bg); color:var(--green); }
+        .s-paid .pstatus-dot { background:var(--green); }
+        .s-pending { background:var(--blue-bg); color:var(--blue); }
+        .s-pending .pstatus-dot { background:var(--blue); }
+
+        /* Receipt arrow — always shown on hover */
+        .receipt-arrow {
+            display:inline-flex; align-items:center; gap:5px;
+            margin-top:8px; color:var(--gold); font-size:11.5px;
+            font-weight:600; opacity:0; transition:opacity .2s, gap .15s;
+        }
+        .prow:hover .receipt-arrow { opacity:1; }
+        /* If there's no receipt URL, hide permanently */
+        .receipt-arrow.no-receipt { display:none; }
+
+        /* ── SIDEBAR ── */
+        .sidebar { display:flex; flex-direction:column; gap:16px; }
+
+        .summary-card {
+            background:var(--deep); border:1px solid var(--rim);
+            border-radius:18px; overflow:hidden;
+            animation:fadeUp .5s .12s cubic-bezier(.22,1,.36,1) both;
+        }
+        .summary-img {
+            height:88px; position:relative;
+            background:url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&q=60') center/cover;
+            filter:brightness(0.28) saturate(0.45);
+        }
+        .summary-img::after {
+            content:''; position:absolute; inset:0;
+            background:linear-gradient(0deg,var(--deep) 0%,transparent 65%);
+        }
+        .summary-body { padding:16px 20px 20px; }
+        .summary-lbl { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
+        .summary-row {
+            display:flex; justify-content:space-between; align-items:center;
+            padding:10px 0; border-bottom:1px solid var(--rim2);
+        }
+        .summary-row:last-child { border-bottom:none; padding-bottom:0; }
+        .summary-key { font-size:12px; color:var(--ghost); }
+        .summary-val { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:var(--gold); }
+        .summary-val.white { color:var(--white); }
+
+        .tip-card {
+            background:linear-gradient(135deg,rgba(212,146,74,0.12),rgba(212,146,74,0.06));
+            border:1px solid rgba(212,146,74,0.22);
+            border-radius:18px; padding:20px 22px;
+            display:flex; gap:14px; align-items:flex-start;
+            animation:fadeUp .5s .18s cubic-bezier(.22,1,.36,1) both;
+        }
+        .tip-icon {
+            width:36px; height:36px; flex-shrink:0; border-radius:9px;
+            background:var(--gold); display:flex; align-items:center;
+            justify-content:center; color:var(--void);
+        }
+        .tip-title { font-size:11.5px; font-weight:700; color:var(--gold2); margin-bottom:5px; letter-spacing:.3px; }
+        .tip-text { font-size:12px; color:var(--ghost); line-height:1.6; font-weight:300; }
+
+        .filter-strip {
+            background:var(--deep); border:1px solid var(--rim);
+            border-radius:14px; padding:16px 22px;
+            display:flex; align-items:center; gap:14px;
+            animation:fadeUp .5s .06s cubic-bezier(.22,1,.36,1) both;
+        }
+        .filter-lbl { font-size:11px; font-weight:600; color:var(--ghost); text-transform:uppercase; letter-spacing:1px; white-space:nowrap; }
+        .filter-btn {
+            padding:6px 16px; border-radius:999px;
+            font-size:12px; font-weight:600; cursor:pointer;
+            font-family:'DM Sans',sans-serif;
+            background:transparent; color:var(--ghost);
+            border:1px solid var(--rim);
+            transition:all .2s;
+        }
+        .filter-btn:hover { border-color:rgba(212,146,74,0.4); color:var(--off); }
+        .filter-btn.active { background:var(--soft); color:var(--gold); border-color:rgba(212,146,74,0.4); }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align:center; padding:72px 32px;
+            display:flex; flex-direction:column; align-items:center;
+        }
+        .empty-ico {
+            width:72px; height:72px; border-radius:18px;
+            background:var(--surface); border:1px solid var(--rim);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--ghost); margin-bottom:20px;
+        }
+        .empty-state h2 {
+            font-family:'DM Serif Display',serif;
+            font-size:22px; color:var(--off); margin-bottom:10px;
+        }
+        .empty-state p { font-size:13.5px; color:var(--ghost); line-height:1.7; margin-bottom:24px; max-width:300px; }
+        .btn-solid {
+            display:inline-flex; align-items:center; gap:7px;
+            padding:12px 26px; border-radius:12px;
+            font-size:13px; font-weight:600; text-decoration:none;
+            background:var(--gold); color:var(--void);
+            transition:background .2s, transform .2s, box-shadow .2s;
+            box-shadow:0 4px 20px var(--glow); border:none; cursor:pointer;
+            font-family:'DM Sans',sans-serif;
+        }
+        .btn-solid:hover { background:var(--gold2); transform:translateY(-1px); box-shadow:0 8px 28px var(--glow); }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+        .fu { animation:fadeUp .6s cubic-bezier(.22,1,.36,1) both; }
+
+        @media(max-width:1000px){ .content-grid{grid-template-columns:1fr;} .hero-stats{display:none;} }
+        @media(max-width:900px){
+            .nav{padding:0 22px;} .nav-center{display:none;}
+            .main{padding:36px 22px 60px;}
+            .hero-body{padding:0 28px 40px;} .hero-h1{font-size:36px;}
+        }
+        @media(max-width:600px){
+            .prow{grid-template-columns:40px 1fr; gap:12px;}
+            .pright{grid-column:2; text-align:left;}
+            .filter-strip{flex-wrap:wrap;}
+            /* On mobile always show the arrow since there's no hover */
+            .receipt-arrow { opacity:1 !important; }
         }
     </style>
 </head>
 <body>
-<nav class="navbar">
-    <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">
-        <div class="brand-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-        House-Forge
+
+<!-- NAV -->
+<nav class="nav">
+    <a href="{{ url_for('user.dashboard') }}" class="nav-logo">
+        <div class="nav-logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <span class="nav-logo-name">House<b>-Forge</b></span>
     </a>
-    <div class="navbar-menu">
-        <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('user.my_orders') }}">My Orders</a>
-        <a href="{{ url_for('user.projects') }}">My Projects</a>
-        <a href="{{ url_for('payment.payment_history') }}" class="active">Payments</a>
-        <div class="nav-div"></div>
-        <a href="{{ url_for('user.profile') }}" style="padding:8px 9px;">
-            {% if user_profile_picture %}<img src="/static/uploads/profiles/{{ user_profile_picture }}" class="profile-pic" alt="Profile">
-            {% else %}<div class="profile-ph">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>{% endif %}
+
+    <div class="nav-center">
+        <a href="{{ url_for('user.dashboard') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
         </a>
-        <a href="{{ url_for('auth.logout') }}" class="logout-link">Logout</a>
+        <a href="{{ url_for('user.projects') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Projects
+        </a>
+        <a href="/user/bids" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Bids
+            <span class="npip amber" id="bidsBadge"></span>
+        </a>
+        <a href="{{ url_for('user.my_orders') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Orders
+        </a>
+        <a href="{{ url_for('user.messages') }}" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Messages
+            <span class="npip" id="messagesBadge"></span>
+        </a>
+        <a href="{{ url_for('payment.payment_history') }}" class="nlink active">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            Payments
+        </a>
+    </div>
+
+    <div class="nav-right">
+        <a href="{{ url_for('user.profile') }}" class="nav-profile">
+            <div class="nav-av">
+                {% if user_profile_picture %}
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile">
+                {% else %}
+                    {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                {% endif %}
+            </div>
+            <span class="nav-uname">{{ current_user.name }}</span>
+        </a>
+        <div class="ndiv"></div>
+        <a href="{{ url_for('auth.logout') }}" class="nav-out">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+        </a>
     </div>
 </nav>
 
-<div class="page">
+<div class="shell">
 
-    <div class="page-header">
-        <h1>💳 Payment History</h1>
-        <div class="divider"></div>
-        <div class="stats-row">
-            <div class="stat-box">
-                <div class="stat-num">{{ payments|length }}</div>
-                <div class="stat-lbl">Total Payments</div>
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-body">
+            <div class="hero-tag"><span class="hero-tag-ln"></span> Financial Records</div>
+            <h1 class="hero-h1">Payment <em>History</em></h1>
+            <p class="hero-sub">A complete record of every transaction — material orders, contractor payments and receipts, all in one place.</p>
+        </div>
+        <div class="hero-stats">
+            <div class="hstat">
+                <div class="hstat-n">{{ payments|length }}</div>
+                <div class="hstat-l">Total</div>
             </div>
-            <div class="stat-box">
-                <div class="stat-num">{{ payments|selectattr('type','equalto','material_order')|list|length }}</div>
-                <div class="stat-lbl">Material Orders</div>
+            <div class="hstat">
+                <div class="hstat-n">{{ payments|selectattr('type','equalto','material_order')|list|length }}</div>
+                <div class="hstat-l">Materials</div>
             </div>
-            <div class="stat-box">
-                <div class="stat-num">₹{{ "{:,.0f}".format(total_spent) }}</div>
-                <div class="stat-lbl">Total Confirmed</div>
+            <div class="hstat">
+                <div class="hstat-n green">₹{{ "{:,.0f}".format(total_spent / 1000)|replace(',','')|int }}K</div>
+                <div class="hstat-l">Confirmed</div>
             </div>
         </div>
-    </div>
+    </section>
 
-    {% if payments %}
-        {% for payment in payments %}
-        <div class="payment-card">
+    <main class="main">
 
-            <div class="payment-icon {{ 'material' if payment.type == 'material_order' else 'contractor' }}">
-                {% if payment.type == 'material_order' %}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                {% else %}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                {% endif %}
-            </div>
+        <!-- FILTER STRIP -->
+        <div class="filter-strip fu">
+            <span class="filter-lbl">Filter</span>
+            <button class="filter-btn active" onclick="filterPayments('all', this)">All</button>
+            <button class="filter-btn" onclick="filterPayments('material_order', this)">Materials</button>
+            <button class="filter-btn" onclick="filterPayments('contractor_payment', this)">Contractors</button>
+            <button class="filter-btn" onclick="filterPayments('paid', this)">Paid</button>
+            <button class="filter-btn" onclick="filterPayments('cod_confirmed', this)">COD</button>
+        </div>
 
-            <div class="payment-info">
-                <h3>
-                    {% if payment.type == 'material_order' %}
-                        Material Order — {{ payment.supplier_name or 'Supplier' }}
-                    {% else %}
-                        Contractor Payment — {{ payment.contractor_name or 'Contractor' }}
-                    {% endif %}
-                </h3>
-                <div class="payment-meta">
-                    <span>
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                        {{ payment.created_at.strftime('%d %b %Y, %I:%M %p') if payment.created_at else 'N/A' }}
-                    </span>
-                    {% if payment.project_title %}
-                    <span>
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                        {{ payment.project_title }}
-                    </span>
-                    {% endif %}
-                    <span>
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                        Cash on Delivery
-                    </span>
-                    <span style="font-family:monospace;font-size:11px;">{{ payment.receipt_number or '—' }}</span>
+        {% if payments %}
+        <div class="content-grid">
+
+            <!-- PAYMENTS LIST -->
+            <div class="panel" style="animation-delay:.08s;">
+                <div class="panel-head">
+                    <div class="panel-head-left">
+                        <div class="panel-head-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                        </div>
+                        <div>
+                            <div class="panel-title">Transactions</div>
+                            <div class="panel-sub">{{ payments|length }} payment{{ 's' if payments|length != 1 else '' }} recorded</div>
+                        </div>
+                    </div>
+                    <span style="font-size:11px;color:var(--ghost);" id="filteredCount">Showing all</span>
                 </div>
-            </div>
 
-            <div class="payment-right">
-                <div class="payment-amount">₹{{ "{:,.0f}".format(payment.amount or 0) }}</div>
-                <div>
-                    {# FIX: use status-cod-confirmed (hyphen) not status-cod_confirmed (underscore) #}
-                    <span class="payment-status {% if payment.status == 'cod_confirmed' %}status-cod-confirmed{% elif payment.status == 'paid' %}status-paid{% endif %}">
-                        {% if payment.status == 'paid' %}✓ Paid
-                        {% elif payment.status == 'cod_confirmed' %}⏳ COD Confirmed
-                        {% else %}{{ payment.status }}{% endif %}
-                    </span>
-                </div>
+                <div id="paymentsContainer">
+                {% for payment in payments %}
+
+                {# ── Resolve the receipt URL once so we can use it both on the row href and the arrow ── #}
                 {% if payment.type == 'material_order' and payment.order_id %}
-                    <a href="{{ url_for('payment.order_receipt', order_id=payment.order_id) }}" class="receipt-link">
-                        Receipt
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                    </a>
+                    {% set receipt_url = url_for('payment.order_receipt', order_id=payment.order_id) %}
                 {% elif payment.type == 'contractor_payment' and payment.project_id %}
-                    <a href="{{ url_for('payment.contractor_receipt', project_id=payment.project_id) }}" class="receipt-link">
-                        Receipt
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                    </a>
+                    {% set receipt_url = url_for('payment.contractor_receipt', project_id=payment.project_id) %}
+                {% else %}
+                    {% set receipt_url = '' %}
                 {% endif %}
+
+                {# ── The entire row is now an <a> tag — clicking anywhere opens the receipt ── #}
+                <a class="prow"
+                   href="{{ receipt_url if receipt_url else '#' }}"
+                   data-type="{{ payment.type }}"
+                   data-status="{{ payment.status }}"
+                   {% if not receipt_url %}onclick="return false;" style="cursor:default;"{% endif %}>
+
+                    <div class="picon {{ 'material' if payment.type == 'material_order' else 'contractor' }}">
+                        {% if payment.type == 'material_order' %}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                        {% else %}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <div class="pinfo-title">
+                            {% if payment.type == 'material_order' %}
+                                Material Order — {{ payment.supplier_name or 'Supplier' }}
+                            {% else %}
+                                Contractor Payment — {{ payment.contractor_name or 'Contractor' }}
+                            {% endif %}
+                        </div>
+                        <div class="pmeta">
+                            <span class="pmeta-chip">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                {{ payment.created_at.strftime('%d %b %Y, %I:%M %p') if payment.created_at else 'N/A' }}
+                            </span>
+                            {% if payment.project_title %}
+                            <span class="pmeta-chip">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                                {{ payment.project_title }}
+                            </span>
+                            {% endif %}
+                            <span class="pmeta-chip">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                                Cash on Delivery
+                            </span>
+                            {% if payment.receipt_number %}
+                            <span class="pmeta-chip" style="font-family:monospace;font-size:11px;">{{ payment.receipt_number }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="pright">
+                        <div class="pamount">₹{{ "{:,.0f}".format(payment.amount or 0) }}</div>
+                        <div>
+                            {% if payment.status == 'cod_confirmed' %}
+                            <span class="pstatus s-cod"><span class="pstatus-dot"></span>COD Confirmed</span>
+                            {% elif payment.status == 'paid' %}
+                            <span class="pstatus s-paid"><span class="pstatus-dot"></span>Paid</span>
+                            {% else %}
+                            <span class="pstatus s-pending"><span class="pstatus-dot"></span>{{ payment.status|title }}</span>
+                            {% endif %}
+                        </div>
+                        {# Receipt arrow — visible on row hover, hidden if no URL #}
+                        <div class="receipt-arrow {{ 'no-receipt' if not receipt_url else '' }}">
+                            View Receipt
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </div>
+                    </div>
+
+                </a>
+                {% endfor %}
+                </div>
+
+                <!-- Empty filter result -->
+                <div id="filterEmpty" style="display:none; padding:40px 28px; text-align:center; color:var(--ghost); font-size:13.5px;">
+                    No payments match this filter.
+                </div>
+            </div>
+
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+
+                <!-- Summary -->
+                <div class="summary-card">
+                    <div class="summary-img"></div>
+                    <div class="summary-body">
+                        <div class="summary-lbl">Summary</div>
+                        <div class="summary-row">
+                            <span class="summary-key">Total payments</span>
+                            <span class="summary-val white">{{ payments|length }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-key">Material orders</span>
+                            <span class="summary-val white">{{ payments|selectattr('type','equalto','material_order')|list|length }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-key">Contractor payments</span>
+                            <span class="summary-val white">{{ payments|selectattr('type','equalto','contractor_payment')|list|length }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-key">Total confirmed</span>
+                            <span class="summary-val">₹{{ "{:,.0f}".format(total_spent) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip -->
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    </div>
+                    <div>
+                        <div class="tip-title">Keep your receipts</div>
+                        <div class="tip-text">Download receipts for each completed payment — useful for project accounting and tax records.</div>
+                    </div>
+                </div>
+
+                <!-- Quick links -->
+                <div style="background:var(--deep);border:1px solid var(--rim);border-radius:18px;overflow:hidden;animation:fadeUp .5s .24s cubic-bezier(.22,1,.36,1) both;">
+                    <div style="padding:16px 20px 12px;border-bottom:1px solid var(--rim);">
+                        <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);">Quick Links</div>
+                    </div>
+                    <a href="{{ url_for('user.my_orders') }}" style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--rim2);text-decoration:none;transition:background .2s;" onmouseover="this.style.background='var(--rim2)'" onmouseout="this.style.background='transparent'">
+                        <div style="width:30px;height:30px;border-radius:8px;background:var(--soft);border:1px solid rgba(212,146,74,0.22);display:flex;align-items:center;justify-content:center;color:var(--gold);flex-shrink:0;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        </div>
+                        <span style="font-size:13px;font-weight:500;color:var(--fog);">My Orders</span>
+                    </a>
+                    <a href="{{ url_for('user.projects') }}" style="display:flex;align-items:center;gap:12px;padding:14px 20px;text-decoration:none;transition:background .2s;" onmouseover="this.style.background='var(--rim2)'" onmouseout="this.style.background='transparent'">
+                        <div style="width:30px;height:30px;border-radius:8px;background:var(--soft);border:1px solid rgba(212,146,74,0.22);display:flex;align-items:center;justify-content:center;color:var(--gold);flex-shrink:0;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <span style="font-size:13px;font-weight:500;color:var(--fog);">My Projects</span>
+                    </a>
+                </div>
+
             </div>
 
         </div>
-        {% endfor %}
 
-    {% else %}
-        <div class="empty">
-            <div class="empty-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        {% else %}
+
+        <!-- EMPTY STATE -->
+        <div class="panel" style="animation-delay:.08s;">
+            <div class="empty-state">
+                <div class="empty-ico">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                </div>
+                <h2>No Payments Yet</h2>
+                <p>Your payment history will appear here once you confirm a Cash on Delivery payment for an order.</p>
+                <a href="{{ url_for('user.my_orders') }}" class="btn-solid">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    View My Orders
+                </a>
             </div>
-            <h2>No Payments Yet</h2>
-            <p>Your payment history will appear here once you confirm a COD payment.</p>
-            <a href="{{ url_for('user.my_orders') }}" class="btn-primary">View My Orders</a>
         </div>
-    {% endif %}
 
+        {% endif %}
+
+    </main>
 </div>
+
+<script>
+    function filterPayments(type, btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const rows = document.querySelectorAll('.prow');
+        let visible = 0;
+
+        rows.forEach(row => {
+            let show = false;
+            if (type === 'all') {
+                show = true;
+            } else if (type === 'paid' || type === 'cod_confirmed') {
+                show = row.dataset.status === type;
+            } else {
+                show = row.dataset.type === type;
+            }
+            row.style.display = show ? 'grid' : 'none';
+            if (show) visible++;
+        });
+
+        const countEl = document.getElementById('filteredCount');
+        const emptyEl = document.getElementById('filterEmpty');
+        if (countEl) countEl.textContent = type === 'all' ? 'Showing all' : `${visible} result${visible !== 1 ? 's' : ''}`;
+        if (emptyEl) emptyEl.style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    function updateBadge(ep, id) {
+        fetch(ep).then(r => r.ok && r.headers.get('content-type')?.includes('application/json') ? r.json() : null)
+        .then(d => { if (!d) return; const b = document.getElementById(id); if (!b) return; b.style.display = d.count > 0 ? 'block' : 'none'; }).catch(() => {});
+    }
+    function refreshBadges() {
+        updateBadge('/user/messages/unread-count', 'messagesBadge');
+        updateBadge('/user/bids/pending-count', 'bidsBadge');
+    }
+    document.addEventListener('DOMContentLoaded', refreshBadges);
+    setInterval(refreshBadges, 30000);
+
+    /* Staggered row entrance */
+    document.querySelectorAll('.prow').forEach((row, i) => {
+        row.style.cssText += ';opacity:0;transform:translateX(-10px)';
+        setTimeout(() => {
+            row.style.transition = 'opacity .38s ease, transform .38s cubic-bezier(.22,1,.36,1), background .2s';
+            row.style.opacity = '1';
+            row.style.transform = 'translateX(0)';
+        }, 350 + i * 65);
+    });
+</script>
 </body>
 </html>

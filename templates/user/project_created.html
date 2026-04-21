@@ -4,659 +4,761 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ project.title }} — Estimate Ready · House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base:        #F2EDE4;
-            --bg-card:        #FAF7F2;
-            --bg-card2:       #F5F0E8;
-            --sand:           #EDE6DB;
-            --stone:          #D9CFC2;
-            --accent:         #C9A84C;
-            --accent-dark:    #a8893a;
-            --accent-light:   #FBF3E0;
-            --text-primary:   #1C1917;
-            --text-secondary: #5C4F43;
-            --text-muted:     #8C7E72;
-            --shadow-sm: 0 1px 3px rgba(28,25,23,0.07), 0 1px 2px rgba(28,25,23,0.05);
-            --shadow-md: 0 4px 18px rgba(28,25,23,0.09), 0 2px 6px rgba(28,25,23,0.05);
-            --shadow-lg: 0 12px 40px rgba(28,25,23,0.13);
-            --blue:       #2563EB;
-            --blue-light: #EFF6FF;
-            --green:      #16A34A;
-            --green-light:#DCFCE7;
-            --warn-bg:    #FFFBEB;
-            --warn-border:#FDE68A;
-            --warn-text:  #92400E;
+            --void:    #0C0B09;
+            --ink:     #141210;
+            --deep:    #1C1A16;
+            --surface: #242118;
+            --rim:     rgba(255,255,255,0.07);
+            --rim2:    rgba(255,255,255,0.04);
+
+            --gold:    #D4924A;
+            --gold2:   #F0C07A;
+            --gold3:   #B8743A;
+            --glow:    rgba(212,146,74,0.22);
+            --soft:    rgba(212,146,74,0.10);
+            --softer:  rgba(212,146,74,0.06);
+
+            --white:   #FFFFFF;
+            --off:     #F2EDE6;
+            --fog:     rgba(242,237,230,0.55);
+            --ghost:   rgba(242,237,230,0.28);
+
+            --green:  #4CAF82; --green-bg: rgba(76,175,130,0.13);
+            --blue:   #4A8FD4; --blue-bg:  rgba(74,143,212,0.13);
+            --amber:  #D49440; --amber-bg: rgba(212,148,64,0.13);
+            --red:    #E05C5C; --red-bg:   rgba(224,92,92,0.12);
         }
 
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
         body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: var(--bg-base);
-            min-height: 100vh;
-            color: var(--text-primary);
-            position: relative;
+            font-family:'DM Sans',sans-serif;
+            background:var(--void);
+            color:var(--off);
+            min-height:100vh;
+            overflow-x:hidden;
+            -webkit-font-smoothing:antialiased;
         }
 
-        body::before {
-            content: '';
-            position: fixed; inset: 0;
-            background: url('/static/images/house.jpg') no-repeat center center / cover;
-            opacity: 0.055;
-            filter: saturate(0.2) sepia(0.3);
-            z-index: 0; pointer-events: none;
+        /* ── NAV ── */
+        .nav {
+            position:fixed; top:0; left:0; right:0; z-index:300;
+            height:66px;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 52px;
+            background:rgba(12,11,9,0.88);
+            backdrop-filter:blur(22px);
+            -webkit-backdrop-filter:blur(22px);
+            border-bottom:1px solid var(--rim);
+        }
+        .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+        .nav-logo-icon {
+            width:40px; height:40px; border-radius:9px;
+            border:1.5px solid var(--gold);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold); position:relative; overflow:hidden;
+        }
+        .nav-logo-icon::before {
+            content:''; position:absolute; inset:0;
+            background:radial-gradient(circle at 30% 30%, rgba(212,146,74,0.18), transparent 70%);
+        }
+        .nav-logo-name {
+            font-family:'Syne',sans-serif;
+            font-size:18px; font-weight:800; color:var(--white); letter-spacing:-0.4px;
+        }
+        .nav-logo-name b { color:var(--gold); font-weight:800; }
+
+        .nav-center {
+            position:absolute; left:50%; transform:translateX(-50%);
+            display:flex; align-items:center; gap:2px;
+        }
+        .nlink {
+            display:flex; align-items:center; gap:6px;
+            padding:7px 16px; border-radius:8px;
+            text-decoration:none; font-size:13.5px; font-weight:500;
+            color:var(--ghost); transition:color .18s, background .18s;
+            position:relative; white-space:nowrap;
+        }
+        .nlink:hover { color:var(--off); background:var(--rim2); }
+        .nlink.active { color:var(--gold); }
+        .nlink.active::after {
+            content:''; position:absolute; bottom:-1px; left:16px; right:16px;
+            height:2px; background:var(--gold); border-radius:2px;
+            box-shadow:0 0 10px var(--glow);
         }
 
-        body::after {
-            content: '';
-            position: fixed;
-            top: -140px; right: -140px;
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(201,168,76,0.10) 0%, transparent 65%);
-            z-index: 0; pointer-events: none;
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .nav-profile {
+            display:flex; align-items:center; gap:9px;
+            padding:5px 14px 5px 5px; border-radius:999px;
+            border:1px solid var(--rim); text-decoration:none;
+            transition:border-color .2s, background .2s;
         }
-
-        /* ─── HERO ─── */
-        .hero {
-            background: linear-gradient(135deg, #1C1917 0%, #3D2B1F 45%, #1C1917 100%);
-            padding: 52px 40px 60px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            animation: fadeDown 0.5s ease both;
+        .nav-profile:hover { border-color:var(--gold); background:var(--soft); }
+        .nav-av {
+            width:30px; height:30px; border-radius:50%;
+            background:var(--gold3); color:#fff;
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:700; flex-shrink:0;
         }
+        .nav-av img { width:30px; height:30px; border-radius:50%; object-fit:cover; display:block; }
+        .nav-uname { font-size:13px; font-weight:500; color:var(--off); }
+        .ndiv { width:1px; height:22px; background:var(--rim); }
+        .nav-out {
+            display:flex; align-items:center; gap:6px;
+            text-decoration:none; font-size:13px; font-weight:500;
+            color:var(--ghost); padding:7px 14px; border-radius:8px;
+            transition:color .18s, background .18s;
+        }
+        .nav-out:hover { color:#EF4444; background:rgba(239,68,68,0.08); }
 
+        /* ── SHELL ── */
+        .shell { padding-top:66px; }
+
+        /* ── HERO ── */
+        .hero { position:relative; height:420px; overflow:hidden; }
+        .hero-bg {
+            position:absolute; inset:0;
+            background:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1600&q=80') center 40%/cover;
+            filter:brightness(0.28) saturate(0.55);
+            transform:scale(1.04);
+            animation:hzoom 18s ease-in-out infinite alternate;
+        }
+        @keyframes hzoom { from{transform:scale(1.04)} to{transform:scale(1.0)} }
         .hero::before {
-            content: '';
-            position: absolute;
-            top: -80px; left: 50%;
-            transform: translateX(-50%);
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(201,168,76,0.18) 0%, transparent 65%);
-            pointer-events: none;
+            content:''; position:absolute; inset:0; z-index:1;
+            background:
+                linear-gradient(90deg,rgba(12,11,9,0.96) 0%,rgba(12,11,9,0.45) 55%,transparent 100%),
+                linear-gradient(0deg,rgba(12,11,9,0.98) 0%,transparent 45%);
         }
-
         .hero::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent);
+            content:''; position:absolute; left:0; top:0; bottom:0; width:3px; z-index:2;
+            background:linear-gradient(180deg,transparent,var(--gold),transparent);
+        }
+        .hero-body {
+            position:absolute; inset:0; z-index:3;
+            display:flex; flex-direction:column; justify-content:flex-end;
+            padding:0 72px 50px;
+        }
+        .hero-success-pill {
+            display:inline-flex; align-items:center; gap:8px;
+            background:rgba(76,175,130,0.15); border:1px solid rgba(76,175,130,0.3);
+            color:var(--green); padding:6px 16px; border-radius:999px;
+            font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+            margin-bottom:18px; width:fit-content;
+        }
+        .hero-success-dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+        .hero-h1 {
+            font-family:'DM Serif Display',Georgia,serif;
+            font-size:52px; font-weight:400; line-height:1.06;
+            color:var(--white); letter-spacing:-1px; margin-bottom:10px;
+        }
+        .hero-h1 em { font-style:italic; color:var(--gold2); }
+        .hero-sub { font-size:14px; color:rgba(242,237,230,0.45); font-weight:300; margin-bottom:22px; max-width:480px; line-height:1.7; }
+
+        .hero-badges { display:flex; gap:8px; flex-wrap:wrap; }
+        .hbadge {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:7px 16px; border-radius:999px;
+            font-size:11px; font-weight:600; letter-spacing:.4px;
+            border:1px solid var(--rim); background:rgba(255,255,255,0.05);
+            backdrop-filter:blur(8px); color:var(--fog);
+        }
+        .hbadge.gold { background:var(--gold); border-color:var(--gold); color:var(--void); font-weight:700; }
+        .hbadge.warn { background:var(--amber-bg); border-color:rgba(212,148,64,0.35); color:var(--amber); }
+
+        /* Hero stats bottom-right */
+        .hero-stats {
+            position:absolute; bottom:0; right:0; z-index:3;
+            display:flex;
+        }
+        .hstat {
+            padding:20px 30px;
+            background:rgba(12,11,9,0.82);
+            backdrop-filter:blur(16px);
+            border-top:1px solid var(--rim);
+            border-left:1px solid var(--rim);
+            text-align:center;
+        }
+        .hstat-n {
+            font-family:'Syne',sans-serif;
+            font-size:26px; font-weight:800; color:var(--white); line-height:1; margin-bottom:4px;
+        }
+        .hstat-n sup { font-size:13px; color:var(--gold); vertical-align:super; }
+        .hstat-n .unit { font-size:14px; color:var(--gold2); }
+        .hstat-l { font-size:9px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; color:var(--ghost); }
+
+        /* ── DISCLAIMER STRIP ── */
+        .disclaimer {
+            background:rgba(212,148,64,0.08);
+            border-bottom:1px solid rgba(212,148,64,0.18);
+            padding:10px 72px;
+            display:flex; align-items:center; gap:9px;
+            font-size:11.5px; color:rgba(212,148,64,0.75); font-weight:500;
+        }
+        .disclaimer strong { color:var(--amber); }
+        .disclaimer svg { flex-shrink:0; color:var(--amber); }
+
+        /* ── COST TIER STRIP ── */
+        .tier-strip {
+            display:grid; grid-template-columns:1fr 1fr 1fr;
+            border-bottom:1px solid var(--rim);
+        }
+        .tier-cell {
+            padding:30px 36px; text-align:center;
+            border-right:1px solid var(--rim);
+            position:relative; transition:background .2s;
+        }
+        .tier-cell:last-child { border-right:none; }
+        .tier-cell.active {
+            background:linear-gradient(135deg, rgba(212,146,74,0.14) 0%, rgba(212,146,74,0.06) 100%);
+        }
+        .tier-cell.active::after {
+            content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+            background:linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        .tier-icon {
+            width:40px; height:40px; border-radius:10px;
+            display:flex; align-items:center; justify-content:center;
+            margin:0 auto 12px;
+            background:var(--surface); color:var(--ghost);
+            border:1px solid var(--rim);
+        }
+        .tier-cell.active .tier-icon { background:rgba(212,146,74,0.15); color:var(--gold); border-color:rgba(212,146,74,0.3); }
+        .tier-label {
+            font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+            color:var(--ghost); margin-bottom:10px;
+        }
+        .tier-cell.active .tier-label { color:var(--gold); }
+        .tier-amount {
+            font-family:'DM Serif Display',serif;
+            font-size:30px; font-weight:400; color:var(--fog);
+            line-height:1; margin-bottom:8px;
+        }
+        .tier-cell.active .tier-amount { color:var(--white); }
+        .tier-detail { font-size:11.5px; color:var(--ghost); line-height:1.9; }
+        .tier-cell.active .tier-detail { color:var(--fog); }
+        .tier-sqft {
+            margin-top:10px; display:inline-block;
+            font-size:11px; font-weight:700;
+            background:rgba(212,146,74,0.12); color:var(--gold);
+            padding:3px 12px; border-radius:999px; border:1px solid rgba(212,146,74,0.2);
         }
 
-        .hero-icon-wrap {
-            width: 64px; height: 64px; border-radius: 18px;
-            background: var(--accent); color: #0A0A0A;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 8px 32px rgba(201,168,76,0.35);
-            animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        /* ── MAIN LAYOUT ── */
+        .main {
+            max-width:1280px; margin:0 auto;
+            padding:36px 72px 80px;
+            display:grid; grid-template-columns:1fr 320px;
+            gap:22px; align-items:start;
         }
 
-        @keyframes scaleIn { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes fadeDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeUp   { from { opacity: 0; transform: translateY(14px); }  to { opacity: 1; transform: translateY(0); } }
+        /* ── PANEL ── */
+        .panel {
+            background:var(--deep);
+            border:1px solid var(--rim);
+            border-radius:20px; overflow:hidden;
+            margin-bottom:18px;
+            transition:border-color .25s;
+        }
+        .panel:hover { border-color:rgba(212,146,74,0.2); }
 
-        .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 30px; font-weight: 800;
-            color: #F7EDE2;
-            margin-bottom: 6px; letter-spacing: -0.5px;
+        .panel-head {
+            padding:24px 28px 20px;
+            border-bottom:1px solid var(--rim);
+            display:flex; align-items:center; gap:12px;
+        }
+        .panel-icon {
+            width:36px; height:36px; border-radius:9px;
+            background:rgba(212,146,74,0.12); color:var(--gold);
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0; border:1px solid rgba(212,146,74,0.2);
+        }
+        .panel-title {
+            font-family:'DM Serif Display',serif;
+            font-size:19px; font-weight:400; color:var(--white);
+        }
+        .panel-badge {
+            margin-left:auto; font-size:10px; font-weight:700;
+            letter-spacing:.6px; text-transform:uppercase;
+            background:rgba(212,146,74,0.12); color:var(--gold);
+            padding:3px 10px; border-radius:999px;
+            border:1px solid rgba(212,146,74,0.2);
         }
 
-        .hero-sub { color: rgba(247,237,226,0.6); font-size: 14px; }
-
-        .hero-divider {
-            width: 48px; height: 3px;
-            background: linear-gradient(90deg, #C9A84C, #E8C97A);
-            border-radius: 2px;
-            margin: 16px auto;
+        /* ── PROPERTY BANNER ── */
+        .prop-banner {
+            position:relative; border-radius:16px; overflow:hidden;
+            height:150px; margin-bottom:18px;
         }
-
-        .hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
-
-        .hero-badge {
-            background: rgba(247,237,226,0.1);
-            border: 1px solid rgba(247,237,226,0.2);
-            color: rgba(247,237,226,0.8);
-            padding: 5px 14px; border-radius: 20px;
-            font-size: 12px; font-weight: 600;
-            display: flex; align-items: center; gap: 5px;
+        .prop-banner-img {
+            position:absolute; inset:0; background-size:cover; background-position:center;
+            filter:brightness(0.3) saturate(0.55);
         }
+        .prop-res .prop-banner-img  { background-image:url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=900&q=75'); }
+        .prop-villa .prop-banner-img { background-image:url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=900&q=75'); }
+        .prop-apartment .prop-banner-img { background-image:url('https://images.unsplash.com/photo-1567496898669-ee935f5f647a?w=900&q=75'); }
 
-        .hero-badge.accent { background: var(--accent); border-color: var(--accent); color: #0A0A0A; }
-        .hero-badge.warn   { background: rgba(245,158,11,0.25); border-color: rgba(245,158,11,0.4); color: #FDE68A; }
-
-        /* ─── DISCLAIMER BANNER ─── */
-        .price-disclaimer {
-            background: var(--warn-bg);
-            border-bottom: 1px solid var(--warn-border);
-            padding: 10px 24px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            font-size: 12px; color: var(--warn-text); font-weight: 500;
+        .prop-banner::before {
+            content:''; position:absolute; inset:0; z-index:1;
+            background:linear-gradient(90deg,rgba(12,11,9,0.92) 0%,rgba(12,11,9,0.45) 60%,transparent 100%);
         }
-        .price-disclaimer strong { font-weight: 700; }
-        .price-disclaimer svg { flex-shrink: 0; }
-
-        /* ─── COST TIER STRIP ─── */
-        .cost-strip {
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--stone);
-            animation: fadeUp 0.45s 0.1s ease both;
+        .prop-banner::after {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:3px; z-index:2;
+            background:var(--gold);
         }
-
-        .cost-strip-inner {
-            max-width: 1120px; margin: 0 auto;
-            display: grid; grid-template-columns: 1fr 1fr 1fr;
+        .prop-banner-body {
+            position:relative; z-index:2; height:100%;
+            display:flex; align-items:center; gap:18px; padding:0 28px;
         }
-
-        .ctb {
-            padding: 26px 28px; text-align: center;
-            border-right: 1px solid var(--stone);
-            transition: background 0.2s;
-            position: relative;
+        .prop-banner-icon {
+            width:52px; height:52px; border-radius:13px;
+            background:rgba(212,146,74,0.15); color:var(--gold2);
+            border:1px solid rgba(212,146,74,0.3);
+            display:flex; align-items:center; justify-content:center; flex-shrink:0;
         }
-
-        .ctb:last-child { border-right: none; }
-
-        .ctb.active {
-            background: var(--accent);
+        .prop-banner-h {
+            font-family:'DM Serif Display',serif;
+            font-size:20px; color:var(--white); margin-bottom:5px;
         }
+        .prop-banner-sub { font-size:12px; color:var(--ghost); line-height:1.7; }
 
-        .ctb.active::before {
-            content: '';
-            position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-            background: var(--accent-dark);
-        }
-
-        .ctb-icon-wrap {
-            width: 38px; height: 38px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 10px;
-            background: var(--sand); color: var(--text-muted);
-            transition: all 0.2s;
-        }
-
-        .ctb.active .ctb-icon-wrap { background: rgba(0,0,0,0.12); color: #0A0A0A; }
-
-        .ctb-lbl {
-            font-size: 10px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.8px;
-            color: var(--text-muted); margin-bottom: 8px;
-        }
-        .ctb.active .ctb-lbl { color: rgba(0,0,0,0.6); }
-
-        .ctb-tot {
-            font-family: 'Playfair Display', serif;
-            font-size: 28px; font-weight: 700;
-            color: var(--text-primary); line-height: 1; margin-bottom: 8px;
-        }
-        .ctb.active .ctb-tot { color: #0A0A0A; }
-
-        .ctb-det { font-size: 12px; color: var(--text-muted); line-height: 1.8; }
-        .ctb.active .ctb-det { color: rgba(0,0,0,0.55); }
-
-        .ctb-sqft {
-            margin-top: 10px; font-size: 11px; font-weight: 700;
-            color: var(--accent); background: var(--accent-light);
-            padding: 3px 10px; border-radius: 20px; display: inline-block;
-        }
-        .ctb.active .ctb-sqft { background: rgba(0,0,0,0.12); color: #0A0A0A; }
-
-        /* ─── LAYOUT ─── */
-        .wrap {
-            max-width: 1120px; margin: 0 auto;
-            padding: 28px 24px 60px;
-            display: grid; grid-template-columns: 1fr 316px;
-            gap: 22px; align-items: start;
-            position: relative; z-index: 1;
-            animation: fadeUp 0.45s 0.15s ease both;
-        }
-
-        @media (max-width: 900px) {
-            .wrap { grid-template-columns: 1fr; }
-            .cost-strip-inner { grid-template-columns: 1fr; }
-            .ctb { border-right: none; border-bottom: 1px solid var(--stone); }
-            .ctb:last-child { border-bottom: none; }
-        }
-
-        /* ─── CARD ─── */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--stone);
-            border-radius: 16px; padding: 26px 30px;
-            margin-bottom: 18px; box-shadow: var(--shadow-sm);
-            transition: box-shadow 0.2s;
-        }
-        .card:hover { box-shadow: var(--shadow-md); }
-
-        .sec-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 17px; font-weight: 700; color: var(--text-primary);
-            margin-bottom: 18px; padding-bottom: 14px;
-            border-bottom: 1px solid var(--sand);
-            display: flex; align-items: center; gap: 10px;
-            letter-spacing: -0.2px;
-        }
-
-        .sec-title svg { color: var(--accent); flex-shrink: 0; }
-
-        .sec-badge {
-            font-family: 'DM Sans', sans-serif;
-            font-size: 10px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.5px;
-            background: var(--accent-light); color: var(--accent);
-            padding: 3px 9px; border-radius: 20px;
-            border: 1px solid rgba(201,168,76,0.25);
-            margin-left: auto; flex-shrink: 0;
-        }
-
-        /* ─── METRICS ─── */
-        .metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 18px; }
-        @media (max-width:600px) { .metrics { grid-template-columns: 1fr 1fr; } }
-
+        /* ── KEY METRICS ── */
+        .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
         .metric {
-            background: var(--bg-card);
-            border: 1px solid var(--stone);
-            border-radius: 14px; padding: 18px 14px;
-            text-align: center; box-shadow: var(--shadow-sm);
-            transition: transform 0.2s, box-shadow 0.2s;
-            position: relative; overflow: hidden;
+            background:var(--deep); border:1px solid var(--rim);
+            border-radius:16px; padding:20px 16px; text-align:center;
+            transition:transform .25s, border-color .25s, box-shadow .25s;
+            position:relative; overflow:hidden;
         }
-
-        .metric:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-
+        .metric:hover { transform:translateY(-4px); border-color:rgba(212,146,74,0.3); box-shadow:0 14px 40px rgba(0,0,0,0.4); }
         .metric::after {
-            content: '';
-            position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, var(--accent), #E8C97A);
-            transform: scaleX(0); transform-origin: left;
-            transition: transform 0.25s ease;
+            content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+            background:linear-gradient(90deg,transparent,var(--gold),transparent);
+            transform:scaleX(0); transform-origin:left; transition:transform .3s;
         }
-        .metric:hover::after { transform: scaleX(1); }
-
-        .m-icon {
-            width: 34px; height: 34px; border-radius: 9px;
-            background: var(--accent-light); color: var(--accent);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 10px;
+        .metric:hover::after { transform:scaleX(1); }
+        .metric-icon {
+            width:36px; height:36px; border-radius:9px;
+            background:rgba(212,146,74,0.1); color:var(--gold);
+            display:flex; align-items:center; justify-content:center;
+            margin:0 auto 12px; border:1px solid rgba(212,146,74,0.18);
         }
-
-        .m-val {
-            font-family: 'Playfair Display', serif;
-            font-size: 20px; font-weight: 700;
-            color: var(--text-primary); line-height: 1;
+        .metric-val {
+            font-family:'Syne',sans-serif;
+            font-size:22px; font-weight:800; color:var(--white); line-height:1; margin-bottom:6px;
         }
+        .metric-lbl { font-size:10px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--ghost); }
 
-        .m-lbl {
-            font-size: 10px; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 0.5px;
-            color: var(--text-muted); margin-top: 5px;
+        /* ── AI BLOCK ── */
+        .ai-block {
+            background:var(--blue-bg); border:1px solid rgba(74,143,212,0.22);
+            border-radius:14px; padding:18px 20px; margin-bottom:18px;
+            display:flex; gap:14px; align-items:flex-start;
         }
+        .ai-icon {
+            width:34px; height:34px; border-radius:9px;
+            background:var(--blue); color:#fff;
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0;
+        }
+        .ai-title { font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--blue); margin-bottom:5px; }
+        .ai-text  { font-size:13px; color:rgba(74,143,212,0.85); line-height:1.65; }
+        .conf-row { display:flex; align-items:center; gap:8px; margin-top:9px; }
+        .conf-lbl { font-size:10.5px; font-weight:600; color:var(--blue); }
+        .cdots { display:flex; gap:3px; }
+        .cdot { width:9px; height:9px; border-radius:50%; background:rgba(74,143,212,0.2); }
+        .cdot.on { background:var(--blue); }
 
-        /* ─── HIGHLIGHTS GRID ─── */
-        .hgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-        @media (max-width:600px) { .hgrid { grid-template-columns: 1fr 1fr; } }
+        .ai-warn {
+            background:var(--amber-bg); border:1px solid rgba(212,148,64,0.25);
+            border-radius:14px; padding:18px 20px; margin-bottom:18px;
+            display:flex; gap:14px; align-items:flex-start;
+        }
+        .ai-warn .ai-icon { background:var(--amber); }
+        .ai-warn .ai-title { color:var(--amber); }
+        .ai-warn .ai-text { color:rgba(240,192,122,0.75); font-size:13px; line-height:1.65; }
 
+        /* ── HIGHLIGHTS GRID ── */
+        .highlights { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
         .hchip {
-            background: var(--sand);
-            border: 1px solid var(--stone);
-            border-radius: 10px; padding: 12px 13px;
-            display: flex; align-items: center; gap: 10px;
-            transition: border-color 0.2s, background 0.2s;
+            background:var(--surface); border:1px solid var(--rim);
+            border-radius:12px; padding:13px 14px;
+            display:flex; align-items:center; gap:11px;
+            transition:border-color .2s, background .2s;
         }
-
-        .hchip:hover { border-color: var(--accent); background: var(--accent-light); }
-
-        .hc-ico {
-            width: 28px; height: 28px; border-radius: 7px;
-            background: var(--bg-card); color: var(--accent);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
+        .hchip:hover { border-color:rgba(212,146,74,0.35); background:rgba(212,146,74,0.06); }
+        .hchip-ico {
+            width:30px; height:30px; border-radius:8px;
+            background:rgba(212,146,74,0.1); color:var(--gold);
+            display:flex; align-items:center; justify-content:center; flex-shrink:0;
         }
+        .hchip-qty { font-size:13.5px; font-weight:700; color:var(--white); line-height:1.2; }
+        .hchip-lbl { font-size:10px; color:var(--ghost); margin-top:2px; }
 
-        .hc-qty { font-size: 13px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
-        .hc-lbl { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-
-        /* ─── PROPERTY BANNER ─── */
-        .prop-ban {
-            border-radius: 14px; padding: 16px 20px; margin-bottom: 18px;
-            display: flex; align-items: center; gap: 16px;
-            border: 1px solid var(--stone);
-        }
-        .prop-ban.residential { background: var(--sand); }
-        .prop-ban.villa       { background: linear-gradient(90deg, #FEF3C7, #FFF8F0); border-color: #FDE68A; }
-        .prop-ban.apartment   { background: linear-gradient(90deg, var(--blue-light), #F0F9FF); border-color: #BFDBFE; }
-
-        .pb-ico {
-            width: 44px; height: 44px; border-radius: 12px;
-            background: var(--bg-card); color: var(--accent);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; box-shadow: var(--shadow-sm);
-        }
-
-        .prop-ban.villa .pb-ico { color: #92400E; }
-        .prop-ban.apartment .pb-ico { color: var(--blue); }
-
-        .pb-h   { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; margin-bottom: 3px; }
-        .pb-sub { font-size: 11px; color: var(--text-muted); }
-
-        /* ─── AI BLOCK ─── */
-        .ai-blk {
-            background: var(--blue-light);
-            border: 1px solid #BFDBFE;
-            border-radius: 12px; padding: 16px 18px;
-            margin-bottom: 18px; display: flex; gap: 13px;
-        }
-
-        .ai-ico {
-            width: 32px; height: 32px; border-radius: 8px;
-            background: var(--blue); color: white;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; margin-top: 1px;
-        }
-
-        .ai-ttl { font-size: 11px; font-weight: 700; color: #1E40AF; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .ai-txt { font-size: 13px; color: #1D4ED8; line-height: 1.6; }
-
-        .conf-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-        .conf-lbl { font-size: 11px; font-weight: 600; color: #1E40AF; }
-        .cdots    { display: flex; gap: 3px; }
-        .cdot     { width: 9px; height: 9px; border-radius: 50%; background: #BFDBFE; }
-        .cdot.on  { background: #2563EB; }
-
-        .ai-blk-warn {
-            background: var(--warn-bg);
-            border: 1px solid var(--warn-border);
-            border-radius: 12px; padding: 14px 18px;
-            margin-bottom: 18px; display: flex; gap: 12px; align-items: flex-start;
-        }
-
-        .ai-blk-warn .ai-ico { background: #F59E0B; }
-        .ai-blk-warn .ai-ttl { color: var(--warn-text); }
-        .ai-blk-warn .ai-txt { font-size: 13px; color: #78350F; line-height: 1.6; }
-
-        /* ─── STAGE ACCORDION ─── */
+        /* ── STAGE ACCORDION ── */
         .sacc {
-            border: 1.5px solid var(--stone);
-            border-radius: 12px; overflow: hidden;
-            margin-bottom: 10px;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            border:1px solid var(--rim); border-radius:13px; overflow:hidden;
+            margin-bottom:10px; transition:border-color .2s;
         }
-        .sacc:hover { border-color: rgba(201,168,76,0.4); }
-        .sacc.expanded { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(201,168,76,0.12); }
+        .sacc:hover { border-color:rgba(212,146,74,0.2); }
+        .sacc.expanded { border-color:rgba(212,146,74,0.45); }
 
         .sh {
-            padding: 14px 18px; cursor: pointer;
-            display: flex; align-items: center; justify-content: space-between;
-            background: var(--sand); transition: background 0.2s;
-            user-select: none;
+            padding:15px 18px; cursor:pointer;
+            display:flex; align-items:center; justify-content:space-between;
+            background:var(--surface); transition:background .2s;
+            user-select:none;
         }
-        .sh:hover { background: var(--accent-light); }
-        .sh.open  { background: var(--accent); }
+        .sh:hover { background:rgba(212,146,74,0.06); }
+        .sh.open  { background:rgba(212,146,74,0.1); }
 
-        .sh-l { display: flex; align-items: center; gap: 12px; }
-
+        .sh-l { display:flex; align-items:center; gap:12px; }
         .sh-ico {
-            width: 32px; height: 32px; border-radius: 8px;
-            background: var(--bg-card); color: var(--accent);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; transition: all 0.2s;
+            width:32px; height:32px; border-radius:8px;
+            background:var(--deep); color:var(--ghost);
+            display:flex; align-items:center; justify-content:center; flex-shrink:0;
+            border:1px solid var(--rim); transition:all .2s;
         }
-        .sh.open .sh-ico { background: rgba(0,0,0,0.12); color: #0A0A0A; }
+        .sh.open .sh-ico { background:rgba(212,146,74,0.15); color:var(--gold); border-color:rgba(212,146,74,0.3); }
 
-        .sh-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
-        .sh.open .sh-name { color: #0A0A0A; }
-        .sh-sub  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-        .sh.open .sh-sub  { color: rgba(0,0,0,0.5); }
+        .sh-name { font-size:13.5px; font-weight:600; color:var(--off); }
+        .sh.open .sh-name { color:var(--white); }
+        .sh-sub  { font-size:11px; color:var(--ghost); margin-top:2px; }
 
-        .sh-r { display: flex; align-items: center; gap: 12px; }
-
-        .sh-bar-w { width: 64px; height: 4px; background: rgba(0,0,0,0.08); border-radius: 2px; overflow: hidden; }
-        .sh-bar   { height: 100%; border-radius: 2px; background: var(--accent); }
-        .sh.open .sh-bar-w { background: rgba(0,0,0,0.15); }
-        .sh.open .sh-bar   { background: rgba(0,0,0,0.4); }
-
-        .sh-cost  { font-size: 13px; font-weight: 700; color: var(--accent); min-width: 64px; text-align: right; }
-        .sh.open .sh-cost { color: #0A0A0A; }
-
+        .sh-r { display:flex; align-items:center; gap:12px; }
+        .sh-bar-w { width:60px; height:3px; background:var(--rim); border-radius:2px; overflow:hidden; }
+        .sh-bar   { height:100%; border-radius:2px; background:var(--gold); opacity:.5; }
+        .sh.open .sh-bar { opacity:1; }
+        .sh-cost  { font-size:13px; font-weight:700; color:var(--ghost); min-width:68px; text-align:right; }
+        .sh.open .sh-cost { color:var(--gold2); }
         .sh-arr {
-            width: 22px; height: 22px; border-radius: 50%;
-            background: rgba(0,0,0,0.06); color: var(--text-muted);
-            display: flex; align-items: center; justify-content: center;
-            transition: transform 0.3s, background 0.2s;
-            flex-shrink: 0;
+            width:22px; height:22px; border-radius:50%;
+            background:var(--rim); color:var(--ghost);
+            display:flex; align-items:center; justify-content:center;
+            transition:transform .3s, background .2s; flex-shrink:0;
         }
-        .sh.open .sh-arr { transform: rotate(180deg); background: rgba(0,0,0,0.15); color: #0A0A0A; }
+        .sh.open .sh-arr { transform:rotate(180deg); background:rgba(212,146,74,0.15); color:var(--gold); }
 
-        .sb { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-        .sb.open { max-height: 1400px; }
+        .sb { max-height:0; overflow:hidden; transition:max-height .4s ease; }
+        .sb.open { max-height:1600px; }
 
-        .mat-wrap { padding: 14px 18px 18px; }
-
-        .mat-tbl { width: 100%; border-collapse: collapse; }
+        .mat-wrap { padding:14px 18px 20px; }
+        .mat-tbl { width:100%; border-collapse:collapse; }
         .mat-tbl th {
-            padding: 8px 12px; text-align: left;
-            background: var(--sand);
-            font-size: 10px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.6px;
-            color: var(--text-muted);
+            padding:8px 12px; text-align:left;
+            background:var(--surface);
+            font-size:9.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+            color:var(--ghost);
         }
-        .mat-tbl th:first-child { border-radius: 6px 0 0 6px; }
-        .mat-tbl th:last-child  { border-radius: 0 6px 6px 0; }
-        .mat-tbl td { padding: 9px 12px; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--sand); }
-        .mat-tbl tr:last-child td { border-bottom: none; }
-        .mat-tbl tr:hover td { background: var(--bg-base); }
-        .mat-qty  { font-weight: 700; color: var(--text-primary); }
-        .mat-unit { font-size: 11px; color: var(--text-muted); }
+        .mat-tbl th:first-child { border-radius:6px 0 0 6px; }
+        .mat-tbl th:last-child  { border-radius:0 6px 6px 0; }
+        .mat-tbl td { padding:9px 12px; font-size:13px; color:var(--fog); border-bottom:1px solid var(--rim2); }
+        .mat-tbl tr:last-child td { border-bottom:none; }
+        .mat-tbl tr:hover td { background:rgba(255,255,255,0.02); }
+        .mat-qty  { font-weight:700; color:var(--white); }
+        .mat-unit { font-size:11px; color:var(--ghost); }
 
-        /* ─── TIMELINE ─── */
+        /* ── TIMELINE ── */
         .tl-card {
-            background: linear-gradient(135deg, var(--accent-light), #FEF3C7);
-            border: 1px solid rgba(201,168,76,0.2);
-            border-radius: 14px; padding: 22px 24px;
-            display: flex; align-items: flex-start; gap: 22px;
+            background:linear-gradient(135deg, rgba(212,146,74,0.1) 0%, rgba(212,146,74,0.04) 100%);
+            border:1px solid rgba(212,146,74,0.2); border-radius:16px;
+            padding:24px 26px; display:flex; align-items:flex-start; gap:26px;
         }
-
-        .tl-number-wrap {
-            text-align: center; flex-shrink: 0;
-        }
-
-        .tl-lbl {
-            font-size: 10px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.8px;
-            color: var(--text-muted); margin-bottom: 6px;
-        }
-
-        .tl-big {
-            font-family: 'Playfair Display', serif;
-            font-size: 44px; font-weight: 700;
-            color: var(--accent); line-height: 1;
-        }
-
-        .tl-sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
-
-        .tl-stages { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; }
-
+        .tl-left { text-align:center; flex-shrink:0; }
+        .tl-lbl  { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--ghost); margin-bottom:6px; }
+        .tl-big  { font-family:'Syne',sans-serif; font-size:48px; font-weight:800; color:var(--gold2); line-height:1; }
+        .tl-sub  { font-size:12px; color:var(--ghost); margin-top:4px; }
+        .tl-stages { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:2px 18px; }
         .tl-row {
-            display: flex; justify-content: space-between;
-            font-size: 12px; color: var(--text-secondary);
-            padding: 4px 0; border-bottom: 1px solid rgba(201,168,76,0.15);
+            display:flex; justify-content:space-between;
+            font-size:12px; color:var(--ghost);
+            padding:5px 0; border-bottom:1px solid var(--rim2);
         }
-        .tl-row:last-child { border-bottom: none; }
-        .tl-row-d { font-weight: 700; color: var(--text-primary); }
-
+        .tl-row:last-child { border-bottom:none; }
+        .tl-row-d { font-weight:700; color:var(--off); }
         .tl-icon {
-            width: 48px; height: 48px; border-radius: 12px;
-            background: var(--accent); color: #0A0A0A;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; align-self: center;
-            box-shadow: 0 4px 14px rgba(201,168,76,0.3);
+            width:50px; height:50px; border-radius:13px;
+            background:rgba(212,146,74,0.15); color:var(--gold);
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0; align-self:center; border:1px solid rgba(212,146,74,0.25);
         }
 
-        /* ─── BUDGET COMPARISON ─── */
-        .bcomp { width: 100%; border-collapse: collapse; font-size: 13px; }
+        /* ── BUDGET TABLE ── */
+        .bcomp { width:100%; border-collapse:collapse; font-size:13px; }
         .bcomp th {
-            padding: 9px 13px; text-align: left;
-            background: var(--sand);
-            font-size: 10px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.6px;
-            color: var(--text-muted);
+            padding:9px 14px; text-align:left;
+            background:var(--surface);
+            font-size:9.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--ghost);
         }
-        .bcomp th:first-child { border-radius: 6px 0 0 6px; }
-        .bcomp th:last-child  { border-radius: 0 6px 6px 0; }
-        .bcomp td { padding: 9px 13px; color: var(--text-secondary); border-bottom: 1px solid var(--sand); }
-        .bcomp tr:last-child td { border-bottom: none; }
-        .bcomp tr.sel td { background: var(--accent-light); font-weight: 700; color: var(--text-primary); }
-        .bcomp td.amt { font-weight: 700; color: var(--text-primary); }
+        .bcomp th:first-child { border-radius:7px 0 0 7px; }
+        .bcomp th:last-child  { border-radius:0 7px 7px 0; }
+        .bcomp td { padding:10px 14px; color:var(--fog); border-bottom:1px solid var(--rim2); }
+        .bcomp tr:last-child td { border-bottom:none; }
+        .bcomp tr.sel td { background:rgba(212,146,74,0.07); color:var(--off); font-weight:600; }
+        .bcomp td.amt { font-weight:700; color:var(--white); }
 
-        /* ─── SIDEBAR ─── */
+        /* ── SIDEBAR ── */
         .scard {
-            background: var(--bg-card);
-            border: 1px solid var(--stone);
-            border-radius: 16px; padding: 22px 24px;
-            margin-bottom: 16px; box-shadow: var(--shadow-sm);
-            transition: box-shadow 0.2s;
+            background:var(--deep); border:1px solid var(--rim);
+            border-radius:18px; padding:22px 24px;
+            margin-bottom:16px; transition:border-color .2s;
         }
-        .scard:hover { box-shadow: var(--shadow-md); }
+        .scard:hover { border-color:rgba(212,146,74,0.2); }
 
         .stitle {
-            font-family: 'Playfair Display', serif;
-            font-size: 15px; font-weight: 700; color: var(--text-primary);
-            margin-bottom: 14px; padding-bottom: 10px;
-            border-bottom: 1px solid var(--sand);
-            display: flex; align-items: center; gap: 8px;
+            font-family:'DM Serif Display',serif;
+            font-size:16px; color:var(--white);
+            margin-bottom:14px; padding-bottom:12px;
+            border-bottom:1px solid var(--rim);
+            display:flex; align-items:center; gap:8px;
         }
-        .stitle svg { color: var(--accent); }
+        .stitle svg { color:var(--gold); }
 
         .irow {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            padding: 8px 0; border-bottom: 1px solid var(--sand);
+            display:flex; justify-content:space-between; align-items:flex-start;
+            padding:8px 0; border-bottom:1px solid var(--rim2);
         }
-        .irow:last-child { border-bottom: none; }
-        .ilbl { font-size: 12px; color: var(--text-muted); font-weight: 500; flex-shrink: 0; margin-right: 8px; }
-        .ival { font-size: 12px; font-weight: 700; color: var(--text-primary); text-align: right; }
+        .irow:last-child { border-bottom:none; }
+        .ilbl { font-size:11.5px; color:var(--ghost); font-weight:500; flex-shrink:0; margin-right:8px; }
+        .ival { font-size:11.5px; font-weight:700; color:var(--off); text-align:right; }
 
         .loc-b {
-            background: var(--sand); border: 1px solid var(--stone);
-            border-radius: 10px; padding: 12px 14px; margin-top: 13px;
+            background:var(--surface); border:1px solid var(--rim);
+            border-radius:10px; padding:13px 15px; margin-top:12px;
         }
-        .loc-bl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 7px; display: flex; align-items: center; gap: 5px; }
-        .loc-ln { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
-        .loc-ln strong { color: var(--text-primary); font-weight: 700; }
+        .loc-bl { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--ghost); margin-bottom:7px; display:flex; align-items:center; gap:5px; }
+        .loc-ln { font-size:12px; color:var(--ghost); line-height:1.75; }
+        .loc-ln strong { color:var(--off); font-weight:600; }
 
-        /* Stage mini chart in sidebar */
-        .sml { display: flex; flex-direction: column; }
+        /* Stage mini chart */
         .smr {
-            display: flex; align-items: center; gap: 8px;
-            padding: 6px 0; border-bottom: 1px solid var(--sand);
+            display:flex; align-items:center; gap:8px;
+            padding:6px 0; border-bottom:1px solid var(--rim2);
         }
-        .smr:last-child { border-bottom: none; }
-        .sm-ico {
-            width: 18px; height: 18px; flex-shrink: 0;
-            color: var(--accent); display: flex; align-items: center; justify-content: center;
-        }
-        .sm-lbl { font-size: 11px; color: var(--text-secondary); flex: 0 0 72px; font-weight: 500; }
-        .sm-bw  { flex: 1; height: 4px; background: var(--sand); border-radius: 2px; overflow: hidden; }
-        .sm-bar { height: 100%; border-radius: 2px; background: var(--accent); }
-        .sm-amt { font-size: 11px; font-weight: 700; color: var(--text-primary); width: 54px; text-align: right; flex-shrink: 0; }
+        .smr:last-child { border-bottom:none; }
+        .sm-ico { width:16px; height:16px; flex-shrink:0; color:var(--gold); display:flex; align-items:center; justify-content:center; }
+        .sm-lbl { font-size:11px; color:var(--fog); flex:0 0 70px; font-weight:500; }
+        .sm-bw  { flex:1; height:3px; background:var(--rim); border-radius:2px; overflow:hidden; }
+        .sm-bar { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--gold3),var(--gold2)); }
+        .sm-amt { font-size:11px; font-weight:700; color:var(--off); width:54px; text-align:right; flex-shrink:0; }
 
         /* Scope pills */
-        .sco { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
-        .sco-mat  { background: var(--accent-light); color: var(--accent); }
-        .sco-full { background: var(--green-light); color: var(--green); }
-        .sco-vil  { background: #FEF3C7; color: #92400E; }
-        .sco-apt  { background: var(--blue-light); color: var(--blue); }
-        .sco-res  { background: var(--sand); color: var(--text-secondary); }
+        .sco { display:inline-block; padding:3px 10px; border-radius:999px; font-size:10.5px; font-weight:700; letter-spacing:.4px; }
+        .sco-mat  { background:rgba(212,146,74,0.12); color:var(--gold); border:1px solid rgba(212,146,74,0.2); }
+        .sco-full { background:var(--green-bg); color:var(--green); border:1px solid rgba(76,175,130,0.2); }
+        .sco-villa{ background:var(--amber-bg); color:var(--amber); border:1px solid rgba(212,148,64,0.2); }
+        .sco-apartment { background:var(--blue-bg); color:var(--blue); border:1px solid rgba(74,143,212,0.2); }
+        .sco-residential { background:var(--surface); color:var(--fog); border:1px solid var(--rim); }
 
         /* Action buttons */
-        .agrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .agrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-        .btn-p {
-            padding: 11px 14px;
-            background: var(--accent); color: #0A0A0A;
-            border: none; border-radius: 10px;
-            font-weight: 600; font-size: 13px; cursor: pointer;
-            text-decoration: none; text-align: center;
-            transition: all 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-            font-family: 'DM Sans', sans-serif;
+        .btn-solid {
+            padding:11px 14px;
+            background:var(--gold); color:var(--void);
+            border:none; border-radius:10px;
+            font-weight:700; font-size:13px; cursor:pointer;
+            text-decoration:none; text-align:center;
+            transition:all .2s;
+            display:flex; align-items:center; justify-content:center; gap:6px;
+            font-family:'DM Sans',sans-serif;
+            box-shadow:0 4px 16px var(--glow);
         }
-        .btn-p:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 5px 16px rgba(201,168,76,0.35); }
-        .btn-p.full { grid-column: 1/-1; }
+        .btn-solid:hover { background:var(--gold2); transform:translateY(-2px); box-shadow:0 8px 28px var(--glow); }
+        .btn-solid.full { grid-column:1/-1; }
 
-        .btn-o {
-            padding: 10px 14px;
-            background: transparent; color: var(--accent);
-            border: 1.5px solid rgba(201,168,76,0.4);
-            border-radius: 10px; font-weight: 600; font-size: 13px;
-            text-decoration: none; text-align: center;
-            transition: all 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
+        .btn-outline {
+            padding:10px 14px;
+            background:transparent; color:var(--fog);
+            border:1px solid var(--rim);
+            border-radius:10px; font-weight:600; font-size:13px;
+            text-decoration:none; text-align:center;
+            transition:all .2s;
+            display:flex; align-items:center; justify-content:center; gap:6px;
         }
-        .btn-o:hover { background: var(--accent-light); border-color: var(--accent); }
-        .btn-o.full { grid-column: 1/-1; }
+        .btn-outline:hover { border-color:var(--gold); color:var(--gold); background:var(--soft); }
+        .btn-outline.full { grid-column:1/-1; }
 
         .rates-note {
-            font-size: 11px; color: var(--text-muted);
-            text-align: center; padding: 9px 12px;
-            background: var(--sand); border-radius: 8px;
-            margin-top: 12px; line-height: 1.5;
-            display: flex; align-items: flex-start; gap: 6px;
+            font-size:11px; color:var(--ghost); text-align:center;
+            padding:9px 12px; background:var(--surface); border-radius:8px;
+            margin-top:12px; line-height:1.5; display:flex; align-items:flex-start; gap:6px;
         }
-        .rates-note svg { flex-shrink: 0; margin-top: 1px; }
+        .rates-note svg { flex-shrink:0; margin-top:1px; color:var(--ghost); }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .fu { animation:fadeUp .55s cubic-bezier(.22,1,.36,1) both; }
+        .d1{animation-delay:.05s} .d2{animation-delay:.12s} .d3{animation-delay:.2s} .d4{animation-delay:.28s} .d5{animation-delay:.36s}
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:1100px) {
+            .main { grid-template-columns:1fr; padding:28px 28px 60px; }
+            .tier-strip { grid-template-columns:1fr; }
+            .tier-cell { border-right:none; border-bottom:1px solid var(--rim); }
+            .tier-cell:last-child { border-bottom:none; }
+        }
+        @media(max-width:900px) {
+            .nav { padding:0 22px; } .nav-center { display:none; }
+            .hero-body { padding:0 28px 44px; } .hero-h1 { font-size:38px; }
+            .hero-stats { display:none; }
+            .disclaimer { padding:10px 22px; }
+            .metrics { grid-template-columns:1fr 1fr; }
+        }
+        @media(max-width:600px) {
+            .highlights { grid-template-columns:1fr 1fr; }
+            .main { padding:22px 16px 60px; }
+        }
     </style>
 </head>
 <body>
 
-<!-- ─── HERO ─── -->
-<div class="hero">
-    <div class="hero-icon-wrap">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    </div>
-    
-    <h1>Estimation Complete</h1>
-    <div class="hero-divider"></div>
-    <p class="hero-sub">
-        {{ project.title }}
-        &nbsp;·&nbsp; {{ project.square_feet | int }} sq ft
-        &nbsp;·&nbsp; {{ (project.property_type or 'residential') | title }}
-    </p>
-    <div class="hero-badges">
-        <span class="hero-badge accent">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">{% if (project.estimate_scope or '') == 'material_and_labour' %}<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>{% else %}<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>{% endif %}</svg>
-            {% if (project.estimate_scope or '') == 'material_and_labour' %}Material + Labour{% else %}Material Only{% endif %}
-        </span>
-        <span class="hero-badge">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-            {{ estimation.total_materials_count }}+ materials
-        </span>
-        {% if estimation.get('ai_success') %}
-            <span class="hero-badge">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-                AI-refined
-            </span>
-            {% if estimation.get('ai_confidence') %}
-                <span class="hero-badge">Confidence {{ estimation.ai_confidence }}/10</span>
-            {% endif %}
-        {% else %}
-            <span class="hero-badge warn">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                Base rates only
-            </span>
-        {% endif %}
-    </div>
-</div>
+<!-- ─── NAV ─── -->
+<nav class="nav">
+    <a href="/user/dashboard" class="nav-logo">
+        <div class="nav-logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <span class="nav-logo-name">House<b>-Forge</b></span>
+    </a>
 
-<!-- ─── PRICE DISCLAIMER ─── -->
-<div class="price-disclaimer">
+    <div class="nav-center">
+        <a href="/user/dashboard" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+        </a>
+        <a href="/user/projects" class="nlink active">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Projects
+        </a>
+        <a href="/user/bids" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Bids
+        </a>
+        <a href="/user/my-orders" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Orders
+        </a>
+        <a href="/user/messages" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Messages
+        </a>
+    </div>
+
+    <div class="nav-right">
+        <a href="/user/profile" class="nav-profile">
+            <div class="nav-av">
+                {% if user_profile_picture %}
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile">
+                {% else %}
+                    {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                {% endif %}
+            </div>
+            <span class="nav-uname">{{ current_user.name }}</span>
+        </a>
+        <div class="ndiv"></div>
+        <a href="{{ url_for('auth.logout') }}" class="nav-out">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+        </a>
+    </div>
+</nav>
+
+<div class="shell">
+
+<!-- ─── HERO ─── -->
+<section class="hero fu d1">
+    <div class="hero-bg"></div>
+    <div class="hero-body">
+        <div class="hero-success-pill">
+            <span class="hero-success-dot"></span>
+            Estimation Complete
+        </div>
+        <h1 class="hero-h1">
+            <em>{{ project.title }}</em><br>is ready to build.
+        </h1>
+        <p class="hero-sub">
+            {{ project.square_feet | int }} sq ft &nbsp;·&nbsp; {{ (project.property_type or 'residential') | title }}
+            &nbsp;·&nbsp; {% if (project.estimate_scope or '') == 'material_and_labour' %}Material + Labour{% else %}Material Only{% endif %}
+        </p>
+        <div class="hero-badges">
+            <span class="hbadge gold">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">{% if (project.estimate_scope or '') == 'material_and_labour' %}<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>{% else %}<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>{% endif %}</svg>
+                {% if (project.estimate_scope or '') == 'material_and_labour' %}Material + Labour{% else %}Material Only{% endif %}
+            </span>
+            <span class="hbadge">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                {{ estimation.total_materials_count }}+ materials
+            </span>
+            {% if estimation.get('ai_success') %}
+                <span class="hbadge">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                    AI-refined
+                </span>
+                {% if estimation.get('ai_confidence') %}
+                    <span class="hbadge">Confidence {{ estimation.ai_confidence }}/10</span>
+                {% endif %}
+            {% else %}
+                <span class="hbadge warn">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    Base rates only
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% set budget = (project.budget_range or 'medium') | lower %}
+    {% set scope  = project.estimate_scope or 'material_only' %}
+    {% set sqf    = project.square_feet | float or 1 %}
+    {% set sel    = estimation.costs.get(budget, estimation.costs.get('medium', {})) %}
+    {% set tot    = sel.get('total_cost', 0) %}
+
+    <div class="hero-stats">
+        <div class="hstat">
+            <div class="hstat-n">
+                {% if tot >= 10000000 %}<span class="unit">₹</span>{{ "%.2f"|format(tot/10000000) }}<sup>Cr</sup>
+                {% elif tot >= 100000  %}<span class="unit">₹</span>{{ "%.1f"|format(tot/100000)  }}<sup>L</sup>
+                {% else %}<span class="unit">₹</span>{{ "{:,.0f}".format(tot) }}{% endif %}
+            </div>
+            <div class="hstat-l">Total ({{ budget | title }})</div>
+        </div>
+        <div class="hstat">
+            <div class="hstat-n"><span class="unit">₹</span>{{ "{:,.0f}".format((tot / sqf) | round) }}</div>
+            <div class="hstat-l">Per Sq Ft</div>
+        </div>
+        <div class="hstat">
+            {% set _raw_days   = estimation.timeline.get('total_days', 0)   | float %}
+            {% set _raw_months = estimation.timeline.get('total_months', 0) | float %}
+            {% if _raw_days > 0 %}
+                {% set tl_months = (_raw_days / 30) | round(1) %}
+            {% elif _raw_months > 0 %}
+                {% set tl_months = _raw_months | round(1) %}
+            {% else %}
+                {% set tl_months = 0 %}
+            {% endif %}
+            <div class="hstat-n">{{ tl_months if tl_months > 0 else '—' }}</div>
+            <div class="hstat-l">Months</div>
+        </div>
+        <div class="hstat">
+            <div class="hstat-n">{{ estimation.total_materials_count }}<sup>+</sup></div>
+            <div class="hstat-l">Items</div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── DISCLAIMER ─── -->
+<div class="disclaimer fu d2">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     {% if estimation.get('ai_success') %}
-        <strong></strong> Base rates are March 2026 market averages, adjusted by AI for your location &amp; spec. Actual quotes from contractors may vary ±10–20%.
+        Base rates are <strong>March 2026 market averages</strong>, adjusted by AI for your location &amp; spec. Actual contractor quotes may vary ±10–20%.
     {% else %}
-        <strong>Base rate estimate</strong> — prices are March 2026 Indian market averages. AI refinement was unavailable. Actual quotes may vary ±15–20%. Always verify with local suppliers.
+        <strong>Base rate estimate</strong> — March 2026 Indian market averages. AI refinement unavailable. Quotes may vary ±15–20%.
     {% endif %}
 </div>
 
@@ -665,45 +767,37 @@
 {% set scope  = project.estimate_scope or 'material_only' %}
 {% set sqf    = project.square_feet | float or 1 %}
 
-<div class="cost-strip">
-    <div class="cost-strip-inner">
-        {% for tk, tsvg, tl in [
-            ('low',    '<circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/>', 'Budget'),
-            ('medium', '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',                                                                'Standard'),
-            ('high',   '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',                                                 'Premium')
-        ] %}
-        {% set tc = estimation.costs.get(tk, {}) %}
-        {% set tv = tc.get('total_cost', 0) %}
-        <div class="ctb {% if tk == budget %}active{% endif %}">
-            <div class="ctb-icon-wrap">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ tsvg | safe }}</svg>
-            </div>
-            <div class="ctb-lbl">{{ tl }}</div>
-            <div class="ctb-tot">
-                {% if tv >= 10000000 %}₹{{ "%.2f"|format(tv/10000000) }} Cr
-                {% elif tv >= 100000  %}₹{{ "%.1f"|format(tv/100000)  }} L
-                {% else %}₹{{ "{:,.0f}".format(tv) }}{% endif %}
-            </div>
-            <div class="ctb-det">
-                Materials: ₹{{ "{:,.0f}".format(tc.get('material_cost',0)) }}<br>
-                {% if scope == 'material_and_labour' %}Labour: ₹{{ "{:,.0f}".format(tc.get('labor_cost',0)) }}<br>{% endif %}
-                Other: ₹{{ "{:,.0f}".format(tc.get('other_costs',0)) }}
-            </div>
-            <span class="ctb-sqft">₹{{ "{:,.0f}".format((tv / sqf) | round) }}/sqft</span>
+<div class="tier-strip fu d2">
+    {% for tk, tsvg, tl in [
+        ('low',    '<circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/>',                                                              'Budget'),
+        ('medium', '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',                                                                                                                            'Standard'),
+        ('high',   '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',                                                                                                               'Premium')
+    ] %}
+    {% set tc = estimation.costs.get(tk, {}) %}
+    {% set tv = tc.get('total_cost', 0) %}
+    <div class="tier-cell {% if tk == budget %}active{% endif %}">
+        <div class="tier-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ tsvg | safe }}</svg>
         </div>
-        {% endfor %}
+        <div class="tier-label">{{ tl }}</div>
+        <div class="tier-amount">
+            {% if tv >= 10000000 %}₹{{ "%.2f"|format(tv/10000000) }} Cr
+            {% elif tv >= 100000  %}₹{{ "%.1f"|format(tv/100000)  }} L
+            {% else %}₹{{ "{:,.0f}".format(tv) }}{% endif %}
+        </div>
+        <div class="tier-detail">
+            Materials: ₹{{ "{:,.0f}".format(tc.get('material_cost',0)) }}<br>
+            {% if scope == 'material_and_labour' %}Labour: ₹{{ "{:,.0f}".format(tc.get('labor_cost',0)) }}<br>{% endif %}
+            Other: ₹{{ "{:,.0f}".format(tc.get('other_costs',0)) }}
+        </div>
+        <span class="tier-sqft">₹{{ "{:,.0f}".format((tv / sqf) | round) }}/sqft</span>
     </div>
+    {% endfor %}
 </div>
 
-{# ─── TIMELINE HELPER ─── 
-   Resolve duration from whichever key the calculation service returns.
-   Priority: total_days → compute months  |  total_months → compute days
-   Falls back to 0 if both are absent.
-#}
+{# ─── TIMELINE HELPER ─── #}
 {% set _raw_days   = estimation.timeline.get('total_days', 0)   | float %}
 {% set _raw_months = estimation.timeline.get('total_months', 0) | float %}
-
-{# Prefer total_days if present and non-zero, otherwise derive from total_months #}
 {% if _raw_days > 0 %}
     {% set tl_days   = _raw_days | round | int %}
     {% set tl_months = (_raw_days / 30) | round(1) %}
@@ -715,7 +809,6 @@
     {% set tl_months = 0 %}
 {% endif %}
 
-<!-- ─── STAGE DEFINITIONS ─── -->
 {% set stage_defs = [
     ('foundation',    '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',                                                                  'Foundation',        'Footings, anti-termite, waterproofing, concrete'),
     ('walls',         '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',                                        'Masonry & Walls',   'Bricks/blocks, plaster, doors, windows'),
@@ -730,115 +823,111 @@
 ] %}
 
 <!-- ─── MAIN BODY ─── -->
-<div class="wrap">
+<div class="main">
 
     <!-- LEFT COLUMN -->
     <div>
 
-        <!-- Property banner -->
+        <!-- Property Banner -->
         {% set prop_type = project.property_type or 'residential' %}
-        <div class="prop-ban {{ prop_type }}">
-            <div class="pb-ico">
-                {% if prop_type == 'villa' %}
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" y1="22" x2="9" y2="12"/><line x1="15" y1="22" x2="15" y2="12"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
-                {% elif prop_type == 'apartment' %}
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
-                {% else %}
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                {% endif %}
-            </div>
-            <div>
-                {% if prop_type == 'villa' %}
-                    <div class="pb-h">Villa Construction Estimate</div>
-                    <div class="pb-sub">{{ project.floors or 2 }} floors · {{ project.rooms or 5 }} rooms · {{ project.bathrooms or 3 }} bathrooms · Luxury specs</div>
-                {% elif prop_type == 'apartment' %}
-                    <div class="pb-h">Apartment Building Estimate</div>
-                    <div class="pb-sub">{{ project.floors or 5 }} floors · {{ project.rooms or 20 }} units · Multi-unit residential</div>
-                {% else %}
-                    <div class="pb-h">Residential Construction Estimate</div>
-                    <div class="pb-sub">{{ project.floors or 2 }} floors · {{ project.rooms or 3 }} rooms · {{ project.bathrooms or 2 }} bathrooms</div>
-                {% endif %}
+        <div class="prop-banner prop-{{ prop_type }} fu d2">
+            <div class="prop-banner-img"></div>
+            <div class="prop-banner-body">
+                <div class="prop-banner-icon">
+                    {% if prop_type == 'villa' %}
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" y1="22" x2="9" y2="12"/><line x1="15" y1="22" x2="15" y2="12"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+                    {% elif prop_type == 'apartment' %}
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+                    {% else %}
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    {% endif %}
+                </div>
+                <div>
+                    {% if prop_type == 'villa' %}
+                        <div class="prop-banner-h">Villa Construction Estimate</div>
+                        <div class="prop-banner-sub">{{ project.floors or 2 }} floors · {{ project.rooms or 5 }} rooms · {{ project.bathrooms or 3 }} bathrooms · Luxury specs</div>
+                    {% elif prop_type == 'apartment' %}
+                        <div class="prop-banner-h">Apartment Building Estimate</div>
+                        <div class="prop-banner-sub">{{ project.floors or 5 }} floors · {{ project.rooms or 20 }} units · Multi-unit residential</div>
+                    {% else %}
+                        <div class="prop-banner-h">Residential Construction Estimate</div>
+                        <div class="prop-banner-sub">{{ project.floors or 2 }} floors · {{ project.rooms or 3 }} rooms · {{ project.bathrooms or 2 }} bathrooms</div>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
-        <!-- Key metrics -->
+        <!-- Key Metrics -->
         {% set sel = estimation.costs.get(budget, estimation.costs.get('medium', {})) %}
         {% set tot = sel.get('total_cost', 0) %}
-        <div class="metrics">
+        <div class="metrics fu d3">
             <div class="metric">
-                <div class="m-icon">
+                <div class="metric-icon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 </div>
-                <div class="m-val">
+                <div class="metric-val">
                     {% if tot >= 10000000 %}₹{{ "%.2f"|format(tot/10000000) }}Cr
                     {% elif tot >= 100000  %}₹{{ "%.1f"|format(tot/100000)  }}L
                     {% else %}₹{{ "{:,.0f}".format(tot) }}{% endif %}
                 </div>
-                <div class="m-lbl">Total ({{ budget | title }})</div>
+                <div class="metric-lbl">Total ({{ budget | title }})</div>
             </div>
             <div class="metric">
-                <div class="m-icon">
+                <div class="metric-icon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/></svg>
                 </div>
-                <div class="m-val">₹{{ "{:,.0f}".format((tot / sqf) | round) }}</div>
-                <div class="m-lbl">Per Sq Ft</div>
+                <div class="metric-val">₹{{ "{:,.0f}".format((tot / sqf) | round) }}</div>
+                <div class="metric-lbl">Per Sq Ft</div>
             </div>
             <div class="metric">
-                <div class="m-icon">
+                <div class="metric-icon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
-                {# FIX: Show months prominently, derived robustly from whichever key exists #}
-                <div class="m-val">
-                    {% if tl_months > 0 %}
-                        {{ tl_months }}
-                    {% else %}
-                        —
-                    {% endif %}
-                </div>
-                <div class="m-lbl">Months to Build</div>
+                <div class="metric-val">{{ tl_months if tl_months > 0 else '—' }}</div>
+                <div class="metric-lbl">Months to Build</div>
             </div>
             <div class="metric">
-                <div class="m-icon">
+                <div class="metric-icon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                 </div>
-                <div class="m-val">{{ estimation.total_materials_count }}+</div>
-                <div class="m-lbl">Material Items</div>
+                <div class="metric-val">{{ estimation.total_materials_count }}+</div>
+                <div class="metric-lbl">Material Items</div>
             </div>
         </div>
 
-        <!-- AI rationale block -->
+        <!-- AI Rationale -->
         {% if estimation.get('ai_success') %}
-        <div class="ai-blk">
-            <div class="ai-ico">
+        <div class="ai-block fu d3">
+            <div class="ai-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
             </div>
             <div>
-                <div class="ai-ttl">AI Cost Refinement Applied</div>
-                <div class="ai-txt">{{ estimation.ai_rationale }}</div>
+                <div class="ai-title">AI Cost Refinement Applied</div>
+                <div class="ai-text">{{ estimation.ai_rationale }}</div>
                 {% if estimation.get('ai_confidence') and estimation.ai_confidence > 0 %}
                 <div class="conf-row">
                     <span class="conf-lbl">Confidence</span>
                     <div class="cdots">
                         {% for i in range(1,11) %}<div class="cdot {% if i <= estimation.ai_confidence | int %}on{% endif %}"></div>{% endfor %}
                     </div>
-                    <span style="font-size:11px;color:#1E40AF;font-weight:700;">{{ estimation.ai_confidence }}/10</span>
+                    <span style="font-size:11px;color:var(--blue);font-weight:700;">{{ estimation.ai_confidence }}/10</span>
                 </div>
                 {% endif %}
             </div>
         </div>
         {% else %}
-        <div class="ai-blk-warn">
-            <div class="ai-ico">
+        <div class="ai-warn fu d3">
+            <div class="ai-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </div>
             <div>
-                <div class="ai-ttl">Using Base Rate Tables</div>
-                <div class="ai-txt">{{ estimation.ai_rationale }}</div>
+                <div class="ai-title">Using Base Rate Tables</div>
+                <div class="ai-text">{{ estimation.ai_rationale }}</div>
             </div>
         </div>
         {% endif %}
 
-        <!-- Key material highlights -->
+        <!-- Key Material Highlights -->
         {% set fm = estimation.materials %}
         {% set cement_total = (
             (fm.get('foundation',{}).get('cement_bags',0) or 0) +
@@ -852,281 +941,289 @@
             (fm.get('roofing',   {}).get('steel_kg',0) or 0)
         ) | round | int %}
 
-        <div class="card">
-            <div class="sec-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                Key Material Quantities
-                <span class="sec-badge">Quick Reference</span>
+        <div class="panel fu d3">
+            <div class="panel-head">
+                <div class="panel-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                </div>
+                <div class="panel-title">Key Material Quantities</div>
+                <span class="panel-badge">Quick Reference</span>
             </div>
-            <div class="hgrid">
-                {% if cement_total > 0 %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
-                    <div><div class="hc-qty">{{ "{:,}".format(cement_total) }}</div><div class="hc-lbl">Cement Bags (50 kg)</div></div>
+            <div style="padding:20px 24px;">
+                <div class="highlights">
+                    {% if cement_total > 0 %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+                        <div><div class="hchip-qty">{{ "{:,}".format(cement_total) }}</div><div class="hchip-lbl">Cement Bags (50 kg)</div></div>
+                    </div>
+                    {% endif %}
+                    {% if steel_total > 0 %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                        <div><div class="hchip-qty">{{ "{:,}".format(steel_total) }} kg</div><div class="hchip-lbl">TMT Steel</div></div>
+                    </div>
+                    {% endif %}
+                    {% if fm.get('walls',{}).get('bricks_or_blocks',0) %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
+                        <div><div class="hchip-qty">{{ "{:,}".format(fm.get('walls',{}).get('bricks_or_blocks',0) | int) }}</div><div class="hchip-lbl">Bricks / Blocks</div></div>
+                    </div>
+                    {% endif %}
+                    {% if fm.get('flooring',{}).get('floor_tiles_sqft',0) %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/></svg></div>
+                        <div><div class="hchip-qty">{{ "{:,}".format(fm.get('flooring',{}).get('floor_tiles_sqft',0) | round | int) }} sqft</div><div class="hchip-lbl">Floor Tiles</div></div>
+                    </div>
+                    {% endif %}
+                    {% if fm.get('flooring',{}).get('bathroom_wall_tiles_sqft',0) %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg></div>
+                        <div><div class="hchip-qty">{{ "{:,}".format(fm.get('flooring',{}).get('bathroom_wall_tiles_sqft',0) | round | int) }} sqft</div><div class="hchip-lbl">Bathroom Tiles</div></div>
+                    </div>
+                    {% endif %}
+                    {% if fm.get('finishing',{}).get('interior_paint_liters',0) %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+                        <div><div class="hchip-qty">{{ "{:,}".format(fm.get('finishing',{}).get('interior_paint_liters',0) | round | int) }} L</div><div class="hchip-lbl">Interior Paint</div></div>
+                    </div>
+                    {% endif %}
+                    {% if fm.get('finishing',{}).get('exterior_paint_liters',0) %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+                        <div><div class="hchip-qty">{{ "{:,}".format(fm.get('finishing',{}).get('exterior_paint_liters',0) | round | int) }} L</div><div class="hchip-lbl">Exterior Paint</div></div>
+                    </div>
+                    {% endif %}
+                    {% if fm.get('plumbing',{}).get('cpvc_pipes_meters',0) %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg></div>
+                        <div><div class="hchip-qty">{{ "{:,}".format(fm.get('plumbing',{}).get('cpvc_pipes_meters',0) | round | int) }} m</div><div class="hchip-lbl">CPVC Pipes</div></div>
+                    </div>
+                    {% endif %}
+                    {% if fm.get('electrical',{}).get('wiring_meters',0) %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                        <div><div class="hchip-qty">{{ "{:,}".format(fm.get('electrical',{}).get('wiring_meters',0) | round | int) }} m</div><div class="hchip-lbl">Electrical Wiring</div></div>
+                    </div>
+                    {% endif %}
+                    {% if fm.get('finishing',{}).get('false_ceiling_sqft',0) %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
+                        <div><div class="hchip-qty">{{ "{:,}".format(fm.get('finishing',{}).get('false_ceiling_sqft',0) | round | int) }} sqft</div><div class="hchip-lbl">False Ceiling</div></div>
+                    </div>
+                    {% endif %}
+                    {% if fm.get('plumbing',{}).get('toilets',0) %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3a2 2 0 0 0-2 2v4a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6V5a2 2 0 0 0-2-2H5z"/><line x1="7" y1="21" x2="17" y2="21"/><line x1="12" y1="15" x2="12" y2="21"/></svg></div>
+                        <div><div class="hchip-qty">{{ fm.get('plumbing',{}).get('toilets',0) }} sets</div><div class="hchip-lbl">Sanitary Sets</div></div>
+                    </div>
+                    {% endif %}
+                    {% if fm.get('electrical',{}).get('fans',0) %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+                        <div><div class="hchip-qty">{{ fm.get('electrical',{}).get('fans',0) }}</div><div class="hchip-lbl">Fan Points</div></div>
+                    </div>
+                    {% endif %}
+                    {% if fm.get('electrical',{}).get('lights',0) %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg></div>
+                        <div><div class="hchip-qty">{{ fm.get('electrical',{}).get('lights',0) }}</div><div class="hchip-lbl">Light Points</div></div>
+                    </div>
+                    {% endif %}
+                    {% if fm.get('plumbing',{}).get('sump_liters',0) %}
+                    <div class="hchip">
+                        <div class="hchip-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+                        <div><div class="hchip-qty">{{ "{:,}".format(fm.get('plumbing',{}).get('sump_liters',0) | int) }} L</div><div class="hchip-lbl">Sump Capacity</div></div>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-                {% if steel_total > 0 %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-                    <div><div class="hc-qty">{{ "{:,}".format(steel_total) }} kg</div><div class="hc-lbl">TMT Steel</div></div>
-                </div>
-                {% endif %}
-                {% if fm.get('walls',{}).get('bricks_or_blocks',0) %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
-                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('walls',{}).get('bricks_or_blocks',0) | int) }}</div><div class="hc-lbl">Bricks / Blocks</div></div>
-                </div>
-                {% endif %}
-                {% if fm.get('flooring',{}).get('floor_tiles_sqft',0) %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/></svg></div>
-                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('flooring',{}).get('floor_tiles_sqft',0) | round | int) }} sqft</div><div class="hc-lbl">Floor Tiles</div></div>
-                </div>
-                {% endif %}
-                {% if fm.get('flooring',{}).get('bathroom_wall_tiles_sqft',0) %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg></div>
-                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('flooring',{}).get('bathroom_wall_tiles_sqft',0) | round | int) }} sqft</div><div class="hc-lbl">Bathroom Tiles</div></div>
-                </div>
-                {% endif %}
-                {% if fm.get('finishing',{}).get('interior_paint_liters',0) %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('finishing',{}).get('interior_paint_liters',0) | round | int) }} L</div><div class="hc-lbl">Interior Paint</div></div>
-                </div>
-                {% endif %}
-                {% if fm.get('finishing',{}).get('exterior_paint_liters',0) %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('finishing',{}).get('exterior_paint_liters',0) | round | int) }} L</div><div class="hc-lbl">Exterior Paint</div></div>
-                </div>
-                {% endif %}
-                {% if fm.get('plumbing',{}).get('cpvc_pipes_meters',0) %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg></div>
-                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('plumbing',{}).get('cpvc_pipes_meters',0) | round | int) }} m</div><div class="hc-lbl">CPVC Pipes</div></div>
-                </div>
-                {% endif %}
-                {% if fm.get('electrical',{}).get('wiring_meters',0) %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('electrical',{}).get('wiring_meters',0) | round | int) }} m</div><div class="hc-lbl">Electrical Wiring</div></div>
-                </div>
-                {% endif %}
-                {% if fm.get('finishing',{}).get('false_ceiling_sqft',0) %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
-                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('finishing',{}).get('false_ceiling_sqft',0) | round | int) }} sqft</div><div class="hc-lbl">False Ceiling</div></div>
-                </div>
-                {% endif %}
-                {% if fm.get('plumbing',{}).get('toilets',0) %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3a2 2 0 0 0-2 2v4a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6V5a2 2 0 0 0-2-2H5z"/><line x1="7" y1="21" x2="17" y2="21"/><line x1="12" y1="15" x2="12" y2="21"/></svg></div>
-                    <div><div class="hc-qty">{{ fm.get('plumbing',{}).get('toilets',0) }} sets</div><div class="hc-lbl">Sanitary Sets</div></div>
-                </div>
-                {% endif %}
-                {% if fm.get('electrical',{}).get('fans',0) %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
-                    <div><div class="hc-qty">{{ fm.get('electrical',{}).get('fans',0) }}</div><div class="hc-lbl">Fan Points</div></div>
-                </div>
-                {% endif %}
-                {% if fm.get('electrical',{}).get('lights',0) %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg></div>
-                    <div><div class="hc-qty">{{ fm.get('electrical',{}).get('lights',0) }}</div><div class="hc-lbl">Light Points</div></div>
-                </div>
-                {% endif %}
-                {% if fm.get('plumbing',{}).get('sump_liters',0) %}
-                <div class="hchip">
-                    <div class="hc-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
-                    <div><div class="hc-qty">{{ "{:,}".format(fm.get('plumbing',{}).get('sump_liters',0) | int) }} L</div><div class="hc-lbl">Sump Capacity</div></div>
-                </div>
-                {% endif %}
             </div>
         </div>
 
-        <!-- Stages accordion -->
-        <div class="card">
-            <div class="sec-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-                Stages &amp; Bill of Quantities
-                <span class="sec-badge">{{ budget | title }} Budget</span>
+        <!-- Stages Accordion -->
+        <div class="panel fu d4">
+            <div class="panel-head">
+                <div class="panel-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                </div>
+                <div class="panel-title">Stages &amp; Bill of Quantities</div>
+                <span class="panel-badge">{{ budget | title }} Budget</span>
             </div>
+            <div style="padding:16px 18px 18px;">
+                {% set stg   = sel.get('stage_breakdown', {}) %}
+                {% set max_c = stg.values() | list | max if stg else 1 %}
 
-            {% set stg = sel.get('stage_breakdown', {}) %}
-            {% set max_c = stg.values() | list | max if stg else 1 %}
-
-            {% for sk, ssvg, sname, sdesc in stage_defs %}
-            {% set sc = stg.get(sk, 0) %}
-            {% set sm = estimation.materials.get(sk, {}) %}
-            {% set bp = ((sc / max_c) * 100) | round | int if max_c > 0 else 0 %}
-            <div class="sacc" id="sacc-{{ sk }}">
-                <div class="sh" id="sh-{{ sk }}" onclick="tog('{{ sk }}')">
-                    <div class="sh-l">
-                        <div class="sh-ico">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ ssvg | safe }}</svg>
+                {% for sk, ssvg, sname, sdesc in stage_defs %}
+                {% set sc = stg.get(sk, 0) %}
+                {% set sm = estimation.materials.get(sk, {}) %}
+                {% set bp = ((sc / max_c) * 100) | round | int if max_c > 0 else 0 %}
+                <div class="sacc" id="sacc-{{ sk }}">
+                    <div class="sh" id="sh-{{ sk }}" onclick="tog('{{ sk }}')">
+                        <div class="sh-l">
+                            <div class="sh-ico">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{{ ssvg | safe }}</svg>
+                            </div>
+                            <div>
+                                <div class="sh-name">{{ sname }}</div>
+                                <div class="sh-sub">{{ sdesc }} · {{ sm | length }} items</div>
+                            </div>
                         </div>
-                        <div>
-                            <div class="sh-name">{{ sname }}</div>
-                            <div class="sh-sub">{{ sdesc }} · {{ sm | length }} items</div>
+                        <div class="sh-r">
+                            <div class="sh-bar-w"><div class="sh-bar" data-w="{{ bp }}"></div></div>
+                            <div class="sh-cost">
+                                {% if sc >= 100000 %}₹{{ "%.1f"|format(sc/100000) }}L
+                                {% else %}₹{{ "{:,.0f}".format(sc) }}{% endif %}
+                            </div>
+                            <div class="sh-arr">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            </div>
                         </div>
                     </div>
-                    <div class="sh-r">
-                        <div class="sh-bar-w"><div class="sh-bar" data-w="{{ bp }}"></div></div>
-                        <div class="sh-cost">
-                            {% if sc >= 100000 %}₹{{ "%.1f"|format(sc/100000) }}L
-                            {% else %}₹{{ "{:,.0f}".format(sc) }}{% endif %}
-                        </div>
-                        <div class="sh-arr">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    <div class="sb" id="sb-{{ sk }}">
+                        <div class="mat-wrap">
+                            {% if sm %}
+                            <table class="mat-tbl">
+                                <thead><tr><th>Material</th><th>Quantity</th><th>Unit</th></tr></thead>
+                                <tbody>
+                                    {% for mn, qty in sm.items() %}
+                                    {% if qty is number and qty > 0 %}
+                                    <tr>
+                                        <td>{{ mn.replace('_',' ').title() }}</td>
+                                        <td><span class="mat-qty">{{ "{:,.0f}".format(qty) }}</span></td>
+                                        <td><span class="mat-unit">
+                                            {% if 'bags' in mn %}bags (50 kg)
+                                            {% elif mn.endswith('_kg') or '_kg' in mn %}kg
+                                            {% elif 'cuft' in mn %}cu ft
+                                            {% elif 'sqft' in mn %}sq ft
+                                            {% elif 'meters' in mn %}m
+                                            {% elif 'liters' in mn %}litres
+                                            {% elif 'sheets' in mn %}sheets
+                                            {% elif 'blocks' in mn or 'bricks' in mn %}nos
+                                            {% else %}nos{% endif %}
+                                        </span></td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p style="font-size:13px;color:var(--ghost);padding:4px 0;">No materials for this stage.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-                <div class="sb" id="sb-{{ sk }}">
-                    <div class="mat-wrap">
-                        {% if sm %}
-                        <table class="mat-tbl">
-                            <thead><tr><th>Material</th><th>Quantity</th><th>Unit</th></tr></thead>
-                            <tbody>
-                                {% for mn, qty in sm.items() %}
-                                {% if qty is number and qty > 0 %}
-                                <tr>
-                                    <td>{{ mn.replace('_',' ').title() }}</td>
-                                    <td><span class="mat-qty">{{ "{:,.0f}".format(qty) }}</span></td>
-                                    <td><span class="mat-unit">
-                                        {% if 'bags' in mn %}bags (50 kg)
-                                        {% elif mn.endswith('_kg') or '_kg' in mn %}kg
-                                        {% elif 'cuft' in mn %}cu ft
-                                        {% elif 'sqft' in mn %}sq ft
-                                        {% elif 'meters' in mn %}m
-                                        {% elif 'liters' in mn %}litres
-                                        {% elif 'sheets' in mn %}sheets
-                                        {% elif 'blocks' in mn or 'bricks' in mn %}nos
-                                        {% else %}nos{% endif %}
-                                    </span></td>
-                                </tr>
-                                {% endif %}
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        {% else %}
-                        <p style="font-size:13px;color:var(--text-muted);padding:4px 0;">No materials for this stage.</p>
-                        {% endif %}
-                    </div>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
 
-        <!-- Budget comparison -->
-        <div class="card">
-            <div class="sec-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                All Budget Tiers Compared
+        <!-- Budget Comparison -->
+        <div class="panel fu d4">
+            <div class="panel-head">
+                <div class="panel-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div class="panel-title">All Budget Tiers Compared</div>
             </div>
-            <table class="bcomp">
-                <thead>
-                    <tr>
-                        <th>Tier</th><th>Materials</th>
-                        {% if scope == 'material_and_labour' %}<th>Labour</th>{% endif %}
-                        <th>Other</th><th>Total</th><th>₹/sqft</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for tk, tl in [('low','Budget'),('medium','Standard'),('high','Premium')] %}
-                    {% set t = estimation.costs.get(tk, {}) %}
-                    {% set tv = t.get('total_cost', 0) %}
-                    <tr {% if tk == budget %}class="sel"{% endif %}>
-                        <td>{{ tl }}</td>
-                        <td class="amt">₹{{ "{:,.0f}".format(t.get('material_cost',0)) }}</td>
-                        {% if scope == 'material_and_labour' %}<td class="amt">₹{{ "{:,.0f}".format(t.get('labor_cost',0)) }}</td>{% endif %}
-                        <td>₹{{ "{:,.0f}".format(t.get('other_costs',0)) }}</td>
-                        <td class="amt">
-                            {% if tv >= 10000000 %}₹{{ "%.2f"|format(tv/10000000) }} Cr
-                            {% elif tv >= 100000  %}₹{{ "%.1f"|format(tv/100000)  }} L
-                            {% else %}₹{{ "{:,.0f}".format(tv) }}{% endif %}
-                        </td>
-                        <td>₹{{ "{:,.0f}".format((tv / sqf) | round) }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div style="padding:16px 18px 20px;">
+                <table class="bcomp">
+                    <thead>
+                        <tr>
+                            <th>Tier</th><th>Materials</th>
+                            {% if scope == 'material_and_labour' %}<th>Labour</th>{% endif %}
+                            <th>Other</th><th>Total</th><th>₹/sqft</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tk, tl in [('low','Budget'),('medium','Standard'),('high','Premium')] %}
+                        {% set t = estimation.costs.get(tk, {}) %}
+                        {% set tv = t.get('total_cost', 0) %}
+                        <tr {% if tk == budget %}class="sel"{% endif %}>
+                            <td>{{ tl }}</td>
+                            <td class="amt">₹{{ "{:,.0f}".format(t.get('material_cost',0)) }}</td>
+                            {% if scope == 'material_and_labour' %}<td class="amt">₹{{ "{:,.0f}".format(t.get('labor_cost',0)) }}</td>{% endif %}
+                            <td>₹{{ "{:,.0f}".format(t.get('other_costs',0)) }}</td>
+                            <td class="amt">
+                                {% if tv >= 10000000 %}₹{{ "%.2f"|format(tv/10000000) }} Cr
+                                {% elif tv >= 100000  %}₹{{ "%.1f"|format(tv/100000)  }} L
+                                {% else %}₹{{ "{:,.0f}".format(tv) }}{% endif %}
+                            </td>
+                            <td>₹{{ "{:,.0f}".format((tv / sqf) | round) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Timeline -->
-        <div class="card">
-            <div class="sec-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Construction Timeline
+        <div class="panel fu d5">
+            <div class="panel-head">
+                <div class="panel-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="panel-title">Construction Timeline</div>
             </div>
-            <div class="tl-card">
-                <div class="tl-number-wrap">
-                    <div class="tl-lbl">Total Duration</div>
-                    {# FIX: Show days if available, otherwise derive from months #}
-                    <div class="tl-big">{{ tl_days if tl_days > 0 else '—' }}</div>
-                    <div class="tl-sub">
-                        {% if tl_days > 0 %}
-                            ≈ {{ tl_months }} months
-                        {% elif tl_months > 0 %}
-                            {{ tl_months }} months
-                        {% else %}
-                            Duration not calculated
-                        {% endif %}
+            <div style="padding:20px 22px;">
+                <div class="tl-card">
+                    <div class="tl-left">
+                        <div class="tl-lbl">Duration</div>
+                        <div class="tl-big">{{ tl_days if tl_days > 0 else '—' }}</div>
+                        <div class="tl-sub">
+                            {% if tl_days > 0 %}≈ {{ tl_months }} months
+                            {% elif tl_months > 0 %}{{ tl_months }} months
+                            {% else %}Not calculated{% endif %}
+                        </div>
                     </div>
-                </div>
-                <div class="tl-stages">
-                    {% for sk, sn in [('foundation','Foundation'),('walls','Walls'),('flooring','Flooring'),('roofing','Roofing'),('plumbing','Plumbing'),('electrical','Electrical'),('finishing','Finishing'),('carpentry','Carpentry'),('exterior','Exterior')] %}
-                    {# FIX: Check both 'Xdays' and 'X' key patterns for stage durations #}
-                    {% set d_days = estimation.timeline.get(sk, 0) | int %}
-                    {% set d_months = estimation.timeline.get(sk ~ '_months', 0) %}
-                    {% if d_days > 0 %}
-                    <div class="tl-row"><span>{{ sn }}</span><span class="tl-row-d">{{ d_days }}d</span></div>
-                    {% elif d_months > 0 %}
-                    <div class="tl-row"><span>{{ sn }}</span><span class="tl-row-d">{{ d_months }}mo</span></div>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-                <div class="tl-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    <div class="tl-stages">
+                        {% for sk, sn in [('foundation','Foundation'),('walls','Walls'),('flooring','Flooring'),('roofing','Roofing'),('plumbing','Plumbing'),('electrical','Electrical'),('finishing','Finishing'),('carpentry','Carpentry'),('exterior','Exterior')] %}
+                        {% set d_days   = estimation.timeline.get(sk, 0) | int %}
+                        {% set d_months = estimation.timeline.get(sk ~ '_months', 0) %}
+                        {% if d_days > 0 %}
+                        <div class="tl-row"><span>{{ sn }}</span><span class="tl-row-d">{{ d_days }}d</span></div>
+                        {% elif d_months > 0 %}
+                        <div class="tl-row"><span>{{ sn }}</span><span class="tl-row-d">{{ d_months }}mo</span></div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="tl-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    </div>
                 </div>
             </div>
         </div>
 
-    </div><!-- end left column -->
+    </div><!-- end left col -->
 
     <!-- SIDEBAR -->
     <div>
 
         <!-- Actions -->
-        <div class="scard">
+        <div class="scard fu d2">
             <div class="stitle">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                 Next Steps
             </div>
             <div class="agrid">
-                
-                <a href="{{ url_for('user.download_pdf', project_id=project_id) }}" class="btn-p">
+                <a href="{{ url_for('user.download_pdf', project_id=project_id) }}" class="btn-solid">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                     PDF Report
                 </a>
-                <a href="{{ url_for('user.view_project', project_id=project_id) }}" class="btn-p">
+                <a href="{{ url_for('user.view_project', project_id=project_id) }}" class="btn-solid">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                     Full Detail
                 </a>
-                <a href="{{ url_for('user.find_contractors') }}" class="btn-o full">
+                <a href="{{ url_for('user.find_contractors') }}" class="btn-outline full">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
                     Find Contractors
                 </a>
-                <a href="{{ url_for('user.order_materials', project_id=project_id) }}" class="btn-o full">
+                <a href="{{ url_for('user.order_materials', project_id=project_id) }}" class="btn-outline full">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                     Order Materials
                 </a>
-                <a href="{{ url_for('user.create_project') }}" class="btn-o">
+                <a href="{{ url_for('user.create_project') }}" class="btn-outline">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     New Project
                 </a>
-                <a href="{{ url_for('user.projects') }}" class="btn-o">
+                <a href="{{ url_for('user.projects') }}" class="btn-outline">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                     My Projects
                 </a>
@@ -1137,8 +1234,8 @@
             </div>
         </div>
 
-        <!-- Project info -->
-        <div class="scard">
+        <!-- Project Details -->
+        <div class="scard fu d3">
             <div class="stitle">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 Project Details
@@ -1155,21 +1252,17 @@
             <div class="irow"><span class="ilbl">Floors</span><span class="ival">{{ project.floors }}</span></div>
             <div class="irow"><span class="ilbl">Bathrooms</span><span class="ival">{{ project.bathrooms }}</span></div>
             <div class="irow"><span class="ilbl">Budget</span><span class="ival">{{ {'low':'Budget','medium':'Standard','high':'Premium'}.get(budget, budget | title) }}</span></div>
-            {# FIX: Show duration in sidebar robustly #}
             <div class="irow">
                 <span class="ilbl">Duration</span>
                 <span class="ival">
                     {% if tl_months > 0 %}
-                        {{ tl_months }} months
-                        {% if tl_days > 0 %}({{ tl_days }} days){% endif %}
-                    {% else %}
-                        —
-                    {% endif %}
+                        {{ tl_months }} months{% if tl_days > 0 %} ({{ tl_days }}d){% endif %}
+                    {% else %}—{% endif %}
                 </span>
             </div>
             <div class="loc-b">
                 <div class="loc-bl">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                     Location
                 </div>
                 <div class="loc-ln">
@@ -1181,15 +1274,15 @@
             </div>
         </div>
 
-        <!-- Stage cost mini chart -->
-        <div class="scard">
+        <!-- Stage Cost Mini Chart -->
+        <div class="scard fu d4">
             <div class="stitle">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                 Cost by Stage
             </div>
             {% set stg = sel.get('stage_breakdown', {}) %}
             {% set mx  = stg.values() | list | max if stg else 1 %}
-            <div class="sml">
+            <div>
                 {% for sk, ssvg, sname, _ in stage_defs %}
                 {% set c = stg.get(sk, 0) %}
                 {% if c > 0 %}
@@ -1207,17 +1300,19 @@
         </div>
 
         {% if project.description %}
-        <div class="scard">
+        <div class="scard fu d5">
             <div class="stitle">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
                 Notes
             </div>
-            <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">{{ project.description }}</p>
+            <p style="font-size:13px;color:var(--ghost);line-height:1.7;">{{ project.description }}</p>
         </div>
         {% endif %}
 
     </div><!-- end sidebar -->
-</div><!-- end wrap -->
+</div><!-- end main -->
+
+</div><!-- end shell -->
 
 <script>
     function tog(key) {

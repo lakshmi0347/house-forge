@@ -4,918 +4,921 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders — House-Forge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #F0EBE1;
-            --bg-card: #FAF6EF;
-            --bg-card2: #F4EEE3;
-            --sand: #E8DFD0;
-            --stone: #D4C8B8;
-            --accent: #B8864E;
-            --accent2: #D4A96A;
-            --accent-dark: #96693A;
-            --accent-light: #FBF3E4;
-            --text-primary: #1A1612;
-            --text-secondary: #4A3F35;
-            --text-muted: #8A7A6E;
-            --green: #065F46;
-            --green-bg: #D1FAE5;
-            --red: #991B1B;
-            --red-bg: #FEE2E2;
-            --blue: #1E40AF;
-            --blue-bg: #DBEAFE;
-        }
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+            --void:    #0C0B09;
+            --ink:     #141210;
+            --deep:    #1C1A16;
+            --surface: #242118;
+            --rim:     rgba(255,255,255,0.07);
+            --rim2:    rgba(255,255,255,0.04);
 
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text-primary); overflow-x: hidden; }
+            --gold:    #D4924A;
+            --gold2:   #F0C07A;
+            --gold3:   #B8743A;
+            --glow:    rgba(212,146,74,0.22);
+            --soft:    rgba(212,146,74,0.10);
 
-        body::before {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: url('/static/images/Home.jpg') no-repeat center center / cover;
-            opacity: 0.28;
-            filter: saturate(0.3) sepia(0.85) hue-rotate(-15deg) brightness(0.95);
+            --white:   #FFFFFF;
+            --off:     #F2EDE6;
+            --fog:     rgba(242,237,230,0.55);
+            --ghost:   rgba(242,237,230,0.28);
+
+            --green:   #4CAF82; --green-bg: rgba(76,175,130,0.13); --green-border: rgba(76,175,130,0.3);
+            --blue:    #4A8FD4; --blue-bg:  rgba(74,143,212,0.13);  --blue-border:  rgba(74,143,212,0.3);
+            --amber:   #D49440; --amber-bg: rgba(212,148,64,0.13);  --amber-border: rgba(212,148,64,0.3);
+            --red:     #E05555; --red-bg:   rgba(224,85,85,0.13);   --red-border:   rgba(224,85,85,0.3);
         }
-        body::after {
-            content: '';
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: radial-gradient(ellipse 100% 100% at 50% 50%,
-                rgba(184,134,78,0.12) 0%, rgba(240,235,225,0.0) 55%, rgba(240,235,225,0.45) 100%);
-        }
-        .bg-grid {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background-image:
-                linear-gradient(rgba(184,134,78,0.045) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(184,134,78,0.045) 1px, transparent 1px);
-            background-size: 48px 48px;
-        }
-        .bg-warm {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: rgba(184,134,78,0.10);
-            mix-blend-mode: multiply;
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body {
+            font-family:'DM Sans',sans-serif;
+            background:var(--void); color:var(--off);
+            min-height:100vh; overflow-x:hidden;
+            -webkit-font-smoothing:antialiased;
         }
 
-        /* ── NAVBAR ── */
-        .navbar {
-            background: rgba(250,246,239,0.94); backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--stone);
-            padding: 0 44px; height: 66px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 1px 0 rgba(184,134,78,0.12), 0 4px 20px rgba(28,22,18,0.05);
+        /* ── NAV ── */
+        .nav {
+            position:fixed; top:0; left:0; right:0; z-index:300;
+            height:66px; display:flex; align-items:center; justify-content:space-between;
+            padding:0 52px;
+            background:rgba(12,11,9,0.85);
+            backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+            border-bottom:1px solid var(--rim);
         }
-        .navbar-brand {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px; font-weight: 700; color: var(--text-primary);
-            display: flex; align-items: center; gap: 11px; text-decoration: none; letter-spacing: 0.3px;
+        .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+        .nav-logo-icon {
+            width:40px; height:40px; border-radius:9px;
+            border:1.5px solid var(--gold);
+            display:flex; align-items:center; justify-content:center;
+            color:var(--gold); position:relative; overflow:hidden;
         }
-        .navbar-brand-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            color: #fff; box-shadow: 0 2px 10px rgba(184,134,78,0.35); position: relative; overflow: hidden;
+        .nav-logo-icon::before {
+            content:''; position:absolute; inset:0;
+            background:radial-gradient(circle at 30% 30%, rgba(212,146,74,0.18), transparent 70%);
         }
-        .navbar-brand-icon::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent); }
-        .navbar-menu { display: flex; align-items: center; gap: 2px; }
-        .navbar-menu a {
-            color: var(--text-secondary); text-decoration: none;
-            padding: 7px 12px; border-radius: 9px;
-            font-size: 13.5px; font-weight: 500;
-            transition: color 0.2s, background 0.2s;
-            display: flex; align-items: center; gap: 6px; position: relative;
-        }
-        .navbar-menu a:hover, .navbar-menu a.nav-active { color: var(--accent); background: var(--accent-light); }
-        .profile-pic { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--stone); display: block; }
-        .profile-placeholder {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            color: var(--accent); display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 13px; border: 2px solid var(--stone);
-        }
-        .nav-divider { width: 1px; height: 20px; background: var(--stone); margin: 0 5px; }
-        .logout-link {
-            color: var(--text-muted) !important; text-decoration: none;
-            padding: 7px 12px; border-radius: 9px; font-size: 13px; font-weight: 500;
-            display: inline-flex; align-items: center; gap: 5px; transition: color 0.2s, background 0.2s;
-        }
-        .logout-link:hover { color: #DC2626 !important; background: #FEF2F2; }
+        .nav-logo-name { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:var(--white); letter-spacing:-0.4px; }
+        .nav-logo-name b { color:var(--gold); font-weight:800; }
 
-        /* ── LAYOUT ── */
-        .container { max-width: 1040px; margin: 0 auto; padding: 32px 24px 60px; position: relative; z-index: 1; }
+        .nav-center {
+            position:absolute; left:50%; transform:translateX(-50%);
+            display:flex; align-items:center; gap:2px;
+        }
+        .nlink {
+            display:flex; align-items:center; gap:6px;
+            padding:7px 16px; border-radius:8px;
+            text-decoration:none; font-size:13.5px; font-weight:500;
+            color:var(--ghost); transition:color .18s, background .18s;
+            position:relative; white-space:nowrap;
+        }
+        .nlink:hover { color:var(--off); background:var(--rim2); }
+        .nlink.active { color:var(--gold); }
+        .nlink.active::after {
+            content:''; position:absolute; bottom:-1px; left:16px; right:16px;
+            height:2px; background:var(--gold); border-radius:2px;
+            box-shadow:0 0 10px var(--glow);
+        }
+        .npip {
+            position:absolute; top:5px; right:5px;
+            width:6px; height:6px; border-radius:50%;
+            background:#EF4444; border:1.5px solid var(--void); display:none;
+        }
+        .npip.amber { background:var(--amber); }
 
-        /* ── PAGE HEADER ── */
-        .page-header {
-            background: rgba(250,244,234,0.82);
-            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.55);
-            border-radius: 22px; padding: 0;
-            margin-bottom: 24px; overflow: hidden;
-            display: grid; grid-template-columns: 1fr auto; align-items: stretch;
-            box-shadow: 0 4px 32px rgba(150,105,58,0.10), inset 0 1px 0 rgba(255,248,235,0.7);
-            animation: slideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
-            position: relative;
+        .nav-right { display:flex; align-items:center; gap:10px; }
+        .nav-profile {
+            display:flex; align-items:center; gap:9px;
+            padding:5px 14px 5px 5px; border-radius:999px;
+            border:1px solid var(--rim); text-decoration:none;
+            transition:border-color .2s, background .2s;
         }
-        .page-header::before {
-            content: '';
-            position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-            background: linear-gradient(180deg, var(--accent), var(--accent2));
-            border-radius: 22px 0 0 22px;
+        .nav-profile:hover { border-color:var(--gold); background:var(--soft); }
+        .nav-av {
+            width:30px; height:30px; border-radius:50%;
+            background:var(--gold3); color:#fff;
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:700; flex-shrink:0;
         }
-        .header-left { padding: 34px 40px; }
-        .header-eyebrow {
-            font-size: 11px; font-weight: 600; letter-spacing: 2px;
-            text-transform: uppercase; color: var(--accent);
-            margin-bottom: 10px; display: flex; align-items: center; gap: 7px;
+        .nav-av img { width:30px; height:30px; border-radius:50%; object-fit:cover; display:block; }
+        .nav-uname { font-size:13px; font-weight:500; color:var(--off); }
+        .ndiv { width:1px; height:22px; background:var(--rim); }
+        .nav-out {
+            display:flex; align-items:center; gap:6px;
+            text-decoration:none; font-size:13px; font-weight:500;
+            color:var(--ghost); padding:7px 14px; border-radius:8px;
+            transition:color .18s, background .18s;
         }
-        .header-eyebrow::before { content: ''; width: 22px; height: 1.5px; background: var(--accent); display: inline-block; }
-        .header-left h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 32px; font-weight: 700; color: var(--text-primary);
-            line-height: 1.15; margin-bottom: 8px;
+        .nav-out:hover { color:#EF4444; background:rgba(239,68,68,0.08); }
+
+        /* ── SHELL ── */
+        .shell { padding-top:66px; }
+
+        /* ── HERO ── */
+        .hero { position:relative; height:300px; overflow:hidden; }
+        .hero-bg {
+            position:absolute; inset:0;
+            background:url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1600&q=80') center 55%/cover;
+            filter:brightness(0.28) saturate(0.55);
+            transform:scale(1.04);
+            animation:hzoom 14s ease-in-out infinite alternate;
         }
-        .header-left p { color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
-        .header-right {
-            background: linear-gradient(135deg, rgba(251,243,228,0.72) 0%, rgba(253,236,200,0.68) 100%);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-left: 1px solid rgba(212,186,150,0.4);
-            display: flex; align-items: center; justify-content: center;
-            padding: 28px 36px; position: relative; overflow: hidden;
+        @keyframes hzoom { from{transform:scale(1.04)} to{transform:scale(1.0)} }
+        .hero::before {
+            content:''; position:absolute; inset:0; z-index:1;
+            background:
+                linear-gradient(90deg,rgba(12,11,9,0.96) 0%,rgba(12,11,9,0.4) 55%,transparent 100%),
+                linear-gradient(0deg,rgba(12,11,9,1) 0%,transparent 55%);
         }
-        .header-right::before {
-            content: ''; position: absolute; inset: 0;
-            background-image: linear-gradient(rgba(184,134,78,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(184,134,78,0.08) 1px, transparent 1px);
-            background-size: 20px 20px;
+        .hero::after {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:3px; z-index:2;
+            background:linear-gradient(180deg,transparent,var(--gold),transparent);
         }
-        .header-orders-icon {
-            position: relative; z-index: 1;
-            width: 64px; height: 64px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 18px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 6px 24px rgba(184,134,78,0.35);
+        .hero-body {
+            position:absolute; inset:0; z-index:3;
+            display:flex; flex-direction:column; justify-content:flex-end;
+            padding:0 72px 44px;
         }
+        .hero-tag {
+            display:inline-flex; align-items:center; gap:9px;
+            font-size:10px; font-weight:600; letter-spacing:3px;
+            text-transform:uppercase; color:var(--gold); margin-bottom:14px;
+        }
+        .hero-tag-ln { width:30px; height:1px; background:var(--gold); }
+        .hero-h1 {
+            font-family:'DM Serif Display',Georgia,serif;
+            font-size:44px; font-weight:400; line-height:1.06;
+            color:var(--white); letter-spacing:-1px; margin-bottom:12px;
+        }
+        .hero-h1 em { font-style:italic; color:var(--gold2); }
+        .hero-sub { font-size:14px; color:rgba(242,237,230,0.45); line-height:1.7; max-width:460px; font-weight:300; }
+
+        /* ── MAIN ── */
+        .main { max-width:1060px; margin:0 auto; padding:44px 52px 80px; display:flex; flex-direction:column; gap:28px; }
+
+        .sec-lbl {
+            font-size:10px; font-weight:600; letter-spacing:2.5px;
+            text-transform:uppercase; color:var(--gold);
+            display:flex; align-items:center; gap:10px; margin-bottom:20px;
+        }
+        .sec-lbl::before { content:''; width:22px; height:1px; background:var(--gold); }
 
         /* ── STATS GRID ── */
         .stats-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            gap: 14px; margin-bottom: 24px;
+            display:grid; grid-template-columns:repeat(5,1fr); gap:14px;
         }
         .stat-card {
-            background: rgba(250,244,234,0.75);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(212,186,150,0.45);
-            border-radius: 18px; padding: 20px 16px;
-            box-shadow: 0 2px 20px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.6);
-            transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s, border-color 0.3s, background 0.3s;
-            position: relative; overflow: hidden; cursor: default; text-align: center;
-            animation: slideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
+            background:var(--deep);
+            border:1px solid var(--rim);
+            border-radius:18px; padding:22px 16px;
+            text-align:center; position:relative; overflow:hidden;
+            transition:transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s, border-color .3s;
+            cursor:default;
         }
-        .stat-card:nth-child(1) { animation-delay: 0.08s; }
-        .stat-card:nth-child(2) { animation-delay: 0.13s; }
-        .stat-card:nth-child(3) { animation-delay: 0.18s; }
-        .stat-card:nth-child(4) { animation-delay: 0.23s; }
-        .stat-card:nth-child(5) { animation-delay: 0.28s; }
         .stat-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            transform: scaleX(0); transform-origin: left;
-            transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
-            border-radius: 18px 18px 0 0;
+            content:''; position:absolute; top:0; left:0; right:0; height:2px;
+            background:linear-gradient(90deg, var(--gold), var(--gold2));
+            transform:scaleX(0); transform-origin:left;
+            transition:transform .35s cubic-bezier(.22,1,.36,1);
+            border-radius:18px 18px 0 0;
         }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(150,105,58,0.16); border-color: rgba(184,134,78,0.55); background: rgba(252,247,238,0.88); }
-        .stat-card:hover::before { transform: scaleX(1); }
+        .stat-card:hover { transform:translateY(-5px); box-shadow:0 16px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(212,146,74,0.25); border-color:rgba(212,146,74,0.3); }
+        .stat-card:hover::before { transform:scaleX(1); }
         .stat-num {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 28px; font-weight: 700; color: var(--text-primary);
-            line-height: 1; margin-bottom: 5px; display: block;
+            font-family:'DM Serif Display',serif;
+            font-size:30px; font-weight:400; color:var(--white);
+            line-height:1; margin-bottom:6px; display:block;
         }
-        .stat-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); }
+        .stat-lbl { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.8px; color:var(--ghost); }
 
         /* ── FILTER BAR ── */
         .filter-bar {
-            display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; align-items: center;
-            animation: slideUp 0.55s 0.26s cubic-bezier(0.22,1,0.36,1) both;
+            display:flex; gap:8px; flex-wrap:wrap; align-items:center;
         }
-        .filter-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-right: 4px; }
+        .filter-lbl { font-size:10px; font-weight:700; color:var(--ghost); text-transform:uppercase; letter-spacing:1.5px; margin-right:4px; }
         .filter-btn {
-            padding: 7px 18px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer;
-            border: 1px solid rgba(212,186,150,0.5);
-            background: rgba(250,244,234,0.72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            color: var(--text-secondary); transition: all 0.2s; font-family: 'Outfit', sans-serif;
-            display: flex; align-items: center; gap: 6px;
-            box-shadow: inset 0 1px 0 rgba(255,248,235,0.5);
+            padding:7px 18px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer;
+            border:1px solid var(--rim);
+            background:rgba(255,255,255,0.04);
+            color:var(--ghost); transition:all .2s; font-family:'DM Sans',sans-serif;
+            display:flex; align-items:center; gap:7px;
         }
-        .filter-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(251,243,228,0.85); }
-        .filter-btn.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(184,134,78,0.3); }
+        .filter-btn:hover { border-color:rgba(212,146,74,0.4); color:var(--off); background:var(--rim2); }
+        .filter-btn.active { background:linear-gradient(135deg, var(--gold), var(--gold2)); color:var(--void); border-color:transparent; font-weight:700; box-shadow:0 3px 14px var(--glow); }
+        .filter-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 
         /* ── ORDER CARD ── */
         .order-card {
-            background: rgba(250,244,234,0.78);
-            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.48);
-            border-radius: 20px; margin-bottom: 18px; overflow: hidden;
-            box-shadow: 0 2px 24px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.65);
-            transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
-            animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+            background:var(--deep);
+            border:1px solid var(--rim);
+            border-radius:22px; overflow:hidden;
+            transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s, border-color .3s;
         }
-        .order-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(150,105,58,0.16); border-color: rgba(184,134,78,0.55); background: rgba(252,247,238,0.88); }
+        .order-card:hover {
+            transform:translateY(-4px);
+            box-shadow:0 20px 56px rgba(0,0,0,0.45), 0 0 0 1px rgba(212,146,74,0.25);
+            border-color:rgba(212,146,74,0.28);
+        }
 
-        .order-stripe { height: 3.5px; }
-        .stripe-pending    { background: linear-gradient(90deg, #F59E0B, #FDE68A); }
-        .stripe-processing { background: linear-gradient(90deg, #1E40AF, #93C5FD); }
-        .stripe-completed  { background: linear-gradient(90deg, #065F46, #6EE7B7); }
-        .stripe-cancelled  { background: linear-gradient(90deg, #991B1B, #FCA5A5); }
+        /* Top color stripe */
+        .order-stripe { height:3px; }
+        .stripe-pending    { background:linear-gradient(90deg, var(--amber), #FDE68A); }
+        .stripe-processing { background:linear-gradient(90deg, var(--blue), #93C5FD); }
+        .stripe-completed  { background:linear-gradient(90deg, var(--green), #6EE7B7); }
+        .stripe-cancelled  { background:linear-gradient(90deg, var(--red), #FCA5A5); }
 
+        /* Card head */
         .order-head {
-            padding: 20px 26px 16px;
-            display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-            border-bottom: 1px solid rgba(212,186,150,0.3);
+            padding:22px 28px 18px;
+            display:flex; justify-content:space-between; align-items:flex-start; gap:16px;
+            border-bottom:1px solid var(--rim);
         }
         .order-id {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px;
+            font-family:'DM Serif Display',serif;
+            font-size:17px; font-weight:400; color:var(--white); margin-bottom:4px;
         }
-        .order-date { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
-        .order-head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+        .order-date { font-size:12px; color:var(--ghost); display:flex; align-items:center; gap:5px; }
+        .order-head-right { display:flex; flex-direction:column; align-items:flex-end; gap:7px; flex-shrink:0; }
 
+        /* Status badges */
         .status-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 5px 13px; border-radius: 20px;
-            font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+            display:inline-flex; align-items:center; gap:5px;
+            padding:5px 13px; border-radius:999px;
+            font-size:10.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
         }
-        .status-dot { width: 6px; height: 6px; border-radius: 50%; }
-        .s-pending    { background: #FEF3C7; color: #92400E; } .s-pending .status-dot    { background: #D97706; }
-        .s-processing { background: var(--blue-bg); color: var(--blue); } .s-processing .status-dot { background: #3B82F6; }
-        .s-completed  { background: var(--green-bg); color: var(--green); } .s-completed .status-dot  { background: #10B981; }
-        .s-cancelled  { background: var(--red-bg); color: var(--red); } .s-cancelled .status-dot  { background: #EF4444; }
+        .status-dot { width:6px; height:6px; border-radius:50%; }
+        .s-pending    { background:var(--amber-bg); color:var(--amber); border:1px solid var(--amber-border); }
+        .s-pending    .status-dot { background:var(--amber); }
+        .s-processing { background:var(--blue-bg);  color:var(--blue);  border:1px solid var(--blue-border); }
+        .s-processing .status-dot { background:var(--blue); }
+        .s-completed  { background:var(--green-bg); color:var(--green); border:1px solid var(--green-border); }
+        .s-completed  .status-dot { background:var(--green); }
+        .s-cancelled  { background:var(--red-bg);   color:var(--red);   border:1px solid var(--red-border); }
+        .s-cancelled  .status-dot { background:var(--red); }
 
-        .pay-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; }
-        .pay-cod-confirmed { background: var(--accent-light); color: var(--accent-dark); }
-        .pay-paid          { background: var(--green-bg); color: var(--green); }
-        .pay-card-pending  { background: var(--blue-bg); color: var(--blue); }
+        .pay-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:999px; font-size:10px; font-weight:700; border:1px solid; }
+        .pay-cod-confirmed { background:var(--amber-bg); color:var(--amber); border-color:var(--amber-border); }
+        .pay-paid          { background:var(--green-bg); color:var(--green); border-color:var(--green-border); }
+        .pay-card-pending  { background:var(--blue-bg);  color:var(--blue);  border-color:var(--blue-border); }
 
-        .order-body { padding: 18px 26px 22px; }
+        /* Card body */
+        .order-body { padding:20px 28px 26px; }
 
-        .supplier-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .supplier-row { display:flex; align-items:center; gap:14px; margin-bottom:18px; }
         .supplier-avatar {
-            width: 42px; height: 42px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-light), #fdecc8);
-            border: 2px solid rgba(184,134,78,0.3);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; color: var(--accent);
+            width:44px; height:44px; border-radius:12px;
+            background:linear-gradient(135deg, var(--surface), var(--deep));
+            border:1.5px solid rgba(212,146,74,0.35);
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0; color:var(--gold);
+            text-decoration:none;
+            transition:transform .2s, box-shadow .2s, border-color .2s;
         }
-        .supplier-name { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 1px; }
-        .supplier-sub { font-size: 12px; color: var(--text-muted); }
+        .supplier-avatar:hover { transform:scale(1.1); box-shadow:0 4px 18px rgba(212,146,74,0.28); border-color:var(--gold); }
+        .supplier-name { font-family:'DM Serif Display',serif; font-size:16px; color:var(--white); margin-bottom:2px; }
+        .supplier-sub  { font-size:12px; color:var(--ghost); }
 
         .project-tag {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 6px 14px;
-            background: rgba(232,223,208,0.72);
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0;
-            font-size: 12px; font-weight: 600; color: var(--accent-dark);
-            margin-bottom: 16px;
+            display:inline-flex; align-items:center; gap:7px;
+            padding:6px 14px;
+            background:var(--soft);
+            border-left:3px solid var(--gold); border-radius:0 10px 10px 0;
+            font-size:12px; font-weight:600; color:var(--gold2);
+            margin-bottom:18px;
         }
 
-        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
-        .items-table thead tr {
-            background: rgba(232,223,208,0.55);
-            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-        }
+        /* Items table */
+        .items-table { width:100%; border-collapse:collapse; margin-bottom:18px; }
+        .items-table thead tr { background:rgba(255,255,255,0.04); }
         .items-table th {
-            font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.7px; color: var(--text-muted);
-            padding: 9px 12px; text-align: left;
+            font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+            color:var(--ghost); padding:10px 14px; text-align:left;
         }
-        .items-table th:first-child { border-radius: 8px 0 0 8px; }
-        .items-table th:last-child  { border-radius: 0 8px 8px 0; text-align: right; }
+        .items-table th:first-child { border-radius:8px 0 0 8px; }
+        .items-table th:last-child  { border-radius:0 8px 8px 0; text-align:right; }
         .items-table td {
-            padding: 11px 12px; font-size: 13px; color: var(--text-secondary);
-            border-bottom: 1px solid rgba(212,186,150,0.25); vertical-align: top;
+            padding:12px 14px; font-size:13px; color:var(--fog);
+            border-bottom:1px solid var(--rim); vertical-align:top;
         }
-        .items-table tr:last-child td { border-bottom: none; }
-        .items-table td:last-child { text-align: right; font-weight: 700; color: var(--text-primary); }
-        .item-name { font-weight: 600; color: var(--text-primary); }
-        .item-detail { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .items-table tr:last-child td { border-bottom:none; }
+        .items-table td:last-child { text-align:right; font-weight:700; color:var(--off); }
+        .item-name   { font-weight:600; color:var(--off); }
+        .item-detail { font-size:11px; color:var(--ghost); margin-top:2px; }
 
+        /* Total bar */
         .total-bar {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 12px; padding: 14px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 16px;
-            box-shadow: 0 3px 14px rgba(184,134,78,0.3);
+            background:linear-gradient(135deg, var(--gold), var(--gold2));
+            border-radius:14px; padding:16px 22px;
+            display:flex; justify-content:space-between; align-items:center;
+            margin-bottom:18px;
+            box-shadow:0 4px 20px var(--glow);
         }
-        .total-bar-label { font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 500; }
-        .total-bar-val { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; color: #fff; }
+        .total-bar-label { font-size:13px; color:rgba(12,11,9,0.65); font-weight:600; }
+        .total-bar-val   { font-family:'DM Serif Display',serif; font-size:26px; font-weight:400; color:var(--void); }
 
+        /* Status strip */
         .status-strip {
-            display: flex; align-items: center; gap: 9px;
-            padding: 11px 16px; border-radius: 10px;
-            font-size: 13px; font-weight: 500; margin-bottom: 14px;
+            display:flex; align-items:center; gap:9px;
+            padding:12px 16px; border-radius:12px;
+            font-size:13px; font-weight:500; margin-bottom:16px; border:1px solid;
         }
-        .status-strip.pending    { background: rgba(254,243,199,0.8); color: #92400E; border: 1px solid rgba(253,230,138,0.6); }
-        .status-strip.processing { background: rgba(219,234,254,0.8); color: var(--blue); border: 1px solid rgba(147,197,253,0.6); }
-        .status-strip.completed  { background: rgba(209,250,229,0.8); color: var(--green); border: 1px solid rgba(167,243,208,0.6); }
-        .status-strip.cancelled  { background: rgba(254,226,226,0.8); color: var(--red); border: 1px solid rgba(252,165,165,0.6); }
+        .status-strip.pending    { background:var(--amber-bg); color:var(--amber); border-color:var(--amber-border); }
+        .status-strip.processing { background:var(--blue-bg);  color:var(--blue);  border-color:var(--blue-border); }
+        .status-strip.completed  { background:var(--green-bg); color:var(--green); border-color:var(--green-border); }
+        .status-strip.cancelled  { background:var(--red-bg);   color:var(--red);   border-color:var(--red-border); }
 
-        .payment-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        /* Payment actions */
+        .payment-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
         .btn-pay {
-            display: inline-flex; align-items: center; gap: 7px;
-            padding: 10px 22px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff; border-radius: 10px; font-weight: 600; font-size: 13px;
-            text-decoration: none; transition: all 0.2s; border: none; cursor: pointer;
-            font-family: 'Outfit', sans-serif;
-            box-shadow: 0 2px 12px rgba(184,134,78,0.28);
+            display:inline-flex; align-items:center; gap:7px;
+            padding:10px 22px;
+            background:linear-gradient(135deg, var(--gold), var(--gold2));
+            color:var(--void); border-radius:10px; font-weight:700; font-size:13px;
+            text-decoration:none; border:none; cursor:pointer; font-family:'DM Sans',sans-serif;
+            box-shadow:0 3px 14px var(--glow); transition:all .2s;
         }
-        .btn-pay:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(184,134,78,0.4); }
+        .btn-pay:hover { transform:translateY(-1px); box-shadow:0 7px 22px var(--glow); }
         .btn-receipt {
-            display: inline-flex; align-items: center; gap: 7px;
-            padding: 10px 22px;
-            background: rgba(209,250,229,0.75); color: var(--green);
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            border-radius: 10px; font-weight: 600; font-size: 13px;
-            text-decoration: none; transition: all 0.2s;
-            border: 1px solid rgba(167,243,208,0.6);
+            display:inline-flex; align-items:center; gap:7px;
+            padding:10px 22px;
+            background:var(--green-bg); color:var(--green);
+            border:1px solid var(--green-border);
+            border-radius:10px; font-weight:600; font-size:13px;
+            text-decoration:none; transition:all .2s;
         }
-        .btn-receipt:hover { background: rgba(167,243,208,0.9); }
-        .cod-note {
-            display: inline-flex; align-items: center; gap: 7px;
-            padding: 10px 16px;
-            background: rgba(251,243,228,0.82); color: var(--accent-dark);
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            border-radius: 10px; font-size: 12px; font-weight: 600;
-            border: 1px solid rgba(212,186,150,0.45);
+        .btn-receipt:hover { background:rgba(76,175,130,0.22); }
+        .info-note {
+            display:inline-flex; align-items:center; gap:7px;
+            padding:10px 16px; border-radius:10px;
+            font-size:12px; font-weight:600; border:1px solid;
         }
-        .completed-note {
-            display: inline-flex; align-items: center; gap: 7px;
-            padding: 10px 16px;
-            background: rgba(209,250,229,0.75); color: var(--green);
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            border-radius: 10px; font-size: 12px; font-weight: 600;
-            border: 1px solid rgba(167,243,208,0.6);
-        }
+        .note-amber { background:var(--amber-bg); color:var(--amber); border-color:var(--amber-border); }
+        .note-blue  { background:var(--blue-bg);  color:var(--blue);  border-color:var(--blue-border); }
+        .note-green { background:var(--green-bg); color:var(--green); border-color:var(--green-border); }
 
         /* ── REVIEW SECTION ── */
-        .review-divider {
-            border: none; border-top: 1px solid rgba(212,186,150,0.35);
-            margin: 16px 0 14px;
-        }
+        .review-divider { border:none; border-top:1px solid var(--rim); margin:18px 0 16px; }
 
-        /* Already-submitted review display */
         .review-display {
-            background: rgba(251,243,228,0.65);
-            border: 1px solid rgba(212,186,150,0.45);
-            border-radius: 12px; padding: 14px 18px;
-            display: flex; align-items: flex-start; gap: 12px;
+            background:var(--soft);
+            border:1px solid rgba(212,146,74,0.22);
+            border-radius:14px; padding:16px 20px;
+            display:flex; align-items:flex-start; gap:14px;
         }
-        .review-display-stars { display: flex; gap: 3px; flex-shrink: 0; }
-        .review-display-stars span { font-size: 16px; }
-        .review-display-body { flex: 1; min-width: 0; }
-        .review-display-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
-        .review-display-text { font-size: 13px; color: var(--text-secondary); line-height: 1.55; }
+        .review-display-stars { display:flex; gap:3px; flex-shrink:0; }
+        .review-display-stars span { font-size:16px; }
+        .review-display-body { flex:1; min-width:0; }
+        .review-display-meta { font-size:11px; color:var(--ghost); margin-bottom:5px; }
+        .review-display-text { font-size:13px; color:var(--fog); line-height:1.6; }
         .review-display-label {
-            font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
-            color: var(--accent-dark); background: var(--accent-light);
-            border-radius: 20px; padding: 2px 9px; display: inline-flex; align-items: center; gap: 4px;
-            margin-bottom: 8px;
+            font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+            color:var(--gold); display:inline-flex; align-items:center; gap:4px;
+            margin-bottom:8px;
         }
 
-        /* Review CTA button */
         .btn-review {
-            display: inline-flex; align-items: center; gap: 7px;
-            padding: 10px 20px;
-            background: rgba(251,243,228,0.85); color: var(--accent-dark);
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            border-radius: 10px; font-weight: 600; font-size: 13px;
-            border: 1px solid rgba(184,134,78,0.4); cursor: pointer;
-            font-family: 'Outfit', sans-serif; transition: all 0.2s;
+            display:inline-flex; align-items:center; gap:7px;
+            padding:10px 20px;
+            background:var(--soft);
+            border:1.5px solid rgba(212,146,74,0.35);
+            border-radius:10px; font-weight:600; font-size:13px;
+            color:var(--gold2); cursor:pointer; font-family:'DM Sans',sans-serif;
+            transition:all .2s;
         }
-        .btn-review:hover { background: var(--accent-light); border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(184,134,78,0.22); }
-
-        /* ── REVIEW MODAL ── */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(26,22,18,0.55); z-index: 300;
-            align-items: center; justify-content: center;
-            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-        }
-        .modal-overlay.show { display: flex; }
-        .modal-box {
-            background: rgba(250,244,234,0.97);
-            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(212,186,150,0.55);
-            border-radius: 22px; padding: 36px 38px;
-            max-width: 500px; width: 92%; max-height: 90vh; overflow-y: auto;
-            box-shadow: 0 24px 80px rgba(150,105,58,0.22), inset 0 1px 0 rgba(255,248,235,0.8);
-            animation: scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
-            position: relative;
-        }
-        .modal-box::before {
-            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-            background: linear-gradient(180deg, var(--accent), var(--accent2));
-            border-radius: 22px 0 0 22px;
-        }
-        .modal-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;
-        }
-        .modal-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; }
-        .modal-close {
-            position: absolute; top: 18px; right: 18px;
-            width: 32px; height: 32px; border-radius: 50%;
-            background: rgba(232,223,208,0.8); border: 1px solid var(--stone);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 16px; color: var(--text-muted);
-            transition: all 0.2s;
-        }
-        .modal-close:hover { background: var(--stone); color: var(--text-primary); }
-
-        /* Star rating picker */
-        .star-picker { display: flex; gap: 6px; margin-bottom: 6px; }
-        .star-picker-btn {
-            font-size: 30px; cursor: pointer; transition: transform 0.15s, filter 0.15s;
-            background: none; border: none; padding: 2px; line-height: 1;
-            filter: grayscale(1) opacity(0.4);
-        }
-        .star-picker-btn.lit { filter: none; }
-        .star-picker-btn:hover { transform: scale(1.2); }
-        .star-label {
-            font-size: 13px; color: var(--text-muted); font-weight: 500; margin-bottom: 18px;
-            min-height: 18px; transition: color 0.2s;
-        }
-        .star-label.set { color: var(--accent-dark); font-weight: 600; }
-
-        /* Category ratings */
-        .cat-ratings { margin-bottom: 20px; }
-        .cat-label-row { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 10px; }
-        .cat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 12px; }
-        .cat-name { font-size: 13px; color: var(--text-secondary); font-weight: 500; flex: 1; }
-        .cat-stars { display: flex; gap: 4px; }
-        .cat-star {
-            font-size: 18px; cursor: pointer; filter: grayscale(1) opacity(0.35);
-            background: none; border: none; padding: 1px; transition: filter 0.12s, transform 0.12s;
-        }
-        .cat-star.lit { filter: none; }
-        .cat-star:hover { transform: scale(1.15); }
-
-        /* Review text */
-        .review-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 7px; display: block; text-transform: uppercase; letter-spacing: 0.6px; }
-        .review-textarea {
-            width: 100%; padding: 13px 15px; border-radius: 11px;
-            border: 1.5px solid rgba(212,186,150,0.5);
-            background: rgba(244,238,227,0.7); color: var(--text-primary);
-            font-family: 'Outfit', sans-serif; font-size: 13.5px; line-height: 1.6;
-            resize: vertical; min-height: 100px;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            margin-bottom: 16px;
-        }
-        .review-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(184,134,78,0.12); }
-        .review-textarea::placeholder { color: var(--text-muted); }
-
-        /* Recommend toggle */
-        .recommend-row {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 16px; border-radius: 11px;
-            background: rgba(232,223,208,0.5); border: 1px solid rgba(212,186,150,0.35);
-            margin-bottom: 20px; cursor: pointer; transition: background 0.2s;
-        }
-        .recommend-row:hover { background: rgba(251,243,228,0.8); }
-        .recommend-toggle {
-            width: 38px; height: 22px; border-radius: 11px;
-            background: var(--stone); position: relative; flex-shrink: 0;
-            transition: background 0.25s; cursor: pointer;
-        }
-        .recommend-toggle::after {
-            content: ''; position: absolute; top: 3px; left: 3px;
-            width: 16px; height: 16px; border-radius: 50%;
-            background: #fff; transition: transform 0.25s;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-        }
-        .recommend-toggle.on { background: var(--accent); }
-        .recommend-toggle.on::after { transform: translateX(16px); }
-        .recommend-text { font-size: 13px; font-weight: 600; color: var(--text-secondary); flex: 1; }
-        .recommend-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
-
-        /* Modal actions */
-        .modal-actions { display: flex; gap: 10px; }
-        .btn-modal-cancel {
-            flex: 1; padding: 11px; background: rgba(232,223,208,0.7);
-            border: 1px solid var(--stone); border-radius: 10px;
-            font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600;
-            color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
-        }
-        .btn-modal-cancel:hover { background: var(--stone); }
-        .btn-modal-submit {
-            flex: 2; padding: 11px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border: none; border-radius: 10px;
-            font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700;
-            color: #fff; cursor: pointer; transition: all 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 3px 14px rgba(184,134,78,0.3);
-        }
-        .btn-modal-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(184,134,78,0.4); }
-        .btn-modal-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
-        .btn-spinner {
-            width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.4);
-            border-top-color: #fff; border-radius: 50%;
-            animation: spin 0.7s linear infinite; display: none;
-        }
-        .btn-modal-submit.loading .btn-lbl { display: none; }
-        .btn-modal-submit.loading .btn-spinner { display: block; }
-
-        /* Toast */
-        .toast {
-            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(12px);
-            background: rgba(26,22,18,0.92); color: #fff;
-            padding: 13px 24px; border-radius: 12px;
-            font-size: 13.5px; font-weight: 500;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.25);
-            backdrop-filter: blur(10px);
-            z-index: 500; opacity: 0; pointer-events: none;
-            transition: opacity 0.3s, transform 0.3s;
-            display: flex; align-items: center; gap: 9px;
-        }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .toast.success { background: rgba(6,95,70,0.92); }
-        .toast.error   { background: rgba(153,27,27,0.92); }
+        .btn-review:hover { background:rgba(212,146,74,0.18); border-color:var(--gold); transform:translateY(-1px); box-shadow:0 5px 16px rgba(212,146,74,0.2); }
+        .review-hint { font-size:12px; color:var(--ghost); align-self:center; }
 
         /* ── EMPTY STATE ── */
         .empty-state {
-            text-align: center; padding: 80px 20px;
-            background: rgba(250,244,234,0.78);
-            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212,186,150,0.48);
-            border-radius: 22px;
-            box-shadow: 0 2px 24px rgba(150,105,58,0.08), inset 0 1px 0 rgba(255,248,235,0.65);
+            text-align:center; padding:80px 24px;
+            background:var(--deep); border:1px solid var(--rim); border-radius:22px;
         }
-        .empty-icon-wrap {
-            width: 72px; height: 72px;
-            background: rgba(232,223,208,0.72); border-radius: 20px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 18px; color: var(--text-muted);
-            border: 1px solid rgba(212,186,150,0.4);
+        .empty-img {
+            width:100%; max-width:280px; height:150px; border-radius:14px;
+            background:url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=60') center/cover;
+            margin:0 auto 24px; opacity:0.28; border:1px solid var(--rim);
         }
-        .empty-state h2 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; margin-bottom: 10px; }
-        .empty-state p { color: var(--text-muted); font-size: 14px; line-height: 1.65; margin-bottom: 24px; }
-        .btn-primary {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 11px 26px; font-size: 14px; border-radius: 11px;
-            text-decoration: none; font-weight: 600;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff; border: none; cursor: pointer; font-family: 'Outfit', sans-serif;
-            box-shadow: 0 4px 18px rgba(184,134,78,0.3); transition: all 0.25s;
+        .empty-state h2 { font-family:'DM Serif Display',serif; font-size:24px; font-weight:400; color:var(--off); margin-bottom:10px; }
+        .empty-state p  { color:var(--ghost); font-size:13.5px; line-height:1.7; margin-bottom:26px; }
+        .btn-solid {
+            display:inline-flex; align-items:center; gap:8px;
+            padding:12px 26px; font-size:13px; border-radius:12px;
+            text-decoration:none; font-weight:700;
+            background:var(--gold); color:var(--void);
+            transition:background .2s, transform .2s, box-shadow .2s;
+            box-shadow:0 4px 20px var(--glow);
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(184,134,78,0.42); }
+        .btn-solid:hover { background:var(--gold2); transform:translateY(-1px); box-shadow:0 8px 30px var(--glow); }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
+        /* ── REVIEW MODAL ── */
+        .modal-overlay {
+            display:none; position:fixed; inset:0;
+            background:rgba(0,0,0,0.7); z-index:400;
+            align-items:center; justify-content:center;
+            backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
         }
-        @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.92); }
-            to   { opacity: 1; transform: scale(1); }
+        .modal-overlay.show { display:flex; }
+        .modal-box {
+            background:var(--deep);
+            border:1px solid rgba(212,146,74,0.3);
+            border-radius:24px; padding:38px 40px;
+            max-width:520px; width:94%; max-height:90vh; overflow-y:auto;
+            box-shadow:0 32px 90px rgba(0,0,0,0.6), 0 0 0 1px rgba(212,146,74,0.15);
+            animation:scaleIn .3s cubic-bezier(.34,1.56,.64,1) both;
+            position:relative;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .modal-box::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:2px;
+            background:linear-gradient(90deg, var(--gold), var(--gold2), transparent);
+            border-radius:24px 24px 0 0;
+        }
+        .modal-title { font-family:'DM Serif Display',serif; font-size:24px; color:var(--white); margin-bottom:4px; }
+        .modal-sub   { font-size:13px; color:var(--ghost); margin-bottom:26px; }
+        .modal-close {
+            position:absolute; top:20px; right:20px;
+            width:34px; height:34px; border-radius:50%;
+            background:rgba(255,255,255,0.06); border:1px solid var(--rim);
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; font-size:16px; color:var(--ghost);
+            transition:all .2s;
+        }
+        .modal-close:hover { background:rgba(255,255,255,0.1); color:var(--off); }
 
-        @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(3,1fr); } .page-header { grid-template-columns: 1fr; } .header-right { display: none; } }
-        @media (max-width: 640px) { .stats-grid { grid-template-columns: repeat(2,1fr); } .navbar { padding: 0 20px; } .container { padding: 20px 16px 40px; } .header-left { padding: 24px; } .order-head { flex-direction: column; gap: 10px; } .order-head-right { align-items: flex-start; } .payment-actions { flex-direction: column; } .total-bar-val { font-size: 20px; } .modal-box { padding: 26px 22px; } }
+        /* Star picker */
+        .star-picker { display:flex; gap:6px; margin-bottom:6px; }
+        .star-picker-btn {
+            font-size:32px; cursor:pointer; background:none; border:none; padding:2px; line-height:1;
+            filter:grayscale(1) opacity(0.3); transition:transform .15s, filter .15s;
+        }
+        .star-picker-btn.lit { filter:none; }
+        .star-picker-btn:hover { transform:scale(1.2); }
+        .star-label {
+            font-size:13px; color:var(--ghost); font-weight:500; margin-bottom:22px;
+            min-height:18px; transition:color .2s;
+        }
+        .star-label.set { color:var(--gold2); font-weight:600; }
+
+        /* Category ratings */
+        .cat-ratings { margin-bottom:22px; }
+        .cat-label-row { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--ghost); margin-bottom:12px; }
+        .cat-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; gap:12px; }
+        .cat-name { font-size:13px; color:var(--fog); font-weight:500; flex:1; }
+        .cat-stars { display:flex; gap:4px; }
+        .cat-star {
+            font-size:19px; cursor:pointer; filter:grayscale(1) opacity(0.3);
+            background:none; border:none; padding:1px; transition:filter .12s, transform .12s;
+        }
+        .cat-star.lit { filter:none; }
+        .cat-star:hover { transform:scale(1.15); }
+
+        /* Review textarea */
+        .review-label { font-size:11px; font-weight:700; color:var(--ghost); margin-bottom:8px; display:block; text-transform:uppercase; letter-spacing:.8px; }
+        .review-textarea {
+            width:100%; padding:14px 16px; border-radius:12px;
+            border:1.5px solid rgba(255,255,255,0.08);
+            background:rgba(255,255,255,0.04); color:var(--off);
+            font-family:'DM Sans',sans-serif; font-size:13.5px; line-height:1.6;
+            resize:vertical; min-height:100px;
+            transition:border-color .2s, box-shadow .2s; margin-bottom:18px; outline:none;
+        }
+        .review-textarea:focus { border-color:var(--gold); background:rgba(212,146,74,0.05); box-shadow:0 0 0 3px rgba(212,146,74,0.1); }
+        .review-textarea::placeholder { color:rgba(242,237,230,0.18); }
+
+        /* Recommend toggle */
+        .recommend-row {
+            display:flex; align-items:center; gap:14px;
+            padding:14px 18px; border-radius:12px;
+            background:rgba(255,255,255,0.04); border:1px solid var(--rim);
+            margin-bottom:22px; cursor:pointer; transition:background .2s, border-color .2s;
+        }
+        .recommend-row:hover { background:var(--soft); border-color:rgba(212,146,74,0.25); }
+        .recommend-toggle {
+            width:40px; height:22px; border-radius:11px;
+            background:rgba(255,255,255,0.12); position:relative; flex-shrink:0;
+            transition:background .25s; cursor:pointer;
+        }
+        .recommend-toggle::after {
+            content:''; position:absolute; top:3px; left:3px;
+            width:16px; height:16px; border-radius:50%;
+            background:var(--ghost); transition:transform .25s, background .25s;
+            box-shadow:0 1px 4px rgba(0,0,0,0.4);
+        }
+        .recommend-toggle.on { background:var(--gold); }
+        .recommend-toggle.on::after { transform:translateX(18px); background:#fff; }
+        .recommend-text { font-size:13px; font-weight:600; color:var(--off); flex:1; }
+        .recommend-sub  { font-size:11px; color:var(--ghost); margin-top:2px; }
+
+        /* Modal actions */
+        .modal-actions { display:flex; gap:10px; }
+        .btn-modal-cancel {
+            flex:1; padding:12px; background:rgba(255,255,255,0.05);
+            border:1px solid var(--rim); border-radius:10px;
+            font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600;
+            color:var(--ghost); cursor:pointer; transition:all .2s;
+        }
+        .btn-modal-cancel:hover { background:rgba(255,255,255,0.08); color:var(--off); }
+        .btn-modal-submit {
+            flex:2; padding:12px;
+            background:linear-gradient(135deg, var(--gold), var(--gold2));
+            border:none; border-radius:10px;
+            font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700;
+            color:var(--void); cursor:pointer; transition:all .2s;
+            display:flex; align-items:center; justify-content:center; gap:8px;
+            box-shadow:0 3px 14px var(--glow);
+        }
+        .btn-modal-submit:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 7px 24px var(--glow); }
+        .btn-modal-submit:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+        .btn-spinner {
+            width:15px; height:15px; border:2px solid rgba(12,11,9,0.3);
+            border-top-color:var(--void); border-radius:50%;
+            animation:spin .7s linear infinite; display:none;
+        }
+        .btn-modal-submit.loading .btn-lbl { display:none; }
+        .btn-modal-submit.loading .btn-spinner { display:block; }
+
+        /* Toast */
+        .toast {
+            position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px);
+            background:rgba(28,26,22,0.96); color:var(--off);
+            padding:13px 26px; border-radius:14px;
+            font-size:13.5px; font-weight:500;
+            box-shadow:0 10px 32px rgba(0,0,0,0.4);
+            backdrop-filter:blur(12px); z-index:500;
+            opacity:0; pointer-events:none;
+            transition:opacity .3s, transform .3s;
+            display:flex; align-items:center; gap:9px;
+            border:1px solid var(--rim);
+        }
+        .toast.show  { opacity:1; transform:translateX(-50%) translateY(0); }
+        .toast.success { border-color:var(--green-border); }
+        .toast.error   { border-color:var(--red-border); }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp  { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes scaleIn { from{opacity:0;transform:scale(.92)} to{opacity:1;transform:scale(1)} }
+        @keyframes spin    { to{transform:rotate(360deg)} }
+        .fu { animation:fadeUp .6s cubic-bezier(.22,1,.36,1) both; }
+        .d1{animation-delay:.06s} .d2{animation-delay:.14s} .d3{animation-delay:.22s}
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:1000px){
+            .main{padding:36px 28px 60px;}
+            .stats-grid{grid-template-columns:repeat(3,1fr);}
+        }
+        @media(max-width:900px){
+            .nav{padding:0 22px;} .nav-center{display:none;}
+            .hero-body{padding:0 28px 36px;} .hero-h1{font-size:34px;}
+        }
+        @media(max-width:640px){
+            .main{padding:24px 16px 50px;}
+            .stats-grid{grid-template-columns:repeat(2,1fr);}
+            .order-head{flex-direction:column;gap:10px;}
+            .order-head-right{align-items:flex-start;}
+            .payment-actions{flex-direction:column;}
+            .modal-box{padding:28px 22px;}
+        }
     </style>
 </head>
 <body>
-<div class="bg-grid"></div>
-<div class="bg-warm"></div>
 
-<nav class="navbar">
-    <a href="{{ url_for('user.dashboard') }}" class="navbar-brand">
-        <div class="navbar-brand-icon">
+<!-- NAV -->
+<nav class="nav">
+    <a href="{{ url_for('user.dashboard') }}" class="nav-logo">
+        <div class="nav-logo-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
-        House-Forge
+        <span class="nav-logo-name">House<b>-Forge</b></span>
     </a>
-    <div class="navbar-menu">
-        <a href="{{ url_for('user.dashboard') }}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+
+    <div class="nav-center">
+        <a href="{{ url_for('user.dashboard') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Dashboard
         </a>
-        <a href="{{ url_for('user.projects') }}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <a href="{{ url_for('user.projects') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
             Projects
         </a>
-        <a href="/user/bids">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <a href="/user/bids" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             Bids
-            <span class="badge-notification badge-amber" id="bidsBadge"></span>
+            <span class="npip amber" id="bidsBadge"></span>
         </a>
-        <a href="{{ url_for('user.my_orders') }}" class="nav-active">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <a href="{{ url_for('user.my_orders') }}" class="nlink active">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             Orders
         </a>
-        <a href="{{ url_for('payment.payment_history') }}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <a href="{{ url_for('payment.payment_history') }}" class="nlink">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
             Payments
         </a>
-        <a href="/user/messages">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <a href="/user/messages" class="nlink" style="position:relative;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             Messages
-            <span class="badge-notification" id="messagesBadge"></span>
+            <span class="npip" id="messagesBadge"></span>
         </a>
-        <div class="nav-divider"></div>
-        <a href="{{ url_for('user.profile') }}" style="padding:8px 9px;">
-            {% if user_profile_picture %}
-                <img src="/static/uploads/profiles/{{ user_profile_picture }}" class="profile-pic" alt="Profile">
-            {% else %}
-                <div class="profile-placeholder">{{ current_user.name[0].upper() if current_user.name else 'U' }}</div>
-            {% endif %}
+    </div>
+
+    <div class="nav-right">
+        <a href="{{ url_for('user.profile') }}" class="nav-profile">
+            <div class="nav-av">
+                {% if user_profile_picture %}
+                    <img src="/static/uploads/profiles/{{ user_profile_picture }}" alt="Profile">
+                {% else %}
+                    {{ current_user.name[0].upper() if current_user.name else 'U' }}
+                {% endif %}
+            </div>
+            <span class="nav-uname">{{ current_user.name }}</span>
         </a>
-        <a href="{{ url_for('auth.logout') }}" class="logout-link">
+        <div class="ndiv"></div>
+        <a href="{{ url_for('auth.logout') }}" class="nav-out">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             Sign Out
         </a>
     </div>
 </nav>
 
-<div class="container">
+<div class="shell">
 
-    <!-- PAGE HEADER -->
-    <div class="page-header">
-        <div class="header-left">
-            <div class="header-eyebrow">Material Management</div>
-            <h1>My Orders</h1>
-            <p>Track every material order placed with suppliers across your construction projects.</p>
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-body">
+            <div class="hero-tag"><span class="hero-tag-ln"></span> Material Management</div>
+            <h1 class="hero-h1">My <em>Orders</em></h1>
+            <p class="hero-sub">Track every material order placed with suppliers across your construction projects.</p>
         </div>
-        <div class="header-right">
-            <div class="header-orders-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-            </div>
-        </div>
-    </div>
+    </section>
 
-    <!-- STATS -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <span class="stat-num">{{ stats.total }}</span>
-            <span class="stat-lbl">Total Orders</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-num">{{ stats.pending }}</span>
-            <span class="stat-lbl">Pending</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-num">{{ stats.processing }}</span>
-            <span class="stat-lbl">Processing</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-num">{{ stats.completed }}</span>
-            <span class="stat-lbl">Completed</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-num" style="font-size:20px;">₹{{ "{:,.0f}".format(stats.total_spent) }}</span>
-            <span class="stat-lbl">Total Spent</span>
-        </div>
-    </div>
+    <main class="main">
 
-    {% if orders %}
-    <!-- FILTER BAR -->
-    <div class="filter-bar">
-        <span class="filter-label">Filter</span>
-        <button class="filter-btn active" onclick="filterOrders('all', this)">All Orders</button>
-        <button class="filter-btn" onclick="filterOrders('pending', this)">
-            <span style="width:7px;height:7px;border-radius:50%;background:#D97706;display:inline-block;"></span>Pending
-        </button>
-        <button class="filter-btn" onclick="filterOrders('processing', this)">
-            <span style="width:7px;height:7px;border-radius:50%;background:#3B82F6;display:inline-block;"></span>Processing
-        </button>
-        <button class="filter-btn" onclick="filterOrders('completed', this)">
-            <span style="width:7px;height:7px;border-radius:50%;background:#10B981;display:inline-block;"></span>Completed
-        </button>
-        <button class="filter-btn" onclick="filterOrders('cancelled', this)">
-            <span style="width:7px;height:7px;border-radius:50%;background:#EF4444;display:inline-block;"></span>Cancelled
-        </button>
-    </div>
-    {% endif %}
-
-    {% if orders %}
-        {% for order in orders %}
-        {# ── Determine if this order has been reviewed ── #}
-        {% set already_reviewed = order.review is defined and order.review %}
-        <div class="order-card" data-status="{{ order.status }}" data-index="{{ loop.index0 }}">
-
-            <div class="order-stripe stripe-{{ order.status }}"></div>
-
-            <div class="order-head">
-                <div>
-                    <div class="order-id">Order #{{ order.id[:8].upper() }}</div>
-                    <div class="order-date">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        {{ order.created_at.strftime('%d %b %Y at %I:%M %p') if order.created_at else 'N/A' }}
-                    </div>
+        <!-- STATS GRID -->
+        <section class="fu d1">
+            <div class="sec-lbl">Overview</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-num">{{ stats.total }}</span>
+                    <span class="stat-lbl">Total Orders</span>
                 </div>
-                <div class="order-head-right">
-                    <span class="status-badge s-{{ order.status }}">
-                        <span class="status-dot"></span>
-                        {% if order.status == 'pending' %}Awaiting Supplier
-                        {% elif order.status == 'processing' %}In Progress
-                        {% elif order.status == 'completed' %}Delivered
-                        {% elif order.status == 'cancelled' %}Cancelled
-                        {% else %}{{ order.status | title }}{% endif %}
-                    </span>
-                    {% if order.payment_status == 'paid' %}
-                        <span class="pay-badge pay-paid">✓ Paid</span>
-                    {% elif order.payment_status == 'cod_confirmed' %}
-                        <span class="pay-badge pay-cod-confirmed">COD Confirmed</span>
-                    {% elif order.payment_status == 'card_pending' %}
-                        <span class="pay-badge pay-card-pending">Card Pending</span>
-                    {% endif %}
+                <div class="stat-card">
+                    <span class="stat-num" style="color:var(--amber)">{{ stats.pending }}</span>
+                    <span class="stat-lbl">Pending</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num" style="color:var(--blue)">{{ stats.processing }}</span>
+                    <span class="stat-lbl">Processing</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num" style="color:var(--green)">{{ stats.completed }}</span>
+                    <span class="stat-lbl">Completed</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num" style="font-size:22px;color:var(--gold)">₹{{ "{:,.0f}".format(stats.total_spent) }}</span>
+                    <span class="stat-lbl">Total Spent</span>
                 </div>
             </div>
+        </section>
 
-            <div class="order-body">
+        {% if orders %}
 
-                <div class="supplier-row">
-                    <a href="{{ url_for('user.view_supplier', supplier_id=order.supplier_id) }}"
-                       class="supplier-avatar"
-                       title="View {{ order.supplier_name }}'s profile"
-                       style="text-decoration:none; cursor:pointer; transition: transform 0.2s, box-shadow 0.2s;"
-                       onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 4px 16px rgba(184,134,78,0.35)';"
-                       onmouseout="this.style.transform='';this.style.boxShadow='';">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                    </a>
+        <!-- FILTER BAR -->
+        <div class="filter-bar fu d2">
+            <span class="filter-lbl">Filter</span>
+            <button class="filter-btn active" onclick="filterOrders('all', this)">All Orders</button>
+            <button class="filter-btn" onclick="filterOrders('pending', this)">
+                <span class="filter-dot" style="background:var(--amber)"></span>Pending
+            </button>
+            <button class="filter-btn" onclick="filterOrders('processing', this)">
+                <span class="filter-dot" style="background:var(--blue)"></span>Processing
+            </button>
+            <button class="filter-btn" onclick="filterOrders('completed', this)">
+                <span class="filter-dot" style="background:var(--green)"></span>Completed
+            </button>
+            <button class="filter-btn" onclick="filterOrders('cancelled', this)">
+                <span class="filter-dot" style="background:var(--red)"></span>Cancelled
+            </button>
+        </div>
+
+        <!-- ORDER LIST -->
+        <section class="fu d3" id="orderList">
+            {% for order in orders %}
+            {% set already_reviewed = order.review is defined and order.review %}
+            <div class="order-card" data-status="{{ order.status }}" data-index="{{ loop.index0 }}" style="margin-bottom:18px;">
+
+                <div class="order-stripe stripe-{{ order.status }}"></div>
+
+                <!-- HEAD -->
+                <div class="order-head">
                     <div>
-                        <div class="supplier-name">{{ order.supplier_name or 'Supplier' }}</div>
-                        <div class="supplier-sub">Material Supplier</div>
-                    </div>
-                </div>
-
-                {% if order.project_title %}
-                <div class="project-tag">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    For project: {{ order.project_title }}
-                </div>
-                {% endif %}
-
-                <table class="items-table">
-                    <thead>
-                        <tr>
-                            <th>Material</th><th>Unit Price</th><th>Qty</th><th>Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in order.order_items %}
-                        <tr>
-                            <td>
-                                <div class="item-name">{{ item.material_name }}</div>
-                                <div class="item-detail">{{ item.unit }}</div>
-                            </td>
-                            <td>₹{{ "{:,.0f}".format(item.price_per_unit) }}</td>
-                            <td>{{ item.quantity }}</td>
-                            <td>₹{{ "{:,.0f}".format(item.total) }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-
-                <div class="total-bar">
-                    <span class="total-bar-label">Order Total</span>
-                    <span class="total-bar-val">₹{{ "{:,.0f}".format(order.total) }}</span>
-                </div>
-
-                <!-- Status strip -->
-                {% if order.status == 'pending' %}
-                <div class="status-strip pending">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    Waiting for {{ order.supplier_name or 'supplier' }} to review and accept your order.
-                </div>
-                {% elif order.status == 'processing' %}
-                <div class="status-strip processing">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
-                    Order accepted — supplier is preparing your materials for delivery.
-                </div>
-                {% elif order.status == 'completed' %}
-                <div class="status-strip completed">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    Delivered on {{ order.completed_at.strftime('%d %b %Y') if order.completed_at else 'N/A' }}.
-                </div>
-                {% elif order.status == 'cancelled' %}
-                <div class="status-strip cancelled">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                    This order was cancelled by the supplier.
-                </div>
-                {% endif %}
-
-                <!-- Payment actions -->
-                {% if order.status == 'processing' %}
-                <div class="payment-actions">
-                    {% if order.payment_status == 'paid' %}
-                        <span class="completed-note">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            Payment complete
-                        </span>
-                        <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                            View Receipt
-                        </a>
-                    {% elif order.payment_status == 'cod_confirmed' %}
-                        <span class="cod-note">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                            COD confirmed · Pay ₹{{ "{:,.0f}".format(order.total) }} cash on delivery
-                        </span>
-                        <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                            View Receipt
-                        </a>
-                    {% elif order.payment_status == 'card_pending' %}
-                        <span class="cod-note" style="background:rgba(219,234,254,0.75);border-color:rgba(147,197,253,0.5);color:var(--blue);">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                            Card declared · Supplier will verify ₹{{ "{:,.0f}".format(order.total) }} on delivery
-                        </span>
-                        <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                            View Receipt
-                        </a>
-                    {% else %}
-                        <a href="{{ url_for('payment.pay_order', order_id=order.id) }}" class="btn-pay">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                            Confirm Payment
-                        </a>
-                    {% endif %}
-                </div>
-
-                {% elif order.status == 'completed' and order.payment_status in ('paid', 'cod_confirmed', 'card_pending') %}
-                <div class="payment-actions">
-                    <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                        View Receipt
-                    </a>
-                </div>
-                {% endif %}
-
-                {# ── REVIEW SECTION: only for completed orders ── #}
-                {% if order.status == 'completed' %}
-                <hr class="review-divider">
-
-                {% if already_reviewed %}
-                {# Show submitted review #}
-                <div class="review-display">
-                    <div>
-                        <div class="review-display-label">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            Your Review
-                        </div>
-                        <div class="review-display-stars">
-                            {% for i in range(1, 6) %}
-                                <span>{{ '⭐' if i <= order.review.rating else '☆' }}</span>
-                            {% endfor %}
+                        <div class="order-id">Order #{{ order.id[:8].upper() }}</div>
+                        <div class="order-date">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            {{ order.created_at.strftime('%d %b %Y at %I:%M %p') if order.created_at else 'N/A' }}
                         </div>
                     </div>
-                    <div class="review-display-body">
-                        <div class="review-display-meta">
-                            Reviewed {{ order.review.created_at.strftime('%d %b %Y') if order.review.created_at else '' }}
-                            {% if order.review.recommend %} · Recommends this supplier{% endif %}
-                        </div>
-                        {% if order.review.text %}
-                        <div class="review-display-text">{{ order.review.text }}</div>
+                    <div class="order-head-right">
+                        <span class="status-badge s-{{ order.status }}">
+                            <span class="status-dot"></span>
+                            {% if order.status == 'pending' %}Awaiting Supplier
+                            {% elif order.status == 'processing' %}In Progress
+                            {% elif order.status == 'completed' %}Delivered
+                            {% elif order.status == 'cancelled' %}Cancelled
+                            {% else %}{{ order.status | title }}{% endif %}
+                        </span>
+                        {% if order.payment_status == 'paid' %}
+                            <span class="pay-badge pay-paid">✓ Paid</span>
+                        {% elif order.payment_status == 'cod_confirmed' %}
+                            <span class="pay-badge pay-cod-confirmed">COD Confirmed</span>
+                        {% elif order.payment_status == 'card_pending' %}
+                            <span class="pay-badge pay-card-pending">Card Pending</span>
                         {% endif %}
                     </div>
                 </div>
 
-                {% else %}
-                {# Prompt to write a review #}
-                <div class="payment-actions">
-                    <button class="btn-review js-open-review"
-                            data-order-id="{{ order.id }}"
-                            data-supplier-id="{{ order.supplier_id }}"
-                            data-supplier-name="{{ order.supplier_name or 'Supplier' }}">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        Rate this Supplier
-                    </button>
-                    <span style="font-size:12px;color:var(--text-muted);align-self:center;">Share your experience to help others choose the right supplier.</span>
-                </div>
-                {% endif %}
+                <!-- BODY -->
+                <div class="order-body">
 
-                {% endif %}{# end completed #}
+                    <!-- Supplier row -->
+                    <div class="supplier-row">
+                        <a href="{{ url_for('user.view_supplier', supplier_id=order.supplier_id) }}" class="supplier-avatar" title="View {{ order.supplier_name }}'s profile">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                        </a>
+                        <div>
+                            <div class="supplier-name">{{ order.supplier_name or 'Supplier' }}</div>
+                            <div class="supplier-sub">Material Supplier</div>
+                        </div>
+                    </div>
 
-            </div>{# end order-body #}
-        </div>{# end order-card #}
-        {% endfor %}
+                    {% if order.project_title %}
+                    <div class="project-tag">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        For project: {{ order.project_title }}
+                    </div>
+                    {% endif %}
 
-    {% else %}
-    <div class="empty-state">
-        <div class="empty-icon-wrap">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <!-- Items table -->
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Material</th><th>Unit Price</th><th>Qty</th><th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.order_items %}
+                            <tr>
+                                <td>
+                                    <div class="item-name">{{ item.material_name }}</div>
+                                    <div class="item-detail">{{ item.unit }}</div>
+                                </td>
+                                <td>₹{{ "{:,.0f}".format(item.price_per_unit) }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>₹{{ "{:,.0f}".format(item.total) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- Total bar -->
+                    <div class="total-bar">
+                        <span class="total-bar-label">Order Total</span>
+                        <span class="total-bar-val">₹{{ "{:,.0f}".format(order.total) }}</span>
+                    </div>
+
+                    <!-- Status message -->
+                    {% if order.status == 'pending' %}
+                    <div class="status-strip pending">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Waiting for {{ order.supplier_name or 'supplier' }} to review and accept your order.
+                    </div>
+                    {% elif order.status == 'processing' %}
+                    <div class="status-strip processing">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+                        Order accepted — supplier is preparing your materials for delivery.
+                    </div>
+                    {% elif order.status == 'completed' %}
+                    <div class="status-strip completed">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Delivered on {{ order.completed_at.strftime('%d %b %Y') if order.completed_at else 'N/A' }}.
+                    </div>
+                    {% elif order.status == 'cancelled' %}
+                    <div class="status-strip cancelled">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        This order was cancelled by the supplier.
+                    </div>
+                    {% endif %}
+
+                    <!-- Payment actions -->
+                    {% if order.status == 'processing' %}
+                    <div class="payment-actions">
+                        {% if order.payment_status == 'paid' %}
+                            <span class="info-note note-green">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Payment complete
+                            </span>
+                            <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                View Receipt
+                            </a>
+                        {% elif order.payment_status == 'cod_confirmed' %}
+                            <span class="info-note note-amber">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                                COD confirmed · Pay ₹{{ "{:,.0f}".format(order.total) }} cash on delivery
+                            </span>
+                            <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                View Receipt
+                            </a>
+                        {% elif order.payment_status == 'card_pending' %}
+                            <span class="info-note note-blue">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                                Card declared · Supplier will verify ₹{{ "{:,.0f}".format(order.total) }} on delivery
+                            </span>
+                            <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                View Receipt
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('payment.pay_order', order_id=order.id) }}" class="btn-pay">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                                Confirm Payment
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    {% elif order.status == 'completed' and order.payment_status in ('paid', 'cod_confirmed', 'card_pending') %}
+                    <div class="payment-actions">
+                        <a href="{{ url_for('payment.order_receipt', order_id=order.id) }}" class="btn-receipt">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            View Receipt
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {# ── REVIEW SECTION: completed orders only ── #}
+                    {% if order.status == 'completed' %}
+                    <hr class="review-divider">
+
+                    {% if already_reviewed %}
+                    <div class="review-display">
+                        <div>
+                            <div class="review-display-label">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                Your Review
+                            </div>
+                            <div class="review-display-stars">
+                                {% for i in range(1, 6) %}
+                                    <span>{{ '⭐' if i <= order.review.rating else '☆' }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="review-display-body">
+                            <div class="review-display-meta">
+                                Reviewed {{ order.review.created_at.strftime('%d %b %Y') if order.review.created_at else '' }}
+                                {% if order.review.recommend %} · Recommends this supplier{% endif %}
+                            </div>
+                            {% if order.review.text %}
+                            <div class="review-display-text">{{ order.review.text }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% else %}
+                    <div class="payment-actions">
+                        <button class="btn-review js-open-review"
+                                data-order-id="{{ order.id }}"
+                                data-supplier-id="{{ order.supplier_id }}"
+                                data-supplier-name="{{ order.supplier_name or 'Supplier' }}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            Rate this Supplier
+                        </button>
+                        <span class="review-hint">Share your experience to help other builders.</span>
+                    </div>
+                    {% endif %}
+
+                    {% endif %}{# end completed #}
+
+                </div>{# end order-body #}
+            </div>{# end order-card #}
+            {% endfor %}
+        </section>
+
+        {% else %}
+
+        <div class="empty-state fu d2">
+            <div class="empty-img"></div>
+            <h2>No Orders Yet</h2>
+            <p>Start a project, then order materials directly from verified suppliers.</p>
+            <a href="{{ url_for('user.projects') }}" class="btn-solid">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                View My Projects
+            </a>
         </div>
-        <h2>No Orders Yet</h2>
-        <p>Start a project, then order materials directly from verified suppliers.</p>
-        <a href="{{ url_for('user.projects') }}" class="btn-primary">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            View My Projects
-        </a>
-    </div>
-    {% endif %}
 
-</div>{# end container #}
+        {% endif %}
+
+    </main>
+</div>
 
 
 <!-- ── REVIEW MODAL ── -->
@@ -923,7 +926,7 @@
     <div class="modal-box">
         <button class="modal-close" onclick="closeReviewModal()">✕</button>
         <div class="modal-title">Rate Your Experience</div>
-        <div class="modal-sub" id="reviewModalSub">How was your order from <strong id="reviewSupplierName"></strong>?</div>
+        <div class="modal-sub">How was your order from <strong id="reviewSupplierName" style="color:var(--gold2)"></strong>?</div>
 
         <!-- Overall star rating -->
         <div class="star-picker" id="starPicker">
@@ -940,7 +943,7 @@
             <div class="cat-label-row">Rate specific aspects (optional)</div>
             <div class="cat-row">
                 <span class="cat-name">Material Quality</span>
-                <div class="cat-stars" id="catQuality">
+                <div class="cat-stars">
                     <button class="cat-star" data-cat="quality" data-val="1" onclick="setCatRating('quality',1)">★</button>
                     <button class="cat-star" data-cat="quality" data-val="2" onclick="setCatRating('quality',2)">★</button>
                     <button class="cat-star" data-cat="quality" data-val="3" onclick="setCatRating('quality',3)">★</button>
@@ -950,7 +953,7 @@
             </div>
             <div class="cat-row">
                 <span class="cat-name">Delivery Speed</span>
-                <div class="cat-stars" id="catDelivery">
+                <div class="cat-stars">
                     <button class="cat-star" data-cat="delivery" data-val="1" onclick="setCatRating('delivery',1)">★</button>
                     <button class="cat-star" data-cat="delivery" data-val="2" onclick="setCatRating('delivery',2)">★</button>
                     <button class="cat-star" data-cat="delivery" data-val="3" onclick="setCatRating('delivery',3)">★</button>
@@ -960,7 +963,7 @@
             </div>
             <div class="cat-row">
                 <span class="cat-name">Communication</span>
-                <div class="cat-stars" id="catComm">
+                <div class="cat-stars">
                     <button class="cat-star" data-cat="communication" data-val="1" onclick="setCatRating('communication',1)">★</button>
                     <button class="cat-star" data-cat="communication" data-val="2" onclick="setCatRating('communication',2)">★</button>
                     <button class="cat-star" data-cat="communication" data-val="3" onclick="setCatRating('communication',3)">★</button>
@@ -970,7 +973,7 @@
             </div>
             <div class="cat-row">
                 <span class="cat-name">Pricing Fairness</span>
-                <div class="cat-stars" id="catPrice">
+                <div class="cat-stars">
                     <button class="cat-star" data-cat="pricing" data-val="1" onclick="setCatRating('pricing',1)">★</button>
                     <button class="cat-star" data-cat="pricing" data-val="2" onclick="setCatRating('pricing',2)">★</button>
                     <button class="cat-star" data-cat="pricing" data-val="3" onclick="setCatRating('pricing',3)">★</button>
@@ -980,13 +983,11 @@
             </div>
         </div>
 
-        <!-- Text review -->
         <label class="review-label" for="reviewText">Your Review</label>
         <textarea class="review-textarea" id="reviewText"
                   placeholder="Describe your experience — material quality, delivery condition, supplier responsiveness…"
                   maxlength="1000"></textarea>
 
-        <!-- Recommend toggle -->
         <div class="recommend-row" onclick="toggleRecommend()">
             <div>
                 <div class="recommend-text">Would you recommend this supplier?</div>
@@ -1008,10 +1009,41 @@
     </div>
 </div>
 
-<!-- Toast notification -->
+<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
+    /* ── Badge refresh ── */
+    function updateBadge(ep, id) {
+        fetch(ep).then(r => r.ok && r.headers.get('content-type')?.includes('application/json') ? r.json() : null)
+        .then(d => { if (!d) return; const b = document.getElementById(id); if (!b) return; b.style.display = d.count > 0 ? 'block' : 'none'; }).catch(() => {});
+    }
+    function refreshBadges() {
+        updateBadge('/user/messages/unread-count', 'messagesBadge');
+        updateBadge('/user/bids/pending-count', 'bidsBadge');
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        refreshBadges();
+        /* Staggered card entrance */
+        document.querySelectorAll('.order-card').forEach((card, i) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(18px)';
+            card.style.transition = 'none';
+            setTimeout(() => {
+                card.style.transition = 'opacity .45s ease, transform .45s cubic-bezier(.22,1,.36,1), border-color .3s, box-shadow .35s';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 350 + i * 90);
+        });
+        /* Review button delegation */
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.js-open-review');
+            if (!btn) return;
+            openReviewModal(btn.dataset.orderId, btn.dataset.supplierId, btn.dataset.supplierName);
+        });
+    });
+    setInterval(refreshBadges, 30000);
+
     /* ── Filter ── */
     function filterOrders(status, btn) {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -1020,125 +1052,73 @@
             const show = status === 'all' || card.dataset.status === status;
             if (show) {
                 card.style.display = '';
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(14px)';
+                card.style.opacity = '0'; card.style.transform = 'translateY(14px)';
                 setTimeout(() => {
-                    card.style.transition = 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s, border-color 0.3s, background 0.3s';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, i * 55);
+                    card.style.transition = 'opacity .3s ease, transform .3s cubic-bezier(.22,1,.36,1), border-color .3s, box-shadow .35s';
+                    card.style.opacity = '1'; card.style.transform = 'translateY(0)';
+                }, i * 60);
             } else {
                 card.style.display = 'none';
             }
         });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.order-card').forEach(card => {
-            const idx = parseInt(card.dataset.index || '0', 10);
-            card.style.animationDelay = (idx * 0.08) + 's';
-        });
-
-        /* Delegated click for "Rate this Supplier" buttons */
-        document.addEventListener('click', function (e) {
-            const btn = e.target.closest('.js-open-review');
-            if (!btn) return;
-            openReviewModal(
-                btn.dataset.orderId,
-                btn.dataset.supplierId,
-                btn.dataset.supplierName
-            );
-        });
-    });
-
-    /* ── Review Modal State ── */
-    let _orderId    = null;
-    let _supplierId = null;
-    let _overall    = 0;
-    let _cats       = { quality: 0, delivery: 0, communication: 0, pricing: 0 };
-    let _recommend  = false;
-
-    const starLabels = ['', 'Poor — not satisfied', 'Fair — below expectations', 'Good — met expectations', 'Great — exceeded expectations', 'Excellent — highly recommended!'];
+    /* ── Review modal state ── */
+    let _orderId = null, _supplierId = null, _overall = 0;
+    let _cats = { quality:0, delivery:0, communication:0, pricing:0 };
+    let _recommend = false;
+    const starLabels = ['','Poor — not satisfied','Fair — below expectations','Good — met expectations','Great — exceeded expectations','Excellent — highly recommended!'];
 
     function openReviewModal(orderId, supplierId, supplierName) {
-        _orderId    = orderId;
-        _supplierId = supplierId;
-        _overall    = 0;
-        _cats       = { quality: 0, delivery: 0, communication: 0, pricing: 0 };
-        _recommend  = false;
-
+        _orderId = orderId; _supplierId = supplierId; _overall = 0;
+        _cats = { quality:0, delivery:0, communication:0, pricing:0 }; _recommend = false;
         document.getElementById('reviewSupplierName').textContent = supplierName;
         document.getElementById('reviewText').value = '';
         document.getElementById('starLabel').textContent = 'Tap a star to rate';
         document.getElementById('starLabel').classList.remove('set');
         document.getElementById('recommendToggle').classList.remove('on');
         document.getElementById('reviewSubmitBtn').disabled = true;
-
-        // Reset all stars
         document.querySelectorAll('.star-picker-btn').forEach(b => b.classList.remove('lit'));
         document.querySelectorAll('.cat-star').forEach(b => b.classList.remove('lit'));
-
         document.getElementById('reviewModal').classList.add('show');
     }
-
-    function closeReviewModal() {
-        document.getElementById('reviewModal').classList.remove('show');
-    }
-
-    document.getElementById('reviewModal').addEventListener('click', function(e) {
-        if (e.target === this) closeReviewModal();
-    });
+    function closeReviewModal() { document.getElementById('reviewModal').classList.remove('show'); }
+    document.getElementById('reviewModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeReviewModal(); });
 
     function setOverallRating(val) {
         _overall = val;
-        document.querySelectorAll('.star-picker-btn').forEach(b => {
-            b.classList.toggle('lit', parseInt(b.dataset.val) <= val);
-        });
+        document.querySelectorAll('.star-picker-btn').forEach(b => b.classList.toggle('lit', parseInt(b.dataset.val) <= val));
         const lbl = document.getElementById('starLabel');
-        lbl.textContent = starLabels[val];
-        lbl.classList.add('set');
+        lbl.textContent = starLabels[val]; lbl.classList.add('set');
         document.getElementById('reviewSubmitBtn').disabled = false;
     }
-
     function setCatRating(cat, val) {
         _cats[cat] = val;
-        document.querySelectorAll(`.cat-star[data-cat="${cat}"]`).forEach(b => {
-            b.classList.toggle('lit', parseInt(b.dataset.val) <= val);
-        });
+        document.querySelectorAll(`.cat-star[data-cat="${cat}"]`).forEach(b => b.classList.toggle('lit', parseInt(b.dataset.val) <= val));
     }
-
     function toggleRecommend() {
         _recommend = !_recommend;
         document.getElementById('recommendToggle').classList.toggle('on', _recommend);
     }
 
-    /* ── Submit Review ── */
     function submitReview() {
         if (_overall === 0) return;
-
         const btn = document.getElementById('reviewSubmitBtn');
-        btn.disabled = true;
-        btn.classList.add('loading');
-
+        btn.disabled = true; btn.classList.add('loading');
         const fd = new FormData();
-        fd.append('order_id',    _orderId);
-        fd.append('supplier_id', _supplierId);
-        fd.append('rating',      _overall);
-        fd.append('quality',     _cats.quality);
-        fd.append('delivery',    _cats.delivery);
-        fd.append('communication', _cats.communication);
-        fd.append('pricing',     _cats.pricing);
-        fd.append('text',        document.getElementById('reviewText').value.trim());
-        fd.append('recommend',   _recommend ? '1' : '0');
-
-        fetch('/user/orders/review', { method: 'POST', body: fd })
+        fd.append('order_id', _orderId); fd.append('supplier_id', _supplierId);
+        fd.append('rating', _overall); fd.append('quality', _cats.quality);
+        fd.append('delivery', _cats.delivery); fd.append('communication', _cats.communication);
+        fd.append('pricing', _cats.pricing);
+        fd.append('text', document.getElementById('reviewText').value.trim());
+        fd.append('recommend', _recommend ? '1' : '0');
+        fetch('/user/orders/review', { method:'POST', body:fd })
             .then(r => r.json())
             .then(data => {
                 btn.classList.remove('loading');
                 closeReviewModal();
                 if (data.success) {
                     showToast('Review submitted — thank you!', 'success');
-                    // Reload after a short delay so the submitted review renders
                     setTimeout(() => window.location.reload(), 1400);
                 } else {
                     btn.disabled = false;
@@ -1146,20 +1126,17 @@
                 }
             })
             .catch(() => {
-                btn.disabled = false;
-                btn.classList.remove('loading');
+                btn.disabled = false; btn.classList.remove('loading');
                 closeReviewModal();
                 showToast('A network error occurred. Please try again.', 'error');
             });
     }
 
-    /* ── Toast ── */
     function showToast(msg, type = '') {
         const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.className = 'toast show ' + type;
+        t.textContent = msg; t.className = 'toast show ' + type;
         clearTimeout(t._t);
-        t._t = setTimeout(() => { t.classList.remove('show'); }, 3200);
+        t._t = setTimeout(() => t.classList.remove('show'), 3200);
     }
 </script>
 </body>
